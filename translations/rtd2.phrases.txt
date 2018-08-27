@@ -1,0 +1,352 @@
+﻿"Phrases"
+{
+
+	"RTD2_Ad"
+	{
+		"#format"			"{1:c},{2:c}"
+		"en"				"Type {1}rtd{2} to roll for random effects."
+		"pl"				"Napisz {1}rtd{2} aby użyć RTD."
+		"sv"				"Skriv {1}rtd{2} för en slumpmässig effekt."
+		"de"				"Tippe {1}rtd{2} ein um einen zufälligen Effekt zu würfeln."
+	}
+
+	"RTD2_Not_In_Round"
+	{
+		"en"				"Wait for the round to start."
+		"pl"				"Poczekaj na rozpoczęcie rundy."
+		"sv"				"Vänta tills rundan har börjat."
+		"de"				"Warte bis die Runde startet."
+	}
+
+	"RTD2_Rolled_Perk_Roller"
+	{
+		"#format"		"{1:s},{2:s},{3:c}"
+		"en"			"Rolled {1}{2}{3}."
+		"pl"			"Wylosowałeś {1}{2}{3}."
+		"sv"			"Du fick {1}{2}{3}."
+		"de"			"Gewürfelt {1}{2}{3}."
+	}
+
+	"RTD2_Rolled_Perk_Roller_Time"
+	{
+		"#format"		"{1:s},{2:s},{3:c},{4:c},{5:d},{6:c}"
+		"en"			"Rolled {1}{2}{3} for {4}{5}{6} second(s)."
+		"pl"			"Wylosowałeś {1}{2}{3} na {4}{5}{6} sekund(y)."
+		"sv"			"Du fick {1}{2}{3} i {4}{5}{6} sekund(er)."
+		"de"			"Du hast {1}{2}{3} für {4}{5}{6} Sekunde(n) gewürfelt"
+	}
+
+	"RTD2_Rolled_Perk_Others"
+	{
+		"#format"		"{1:s},{2:s},{3:c},{4:s},{5:s},{6:c}"
+		"en"			"{1}{2}{3} rolled {4}{5}{6}."
+		"pl"			"{1}{2}{3} wylosował {4}{5}{6}."
+		"sv"			"{1}{2}{3} fick {4}{5}{6}."
+		"de"			"{1}{2}{3} hat {4}{5}{6} gewürfelt."
+	}
+
+	"RTD2_Rolled_Perk_Others_Time"
+	{
+		"#format"		"{1:s},{2:s},{3:c},{4:s},{5:s},{6:c},{7:c},{8:d},{9:c}"
+		"en"			"{1}{2}{3} rolled {4}{5}{6} for {7}{8}{9} second(s)."
+		"pl"			"{1}{2}{3} wylosował {4}{5}{6} na {7}{8}{9} sekund(y)."
+		"sv"			"{1}{2}{3} fick {4}{5}{6} i {7}{8}{9} sekund(er)."
+		"de"			"{1}{2}{3} hat {4}{5}{6} für {7}{8}{9} Sekunde(n) gewürfelt."
+	}
+
+	///////////////////////////
+	// G R O U P   R O L L S //
+	///////////////////////////
+
+	"RTD2_Rolled_Perk_Multi"
+	{
+		"#format"		"{1:d},{2:s},{3:s},{4:c}"
+		"en"			"{1} players rolled {2}{3}{4}."
+		"pl"			"{1} graczy wylosowało {2}{3}{4}."
+		"sv"			"{1} spelare fick {2}{3}{4}."
+		"de"			"{1} Spieler haben {2}{3}{4} gewürfelt."
+	}
+
+	"RTD2_Rolled_Perk_Multi_Time"
+	{
+		"#format"		"{1:d},{2:s},{3:s},{4:c},{5:c},{6:d},{7:c}"
+		"en"			"{1} players rolled {2}{3}{4} for {5}{6}{7} second(s)."
+		"pl"			"{1} graczy wylosowało {2}{3}{4} na {5}{6}{7} sekund(y)."
+		"sv"			"{1} spelare fick {2}{3}{4} i {5}{6}{7} sekund(er)."
+		"de"			"{1} Spieler haben {2}{3}{4} für {5}{6}{7} Sekunde(n) gewürfelt."
+	}
+
+	/////////////////////////
+	// C A N T   R O L L S //
+	/////////////////////////
+
+	//[RTD] You must be alive to use RTD.
+	"RTD2_Cant_Roll_Alive"
+	{
+		"en"			"You must be alive to use RTD."
+		"pl"			"Musisz być żywy aby używać RTD."
+		"sv"			"Du måste vara vid liv för att använda RTD."
+		"de"			"Du musst am Leben sein, um zu würfeln."
+	}
+
+	//[RTD] You are already using RTD.
+	"RTD2_Cant_Roll_Using"
+	{
+		"en"			"You are already using RTD."
+		"pl"			"Już używasz RTD."
+		"sv"			"Du använder redan RTD."
+		"de"			"Du benutzt momentan RTD."
+	}
+
+	//[RTD] You must wait {Color3}{TimeLeft}{ColorNormal} second(s).
+	"RTD2_Cant_Roll_Wait"
+	{
+		"#format"		"{1:c},{2:d},{3:c},"
+		"en"			"You must wait {1}{2}{3} second(s)."
+		"pl"			"Musisz poczekać {1}{2}{3} sekund(y/ę)."
+		"sv"			"Du måste vänta {1}{2}{3} sekund(er)."
+		"de"			"Du musst {1}{2}{3} Sekunde(n) warten."
+	}
+
+	//[RTD] Too many players are using RTD.
+	"RTD2_Cant_Roll_Mode1"
+	{
+		"en"			"Too many players are already using RTD."
+		"pl"			"Za dużo graczy używa już RTD."
+		"sv"			"För många spelare använder RTD just nu."
+		"de"			"Zu viele Spieler benutzen schon RTD"
+	}
+
+	//[RTD] Too many players on your team are using RTD.
+	"RTD2_Cant_Roll_Mode2"
+	{
+		"en"			"Too many players on your team are already using RTD."
+		"pl"			"Za dużo graczy w twojej drużynie używa już RTD."
+		"sv"			"För många spelare i ditt lag använder RTD just nu."
+		"de"			"Zu viele Spieler in deinem Team benutzen schon RTD."
+	}
+
+	//[RTD] Rolling is disabled at the moment.
+	"RTD2_Cant_Roll_Disabled"
+	{
+		"en"			"Rolling is disabled at the moment."
+		"pl"			"Nie można używać RTD w tym momencie."
+		"sv"			"RTD är inte tillgängligt just nu."
+		"de"			"RTD ist momentan deaktiviert."
+	}
+
+	//[RTD] You do not have access to RTD.
+	"RTD2_Cant_Roll_No_Access"
+	{
+		"en"			"You do not have access to RTD."
+		"pl"			"Nie masz dostępu do RTD."
+		"sv"			"RTD är inte tillgängligt just nu."
+		"de"			"Du hast kein zugriff RTD zu benutzen."
+	}
+
+	//[RTD] Your team cannot use RTD.
+	"RTD2_Cant_Roll_Team"
+	{
+		"en"			"Your team cannot use RTD."
+		"pl"			"Twoja dróżyna nie może używać RTD."
+		"sv"			"Ditt lag kan inte använda RTD."
+		"de"			"Dein Team kann RTD nicht benutzen."
+	}
+
+	/////////////////////////////////
+	// R E M O V E   R E A S O N S //
+	/////////////////////////////////
+
+	//[RTD] Your perk has worn off.
+	"RTD2_Remove_Perk_End_Self"
+	{
+		"en"			"Your perk has worn off."
+		"pl"			"Twój perk się skończył."
+		"sv"			"Din effekt har tagit slut."
+		"de"			"Dein Bonus ist abgelaufen."
+	}
+
+	//[RTD] {RollerTeamColor}{RollerName}{change color to normal}'s perk has worn off.
+	"RTD2_Remove_Perk_End_Others"
+	{
+		"#format"		"{1:s},{2:N},{3:c}"
+		"en"			"{1}{2}{3}'s perk has worn off."
+		"pl"			"Perk {1}{2}{3} się skończył."
+		"sv"			"{1}{2}{3}'s effekt har tagit slut."
+		"de"			"{1}{2}{3}'s Bonus ist abgelaufen."
+	}
+
+	//[RTD] You have died during your roll.
+	"RTD2_Remove_Perk_Died_Self"
+	{
+		"en"			"You have died during your roll."
+		"pl"			"Zginąłeś podczas używania RTD."
+		"sv"			"Du har dött under din RTD."
+		"de"			"Du bist während des Würfelns gestorben."
+	}
+
+	//[RTD] {RollerTeamColor}{RollerName}{change color to normal} has died during their roll.
+	"RTD2_Remove_Perk_Died_Others"
+	{
+		"#format"		"{1:s},{2:N},{3:c}"
+		"en"			"{1}{2}{3} has died during their roll."
+		"pl"			"{1}{2}{3} zginął podczas używania RTD."
+		"sv"			"{1}{2}{3} har dött under sin RTD."
+		"de"			"{1}{2}{3} ist während des Würfelns gestorben."
+	}
+
+	//[RTD] You have changed class during your roll.
+	"RTD2_Remove_Perk_Class_Self"
+	{
+		"en"			"You have changed class during your roll."
+		"pl"			"Zmieniłeś klasę podczas używania RTD."
+		"sv"			"Du har bytt karaktär under din RTD."
+		"de"			"Du hast während des Würfelns die Klasse gewechselt."
+	}
+
+	//[RTD] {RollerTeamColor}{RollerName}{change color to normal} has changed class during their roll.
+	"RTD2_Remove_Perk_Class_Others"
+	{
+		"#format"		"{1:s},{2:N},{3:c}"
+		"en"			"{1}{2}{3} has changed class during their roll."
+		"pl"			"{1}{2}{3} zmienił klasę podczas używania RTD."
+		"sv"			"{1}{2}{3} har bytt karaktär under sin RTD."
+		"de"			"{1}{2}{3} hat während des Würfelns die Klasse gewechselt."
+	}
+
+	//[RTD] The plugin has been unloaded during your roll.
+	"RTD2_Remove_Perk_Unload_Self"
+	{
+		"en"			"The plugin has been unloaded during your roll."
+		"pl"			"Plugin został wyłączony podczas twojego użytku."
+		"sv"			"Pluginet har stängts av under din effekt."
+		"de"			"Das Plugin wurde während deines Würfelns beendet."
+	}
+
+	//[RTD] The plugin has been unloaded during {RollerTeamColor}{RollerName}{change color to normal}'s roll.
+	"RTD2_Remove_Perk_Unload_Others"
+	{
+		"#format"		"{1:s},{2:N},{3:c}"
+		"en"			"The plugin has been unloaded during {1}{2}{3}'s roll."
+		"pl"			"Plugin został wyłączony podczas użytku przez {1}{2}{3}."
+		"sv"			"Pluginet har stängts av under {1}{2}{3}'s effekt."
+		"de"			"Das Plugin wurde während {1}{2}{3}'s Würfelns beendet."
+	}
+
+	//[RTD] {RollerTeamColor}{RollerName}{change color to normal} has disconnected during their roll.
+	"RTD2_Remove_Perk_Disconnected"
+	{
+		"#format"		"{1:s},{2:N},{3:c}"
+		"en"			"{1}{2}{3} has disconnected during their roll."
+		"pl"			"{1}{2}{3} opuścił serwer podczas używania RTD."
+		"sv"			"{1}{2}{3} har lämnat under sin RTD."
+		"de"			"{1}{2}{3} hat während des rollens den Server verlassen."
+	}
+
+	//[RTD] Perk removed, reason: {Reason}.
+	"RTD2_Remove_Perk_Custom_Self"
+	{
+		"#format"		"{1:s}"
+		"en"			"Perk removed, reason: {1}."
+		"pl"			"Perk zakończony, powód: {1}."
+		"sv"			"Effekt togs bort, anledning: {1}."
+		"de"			"Der Bonus wurde aus folgenden Grund entfernt: {1}."
+	}
+
+	//[RTD] {RollerTeamColor}{RollerName}{change color to normal}'s perk removed, reason: {Reason}.
+	"RTD2_Remove_Perk_Custom_Others"
+	{
+		"#format"		"{1:s},{2:N},{3:c},{4:s}"
+		"en"			"{1}{2}{3}'s perk removed, reason: {4}."
+		"pl"			"Perk {1}{2}{3} zastał zakończony, powód: {4}."
+		"sv"			"{1}{2}{3}'s effekt togs bort, anledning: {4}."
+		"de"			"{1}{2}{3}'s Bonus wurde aus folgenden Grund entfernt: {4}."
+	}
+
+	//[RTD] Perk {PerkColor}{PerkName}{ChangeColor} has worn off for {PlayerCount} players.
+	"RTD2_Remove_Perk_Group_Same"
+	{
+		"#format"		"{1:s},{2:s},{3:c},{4:d}"
+		"en"			"Perk {1}{2}{3} has worn off for {4} players."
+		"pl"			"Perk {1}{2}{3} skończył się dla {4} graczy."
+		"sv"			"Effekten {1}{2}{3} har tagit slut för {4} spelare."
+		"de"			"Der Bonus {1}{2}{3} ist für {4} Spieler abgelaufen."
+	}
+
+	//////////////////////////////
+	// P E R K  S P E C I F I C //
+	//////////////////////////////
+
+	//[RTD] You were respawned to avoid getting stuck.
+	"RTD2_Stuck_Respawn"
+	{
+		"en"			"You were respawned to avoid getting stuck."
+		"pl"			"Byłeś uziemiony."
+		"sv"			"Du blev flyttad för att inte fastna."
+		"de"			"Du wurdest aus Platzgründen respawnt."
+	}
+
+	"RTD2_Perk_Attack"
+	{
+		"#format"		"{1:c},{2:c}"
+		"en"			"Shout {1}\"MEDIC!\"{2} to attack."
+		"pl"			"Krzyknij {1}\"MEDYK!\"{2} aby zaatakować."
+		"sv"			"Ropa {1}\"MEDIC!\"{2} för att attackera."
+		"de"			"Rufe nach einen {1}Medic{2} um zu attackieren."
+	}
+
+	"RTD2_Perk_Dispenser_Initialization"
+	{
+		"#format"		"{1:c},{2:c}"
+		"en"			"Shout {1}\"MEDIC!\"{2} to spawn a Dispenser."
+		"pl"			"Krzyknij {1}\"MEDIC!\"{2} aby postawić Zasobnik."
+		"sv"			"Ropa {1}\"MEDIC!\"{2} för att lägga ner en dispenser."
+		"de"			"Rufe nach einen {1}Medic{2} um einen Dispenser zu spawnen."
+	}
+
+	"RTD2_Perk_Dispenser_Spawned"
+	{
+		"#format"		"{1:c},{2:d},{3:d},{4:c}"
+		"en"			"Spawned {1}{2}/{3}{4} Dispensers."
+		"pl"			"Postawiono {1}{2}/{3}{4} Zasobników."
+		"sv"			"Använt {1}{2}/{3}{4} Dispensers."
+		"de"			"Dispenser {1}{2}/{3}{4} wurde gespawnt."
+	}
+
+	"RTD2_Perk_Sentry_Initialization"
+	{
+		"#format"		"{1:c},{2:c}"
+		"en"			"Shout {1}\"MEDIC!\"{2} to spawn a Sentry."
+		"pl"			"Krzyknij {1}\"MEDIC!\"{2} aby postawić Działko."
+		"sv"			"Ropa {1}\"MEDIC!\"{2} för att lägga ner en Sentry."
+		"de"			"Rufe nach einen {1}Medic{2} um eine Sentry zu spawnen."
+	}
+
+	"RTD2_Perk_Sentry_Spawned"
+	{
+		"#format"		"{1:c},{2:d},{3:d},{4:c}"
+		"en"			"Spawned {1}{2}/{3}{4} Sentries."
+		"pl"			"Postawiono {1}{2}/{3}{4} Działek."
+		"sv"			"Använt {1}{2}/{3}{4} Sentries."
+		"de"			"Sentry {1}{2}/{3}{4} wurde gespawnt."
+	}
+
+	"RTD2_Perk_Timebomb_Damage"
+	{
+		"#format"		"{1:c},{2:d},{3:c}"
+		"en"			"Dealt {1}{2}{3} damage."
+		"pl"			"Zadano {1}{2}{3} obrażeń."
+		"sv"			"Gjorde {1}{2}{3} skada."
+		"de"			"Es wurden {1}{2}{3} Schaden zugeteilt."
+	}
+
+	"RTD2_Perk_Timebomb_Ignite"
+	{
+		"#format"		"{1:c},{2:d},{3:c}"
+		"en"			"Ignited {1}{2}{3} players."
+		"pl"			"Podpalono {1}{2}{3} graczy."
+		"sv"			"Fattade eld på {1}{2}{3} spelare."
+		"de"			"Es wurden {1}{2}{3} Spieler in Flammen gesetzt."
+	}
+
+}
