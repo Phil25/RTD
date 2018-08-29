@@ -4,7 +4,6 @@
 PerkContainer g_hPerks = null;
 
 public void OnPluginStart(){
-	g_hPerks = new PerkContainer();
 	ParseEffects();
 }
 

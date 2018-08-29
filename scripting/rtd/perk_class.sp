@@ -3,35 +3,7 @@
 #endif
 #define _perkclass_included
 
-int ClassStringToFlags(const char[] sClasses){
-	if(FindCharInString(sClasses, '0') > -1)
-		return 511;
-
-	int iLength = strlen(sClasses);
-	if(iLength < 2){
-		int iClass = StringToInt(sClasses);
-		if(iClass < 1) return 0;
-		else return (2 << (iClass -1));
-	}else{
-		int iCharSize = (iLength+1)/2;
-		char[][] sPieces = new char[iCharSize][4];
-		ExplodeString(sClasses, ",", sPieces, iCharSize, 4);
-
-		int iValue = 0, iPowed = 0, iFlags = 0;
-		for(int i = 0; i < iCharSize; i++){
-			iValue = StringToInt(sPieces[i]);
-			if(iValue > 9)
-				continue;
-
-			iPowed = 2 << (iValue -1);
-			if(iFlags & iPowed)
-				continue;
-
-			iFlags |= iPowed;
-		}
-		return iFlags;
-	}
-}
+#include "rtd/perk_parsing.sp"
 
 #define GET_VALUE(%1) \
 	public any Get%1(){ \
@@ -192,7 +164,6 @@ methodmap PerkContainer < StringMap{
 
 		p.SetId(iId);
 		this.SetValue(sToken, p);
-		PrintToServer("Adding perk %s %d", sToken, iId);
 
 		return iId;
 	}
