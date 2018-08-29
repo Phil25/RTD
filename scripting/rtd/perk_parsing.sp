@@ -1,17 +1,61 @@
+/**
+* Helper functions for parsing perk from KV.
+* Copyright (C) 2018 Filip Tomaszewski
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #if defined _perkparsing_included
 	#endinput
 #endif
 #define _perkparsing_included
 
-int ClassStringToFlags(const char[] sClasses){
+/* return flag value based on TF2 classes, 0 or 511 = all class */
+int StringToClass(const char[] sClasses){
 	int i = -1, iFlags = 0;
-	while(sClasses[++i] != '\0'){
-		iFlags |= CharToInt(sClasses[i]);
-	}
-	return iFlags;
+	while(sClasses[++i] != '\0')
+		iFlags |= 1 << CharToInt(sClasses[i]);
+	return iFlags == 0 ? 511 : iFlags;
 }
 
+/* return 0 if not a numeric char */
 int CharToInt(char c){
 	int i = c-'0';
 	return i *view_as<int>(0 <= i <= 9);
+}
+
+ArrayList StringToWeaponClass(const char[] sWeapClasses){
+	ArrayList list = new ArrayList(32);
+	if(FindCharInString(sWeapClass, '0') < 0)
+		return list;
+
+	int iSize = CountCharInString(sWeapClasses, ',')+1;
+	char[][] sPieces = new char[iSize][32];
+
+	ExplodeString(sWeaponBuffer, ",", sPieces, iSize, 64);
+	for(int i = 0; i < iSize; i++)
+		list.PushString(sPieces[i]);
+	return list;
+}
+
+ArrayList StringToTags(const char[] sTags){
+	ArrayList list = new ArrayList(32);
+	iTagSize = CountCharInString(sTags, '|')+1;
+	char[][] sPieces = new char[iTagSize][24];
+
+	ExplodeString(sTags, "|", sPieces, iTagSize, 24);
+	for(int i = 0; i < iTagSize; i++)
+		list.PushString(sPieces[i]);
+	return list;
 }

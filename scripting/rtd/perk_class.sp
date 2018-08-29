@@ -1,3 +1,21 @@
+/**
+* Perk class and Perk Container class.
+* Copyright (C) 2018 Filip Tomaszewski
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #if defined _perkclass_included
 	#endinput
 #endif
@@ -26,7 +44,6 @@
 #define DISPOSE_MEMBER(%1) \
 	Handle m_h%1; \
 	if(this.GetValue("m_" ... #%1, m_h%1)){ \
-		PrintToServer("Disposing member " ... #%1); \
 		delete m_h%1;}
 
 
@@ -75,22 +92,25 @@ methodmap Perk < StringMap{
 	SET_VALUE(Time)
 
 	GET_VALUE(Class)
-	public void SetClass(const char[] sClass){
-		int iFlags = ClassStringToFlags(sClass);
-		this.SetValue("m_Class", iFlags);
+	public void SetClass(const char[] s){
+		int h = StringToClass(s);
+		this.SetValue("m_Class", h);
 	}
 
-	//GET_VALUE(Classes)
-	//SET_VALUE(Classes)
-
-	GET_VALUE(WeaponClasses) // ArrayList storing strings
-	SET_VALUE(WeaponClasses) // of weapon classes
+	GET_VALUE(WeaponClass) // ArrayList storing strings of weapon classes
+	public void SetWeaponClass(const char[] s){
+		ArrayList h = StringToWeaponClass(s);
+		this.SetValue("m_WeaponClass", h);
+	}
 
 	GET_STRING(Pref) // preference string
 	SET_STRING(Pref)
 
-	GET_VALUE(Tags) // ArrayList storing strings
-	SET_VALUE(Tags) // of perk tags
+	GET_STRING(Tags) // ArrayList storing strings of perk tags
+	public void SetTags(const char[] s){
+		ArrayList h = StringToTags(s);
+		this.SetValue("m_Tags", h);
+	}
 
 	GET_VALUE(IsDisabled)
 	SET_VALUE(IsDisabled)
@@ -159,7 +179,7 @@ methodmap PerkContainer < StringMap{
 		int iId = view_as<int>(this.GetValue("i", iId)) +iId;
 		this.SetValue("i", iId);
 
-		char sToken[32]; // TODO: check for token presence
+		char sToken[32]; // TODO: check if token already exists
 		p.GetToken(sToken, 32);
 
 		p.SetId(iId);
@@ -174,7 +194,7 @@ methodmap PerkContainer < StringMap{
 		return p;
 	}
 
-	public Perk ParseKey(KeyValues hKv){
+	public bool ParseAndAdd(KeyValues hKv, int iStats[2]){
 		char sBuffer[127];
 		Perk perk = new Perk();
 
@@ -183,86 +203,33 @@ methodmap PerkContainer < StringMap{
 		READ_STRING("sound",Sound)
 		READ_STRING("token",Token)
 		perk.SetTime(hKv.GetNum("time"));
-		READ_STRING("class",Class)
+		/*READ_STRING("class",Class)
+		READ_STRING("weapons",WeaponClass)
+		READ_STRING("settings",Pref)
+		READ_STRING("tags",Tags)
+		iStats[perk.GetGood()]++;*/
 
-		return perk;
-
-			//----[ CLASS ]----//
-		/*strcopy(sClassBuffer[1], PERK_MAX_HIGH, "");
-		KvGetString(hKv, "class", sClassBuffer[0], PERK_MAX_LOW);
-		EscapeString(sClassBuffer[0], ' ', '\0', sClassBuffer[1], PERK_MAX_LOW);
-
-		iClassFlags = ClassStringToFlags(sClassBuffer[1]);
-		if(iClassFlags < 1){
-			PrintToServer("%s WARNING: Invalid class restriction(s) set at perk ID:%d (rtd2_perks.default.cfg). Assuming it's all-class.", CONS_PREFIX, iPerkId);
-			LogError("%s WARNING: Invalid class restriction(s) set at perk ID:%d (rtd2_perks.default.cfg). Assuming it's all-class.", CONS_PREFIX, iPerkId);
-			iWarnings++;
-			iClassFlags = 511;
-		}ePerks[iPerkId][iClasses] = iClassFlags;
-
-			//----[ WEAPONS ]----//
-		strcopy(sWeaponBuffer[1], PERK_MAX_HIGH, "");
-		KvGetString(hKv, "weapons", sWeaponBuffer[0], PERK_MAX_HIGH);
-		EscapeString(sWeaponBuffer[0], ' ', '\0', sWeaponBuffer[1], PERK_MAX_HIGH);
-
-		if(ePerks[iPerkId][hWeaponClasses] == INVALID_HANDLE)
-			ePerks[iPerkId][hWeaponClasses] = CreateArray(32);
-		else ClearArray(ePerks[iPerkId][hWeaponClasses]);
-
-		if(FindCharInString(sWeaponBuffer[1], '0') < 0){
-			int iSize = CountCharInString(sWeaponBuffer[1], ',')+1;
-			char[][] sPieces = new char[iSize][32];
-
-			ExplodeString(sWeaponBuffer[1], ",", sPieces, iSize, 64);
-			for(int i = 0; i < iSize; i++)
-				PushArrayString(ePerks[iPerkId][hWeaponClasses], sPieces[i]);
-		}
-
-			//----[ SETTINGS ]----//
-		KvGetString(hKv, "settings", sSettingBuffer, PERK_MAX_HIGH);
-		EscapeString(sSettingBuffer, ' ', '\0', ePerks[iPerkId][sPref], PERK_MAX_HIGH);
-
-			//----[ TAGS ]----//
-		strcopy(sTagBuffer[1], PERK_MAX_VERYH, ""); iTagSize = 0;
-		KvGetString(hKv, "tags", sTagBuffer[0], PERK_MAX_VERYH);
-		EscapeString(sTagBuffer[0], ' ', '\0', sTagBuffer[1], PERK_MAX_VERYH);
-
-		if(ePerks[iPerkId][hTags] == INVALID_HANDLE)
-			ePerks[iPerkId][hTags] = CreateArray(32);
-		else ClearArray(ePerks[iPerkId][hTags]);
-
-		if(strlen(sTagBuffer[1]) > 0){
-			iTagSize = CountCharInString(sTagBuffer[1], '|')+1;
-			char[][] sPieces = new char[iTagSize][24];
-
-			ExplodeString(sTagBuffer[1], "|", sPieces, iTagSize, 24);
-			for(int i = 0; i < iTagSize; i++)
-				PushArrayString(ePerks[iPerkId][hTags], sPieces[i]);
-		}
-
-			//----[ STATS ]----//
-		if(ePerks[iPerkId][bGood])
-			iGood++;
-		else iBad++;
-
-		g_iPerkCount++;
-		g_iCorePerkCount++;*/
+		this.Add(perk);
+		return true;
 	}
 
-	public void ParseKv(KeyValues hKv){
-		do this.Add(this.ParseKey(hKv));
+	public int ParseKv(KeyValues hKv, int iStats[2]){
+		int iPerksParsed = 0;
+		do iPerksParsed += view_as<int>(this.ParseAndAdd(hKv, iStats));
 		while(hKv.GotoNextKey());
+		return iPerksParsed;
 	}
 
-	public bool ParseFile(const char[] sPath){
+	/* iStats filled with amount of bad perks (index 0), and good perks (index 1) */
+	public int ParseFile(const char[] sPath, int iStats[2]){
 		KeyValues hKv = new KeyValues("Effects");
 
-		bool bOpened = hKv.ImportFromFile(sPath) && hKv.GotoFirstSubKey();
-		if(bOpened)
-			this.ParseKv(hKv);
+		int iPerksParsed = -1;
+		if(hKv.ImportFromFile(sPath) && hKv.GotoFirstSubKey())
+			iPerksParsed = this.ParseKv(hKv, iStats);
 
 		delete hKv;
-		return bOpened;
+		return iPerksParsed;
 	}
 }
 
