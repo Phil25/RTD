@@ -29,21 +29,15 @@ int StringToClass(const char[] sClasses){
 	return iFlags == 0 ? 511 : iFlags;
 }
 
-/* return 0 if not a numeric char */
-int CharToInt(char c){
-	int i = c-'0';
-	return i *view_as<int>(0 <= i <= 9);
-}
-
-ArrayList StringToWeaponClass(const char[] sWeapClasses){
+ArrayList StringToWeaponClass(const char[] sWeapClass){
 	ArrayList list = new ArrayList(32);
-	if(FindCharInString(sWeapClass, '0') < 0)
+	if(FindCharInString(sWeapClass, '0') != -1)
 		return list;
 
-	int iSize = CountCharInString(sWeapClasses, ',')+1;
+	int iSize = CountCharInString(sWeapClass, ',')+1;
 	char[][] sPieces = new char[iSize][32];
 
-	ExplodeString(sWeaponBuffer, ",", sPieces, iSize, 64);
+	ExplodeString(sWeapClass, ",", sPieces, iSize, 64);
 	for(int i = 0; i < iSize; i++)
 		list.PushString(sPieces[i]);
 	return list;
@@ -51,11 +45,25 @@ ArrayList StringToWeaponClass(const char[] sWeapClasses){
 
 ArrayList StringToTags(const char[] sTags){
 	ArrayList list = new ArrayList(32);
-	iTagSize = CountCharInString(sTags, '|')+1;
-	char[][] sPieces = new char[iTagSize][24];
 
-	ExplodeString(sTags, "|", sPieces, iTagSize, 24);
-	for(int i = 0; i < iTagSize; i++)
+	int iSize = CountCharInString(sTags, '|')+1;
+	char[][] sPieces = new char[iSize][24];
+
+	ExplodeString(sTags, "|", sPieces, iSize, 24);
+	for(int i = 0; i < iSize; i++)
 		list.PushString(sPieces[i]);
 	return list;
+}
+
+/* return 0 if not a numeric char */
+int CharToInt(char c){
+	int i = c-'0';
+	return i *view_as<int>(0 <= i <= 9);
+}
+
+int CountCharInString(const char[] s, char c){
+	int i = -1, count = 0;
+	while(s[++i] != '\0')
+		count += view_as<int>(s[i] == c);
+	return count;
 }

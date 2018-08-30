@@ -140,6 +140,52 @@ methodmap Perk < StringMap{
 
 	GET_VALUE(Parent)
 	SET_VALUE(Parent)
+
+	public void FormatStringProperty(const char[] sProp, char[] sBuffer, char[] sInto){
+		this.GetString(sProp, sBuffer, MAX_NAME_LENGTH);
+		FormatEx(sInto, 1024, "%s\n* %s: %s", sInto, sProp, sBuffer);
+	}
+
+	public void FormatIntProperty(const char[] sProp, char[] sInto){
+		int iVal;
+		this.GetValue(sProp, iVal);
+		FormatEx(sInto, 1024, "%s\n* %s: %d", sInto, sProp, iVal);
+	}
+
+	public void FormatArrayProperty(const char[] sProp, char[] sBuffer, char[] sInto){
+		ArrayList list;
+		this.GetValue(sProp, list);
+		FormatEx(sInto, 1024, "%s\n* %s: [", sInto, sProp);
+
+		int iSize = list.Length;
+		if(iSize > 0){
+			list.GetString(1, sBuffer, MAX_NAME_LENGTH);
+			FormatEx(sInto, 1024, "%s%s", sInto, sBuffer);
+			for(int i = 1; i < iSize; ++i){
+				list.GetString(i, sBuffer, MAX_NAME_LENGTH);
+				FormatEx(sInto, 1024, "%s, %s", sInto, sBuffer);
+			}
+		}
+
+		FormatEx(sInto, 1024, "%s]", sInto);
+	}
+
+	public void Print(){
+		char sBuffer[MAX_NAME_LENGTH];
+		char sPrint[1024] = "\n======================";
+
+		this.FormatStringProperty("m_Name", sBuffer, sPrint);
+		this.FormatIntProperty("m_Good", sPrint);
+		this.FormatStringProperty("m_Sound", sBuffer, sPrint);
+		this.FormatStringProperty("m_Token", sBuffer, sPrint);
+		this.FormatIntProperty("m_Time", sPrint);
+		this.FormatIntProperty("m_Class", sPrint);
+		this.FormatArrayProperty("m_WeaponClass", sBuffer, sPrint);
+		this.FormatStringProperty("m_Pref", sBuffer, sPrint);
+		this.FormatArrayProperty("m_Tags", sBuffer, sPrint);
+
+		PrintToServer(sPrint);
+	}
 }
 
 #undef GET_VALUE
@@ -203,13 +249,14 @@ methodmap PerkContainer < StringMap{
 		READ_STRING("sound",Sound)
 		READ_STRING("token",Token)
 		perk.SetTime(hKv.GetNum("time"));
-		/*READ_STRING("class",Class)
+		READ_STRING("class",Class)
 		READ_STRING("weapons",WeaponClass)
 		READ_STRING("settings",Pref)
 		READ_STRING("tags",Tags)
-		iStats[perk.GetGood()]++;*/
+		iStats[perk.GetGood()]++;
 
 		this.Add(perk);
+		perk.Print();
 		return true;
 	}
 
