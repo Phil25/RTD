@@ -23,15 +23,18 @@ PerkContainer g_hPerks = null;
 
 public void OnPluginStart(){
 	ParseEffects();
+	PrintToServer("Size: %d", g_hPerks.Size);
+	g_hPerks.DisposePerks();
+	PrintToServer("Size: %d", g_hPerks.Size);
 }
 
 bool ParseEffects(){
 	if(g_hPerks == null)
 		g_hPerks = new PerkContainer();
-	g_hPerks.Clear();
+	g_hPerks.DisposePerks();
 
 	char sPath[255];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.default.cfg");
 	int iStatus[2];
-	return FileExists(sPath) && g_hPerks.ParseFile(sPath, iStatus);
+	return FileExists(sPath) && g_hPerks.ParseFile(sPath, iStatus) != -1;
 }

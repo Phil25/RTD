@@ -54,21 +54,11 @@ methodmap Perk < StringMap{
 		return view_as<Perk>(new StringMap());
 	}
 
-	/*public void DisposeMember(const char[] sMemName){
-		Handle aMem;
-		if(this.GetValue(sMemName, aMem)){
-			PrintToServer("Disposing %s...", sMemName);
-			delete aMem;
-		}
-	}*/
-
-	public void Clear(){
-		DISPOSE_MEMBER(WeaponClasses)
+	public void Dispose(){
+		DISPOSE_MEMBER(WeaponClass)
 		DISPOSE_MEMBER(Tags)
 		DISPOSE_MEMBER(Call)
-	}
 
-	public void Dispose(){
 		this.Clear();
 		delete this;
 	}
@@ -198,38 +188,43 @@ methodmap Perk < StringMap{
 	hKv.GetString(%1, sBuffer, sizeof(sBuffer)); \
 	perk.Set%2(sBuffer);
 
+int g_iLastId = 0;
+
 methodmap PerkContainer < StringMap{
 	public PerkContainer(){
 		return view_as<PerkContainer>(new StringMap());
 	}
 
-	/*public void Clear(){
+	public void DisposePerks(){
 		Perk p = null;
-		int i = this.Length;
+		StringMapSnapshot snap = this.Snapshot();
+		char sKey[32];
+
+		int i = snap.Length;
 		while(--i >= 0){
-			p = this.Get(i);
+			snap.GetKey(i, sKey, 32);
+			this.GetValue(sKey, p);
 			p.Dispose();
 		}
-		++i; // should end at -1
-		this.Resize(i);
-		if(i != 0)
-			ThrowError("Error clearning PerkContainer: stopped at perk %d!", i)
+
+		delete snap;
+		this.Clear();
+		g_iLastId = 0;
 	}
 
 	public void Dispose(){
-		this.Clear();
+		this.DisposePerks();
 		delete this;
-	}*/
+	}
 
 	public int Add(Perk p){
-		int iId = view_as<int>(this.GetValue("i", iId)) +iId;
-		this.SetValue("i", iId);
+		int iId = g_iLastId++;
 
 		char sToken[32]; // TODO: check if token already exists
 		p.GetToken(sToken, 32);
 
-		p.SetId(iId);
 		this.SetValue(sToken, p);
+		p.SetId(iId);
 
 		return iId;
 	}
@@ -256,7 +251,7 @@ methodmap PerkContainer < StringMap{
 		iStats[perk.GetGood()]++;
 
 		this.Add(perk);
-		perk.Print();
+		//perk.Print();
 		return true;
 	}
 
