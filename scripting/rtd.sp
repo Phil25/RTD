@@ -84,7 +84,7 @@ enum Perks{
 	Handle:plParent
 };
 int ePerks[PERK_MAX_COUNT][Perks];
-PerkContainer g_PerkContainer = null;
+PerkContainer g_hPerkContainer = null;
 
 enum ClientInfo{
 	bool:bRolling,
@@ -887,131 +887,27 @@ void ParseTriggers(){
 }
 
 bool ParseEffects(){
-	if(g_PerkContainer == null)
-		g_PerkContainer = new PerkContainer();
-	g_PerkContainer.Clear();
-
 	char sPath[255];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.default.cfg");
-
 	if(!FileExists(sPath)){
 		LogError("%s Failed to find rtd2_perks.default.cfg in configs/ folder!", CONS_PREFIX);
 		SetFailState("Failed to find rtd2_perks.default.cfg in configs/ folder!");
 		return false;
 	}
 
-	g_iPerkCount = 0;
-	KeyValues hKv = new KeyValues("Effects");
-	int iPrevId = -1, iGood = 0, iBad = 0, iWarnings = 0;
+	if(g_hPerkContainer == null)
+		g_hPerkContainer = new PerkContainer();
+	g_hPerkContainer.DisposePerks();
 
-	if(!hKv.ImportFromFile(sPath) || !hKv.KvGotoFirstSubKey()){
-		delete hKv;
+	int iStatus[2];
+	int iParsed = g_hPerkContainer.ParseFile(sPath, iStatus);
+	if(iParsed == -1){
+		LogError("%s Parsing rtd2_perks.default.cfg failed!", CONS_PREFIX);
+		SetFailState("Parsing rtd2_perks.default.cfg failed!");
 		return false;
 	}
 
-	char sPerkId[4], sTokenBuffer[PERK_MAX_LOW], sClassBuffer[2][PERK_MAX_LOW], sWeaponBuffer[2][PERK_MAX_HIGH], sSettingBuffer[PERK_MAX_HIGH], sTagBuffer[2][PERK_MAX_VERYH];
-	int iPerkId = 0, iRepeat = -1, iClassFlags = 0, iTagSize = 0;
-	do{
-		g_PerkContainer.PushFromKv(hKv);
-		hKv.GetSectionName(sPerkId, sizeof(sPerkId));
-		iPerkId = StringToInt(sPerkId);
-		if(iPrevId +1 != iPerkId){
-			LogError("%s Disorder in rtd2_perks.default.cfg detected; aborting! (iPerkId: %d)", CONS_PREFIX, iPerkId);
-			SetFailState("Disorder in rtd2_perks.default.cfg detected; aborting! (iPerkId: %d)", iPerkId);
-			return false;
-		}
-		iPrevId++;
-
-			//----[ NAME ]----//
-		KvGetString(hKv, "name", ePerks[iPerkId][sName], PERK_MAX_LOW);
-
-			//----[ GOOD ]----//
-		ePerks[iPerkId][bGood] = KvGetNum(hKv, "good") > 0 ? true : false;
-
-			//----[ SOUND ]----//
-		KvGetString(hKv, "sound", ePerks[iPerkId][sSound], PERK_MAX_HIGH);
-
-			//----[ TOKEN ]----//
-		strcopy(sTokenBuffer, PERK_MAX_LOW, "");
-		KvGetString(hKv, "token", sTokenBuffer, PERK_MAX_LOW);
-
-		EscapeString(sTokenBuffer, ' ', '\0', ePerks[iPerkId][sToken], PERK_MAX_LOW);
-
-		iRepeat = FindPerkByToken(ePerks[iPerkId][sToken]);
-		if(iRepeat != -1){
-			LogError("%s Perk \"%s\" (ID:%d) and \"%s\" (ID:%d) have the same token which is forbidden.", CONS_PREFIX, ePerks[iPerkId][sName], iPerkId, ePerks[iRepeat][sName], iRepeat);
-			SetFailState("Perk \"%s\" (ID:%d) and \"%s\" (ID:%d) have the same token which is forbidden.", ePerks[iPerkId][sName], iPerkId, ePerks[iRepeat][sName], iRepeat);
-			return false;
-		}
-
-			//----[ TIME ]----//
-		ePerks[iPerkId][iTime] = KvGetNum(hKv, "time");
-
-			//----[ CLASS ]----//
-		strcopy(sClassBuffer[1], PERK_MAX_HIGH, "");
-		KvGetString(hKv, "class", sClassBuffer[0], PERK_MAX_LOW);
-		EscapeString(sClassBuffer[0], ' ', '\0', sClassBuffer[1], PERK_MAX_LOW);
-
-		iClassFlags = ClassStringToFlags(sClassBuffer[1]);
-		if(iClassFlags < 1){
-			PrintToServer("%s WARNING: Invalid class restriction(s) set at perk ID:%d (rtd2_perks.default.cfg). Assuming it's all-class.", CONS_PREFIX, iPerkId);
-			LogError("%s WARNING: Invalid class restriction(s) set at perk ID:%d (rtd2_perks.default.cfg). Assuming it's all-class.", CONS_PREFIX, iPerkId);
-			iWarnings++;
-			iClassFlags = 511;
-		}ePerks[iPerkId][iClasses] = iClassFlags;
-
-			//----[ WEAPONS ]----//
-		strcopy(sWeaponBuffer[1], PERK_MAX_HIGH, "");
-		KvGetString(hKv, "weapons", sWeaponBuffer[0], PERK_MAX_HIGH);
-		EscapeString(sWeaponBuffer[0], ' ', '\0', sWeaponBuffer[1], PERK_MAX_HIGH);
-
-		if(ePerks[iPerkId][hWeaponClasses] == INVALID_HANDLE)
-			ePerks[iPerkId][hWeaponClasses] = CreateArray(32);
-		else ClearArray(ePerks[iPerkId][hWeaponClasses]);
-
-		if(FindCharInString(sWeaponBuffer[1], '0') < 0){
-			int iSize = CountCharInString(sWeaponBuffer[1], ',')+1;
-			char[][] sPieces = new char[iSize][32];
-
-			ExplodeString(sWeaponBuffer[1], ",", sPieces, iSize, 64);
-			for(int i = 0; i < iSize; i++)
-				PushArrayString(ePerks[iPerkId][hWeaponClasses], sPieces[i]);
-		}
-
-			//----[ SETTINGS ]----//
-		KvGetString(hKv, "settings", sSettingBuffer, PERK_MAX_HIGH);
-		EscapeString(sSettingBuffer, ' ', '\0', ePerks[iPerkId][sPref], PERK_MAX_HIGH);
-
-			//----[ TAGS ]----//
-		strcopy(sTagBuffer[1], PERK_MAX_VERYH, ""); iTagSize = 0;
-		KvGetString(hKv, "tags", sTagBuffer[0], PERK_MAX_VERYH);
-		EscapeString(sTagBuffer[0], ' ', '\0', sTagBuffer[1], PERK_MAX_VERYH);
-
-		if(ePerks[iPerkId][hTags] == INVALID_HANDLE)
-			ePerks[iPerkId][hTags] = CreateArray(32);
-		else ClearArray(ePerks[iPerkId][hTags]);
-
-		if(strlen(sTagBuffer[1]) > 0){
-			iTagSize = CountCharInString(sTagBuffer[1], '|')+1;
-			char[][] sPieces = new char[iTagSize][24];
-
-			ExplodeString(sTagBuffer[1], "|", sPieces, iTagSize, 24);
-			for(int i = 0; i < iTagSize; i++)
-				PushArrayString(ePerks[iPerkId][hTags], sPieces[i]);
-		}
-
-			//----[ STATS ]----//
-		if(ePerks[iPerkId][bGood])
-			iGood++;
-		else iBad++;
-
-		g_iPerkCount++;
-		g_iCorePerkCount++;
-	}while(KvGotoNextKey(hKv));
-
-	PrintToServer("%s Loaded %d perk%s (%d good, %d bad; with %d warnings).", CONS_PREFIX, g_iPerkCount, g_iPerkCount > 1 ? "s" : "", iGood, iBad, iWarnings);
-	if(hKv != INVALID_HANDLE)
-		CloseHandle(hKv);
+	PrintToServer("%s Loaded %d perk%s (%d good, %d bad).", CONS_PREFIX, iParsed, iParsed > 1 ? "s" : "", iStatus[1], iStatus[0]);
 	return true;
 }
 
@@ -2111,13 +2007,13 @@ stock int CountTagOccurences(const char[] sTag, int iTagSize){
 	return count;
 }
 
-stock int CountCharInString(const char[] sString, char cChar){
+/*stock int CountCharInString(const char[] sString, char cChar){
 	int i = 0, count = 0;
 	while(sString[i] != '\0')
 		if(sString[i++] == cChar)
 			count++;
 	return count;
-}
+}*/
 
 stock int EscapeString(const char[] input, int escape, int escaper, char[] output, int maxlen){
 	/*
