@@ -164,6 +164,7 @@ methodmap Perk < StringMap{
 		char sBuffer[MAX_NAME_LENGTH];
 		char sPrint[1024] = "\n======================";
 
+		this.FormatIntProperty("m_Id", sPrint);
 		this.FormatStringProperty("m_Name", sBuffer, sPrint);
 		this.FormatIntProperty("m_Good", sPrint);
 		this.FormatStringProperty("m_Sound", sBuffer, sPrint);
@@ -188,28 +189,28 @@ methodmap Perk < StringMap{
 	hKv.GetString(%1, sBuffer, sizeof(sBuffer)); \
 	perk.Set%2(sBuffer);
 
-int g_iLastId = 0;
+// helper array which maps perk IDs to tokens
+ArrayList g_hPerkTokenMapper = null;
 
 methodmap PerkContainer < StringMap{
 	public PerkContainer(){
+		g_hPerkTokenMapper = new ArrayList(32);
 		return view_as<PerkContainer>(new StringMap());
 	}
 
 	public void DisposePerks(){
-		Perk p = null;
-		StringMapSnapshot snap = this.Snapshot();
-		char sKey[32];
+		Perk perk = null;
+		char sToken[32];
 
-		int i = snap.Length;
+		int i = g_hPerkTokenMapper.Length;
 		while(--i >= 0){
-			snap.GetKey(i, sKey, 32);
-			this.GetValue(sKey, p);
-			p.Dispose();
+			g_hPerkTokenMapper.GetString(i, sToken, 32);
+			this.GetValue(sToken, perk);
+			perk.Dispose();
 		}
 
-		delete snap;
 		this.Clear();
-		g_iLastId = 0;
+		g_hPerkTokenMapper.Clear();
 	}
 
 	public void Dispose(){
@@ -218,14 +219,13 @@ methodmap PerkContainer < StringMap{
 	}
 
 	public int Add(Perk p){
-		int iId = g_iLastId++;
-
 		char sToken[32]; // TODO: check if token already exists
 		p.GetToken(sToken, 32);
 
 		this.SetValue(sToken, p);
-		p.SetId(iId);
+		int iId = g_hPerkTokenMapper.PushString(sToken);
 
+		p.SetId(iId);
 		return iId;
 	}
 
@@ -233,6 +233,18 @@ methodmap PerkContainer < StringMap{
 		Perk p;
 		this.GetValue(sToken, p);
 		return p;
+	}
+
+	public Perk GetFromIdEx(int iId){
+		char sToken[32];
+		g_hPerkTokenMapper.GetString(iId, sToken, 32);
+		return this.Get(sToken);
+	}
+
+	public Perk GetFromId(int iId){
+		if(!(0 <= iId < g_hPerkTokenMapper.Length))
+			return null;
+		return this.GetFromIdEx(iId);
 	}
 
 	public bool ParseAndAdd(KeyValues hKv, int iStats[2]){
@@ -272,6 +284,24 @@ methodmap PerkContainer < StringMap{
 
 		delete hKv;
 		return iPerksParsed;
+	}
+
+	public void PrintAll(int client){
+		char sName[64];
+		Perk perk = null;
+		int iLen = g_hPerkTokenMapper.Length;
+		for(int i = 0; i < iLen; i++){
+			perk = this.GetFromIdEx(i);
+			perk.GetName(sName, 64);
+			PrintToConsole(client, "%d. %s", perk.GetId(), sName);
+		}
+	}
+
+	public void Print(int client, const char[] sQuery=""){
+		if(strlen(sQuery) < 2){
+			this.PrintAll(client);
+			return;
+		}
 	}
 }
 
