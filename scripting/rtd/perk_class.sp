@@ -298,8 +298,14 @@ methodmap PerkContainer < StringMap{
 	}
 
 	public Perk FindPerk(const char[] sQuery){
-		if(strlen(sQuery) < 2)
-			return null;
+		Perk perk = null;
+		if(this.GetValue(sQuery, perk))
+			return perk;
+
+		int iId = -1;
+		if(StringToIntEx(sQuery, iId) > 0)
+			return this.GetFromId(iId);
+
 		return null;
 	}
 
