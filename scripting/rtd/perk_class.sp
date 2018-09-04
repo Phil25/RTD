@@ -96,7 +96,7 @@ methodmap Perk < StringMap{
 	GET_STRING(Pref) // preference string
 	SET_STRING(Pref)
 
-	GET_STRING(Tags) // ArrayList storing strings of perk tags
+	GET_VALUE(Tags) // ArrayList storing strings of perk tags
 	public void SetTags(const char[] s){
 		ArrayList h = StringToTags(s);
 		this.SetValue("m_Tags", h);
@@ -178,11 +178,18 @@ methodmap Perk < StringMap{
 		PrintToServer(sPrint);
 	}
 
-	public bool HasInTags(const char[] sQuery){
-		// TODO: finish me
-		char sToken[2];
-		this.GetToken(sToken, 2);
-		return sQuery[0] == sToken[0];
+	public bool HasTag(const char[] sQuery){
+		ArrayList tags = this.GetTags();
+		char sBuffer[32];
+
+		int i = tags.Length;
+		while(--i >= 0){
+			tags.GetString(i, sBuffer, 32);
+			if(strcmp(sBuffer, sQuery, false) == 0)
+				return true;
+		}
+
+		return false;
 	}
 
 }
@@ -323,13 +330,13 @@ methodmap PerkContainer < StringMap{
 
 #define ADD_PERK_IF_TAG_MATCHES { \
 	perk = this.GetFromIdEx(i); \
-	if(perk.HasInTags(sQuery)) \
+	if(perk.HasTag(sQuery)) \
 		list.Push(perk); }
 
 	/* Returns ArrayList of Perk handles, must be closed, never null, but may be empty;
 	include parameter adds the perk additionally and omits it in further search */
 	public ArrayList FindPerksFromTags(const char[] sQuery, Perk include=null){
-		ArrayList list = new ArrayList(); // TODO: add include perk
+		ArrayList list = new ArrayList();
 
 		Perk perk = null;
 		int iLen = g_hPerkTokenMapper.Length,
