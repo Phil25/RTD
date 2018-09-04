@@ -43,9 +43,12 @@ public Action Command_PerkSearchupTest(int args){
 
 	char sQuery[255];
 	GetCmdArg(1, sQuery, 255);
-	Perk perk = g_hPerks.FindPerk(sQuery);
-	if(perk != null) perk.Print();
-	else PrintToServer("Invlaid perk");
+	ArrayList list = g_hPerks.FindPerks(sQuery);
+	for(int i = 0; i < list.Length; i++){
+		Perk p = list.Get(i);
+		p.Print();
+	}
+	delete list;
 
 	return Plugin_Handled;
 }

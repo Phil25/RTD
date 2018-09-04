@@ -177,6 +177,14 @@ methodmap Perk < StringMap{
 
 		PrintToServer(sPrint);
 	}
+
+	public bool HasInTags(const char[] sQuery){
+		// TODO: finish me
+		char sToken[2];
+		this.GetToken(sToken, 2);
+		return sQuery[0] == sToken[0];
+	}
+
 }
 
 #undef GET_VALUE
@@ -185,9 +193,6 @@ methodmap Perk < StringMap{
 #undef SET_STRING
 #undef DISPOSE_MEMBER
 
-#define READ_STRING(%1,%2) \
-	hKv.GetString(%1, sBuffer, sizeof(sBuffer)); \
-	perk.Set%2(sBuffer);
 
 // helper array which maps perk IDs to tokens
 ArrayList g_hPerkTokenMapper = null;
@@ -247,6 +252,10 @@ methodmap PerkContainer < StringMap{
 		return this.GetFromIdEx(iId);
 	}
 
+#define READ_STRING(%1,%2) \
+	hKv.GetString(%1, sBuffer, sizeof(sBuffer)); \
+	perk.Set%2(sBuffer);
+
 	public bool ParseAndAdd(KeyValues hKv, int iStats[2]){
 		char sBuffer[127];
 		Perk perk = new Perk();
@@ -266,6 +275,8 @@ methodmap PerkContainer < StringMap{
 		//perk.Print();
 		return true;
 	}
+
+#undef READ_STRING
 
 	public int ParseKv(KeyValues hKv, int iStats[2]){
 		int iPerksParsed = 0;
@@ -297,6 +308,7 @@ methodmap PerkContainer < StringMap{
 		}
 	}
 
+	/* Returns Perk handle, do not close, might be null */
 	public Perk FindPerk(const char[] sQuery){
 		Perk perk = null;
 		if(this.GetValue(sQuery, perk))
@@ -306,14 +318,46 @@ methodmap PerkContainer < StringMap{
 		if(StringToIntEx(sQuery, iId) > 0)
 			return this.GetFromId(iId);
 
-		return null;
+		return perk;
 	}
 
+#define ADD_PERK_IF_TAG_MATCHES { \
+	perk = this.GetFromIdEx(i); \
+	if(perk.HasInTags(sQuery)) \
+		list.Push(perk); }
+
+	/* Returns ArrayList of Perk handles, must be closed, never null, but may be empty;
+	include parameter adds the perk additionally and omits it in further search */
+	public ArrayList FindPerksFromTags(const char[] sQuery, Perk include=null){
+		ArrayList list = new ArrayList(); // TODO: add include perk
+
+		Perk perk = null;
+		int iLen = g_hPerkTokenMapper.Length,
+			i = 0;
+
+		if(include == null){
+			for(;i < iLen; i++)
+				ADD_PERK_IF_TAG_MATCHES
+		}else{
+			int iOtherId = include.GetId();
+			for(;i < iOtherId; i++)
+				ADD_PERK_IF_TAG_MATCHES
+
+			list.Push(include);
+			i++;
+
+			for(;i < iLen; i++)
+				ADD_PERK_IF_TAG_MATCHES
+		}
+
+		return list;
+	}
+
+#undef ADD_PERK_IF_TAG_MATCHES
+
+	/* Returns ArrayList of Perk handles, must be closed, never null, but may be empty */
 	public ArrayList FindPerks(const char[] sQuery){
-		if(strlen(sQuery) < 2)
-			return null;
-		return null;
+		Perk perk = this.FindPerk(sQuery);
+		return this.FindPerksFromTags(sQuery, perk);
 	}
 }
-
-#undef READ_STRING
