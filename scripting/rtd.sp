@@ -605,11 +605,9 @@ public Action Command_RemoveRTD(int client, int args){
 
 public Action Command_PerkSearchup(int client, int args){
 	if(args < 1){
-		for(int i = 0; i < g_iPerkCount; i++)
-			PrintToConsole(client, "%d. %s", i, ePerks[i][sName]);
-
+		g_hPerkContainer.PrintAll(client);
 		if(client > 0)
-			PrintToChat(client, "%s Perk list has been printed to your console.", CHAT_PREFIX);
+			PrintToChat(client, "%s Perk list printed to your console.", CHAT_PREFIX);
 		return Plugin_Handled;
 	}
 

@@ -23,9 +23,7 @@ PerkContainer g_hPerks = null;
 
 public void OnPluginStart(){
 	ParseEffects();
-	PrintToServer("Size: %d", g_hPerks.Size);
-	g_hPerks.DisposePerks();
-	PrintToServer("Size: %d", g_hPerks.Size);
+	RegServerCmd("sm_rtdstest", Command_PerkSearchupTest);
 }
 
 bool ParseEffects(){
@@ -37,4 +35,17 @@ bool ParseEffects(){
 	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.default.cfg");
 	int iStatus[2];
 	return FileExists(sPath) && g_hPerks.ParseFile(sPath, iStatus) != -1;
+}
+
+public Action Command_PerkSearchupTest(int args){
+	if(args < 1)
+		return Plugin_Handled;
+
+	char sQuery[255];
+	GetCmdArg(1, sQuery, 255);
+	Perk perk = g_hPerks.FindPerk(sQuery);
+	if(perk != null) perk.Print();
+	else PrintToServer("Invlaid perk");
+
+	return Plugin_Handled;
 }

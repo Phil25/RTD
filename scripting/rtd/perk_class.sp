@@ -297,11 +297,16 @@ methodmap PerkContainer < StringMap{
 		}
 	}
 
-	public void Print(int client, const char[] sQuery=""){
-		if(strlen(sQuery) < 2){
-			this.PrintAll(client);
-			return;
-		}
+	public Perk FindPerk(const char[] sQuery){
+		if(strlen(sQuery) < 2)
+			return null;
+		return null;
+	}
+
+	public ArrayList FindPerks(const char[] sQuery){
+		if(strlen(sQuery) < 2)
+			return null;
+		return null;
 	}
 }
 
