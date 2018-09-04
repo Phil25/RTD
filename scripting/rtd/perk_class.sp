@@ -23,15 +23,15 @@
 
 #include "rtd/perk_parsing.sp"
 
-#define GET_VALUE(%1) \
-	public any Get%1(){ \
-		any i; \
-		this.GetValue("m_" ... #%1, i); \
+#define GET_VALUE(%1,%2) \
+	public %1 Get%2(){ \
+		%1 i; \
+		this.GetValue("m_" ... #%2, i); \
 		return i;}
 
-#define SET_VALUE(%1) \
-	public void Set%1(any i){ \
-		this.SetValue("m_" ... #%1, i);}
+#define SET_VALUE(%1,%2) \
+	public void Set%2(%1 i){ \
+		this.SetValue("m_" ... #%2, i);}
 
 #define GET_STRING(%1) \
 	public void Get%1(char[] s, int i){ \
@@ -63,14 +63,14 @@ methodmap Perk < StringMap{
 		delete this;
 	}
 
-	GET_VALUE(Id)
-	SET_VALUE(Id)
+	GET_VALUE(int,Id)
+	SET_VALUE(int,Id)
 
 	GET_STRING(Name)
 	SET_STRING(Name)
 
-	GET_VALUE(Good)
-	SET_VALUE(Good)
+	GET_VALUE(bool,Good)
+	SET_VALUE(bool,Good)
 
 	GET_STRING(Sound)
 	SET_STRING(Sound)
@@ -78,16 +78,16 @@ methodmap Perk < StringMap{
 	GET_STRING(Token)
 	SET_STRING(Token)
 
-	GET_VALUE(Time)
-	SET_VALUE(Time)
+	GET_VALUE(int,Time)
+	SET_VALUE(int,Time)
 
-	GET_VALUE(Class)
+	GET_VALUE(int,Class)
 	public void SetClass(const char[] s){
 		int h = StringToClass(s);
 		this.SetValue("m_Class", h);
 	}
 
-	GET_VALUE(WeaponClass) // ArrayList storing strings of weapon classes
+	GET_VALUE(ArrayList,WeaponClass) // ArrayList storing strings of weapon classes
 	public void SetWeaponClass(const char[] s){
 		ArrayList h = StringToWeaponClass(s);
 		this.SetValue("m_WeaponClass", h);
@@ -96,17 +96,17 @@ methodmap Perk < StringMap{
 	GET_STRING(Pref) // preference string
 	SET_STRING(Pref)
 
-	GET_VALUE(Tags) // ArrayList storing strings of perk tags
+	GET_VALUE(ArrayList,Tags) // ArrayList storing strings of perk tags
 	public void SetTags(const char[] s){
 		ArrayList h = StringToTags(s);
 		this.SetValue("m_Tags", h);
 	}
 
-	GET_VALUE(IsDisabled)
-	SET_VALUE(IsDisabled)
+	GET_VALUE(bool,IsDisabled)
+	SET_VALUE(bool,IsDisabled)
 
-	GET_VALUE(IsExternal)
-	SET_VALUE(IsExternal)
+	GET_VALUE(bool,IsExternal)
+	SET_VALUE(bool,IsExternal)
 
 	public void SetCall(PerkCall func){
 		Handle hFwd = CreateForward(ET_Single, Param_Cell, Param_Cell, Param_Cell);
@@ -128,8 +128,8 @@ methodmap Perk < StringMap{
 		Call_Finish();
 	}
 
-	GET_VALUE(Parent)
-	SET_VALUE(Parent)
+	GET_VALUE(Handle,Parent)
+	SET_VALUE(Handle,Parent)
 
 	public void FormatStringProperty(const char[] sProp, char[] sBuffer, char[] sInto){
 		this.GetString(sProp, sBuffer, MAX_NAME_LENGTH);
