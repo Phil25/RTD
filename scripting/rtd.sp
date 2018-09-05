@@ -604,39 +604,27 @@ public Action Command_RemoveRTD(int client, int args){
 }
 
 public Action Command_PerkSearchup(int client, int args){
-	if(args < 1){
-		g_hPerkContainer.PrintAll(client);
-		if(client > 0)
-			PrintToChat(client, "%s Perk list printed to your console.", CHAT_PREFIX);
-		return Plugin_Handled;
-	}
+	char sQuery[64] = "";
+	if(args > 1)
+		GetCmdArg(1, sQuery, 64);
 
-	char sQuery[64], sBuffer[32];
-	GetCmdArg(1, sQuery, 64);
-	for(int i = 2; i <= args; i++){
-		GetCmdArg(i, sBuffer, 32);
-		Format(sQuery, 64, "%s %s", sQuery, sBuffer);
-	}
+	char sFormat[64] = "$Id$. $Name$";
+	if(args > 1)
+		GetCmdArg(2, sFormat, 64);
 
 	PerkList list = g_hPerkContainer.FindPerks(sQuery);
 	int iLen = list.Length;
 
-	for(int i = 0; i < iLen; i++){}
-	// TODO: Printf();
-
-	delete list;
-
-	int iPerksFound = 0;
-	for(int j = 0; j < g_iPerkCount; j++){
-		if(!IsPerkInTags(j, sTagString, args))
-			continue;
-
-		PrintToConsole(client, "%d. %s", j, ePerks[j][sName]);
-		iPerksFound++;
+	char sBuffer[1024];
+	for(int i = 0; i < iLen; i++){
+		list.Get(i).Format(sBuffer, 1024, sFormat);
+		PrintToConsole(client, sBuffer);
 	}
 
 	if(client > 0)
-		PrintToChat(client, "%s %d %s found matching given criteria.", CHAT_PREFIX, iPerksFound, iPerksFound != 1 ? "perks" : "perk");
+		PrintToChat(client, "%s %d perk%s found matching given criteria.", CHAT_PREFIX, iLen, iLen != 1 ? "s" : "");
+
+	delete list;
 	return Plugin_Handled;
 }
 

@@ -223,8 +223,8 @@ methodmap Perk < StringMap{
 	}
 
 	public int FormatProp(char[] sBuffer, int iStart, int iLen, const char[] sProp){
-		char sPropString[64];
-		int iPropLen = this.GetPropAsString(sProp, sPropString, 64);
+		char sPropString[128];
+		int iPropLen = this.GetPropAsString(sProp, sPropString, 128);
 		int i = 0;
 		for(; (iStart+i) < iLen && i < iPropLen; ++i)
 			sBuffer[iStart+i] = sPropString[i];
@@ -384,15 +384,12 @@ methodmap PerkContainer < StringMap{
 		return iPerksParsed;
 	}
 
-	public void PrintAll(int client){
-		char sName[64];
-		Perk perk = null;
+	public PerkList ToPerkList(){
+		PerkList list = new PerkList();
 		int iLen = g_hPerkTokenMapper.Length;
-		for(int i = 0; i < iLen; i++){
-			perk = this.GetFromIdEx(i);
-			perk.GetName(sName, 64);
-			PrintToConsole(client, "%d. %s", perk.GetId(), sName);
-		}
+		for(int i = 0; i < iLen; i++)
+			list.Push(this.GetFromIdEx(i));
+		return list;
 	}
 
 	/* Returns Perk handle, do not close, might be null */
@@ -444,6 +441,8 @@ methodmap PerkContainer < StringMap{
 
 	/* Returns PerkList, must be closed, never null, but may be empty */
 	public PerkList FindPerks(const char[] sQuery){
+		if(strlen(sQuery) == 0)
+			return this.ToPerkList();
 		Perk perk = this.FindPerk(sQuery);
 		return this.FindPerksFromTags(sQuery, perk);
 	}
