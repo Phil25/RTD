@@ -605,7 +605,7 @@ public Action Command_RemoveRTD(int client, int args){
 
 public Action Command_PerkSearchup(int client, int args){
 	char sQuery[64] = "";
-	if(args > 1)
+	if(args > 0)
 		GetCmdArg(1, sQuery, 64);
 
 	char sFormat[64] = "$Id$. $Name$";
@@ -910,124 +910,8 @@ void ParseCustomEffects(){
 		return;
 	}
 
-	int iCustomPerkCount = 0;
-	Handle hKv = CreateKeyValues("Effects");
-	if(FileToKeyValues(hKv, sPath) && KvGotoFirstSubKey(hKv)){
-		Handle hCustomized = CreateArray();
-		char sPerkId[4], sClassBuffer[2][PERK_MAX_LOW], sWeaponBuffer[2][PERK_MAX_HIGH], sSettingBuffer[PERK_MAX_HIGH], sTagBuffer[2][PERK_MAX_HIGH];
-		int iPerkId = 0, iClassFlags = 0, iTagSize = 0;
-		do{
-			KvGetSectionName(hKv, sPerkId, sizeof(sPerkId));
-			iPerkId = StringToInt(sPerkId);
-			if(iPerkId >= g_iPerkCount || iPerkId < 0)
-				continue;
-
-				//----[ NAME ]----//
-			if(KvJumpToKey(hKv, "name")){
-				KvGoBack(hKv);
-				KvGetString(hKv, "name", ePerks[iPerkId][sName], PERK_MAX_LOW);
-			}
-
-				//----[ GOOD ]----//
-			if(KvJumpToKey(hKv, "good")){
-				KvGoBack(hKv);
-				ePerks[iPerkId][bGood] = KvGetNum(hKv, "good") > 0 ? true : false;
-			}
-
-				//----[ SOUND ]----//
-			if(KvJumpToKey(hKv, "sound")){
-				KvGoBack(hKv);
-				KvGetString(hKv, "sound", ePerks[iPerkId][sSound], PERK_MAX_HIGH);
-			}
-
-				//----[ TOKEN ]----//
-			if(KvJumpToKey(hKv, "token")){
-				KvGoBack(hKv);
-				KvGetString(hKv, "token", ePerks[iPerkId][sToken], PERK_MAX_LOW);
-			}
-
-				//----[ TIME ]----//
-			if(KvJumpToKey(hKv, "time")){
-				KvGoBack(hKv);
-				ePerks[iPerkId][iTime] = KvGetNum(hKv, "time");
-			}
-
-				//----[ CLASS ]----//
-			if(KvJumpToKey(hKv, "class")){
-				KvGoBack(hKv);
-
-				strcopy(sClassBuffer[1], PERK_MAX_LOW, "");
-				KvGetString(hKv, "class", sClassBuffer[0], PERK_MAX_LOW, "0");
-				EscapeString(sClassBuffer[0], ' ', '\0', sClassBuffer[1], PERK_MAX_LOW);
-
-				iClassFlags = ClassStringToFlags(sClassBuffer[1]);
-				if(iClassFlags < 1){
-					PrintToServer("%s WARNING: Invalid class restriction(s) set at perk ID:%d (rtd2_perks.custom.cfg). Assuming it's all-class. (\"%s\")", CONS_PREFIX, iPerkId, sClassBuffer[1]);
-					LogError("%s WARNING: Invalid class restriction(s) set at perk ID:%d (rtd2_perks.custom.cfg). Assuming it's all-class. (\"%s\")", CONS_PREFIX, iPerkId, sClassBuffer[1]);
-					iClassFlags = 511;
-				}
-				ePerks[iPerkId][iClasses] = iClassFlags;
-			}
-
-				//----[ WEAPONS ]----//
-			if(KvJumpToKey(hKv, "weapons")){
-				KvGoBack(hKv);
-
-				strcopy(sWeaponBuffer[1], PERK_MAX_HIGH, "");
-				KvGetString(hKv, "weapons", sWeaponBuffer[0], PERK_MAX_HIGH);
-				EscapeString(sWeaponBuffer[0], ' ', '\0', sWeaponBuffer[1], PERK_MAX_HIGH);
-
-				ClearArray(ePerks[iPerkId][hWeaponClasses]);
-				if(FindCharInString(sWeaponBuffer[1], '0') < 0){
-					int iSize = CountCharInString(sWeaponBuffer[1], ',')+1;
-					char[][] sPieces = new char[iSize][32];
-
-					ExplodeString(sWeaponBuffer[1], ",", sPieces, iSize, 64);
-					for(int i = 0; i < iSize; i++)
-						PushArrayString(ePerks[iPerkId][hWeaponClasses], sPieces[i]);
-				}
-			}
-
-				//----[ SETTINGS ]----//
-			if(KvJumpToKey(hKv, "settings")){
-				KvGoBack(hKv);
-
-				KvGetString(hKv, "settings", sSettingBuffer, PERK_MAX_HIGH);
-				EscapeString(sSettingBuffer, ' ', '\0', ePerks[iPerkId][sPref], PERK_MAX_HIGH);
-			}
-
-				//----[ TAGS ]----//
-			if(KvJumpToKey(hKv, "tags")){
-				KvGoBack(hKv);
-
-				strcopy(sTagBuffer[1], PERK_MAX_HIGH, ""); iTagSize = 0;
-				KvGetString(hKv, "tags", sTagBuffer[0], PERK_MAX_VERYH);
-				EscapeString(sTagBuffer[0], ' ', '\0', sTagBuffer[1], PERK_MAX_VERYH);
-
-				ClearArray(ePerks[iPerkId][hTags]);
-				if(strlen(sTagBuffer[1]) > 0){
-					iTagSize = CountCharInString(sTagBuffer[1], '|')+1;
-					char[][] sPieces = new char[iTagSize][24];
-
-					ExplodeString(sTagBuffer[1], "|", sPieces, iTagSize, 24);
-					for(int i = 0; i < iTagSize; i++)
-						PushArrayString(ePerks[iPerkId][hTags], sPieces[i]);
-				}
-			}
-
-			if(FindValueInArray(hCustomized, iPerkId) > -1)
-				continue;
-
-			iCustomPerkCount++;
-			PushArrayCell(hCustomized, iPerkId);
-		}while(KvGotoNextKey(hKv));
-
-		PrintToServer("%s Customized %d perk%s.", CONS_PREFIX, iCustomPerkCount, iCustomPerkCount == 1 ? "" : "s");
-		delete hCustomized;
-	}
-
-	if(hKv != INVALID_HANDLE)
-		CloseHandle(hKv);
+	int iPerksCustomized = g_hPerkContainer.ParseCustomFile(sPath);
+	PrintToServer("%s Customized %d perk%s.", CONS_PREFIX, iPerksCustomized, iPerksCustomized == 1 ? "" : "s");
 	PrecachePerkSounds();
 }
 

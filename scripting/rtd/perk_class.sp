@@ -97,8 +97,9 @@ methodmap Perk < StringMap{
 
 	GET_VALUE(ArrayList,WeaponClass) // ArrayList storing strings of weapon classes
 	public void SetWeaponClass(const char[] s){
-		ArrayList h = StringToWeaponClass(s);
-		this.SetValue("m_WeaponClass", h);
+		delete this.GetWeaponClass();
+		ArrayList hWeapClass = StringToWeaponClass(s);
+		this.SetValue("m_WeaponClass", hWeapClass);
 	}
 
 	GET_STRING(Pref) // preference string
@@ -106,8 +107,9 @@ methodmap Perk < StringMap{
 
 	GET_VALUE(ArrayList,Tags) // ArrayList storing strings of perk tags
 	public void SetTags(const char[] s){
-		ArrayList h = StringToTags(s);
-		this.SetValue("m_Tags", h);
+		delete this.GetTags();
+		ArrayList hTags = StringToTags(s);
+		this.SetValue("m_Tags", hTags);
 	}
 
 	GET_VALUE(bool,IsDisabled)
@@ -116,16 +118,17 @@ methodmap Perk < StringMap{
 	GET_VALUE(bool,IsExternal)
 	SET_VALUE(bool,IsExternal)
 
-	public void SetCall(PerkCall func){
-		Handle hFwd = CreateForward(ET_Single, Param_Cell, Param_Cell, Param_Cell);
-		AddToForward(hFwd, null, func);
-		this.SetValue("m_Call", hFwd);
-	}
-
 	public Handle GetCall(){
 		Handle hFwd = null;
 		this.GetValue("m_Call", hFwd);
 		return hFwd;
+	}
+
+	public void SetCall(PerkCall func){
+		delete this.GetCall();
+		Handle hFwd = CreateForward(ET_Single, Param_Cell, Param_Cell, Param_Cell);
+		AddToForward(hFwd, null, func);
+		this.SetValue("m_Call", hFwd);
 	}
 
 	public void Call(int client, bool bEnable){
@@ -137,7 +140,7 @@ methodmap Perk < StringMap{
 	}
 
 	GET_VALUE(Handle,Parent)
-	SET_VALUE(Handle,Parent)
+	SET_VALUE(Handle,Parent) // TODO: leak when setting multiple times
 
 	public PerkPropType GetPropType(const char[] sProp){
 		if(strlen(sProp) < 4)
@@ -184,9 +187,9 @@ methodmap Perk < StringMap{
 		char sItemBuffer[64];
 		int iSize = list.Length;
 		if(iSize > 0){
-			list.GetString(1, sItemBuffer, 64);
+			list.GetString(0, sItemBuffer, 64);
 			FormatEx(sBuffer, iLen, "%s%s", sBuffer, sItemBuffer);
-			for(int i = 2; i < iSize; ++i){
+			for(int i = 1; i < iSize; ++i){
 				list.GetString(i, sItemBuffer, 64);
 				FormatEx(sBuffer, iLen, "%s, %s", sBuffer, sItemBuffer);
 			}
@@ -223,8 +226,8 @@ methodmap Perk < StringMap{
 	}
 
 	public int FormatProp(char[] sBuffer, int iStart, int iLen, const char[] sProp){
-		char sPropString[128];
-		int iPropLen = this.GetPropAsString(sProp, sPropString, 128);
+		char sPropString[127];
+		int iPropLen = this.GetPropAsString(sProp, sPropString, 127);
 		int i = 0;
 		for(; (iStart+i) < iLen && i < iPropLen; ++i)
 			sBuffer[iStart+i] = sPropString[i];
@@ -343,6 +346,22 @@ methodmap PerkContainer < StringMap{
 	hKv.GetString(%1, sBuffer, sizeof(sBuffer)); \
 	perk.Set%2(sBuffer);
 
+#define READ_IF_EXISTS_STRING(%1,%2) \
+	if(hKv.JumpToKey(%1)){ \
+		hKv.GoBack(); \
+		READ_STRING(%1,%2)}
+
+#define READ_IF_EXISTS_BOOL(%1,%2) \
+	if(hKv.JumpToKey(%1)){ \
+		hKv.GoBack(); \
+		perk.Set%2(hKv.GetNum(%1) > 0);}
+
+#define READ_IF_EXISTS_NUM(%1,%2) \
+	if(hKv.JumpToKey(%1)){ \
+		hKv.GoBack(); \
+		perk.Set%2(hKv.GetNum(%1));}
+
+
 	public bool ParseAndAdd(KeyValues hKv, int iStats[2]){
 		char sBuffer[127];
 		Perk perk = new Perk();
@@ -359,10 +378,32 @@ methodmap PerkContainer < StringMap{
 		iStats[perk.GetGood()]++;
 
 		this.Add(perk);
-		//perk.Print();
 		return true;
 	}
 
+	public bool ParseAndEdit(KeyValues hKv){
+		char sBuffer[127];
+		hKv.GetSectionName(sBuffer, 127);
+
+		Perk perk = this.Get(sBuffer);
+		if(perk == null)
+			return false;
+
+		READ_IF_EXISTS_STRING("name",Name)
+		READ_IF_EXISTS_BOOL("good",Good)
+		READ_IF_EXISTS_STRING("sound",Sound)
+		READ_IF_EXISTS_NUM("time",Time)
+		READ_IF_EXISTS_STRING("class",Class)
+		READ_IF_EXISTS_STRING("weapons",WeaponClass)
+		READ_IF_EXISTS_STRING("settings",Pref)
+		READ_IF_EXISTS_STRING("tags",Tags)
+
+		return true;
+	}
+
+#undef READ_IF_EXISTS_STRING
+#undef READ_IF_EXISTS_BOOL
+#undef READ_IF_EXISTS_NUM
 #undef READ_STRING
 
 	public int ParseKv(KeyValues hKv, int iStats[2]){
@@ -379,6 +420,24 @@ methodmap PerkContainer < StringMap{
 		int iPerksParsed = -1;
 		if(hKv.ImportFromFile(sPath) && hKv.GotoFirstSubKey())
 			iPerksParsed = this.ParseKv(hKv, iStats);
+
+		delete hKv;
+		return iPerksParsed;
+	}
+
+	public int ParseCustomKv(KeyValues hKv){
+		int iPerksParsed = 0;
+		do iPerksParsed += view_as<int>(this.ParseAndEdit(hKv));
+		while(hKv.GotoNextKey());
+		return iPerksParsed;
+	}
+
+	public int ParseCustomFile(const char[] sPath){
+		KeyValues hKv = new KeyValues("Effects");
+
+		int iPerksParsed = -1;
+		if(hKv.ImportFromFile(sPath) && hKv.GotoFirstSubKey())
+			iPerksParsed = this.ParseCustomKv(hKv);
 
 		delete hKv;
 		return iPerksParsed;
