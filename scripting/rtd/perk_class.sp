@@ -46,6 +46,14 @@
 	if(this.GetValue("m_" ... #%1, m_h%1)){ \
 		delete m_h%1;}
 
+enum PerkPropType{
+	Type_Invalid = 0,
+	Type_Bool,
+	Type_Int,
+	Type_String,
+	Type_Array
+}
+
 
 typedef PerkCall = function void(int client, int iPerkId, bool bEnable);
 
@@ -131,7 +139,7 @@ methodmap Perk < StringMap{
 	GET_VALUE(Handle,Parent)
 	SET_VALUE(Handle,Parent)
 
-	public void FormatStringProperty(const char[] sProp, char[] sBuffer, char[] sInto){
+	/*public void FormatStringProperty(const char[] sProp, char[] sBuffer, char[] sInto){
 		this.GetString(sProp, sBuffer, MAX_NAME_LENGTH);
 		FormatEx(sInto, 1024, "%s\n* %s: %s", sInto, sProp, sBuffer);
 	}
@@ -176,6 +184,107 @@ methodmap Perk < StringMap{
 		this.FormatArrayProperty("m_Tags", sBuffer, sPrint);
 
 		PrintToServer(sPrint);
+	}*/
+
+	public PerkPropType GetPropType(const char[] sProp){
+		if(strlen(sProp) < 4)
+			return Type_Invalid;
+		switch(sProp[2]){
+			case 'I': return Type_Int; // m_Id
+			case 'N': return Type_String; // m_Name
+			case 'G': return Type_Bool; // m_Good
+			case 'S': return Type_String; // m_Sound
+			case 'T': switch(sProp[3]){
+				case 'o': return Type_String; // m_Token
+				case 'i': return Type_Int; // m_Time
+				case 'a': return Type_Array; // m_Tags
+			}
+			case 'C': return Type_Int; // m_Class
+			case 'W': return Type_Array; // m_Array
+			case 'P': return Type_String; // m_Pref
+		}
+		return Type_Invalid;
+	}
+
+	public void GetStringAsString(const char[] sProp, char[] sBuffer, int iLen){
+		this.GetString(sProp, sBuffer, iLen);
+	}
+
+	public void GetBoolAsString(const char[] sProp, char[] sBuffer, int iLen){
+		bool bVal = false;
+		if(this.GetValue(sProp, bVal))
+			Format(sBuffer, iLen, bVal ? "true" : "false");
+	}
+
+	public void GetIntAsString(const char[] sProp, char[] sBuffer, int iLen){
+		int iVal = 0;
+		if(this.GetValue(sProp, iVal))
+			IntToString(iVal, sBuffer, iLen);
+	}
+
+	public void GetArrayAsString(const char[] sProp, char[] sBuffer, int iLen){
+		ArrayList list;
+		if(!this.GetValue(sProp, list))
+			return;
+
+		FormatEx(sBuffer, iLen, "[");
+		char sItemBuffer[64];
+		int iSize = list.Length;
+		if(iSize > 0){
+			list.GetString(1, sItemBuffer, 64);
+			FormatEx(sBuffer, iLen, "%s%s", sBuffer, sItemBuffer);
+			for(int i = 2; i < iSize; ++i){
+				list.GetString(i, sItemBuffer, 64);
+				FormatEx(sBuffer, iLen, "%s, %s", sBuffer, sItemBuffer);
+			}
+		}
+
+		FormatEx(sBuffer, iLen, "%s]", sBuffer);
+	}
+
+	public void FormatProp(char[] sBuffer, int iLen, int iStart, int iEnd, const char[] sProp){
+		char sPropString[64];
+		PerkPropType iPropType = this.GetPropType(sProp);
+		switch(iPropType){
+			case Type_Invalid:	return;
+			case Type_Bool:		this.GetBoolAsString(sProp, sPropString, 64);
+			case Type_Int:		this.GetIntAsString(sProp, sPropString, 64);
+			case Type_String:	this.GetStringAsString(sProp, sPropString, 64);
+			case Type_Array:	this.GetArrayAsString(sProp, sPropString, 64);
+		}
+		PrintToServer("Replacing [%d, %d] with %s (type %d) with %s", iStart, iEnd, sProp, iPropType, sPropString);
+		int i = -1, iOffset;
+		while(sPropString[++i] != '\0'){
+			iOffset = iStart +i;
+			if(iOffset < iLen)
+				sBuffer[iOffset] = sPropString[i];
+			else break;
+		}
+	}
+
+	public void Format(char[] sBuffer, int iLen, const char[] sFormat){
+		int iFormatLen = strlen(sFormat);
+		char sProp[32] = "m_";
+		for(int i = 0; i < iLen && i < iFormatLen; ++i){
+			if(sFormat[i] != '$'){
+				sBuffer[i] = sFormat[i];
+				continue;
+			}
+
+			int j = i+1;
+			for(; j < iLen && j < iFormatLen; ++j){
+				if(sFormat[j] != '$'){
+					// j-i+1 -> sProp[2], sProp[3], ..., sProp[x]
+					sProp[j-i+1] = sFormat[j];
+					continue;
+				}
+				sProp[j-i+1] = '\0';
+				break;
+			}
+
+			this.FormatProp(sBuffer, iLen, i, j, sProp);
+			i = j;
+		}
 	}
 
 	public bool HasTag(const char[] sQuery){

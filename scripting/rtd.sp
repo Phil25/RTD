@@ -611,15 +611,20 @@ public Action Command_PerkSearchup(int client, int args){
 		return Plugin_Handled;
 	}
 
-	char sTagString[64], sTagBuffer[32];
-	for(int i = 1; i <= args; i++){
-		GetCmdArg(i, sTagBuffer, sizeof(sTagBuffer));
-		if(i < 2){
-			Format(sTagString, sizeof(sTagString), "%s", sTagBuffer);
-			continue;
-		}
-		Format(sTagString, sizeof(sTagString), "%s|%s", sTagString, sTagBuffer);
+	char sQuery[64], sBuffer[32];
+	GetCmdArg(1, sQuery, 64);
+	for(int i = 2; i <= args; i++){
+		GetCmdArg(i, sBuffer, 32);
+		Format(sQuery, 64, "%s %s", sQuery, sBuffer);
 	}
+
+	PerkList list = g_hPerkContainer.FindPerks(sQuery);
+	int iLen = list.Length;
+
+	for(int i = 0; i < iLen; i++){}
+	// TODO: Printf();
+
+	delete list;
 
 	int iPerksFound = 0;
 	for(int j = 0; j < g_iPerkCount; j++){

@@ -44,8 +44,12 @@ public Action Command_PerkSearchupTest(int args){
 	char sQuery[255];
 	GetCmdArg(1, sQuery, 255);
 	PerkList list = g_hPerks.FindPerks(sQuery);
-	for(int i = 0; i < list.Length; i++)
-		list.Get(i).Print();
+	char sBuffer[128];
+	for(int i = 0; i < 1; i++){
+		//list.Get(i).Format(sBuffer, 32, "$Id$. $Name$ ($Good$) - $Tags$");
+		list.Get(i).Format(sBuffer, 128, "$Name$. $Name$ ($WeaponClass$)");
+		PrintToServer(sBuffer);
+	}
 	delete list;
 
 	return Plugin_Handled;
