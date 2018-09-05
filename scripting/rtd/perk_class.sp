@@ -139,53 +139,6 @@ methodmap Perk < StringMap{
 	GET_VALUE(Handle,Parent)
 	SET_VALUE(Handle,Parent)
 
-	/*public void FormatStringProperty(const char[] sProp, char[] sBuffer, char[] sInto){
-		this.GetString(sProp, sBuffer, MAX_NAME_LENGTH);
-		FormatEx(sInto, 1024, "%s\n* %s: %s", sInto, sProp, sBuffer);
-	}
-
-	public void FormatIntProperty(const char[] sProp, char[] sInto){
-		int iVal;
-		this.GetValue(sProp, iVal);
-		FormatEx(sInto, 1024, "%s\n* %s: %d", sInto, sProp, iVal);
-	}
-
-	public void FormatArrayProperty(const char[] sProp, char[] sBuffer, char[] sInto){
-		ArrayList list;
-		this.GetValue(sProp, list);
-		FormatEx(sInto, 1024, "%s\n* %s: [", sInto, sProp);
-
-		int iSize = list.Length;
-		if(iSize > 0){
-			list.GetString(1, sBuffer, MAX_NAME_LENGTH);
-			FormatEx(sInto, 1024, "%s%s", sInto, sBuffer);
-			for(int i = 1; i < iSize; ++i){
-				list.GetString(i, sBuffer, MAX_NAME_LENGTH);
-				FormatEx(sInto, 1024, "%s, %s", sInto, sBuffer);
-			}
-		}
-
-		FormatEx(sInto, 1024, "%s]", sInto);
-	}
-
-	public void Print(){
-		char sBuffer[MAX_NAME_LENGTH];
-		char sPrint[1024] = "\n======================";
-
-		this.FormatIntProperty("m_Id", sPrint);
-		this.FormatStringProperty("m_Name", sBuffer, sPrint);
-		this.FormatIntProperty("m_Good", sPrint);
-		this.FormatStringProperty("m_Sound", sBuffer, sPrint);
-		this.FormatStringProperty("m_Token", sBuffer, sPrint);
-		this.FormatIntProperty("m_Time", sPrint);
-		this.FormatIntProperty("m_Class", sPrint);
-		this.FormatArrayProperty("m_WeaponClass", sBuffer, sPrint);
-		this.FormatStringProperty("m_Pref", sBuffer, sPrint);
-		this.FormatArrayProperty("m_Tags", sBuffer, sPrint);
-
-		PrintToServer(sPrint);
-	}*/
-
 	public PerkPropType GetPropType(const char[] sProp){
 		if(strlen(sProp) < 4)
 			return Type_Invalid;
@@ -242,49 +195,56 @@ methodmap Perk < StringMap{
 		FormatEx(sBuffer, iLen, "%s]", sBuffer);
 	}
 
-	public void FormatProp(char[] sBuffer, int iLen, int iStart, int iEnd, const char[] sProp){
-		char sPropString[64];
+	public int GetPropAsString(const char[] sProp, char[] sBuffer, int iLen){
 		PerkPropType iPropType = this.GetPropType(sProp);
 		switch(iPropType){
-			case Type_Invalid:	return;
-			case Type_Bool:		this.GetBoolAsString(sProp, sPropString, 64);
-			case Type_Int:		this.GetIntAsString(sProp, sPropString, 64);
-			case Type_String:	this.GetStringAsString(sProp, sPropString, 64);
-			case Type_Array:	this.GetArrayAsString(sProp, sPropString, 64);
+			case Type_Invalid:	return 0;
+			case Type_Bool:		this.GetBoolAsString(sProp, sBuffer, iLen);
+			case Type_Int:		this.GetIntAsString(sProp, sBuffer, iLen);
+			case Type_String:	this.GetStringAsString(sProp, sBuffer, iLen);
+			case Type_Array:	this.GetArrayAsString(sProp, sBuffer, iLen);
 		}
-		PrintToServer("Replacing [%d, %d] with %s (type %d) with %s", iStart, iEnd, sProp, iPropType, sPropString);
-		int i = -1, iOffset;
-		while(sPropString[++i] != '\0'){
-			iOffset = iStart +i;
-			if(iOffset < iLen)
-				sBuffer[iOffset] = sPropString[i];
-			else break;
+		return strlen(sBuffer);
+	}
+
+	public int ExtractProp(const char[] sFormat, int iStart, int iLen, char[] sBuffer){
+		int i = iStart+1;
+		sBuffer[2] = '\0';
+		for(; i < iLen; ++i){
+			if(sFormat[i] != '$'){
+				// i-iStart+1 -> sProp[2], sProp[3], ..., sProp[n]
+				sBuffer[i-iStart+1] = sFormat[i];
+				continue;
+			}
+			sBuffer[i-iStart+1] = '\0';
+			break;
 		}
+		return i-iStart;
+	}
+
+	public int FormatProp(char[] sBuffer, int iStart, int iLen, const char[] sProp){
+		char sPropString[64];
+		int iPropLen = this.GetPropAsString(sProp, sPropString, 64);
+		int i = 0;
+		for(; (iStart+i) < iLen && i < iPropLen; ++i)
+			sBuffer[iStart+i] = sPropString[i];
+		return i;
 	}
 
 	public void Format(char[] sBuffer, int iLen, const char[] sFormat){
 		int iFormatLen = strlen(sFormat);
 		char sProp[32] = "m_";
-		for(int i = 0; i < iLen && i < iFormatLen; ++i){
+		int i = 0, j = 0;
+		for(; i < iFormatLen; ++i){
 			if(sFormat[i] != '$'){
-				sBuffer[i] = sFormat[i];
+				sBuffer[j++] = sFormat[i];
 				continue;
 			}
-
-			int j = i+1;
-			for(; j < iLen && j < iFormatLen; ++j){
-				if(sFormat[j] != '$'){
-					// j-i+1 -> sProp[2], sProp[3], ..., sProp[x]
-					sProp[j-i+1] = sFormat[j];
-					continue;
-				}
-				sProp[j-i+1] = '\0';
-				break;
-			}
-
-			this.FormatProp(sBuffer, iLen, i, j, sProp);
-			i = j;
+			int iPropLen = this.ExtractProp(sFormat, i, iFormatLen, sProp);
+			j += this.FormatProp(sBuffer, j, iLen, sProp);
+			i += iPropLen;
 		}
+		sBuffer[j] = '\0';
 	}
 
 	public bool HasTag(const char[] sQuery){
