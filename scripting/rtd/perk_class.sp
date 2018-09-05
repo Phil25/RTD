@@ -201,9 +201,9 @@ methodmap Perk < StringMap{
 #undef DISPOSE_MEMBER
 
 // Small wrapper so you can do stuff like perkList.Get(x).Print()
-methodmap PerkArray < ArrayList{
-	public PerkArray(){
-		return view_as<PerkArray>(new ArrayList());
+methodmap PerkList < ArrayList{
+	public PerkList(){
+		return view_as<PerkList>(new ArrayList());
 	}
 
 	public Perk Get(int i){
@@ -344,10 +344,10 @@ methodmap PerkContainer < StringMap{
 	if(perk.HasTag(sQuery)) \
 		list.Push(perk); }
 
-	/* Returns PerkArray, must be closed, never null, but may be empty;
+	/* Returns PerkList, must be closed, never null, but may be empty;
 	include parameter adds the perk additionally and omits it in further search */
-	public PerkArray FindPerksFromTags(const char[] sQuery, Perk include=null){
-		PerkArray list = new PerkArray();
+	public PerkList FindPerksFromTags(const char[] sQuery, Perk include=null){
+		PerkList list = new PerkList();
 
 		Perk perk = null;
 		int iLen = g_hPerkTokenMapper.Length,
@@ -373,8 +373,8 @@ methodmap PerkContainer < StringMap{
 
 #undef ADD_PERK_IF_TAG_MATCHES
 
-	/* Returns PerkArray, must be closed, never null, but may be empty */
-	public PerkArray FindPerks(const char[] sQuery){
+	/* Returns PerkList, must be closed, never null, but may be empty */
+	public PerkList FindPerks(const char[] sQuery){
 		Perk perk = this.FindPerk(sQuery);
 		return this.FindPerksFromTags(sQuery, perk);
 	}

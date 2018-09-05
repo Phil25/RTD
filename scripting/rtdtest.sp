@@ -43,7 +43,7 @@ public Action Command_PerkSearchupTest(int args){
 
 	char sQuery[255];
 	GetCmdArg(1, sQuery, 255);
-	PerkArray list = g_hPerks.FindPerks(sQuery);
+	PerkList list = g_hPerks.FindPerks(sQuery);
 	for(int i = 0; i < list.Length; i++)
 		list.Get(i).Print();
 	delete list;
