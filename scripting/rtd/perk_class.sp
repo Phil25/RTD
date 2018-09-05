@@ -337,7 +337,8 @@ methodmap PerkContainer < StringMap{
 	}
 
 	public Perk GetFromId(int iId){
-		if(!(0 <= iId < g_hPerkTokenMapper.Length))
+		// checks if bigger first because iterator uses it
+		if(iId >= g_hPerkTokenMapper.Length || iId < 0)
 			return null;
 		return this.GetFromIdEx(iId);
 	}
@@ -505,4 +506,51 @@ methodmap PerkContainer < StringMap{
 		Perk perk = this.FindPerk(sQuery);
 		return this.FindPerksFromTags(sQuery, perk);
 	}
+}
+
+PerkContainer g_hPerkContainer = null;
+
+/* Iterator pattern for perks */
+methodmap PerkIter < ArrayList{
+	public PerkIter(int iId){
+		ArrayList list = new ArrayList(_, 2);
+		list.Set(0, iId);
+		list.Set(1, g_hPerkContainer.GetFromId(iId));
+		return view_as<PerkIter>(list);
+	}
+
+	public int SetPair(int iId){
+		this.Set(0, iId);
+		this.Set(1, g_hPerkContainer.GetFromId(iId));
+	}
+
+	public int Id(){
+		return this.Get(0);
+	}
+
+	public Perk Perk(){
+		return this.Get(1);
+	}
+
+	public void Next(){
+		int iId = this.Get(0);
+		this.SetPair(++iId);
+	}
+
+	public void Prev(){
+		int iId = this.Get(0);
+		this.SetPair(--iId);
+	}
+}
+
+/* prefix ++ operator */
+stock PerkIter operator++(PerkIter iter){
+	iter.Next();
+	return iter;
+}
+
+/* prefix -- operator */
+stock PerkIter operator--(PerkIter iter){
+	iter.Prev();
+	return iter;
 }

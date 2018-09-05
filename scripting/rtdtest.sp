@@ -18,23 +18,27 @@
 
 #include "rtd/perk_class.sp"
 
-
-PerkContainer g_hPerks = null;
-
 public void OnPluginStart(){
 	ParseEffects();
 	RegServerCmd("sm_rtdstest", Command_PerkSearchupTest);
+	char sBuffer[255];
+	PerkIter iter = new PerkIter(-1);
+	while((++iter).Perk()){
+		iter.Perk().Format(sBuffer, 255, "$Id$. $Name$");
+		PrintToServer(sBuffer);
+	}
+	delete iter;
 }
 
 bool ParseEffects(){
-	if(g_hPerks == null)
-		g_hPerks = new PerkContainer();
-	g_hPerks.DisposePerks();
+	if(g_hPerkContainer == null)
+		g_hPerkContainer = new PerkContainer();
+	g_hPerkContainer.DisposePerks();
 
 	char sPath[255];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.default.cfg");
 	int iStatus[2];
-	return FileExists(sPath) && g_hPerks.ParseFile(sPath, iStatus) != -1;
+	return FileExists(sPath) && g_hPerkContainer.ParseFile(sPath, iStatus) != -1;
 }
 
 public Action Command_PerkSearchupTest(int args){
@@ -43,7 +47,7 @@ public Action Command_PerkSearchupTest(int args){
 
 	char sQuery[255];
 	GetCmdArg(1, sQuery, 255);
-	PerkList list = g_hPerks.FindPerks(sQuery);
+	PerkList list = g_hPerkContainer.FindPerks(sQuery);
 
 	char sBuffer[255];
 	for(int i = 0; i < list.Length; i++){
