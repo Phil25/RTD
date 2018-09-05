@@ -84,7 +84,6 @@ enum Perks{
 	Handle:plParent
 };
 int ePerks[PERK_MAX_COUNT][Perks];
-PerkContainer g_hPerkContainer = null;
 
 enum ClientInfo{
 	bool:bRolling,
@@ -916,8 +915,13 @@ void ParseCustomEffects(){
 }
 
 void PrecachePerkSounds(){
-	for(int i = 0; i < g_iPerkCount; i++)
-		PrecacheSound(ePerks[i][sSound]);
+	char sBuffer[64];
+	PerkIter iter = new PerkIter(-1);
+	while((++iter).Perk()){
+		iter.Perk().GetSound(sBuffer, 64);
+		PrecacheSound(sBuffer);
+	}
+	delete iter;
 }
 
 void ParseDisabledPerks(){
