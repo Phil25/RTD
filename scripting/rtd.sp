@@ -925,55 +925,57 @@ void PrecachePerkSounds(){
 }
 
 void ParseDisabledPerks(){
-	for(int i = 0; i < g_iPerkCount; i++)
-		ePerks[i][bIsDisabled] = false;
+	PerkIter iter = new PerkIter(-1);
+	while((++iter).Perk())
+		iter.Perk().SetEnabled(true);
+	delete iter;
 
-	char sDisabled[2][255];
-	GetConVarString(g_hCvarDisabledPerks, sDisabled[0], 255);
-	EscapeString(sDisabled[0], ' ', '\0', sDisabled[1], 255);
-	if(strlen(sDisabled[1]) == 0)
+	char sDisabledPre[255], sDisabled[255];
+	GetConVarString(g_hCvarDisabledPerks, sDisabledPre, 255);
+	EscapeString(sDisabledPre, ' ', '\0', sDisabled, 255);
+	if(strlen(sDisabled) == 0)
 		return;
 
-	int iDisabledNum = CountCharInString(sDisabled[1], ',') +1;
-	char[][] sDisabledPieces = new char[iDisabledNum][32];
-	ExplodeString(sDisabled[1], ",", sDisabledPieces, iDisabledNum, 32);
+	int iDisabledCount = CountCharInString(sDisabled, ',') +1;
+	char[][] sDisabledPieces = new char[iDisabledCount][32];
+	ExplodeString(sDisabled, ",", sDisabledPieces, iDisabledCount, 32);
 
-	int iPerkId = -1, iArraySize = 0;
-	Handle hDisabledArray = CreateArray();
-	for(int i = 0; i < iDisabledNum; i++){
-		iPerkId = GetPerkOfString(sDisabledPieces[i], 32);
-		if(iPerkId < 0)
-			continue;
+	Perk perk = null;
+	PerkList hDisabledPerks = new PerkList();
+	for(int i = 0; i < iDisabledCount; ++i){
+		perk = g_hPerkContainer.FindPerk(sDisabledPieces[i]);
+		if(perk == null) continue;
 
-		if(FindValueInArray(hDisabledArray, iPerkId) != -1)
-			continue;
-
-		ePerks[iPerkId][bIsDisabled] = true;
-		PushArrayCell(hDisabledArray, iPerkId);
-		iArraySize++;
+		perk.SetEnabled(false);
+		hDisabledPerks.Push(perk);
 	}
 
-	switch(iArraySize){
+	char sNameBuffer[64];
+	int iLen = hDisabledPerks.Length;
+	switch(iLen){
 		case 0:{}
 
 		case 1:{
+			hDisabledPerks.Get(0).GetName(sNameBuffer, 64);
 			if(g_bCvarLog)
-				LogMessage("%s Perk disabled: %s.", CONS_PREFIX, ePerks[GetArrayCell(hDisabledArray, 0)][sName]);
-			PrintToServer("%s Perk disabled: %s.", CONS_PREFIX, ePerks[GetArrayCell(hDisabledArray, 0)][sName]);
+				LogMessage("%s Perk disabled: %s.", CONS_PREFIX, sNameBuffer);
+			PrintToServer("%s Perk disabled: %s.", CONS_PREFIX, sNameBuffer);
 		}
 
 		default:{
+			hDisabledPerks.Get(0).GetName(sNameBuffer, 64);
 			if(g_bCvarLog)
-				LogMessage("%s %d perks disabled:", CONS_PREFIX, iArraySize);
-			PrintToServer("%s %d perks disabled:", CONS_PREFIX, iArraySize);
-			for(int i = 0; i < iArraySize; i++){
+				LogMessage("%s %d perks disabled:", CONS_PREFIX, iLen);
+			PrintToServer("%s %d perks disabled:", CONS_PREFIX, iLen);
+			for(int i = 0; i < iLen; ++i){
+				hDisabledPerks.Get(i).GetName(sNameBuffer, 64);
 				if(g_bCvarLog)
-					LogMessage("  • %s", ePerks[GetArrayCell(hDisabledArray, i)][sName]);
-				PrintToServer("  > %s", ePerks[GetArrayCell(hDisabledArray, i)][sName]);
+					LogMessage("  • %s", sNameBuffer);
+				PrintToServer("  > %s", sNameBuffer);
 			}
 		}
 	}
-	delete hDisabledArray;
+	delete hDisabledPerks;
 }
 
 //-----[ Applying ]-----//
