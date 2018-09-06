@@ -112,11 +112,11 @@ methodmap Perk < StringMap{
 		this.SetValue("m_Tags", hTags);
 	}
 
-	GET_VALUE(bool,IsDisabled)
-	SET_VALUE(bool,IsDisabled)
+	GET_VALUE(bool,Enabled)
+	SET_VALUE(bool,Enabled)
 
-	GET_VALUE(bool,IsExternal)
-	SET_VALUE(bool,IsExternal)
+	GET_VALUE(bool,External)
+	SET_VALUE(bool,External)
 
 	public Handle GetCall(){
 		Handle hFwd = null;
