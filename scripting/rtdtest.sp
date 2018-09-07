@@ -24,19 +24,20 @@ public void OnPluginStart(){
 	char sBuffer[255];
 
 	Perk perk = null;
-	PerkIter iter = new PerkIter(-1);
-	PerkList list = new PerkList();
+	PerkList list = g_hPerkContainer.FindPerks("crit");
+	PerkIter iter = new PerkListIter(list, -1);
 
 	int i = 0;
 	while((perk = (++iter).Perk())){
 		perk.Format(sBuffer, 255, "$Id$. $Name$");
 		PrintToServer(sBuffer);
-		list.Push(perk);
 		if(++i > 5) break;
 	}
 
+	PrintToServer("Getting 5 random perks from the list above...");
+
 	i = 0;
-	while(++i < 20){
+	while(++i <= 5){
 		perk = list.GetRandom();
 		perk.Format(sBuffer, 255, "Random: $Name$");
 		PrintToServer(sBuffer);
@@ -44,6 +45,14 @@ public void OnPluginStart(){
 
 	delete list;
 	delete iter;
+
+	PrintToServer("Now showing all perks...");
+
+	iter = new PerkContainerIter(-1);
+	while((perk = (++iter).Perk())){
+		perk.Format(sBuffer, 255, "$Id$. $Name$");
+		PrintToServer(sBuffer);
+	}
 }
 
 bool ParseEffects(){
