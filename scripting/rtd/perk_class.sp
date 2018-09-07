@@ -264,6 +264,11 @@ methodmap Perk < StringMap{
 		return false;
 	}
 
+	public bool IsAptFor(int client, bool bShouldBeGood, int iRollFlags){
+		client = 0;
+		iRollFlags = 0;
+		return this.GetGood() == bShouldBeGood;
+	}
 }
 
 #undef GET_VALUE

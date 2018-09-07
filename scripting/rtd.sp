@@ -176,10 +176,12 @@ Handle g_hCvarTeamLimit;			int g_iCvarTeamLimit = 2;
 Handle g_hCvarRespawnStuck;			bool g_bCvarRespawnStuck = true;
 #define DESC_RESPAWN_STUCK "0/1 - Should a player be forcibly respawned when a perk has ended and he's detected stuck?"
 
+/* TODO: get rid of this
 Handle g_hCvarCanRepeatPerk;		bool g_bCvarCanRepeatPerk = false;
 #define DESC_CAN_REPEAT_PERK "0/1 - Can a perk can be allowed to be rolled twice in a row."
 Handle g_hCvarCanRepeatGreatPerk;	bool g_bCvarCanRepeatGreatPerk = false;
 #define DESC_CAN_REPEAT_GREAT_PERK "0/1 - Can a perk can be allowed to be rolled the second time in 3 rolls."
+*/
 
 Handle g_hCvarGoodChance;			float g_fCvarGoodChance = 0.5;
 #define DESC_GOOD_CHANCE "0.0-1.0 - Chance of rolling a good perk. If there are no good perks available, a bad one will be tried to be rolled instead."
@@ -287,8 +289,10 @@ public void OnPluginStart(){
 	g_hCvarTeamLimit			= CreateConVar("sm_rtd2_teamlimit",		"2",		DESC_TEAM_LIMIT,			FLAGS_CVARS, true, 0.0);
 	g_hCvarRespawnStuck			= CreateConVar("sm_rtd2_respawnstuck",	"1",		DESC_RESPAWN_STUCK,			FLAGS_CVARS, true, 0.0, true, 1.0);
 
+	/* TODO: get rid of this
 	g_hCvarCanRepeatPerk		= CreateConVar("sm_rtd2_repeat", 		"0",		DESC_CAN_REPEAT_PERK,		FLAGS_CVARS, true, 0.0, true, 1.0);
 	g_hCvarCanRepeatGreatPerk	= CreateConVar("sm_rtd2_repeatgreat",	"0",		DESC_CAN_REPEAT_GREAT_PERK,	FLAGS_CVARS, true, 0.0, true, 1.0);
+	*/
 
 	g_hCvarGoodChance			= CreateConVar("sm_rtd2_chance",		"0.5",		DESC_GOOD_CHANCE,			FLAGS_CVARS, true, 0.0, true, 1.0);
 	g_hCvarGoodDonatorChance	= CreateConVar("sm_rtd2_dchance",		"0.75",		DESC_GOOD_DONATOR_CHANCE,	FLAGS_CVARS, true, 0.0, true, 1.0);
@@ -321,8 +325,10 @@ public void OnPluginStart(){
 	HookConVarChange(g_hCvarTeamLimit,			ConVarChange_Rtd	);	g_iCvarTeamLimit			= GetConVarInt(g_hCvarTeamLimit);
 	HookConVarChange(g_hCvarRespawnStuck,		ConVarChange_Rtd	);	g_bCvarRespawnStuck			= GetConVarInt(g_hCvarRespawnStuck) > 0 ? true : false;
 
+	/* TODO: get rid of this
 	HookConVarChange(g_hCvarCanRepeatPerk,		ConVarChange_Repeat	);	g_bCvarCanRepeatPerk		= GetConVarInt(g_hCvarCanRepeatPerk) > 0 ? true : false;
 	HookConVarChange(g_hCvarCanRepeatGreatPerk,	ConVarChange_Repeat	);	g_bCvarCanRepeatGreatPerk	= GetConVarInt(g_hCvarCanRepeatGreatPerk) > 0 ? true : false;
+	*/
 
 	HookConVarChange(g_hCvarGoodChance,			ConVarChange_Good	);	g_fCvarGoodChance			= GetConVarFloat(g_hCvarGoodChance);
 	HookConVarChange(g_hCvarGoodDonatorChance,	ConVarChange_Good	);	g_fCvarGoodDonatorChance	= GetConVarFloat(g_hCvarGoodDonatorChance);
@@ -516,7 +522,7 @@ public Action Command_ForceRTD(int client, int args){
 	}
 
 	int		iPerkTime		= -1;
-	bool	bOverrideClass	= false;
+	//bool	bOverrideClass	= false; // TODO: remove me later (as in v1.1b)
 	char	sPerkString[16]	= "-";
 
 	if(args > 1){
@@ -527,13 +533,14 @@ public Action Command_ForceRTD(int client, int args){
 			GetCmdArg(3, sPerkTime, sizeof(sPerkTime));
 			iPerkTime = StringToInt(sPerkTime);
 
+			/* TODO: strip this later (as in v1.1b)
 			if(args > 3){
 				char sOverrideClass[2];
 				GetCmdArg(4, sOverrideClass, sizeof(sOverrideClass));
 
 				if(StringToInt(sOverrideClass) > 0)
 					bOverrideClass = true;
-			}
+			}*/
 		}
 	}
 
@@ -556,7 +563,8 @@ public Action Command_ForceRTD(int client, int args){
 			PushArrayCell(eGroup[iGroup][hClientArray], GetClientSerial(aTrgList[i]));
 
 		eClients[aTrgList[i]][iGroupRollId] = iGroup;
-		ForcePerk(aTrgList[i], sPerkString, 16, iPerkTime, bOverrideClass, iGroup, client);
+		ForcePerk(aTrgList[i], sPerkString, 16, iPerkTime, /*bOverrideClass,*/ iGroup, client);
+		// TODO: correct the above
 	}
 	return Plugin_Handled;
 }
@@ -742,13 +750,14 @@ public int ConVarChange_Rtd(Handle hCvar, const char[] sOld, const char[] sNew){
 		g_bCvarRespawnStuck = StringToInt(sNew) > 0 ? true : false;
 }
 
+/* TODO: get rid of this
 public int ConVarChange_Repeat(Handle hCvar, const char[] sOld, const char[] sNew){
 	if(hCvar == g_hCvarCanRepeatPerk)
 		g_bCvarCanRepeatPerk = StringToInt(sNew) > 0 ? true : false;
 
 	else if(hCvar == g_hCvarCanRepeatGreatPerk)
 		g_bCvarCanRepeatGreatPerk = StringToInt(sNew) > 0 ? true : false;
-}
+}*/
 
 public int ConVarChange_Good(Handle hCvar, const char[] sOld, const char[] sNew){
 	if(hCvar == g_hCvarGoodChance)
@@ -916,7 +925,7 @@ void ParseCustomEffects(){
 
 void PrecachePerkSounds(){
 	char sBuffer[64];
-	PerkIter iter = new PerkIter(-1);
+	PerkIter iter = new PerkContainerIter(-1);
 	while((++iter).Perk()){
 		iter.Perk().GetSound(sBuffer, 64);
 		PrecacheSound(sBuffer);
@@ -925,7 +934,7 @@ void PrecachePerkSounds(){
 }
 
 void ParseDisabledPerks(){
-	PerkIter iter = new PerkIter(-1);
+	PerkIter iter = new PerkContainerIter(-1);
 	while((++iter).Perk())
 		iter.Perk().SetEnabled(true);
 	delete iter;
@@ -1064,13 +1073,14 @@ void RollPerkForClient(int client){
 		}
 	}
 
-	int iPerkId = RollPerk(client); // TODO: correct me
+	/*int iPerkId = RollPerk(client); // TODO: finish me
 	ApplyPerk(client, iPerkId);
 	if(g_bCvarLog)
-		LogMessage("%L rolled %s(ID: %d).", client, ePerks[iPerkId][sName], iPerkId);
+		LogMessage("%L rolled %s(ID: %d).", client, ePerks[iPerkId][sName], iPerkId);*/
 }
 
-int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int iPerkTime=-1, bool bOverrideClass=false, int iGroup=-1, int initiator=0){
+int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int iPerkTime=-1, /*bool bOverrideClass=false,*/ int iGroup=-1, int initiator=0){
+// TODO: fix the signature
 	if(!IsValidClient(client))
 		return -4;
 
@@ -1104,13 +1114,14 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 			else PrintToServer("%s Perk not found or invalid info, forcing %s.", CONS_PREFIX, iApplicats > 1 ? "rolls" : "a roll");
 		}
 
+		/* TODO: fix me
 		iPerkId = RollPerk(client, true, bOverrideClass, false, false, !StrEqual(sPerkString, "-"), sPerkString);
 		if(iPerkId < 0){
 			if(bIsValidInitiator)
 				PrintToChat(initiator, "%s No perks available for %N.", CHAT_PREFIX, client);
 			else PrintToServer("%s No perks available for %N.", CONS_PREFIX, client);
 			return -1;
-		}
+		}*/
 	}
 
 	if(bIsValidInitiator && GetForwardFunctionCount(g_hFwdCanForce) > 0){
@@ -1143,21 +1154,23 @@ bool GoodRoll(int client){
 	return fGoodChance > GetURandomFloat();
 }
 
+#define ROLLFLAG_NONE 0 // TODO: put me in a correct spot
 Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter=""){
 	bool bShouldBeGood = GoodRoll(client);
 	Perk perk = null;
 	PerkList candidates = g_hPerkContainer.FindPerks(sFilter);
 	PerkList list = new PerkList();
-	PerkIter iter = new PerkIter(-1);
+	PerkIter iter = new PerkListIter(candidates, -1);
 
 	while((perk = (++iter).Perk()))
-		if(perk.IsAptFor(client, bShouldBeGood, iRollFlags, sTagFilter))
+		if(perk.IsAptFor(client, bShouldBeGood, iRollFlags))
 			list.Push(perk);
 
-	remove iter;
-	perk = list.GetRandom();
-	remove list;
+	delete iter;
+	delete candidates;
 
+	perk = list.GetRandom();
+	delete list;
 	return perk;
 }
 
@@ -1487,13 +1500,7 @@ public int Native_ForcePerk(Handle hPlugin, int iParams){
 }
 
 public int Native_RollPerk(Handle hPlugin, int iParams){
-	return RollPerk(
-		GetNativeCell(1),
-		GetNativeCell(2) > 0 ? true : false,
-		GetNativeCell(3) > 0 ? true : false,
-		GetNativeCell(4) > 0 ? true : false,
-		GetNativeCell(5) > 0 ? true : false
-	);
+	return view_as<int>(RollPerk(0, 0, "")); // TODO: correct me, view_as too
 }
 
 public int Native_RemovePerk(Handle hPlugin, int iParams){
