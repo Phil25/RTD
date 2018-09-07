@@ -1064,7 +1064,7 @@ void RollPerkForClient(int client){
 		}
 	}
 
-	int iPerkId = RollPerk(client);
+	int iPerkId = RollPerk(client); // TODO: correct me
 	ApplyPerk(client, iPerkId);
 	if(g_bCvarLog)
 		LogMessage("%L rolled %s(ID: %d).", client, ePerks[iPerkId][sName], iPerkId);
@@ -1136,100 +1136,29 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 }
 
 //-----[ General ]-----//
-int RollPerk(int client=0, bool bOverrideDisabled=false, bool bOverrideClass=false, bool bCountRepeat=true, bool bCountGreatRepeat=true, bool bUseFilter=false, const char[] sTagFilter=""){
+bool GoodRoll(int client){
 	float fGoodChance = g_fCvarGoodChance;
 	if(IsValidClient(client) && IsRollerDonator(client))
 		fGoodChance = g_fCvarGoodDonatorChance;
+	return fGoodChance > GetURandomFloat();
+}
 
-	bool bGoodPerk = fGoodChance > GetURandomFloat() ? true : false;
-	Handle hAvailablePerks = CreateArray();
-	for(int i = 0; i < g_iPerkCount; i++){
-		if(!bUseFilter){
-			if(ePerks[i][bGood] != bGoodPerk)
-				continue;
+Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter=""){
+	bool bShouldBeGood = GoodRoll(client);
+	Perk perk = null;
+	PerkList candidates = g_hPerkContainer.FindPerks(sFilter);
+	PerkList list = new PerkList();
+	PerkIter iter = new PerkIter(-1);
 
-			if(!bOverrideDisabled)
-				if(ePerks[i][bIsDisabled])
-					continue;
+	while((perk = (++iter).Perk()))
+		if(perk.IsAptFor(client, bShouldBeGood, iRollFlags, sTagFilter))
+			list.Push(perk);
 
-			if(IsValidClient(client)){
-				if(bCountRepeat)
-					if(!g_bCvarCanRepeatPerk)
-						if(i == eClients[client][iLastPerk])
-							continue;
+	remove iter;
+	perk = list.GetRandom();
+	remove list;
 
-				if(bCountGreatRepeat)
-					if(!g_bCvarCanRepeatGreatPerk)
-						if(i == eClients[client][iGreatLastPerk])
-							continue;
-			}
-		}else if(!IsPerkInTags(i, sTagFilter, CountCharInString(sTagFilter, '|')+1))
-			continue;
-
-		if(!bOverrideClass)
-			if(!PerkAllowedForClassOf(client, i))
-				continue;
-
-		if(!PerkAllowedForWeaponsOf(client, i))
-			continue;
-
-		PushArrayCell(hAvailablePerks, i);
-	}
-
-	int iPerkNum = GetArraySize(hAvailablePerks);
-	int iUsingHandle = 0;
-	Handle hAvailablePerks2 = CreateArray();
-	int iPerkNum2 = -1;
-	if(!iPerkNum){
-		for(int i = 0; i < g_iPerkCount; i++){
-			if(!bUseFilter){
-				if(ePerks[i][bGood] == bGoodPerk)
-					continue;
-
-				if(!bOverrideDisabled)
-					if(ePerks[i][bIsDisabled])
-						continue;
-
-				if(IsValidClient(client)){
-					if(bCountRepeat)
-						if(!g_bCvarCanRepeatPerk)
-							if(i == eClients[client][iLastPerk])
-								continue;
-
-					if(bCountGreatRepeat)
-						if(!g_bCvarCanRepeatGreatPerk)
-							if(i == eClients[client][iGreatLastPerk])
-								continue;
-				}
-			}else if(!IsPerkInTags(i, sTagFilter, CountCharInString(sTagFilter, ',')+1))
-				continue;
-
-			if(!bOverrideClass)
-				if(!PerkAllowedForClassOf(client, i))
-					continue;
-
-			if(!PerkAllowedForWeaponsOf(client, i))
-				continue;
-
-			PushArrayCell(hAvailablePerks2, i);
-		}
-		iPerkNum2 = GetArraySize(hAvailablePerks2);
-		if(iPerkNum2)
-			iUsingHandle = 2;
-
-	}else iUsingHandle = 1;
-
-	int iPerkId = -1;
-	switch(iUsingHandle){
-		case 1:{iPerkId = GetArrayCell(hAvailablePerks, GetRandomInt(0, iPerkNum-1));}
-		case 2:{iPerkId = GetArrayCell(hAvailablePerks2, GetRandomInt(0, iPerkNum2-1));}
-	}
-
-	delete hAvailablePerks;
-	if(!iPerkNum)
-		delete hAvailablePerks2;
-
-	return iPerkId;
+	return perk;
 }
 
 void ApplyPerk(int client, int iPerk, int iPerkTime=-1, int iGroup=-1, int iSamePerk=-1){
