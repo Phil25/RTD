@@ -22,11 +22,27 @@ public void OnPluginStart(){
 	ParseEffects();
 	RegServerCmd("sm_rtdstest", Command_PerkSearchupTest);
 	char sBuffer[255];
+
+	Perk perk = null;
 	PerkIter iter = new PerkIter(-1);
-	while((++iter).Perk()){
-		iter.Perk().Format(sBuffer, 255, "$Id$. $Name$");
+	PerkList list = new PerkList();
+
+	int i = 0;
+	while((perk = (++iter).Perk())){
+		perk.Format(sBuffer, 255, "$Id$. $Name$");
+		PrintToServer(sBuffer);
+		list.Push(perk);
+		if(++i > 5) break;
+	}
+
+	i = 0;
+	while(++i < 20){
+		perk = list.GetRandom();
+		perk.Format(sBuffer, 255, "Random: $Name$");
 		PrintToServer(sBuffer);
 	}
+
+	delete list;
 	delete iter;
 }
 

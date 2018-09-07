@@ -281,6 +281,12 @@ methodmap PerkList < ArrayList{
 	public Perk Get(int i){
 		return view_as<Perk>(this.Get(i));
 	}
+
+	public Perk GetRandom(){
+		int iLen = this.Length;
+		if(!iLen) return null;
+		return this.Get(GetRandomInt(0, --iLen));
+	}
 }
 
 
