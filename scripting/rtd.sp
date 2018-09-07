@@ -20,7 +20,7 @@
 
 /****** I N C L U D E S *****/
 
-#include <sourcemod>
+#include <rtd2>
 #include <sdktools>
 #include <sdkhooks>
 #include <tf2_stocks>
@@ -1154,7 +1154,6 @@ bool GoodRoll(int client){
 	return fGoodChance > GetURandomFloat();
 }
 
-#define ROLLFLAG_NONE 0 // TODO: put me in a correct spot
 Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter=""){
 	bool bShouldBeGood = GoodRoll(client);
 	Perk perk = null;
@@ -1163,7 +1162,7 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 	PerkIter iter = new PerkListIter(candidates, -1);
 
 	while((perk = (++iter).Perk()))
-		if(perk.IsAptFor(client, bShouldBeGood, iRollFlags))
+		if(perk.GetGood() == bShouldBeGood && perk.IsAptFor(client, iRollFlags))
 			list.Push(perk);
 
 	delete iter;

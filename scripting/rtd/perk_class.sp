@@ -54,6 +54,8 @@ enum PerkPropType{
 	Type_Array
 }
 
+/* TF2 class enum offsets numbered accoring to their appearance in-game */
+int g_iClassConverter[10] = {0, 1, 8, 2, 4, 7, 5, 3, 9, 6};
 
 typedef PerkCall = function void(int client, int iPerkId, bool bEnable);
 
@@ -264,10 +266,61 @@ methodmap Perk < StringMap{
 		return false;
 	}
 
-	public bool IsAptFor(int client, bool bShouldBeGood, int iRollFlags){
-		client = 0;
-		iRollFlags = 0;
-		return this.GetGood() == bShouldBeGood;
+	public bool IsAptForClassOf(int client){
+		int iClass = view_as<int>(TF2_GetPlayerClass(client));
+		iClass = g_iClassConverter[iClass];
+		return view_as<bool>(this.GetClass() & (1 << iClass));
+	}
+
+	public bool IsAptForLoadoutOf(int client){
+		ArrayList hWeaps = this.GetWeaponClass();
+		if(hWeaps == null) return true;
+
+		int iLen = hWeaps.Length;
+		if(!iLen) return true;
+
+		int iWeap = 0;
+		char sClass[32], sWeapClass[32];
+
+		for(int i = 0; i < 5; i++){
+			iWeap = GetPlayerWeaponSlot(client, i);
+
+			if(iWeap <= MaxClients) continue;
+			if(!IsValidEntity(iWeap)) continue;
+
+			GetEntityClassname(iWeap, sWeapClass, 32);
+			for(int j = 0; j < iLen; j++){
+				hWeaps.GetString(j, sClass, 32);
+				if(StrContains(sWeapClass, sClass, false) > -1)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	public bool IsAptFor(int client, int iRollFlags){
+		if(!(iRollFlags & ROLLFLAG_OVERRIDE_DISABLED))
+			if(!this.GetEnabled()) return false;
+
+		if(IsValidClient(client)){
+			if(!(iRollFlags & ROLLFLAG_IGNORE_PLAYER_REPEATS))
+				// TODO: if(perk in client queue)
+				return false;
+
+			if(!(iRollFlags & ROLLFLAG_IGNORE_PERK_REPEATS))
+				// TODO: if(perk in global queue)
+				return false;
+		}
+
+		if(!(iRollFlags & ROLLFLAG_OVERRIDE_CLASS))
+			if(!this.IsAptForClassOf(client))
+				return false;
+
+		if(!(iRollFlags & ROLLFLAG_OVERRIDE_LOADOUT))
+			if(!this.IsAptForLoadoutOf(client))
+				return false;
+
+		return true;
 	}
 }
 

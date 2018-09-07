@@ -43,12 +43,11 @@ public __pl_rtd2_SetNTVOptional(){
 	\**************************/
 
 #define ROLLFLAG_NONE					0
-#define ROLLFLAG_USE_FILTER				(1 << 0)	/* Use the provided string to filter out perks */
-#define ROLLFLAG_OVERRIDE_DISABLED		(1 << 1)	/* Accept disabled perks */
-#define ROLLFLAG_OVERRIDE_CLASS			(1 << 2)	/* If client is specified, ignore their class */
-#define ROLLFLAG_OVERRIDE_LOADOUT		(1 << 3)	/* Ignore whether the client has irrelevant loadout */
-#define ROLLFLAG_IGNORE_PERK_REPEATS	(1 << 4)	/* Ignore whether the perk was rolled recently */
-#define ROLLFLAG_IGNORE_PLAYER_REPEATS	(1 << 5)	/* Ignore whether the client has rolled the perk recently */
+#define ROLLFLAG_OVERRIDE_DISABLED		(1 << 0)	/* Accept disabled perks */
+#define ROLLFLAG_OVERRIDE_CLASS			(1 << 1)	/* If client is specified, ignore their class */
+#define ROLLFLAG_OVERRIDE_LOADOUT		(1 << 2)	/* Ignore whether the client has irrelevant loadout */
+#define ROLLFLAG_IGNORE_PERK_REPEATS	(1 << 3)	/* Ignore whether the perk was rolled recently */
+#define ROLLFLAG_IGNORE_PLAYER_REPEATS	(1 << 4)	/* Ignore whether the client has rolled the perk recently */
 
 
 
