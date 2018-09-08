@@ -8,11 +8,6 @@ You may not consider this list if you're not customizing perks in any way.
 	* ID is still present, cannot be changed.
 	* ID is added automatically, by the order the perks appear in.
 
-* Spaces from config fields are no longer stripped.
-	* Make sure to update your custom perk config.
-	* ex. `"weapons" "bow, launcher"` is no longer correct.
-	* It now should be `"weapons" "bow,launcher"`.
-
 * `"class"` field is parsed differently
 	* Doesn't count any other characters than digits.
 		* `"1, 2, 5, 8"` is the same as `"12 5 a8"`.
