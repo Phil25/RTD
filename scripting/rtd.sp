@@ -1104,10 +1104,10 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 	}
 
 	int iPerkId = GetPerkOfString(sPerkString, iPerkStringSize);
-	bool bSamePerk = true;
+	//bool bSamePerk = true; TODO: use me
 	int iApplicats = iGroup < 0 ? 1 : eGroup[iGroup][iClientCount];
 	if(iPerkId < 0 || iPerkId >= g_iPerkCount){
-		bSamePerk = false;
+		//bSamePerk = false; TODO: use me
 		if(!g_bTempPrint){
 			if(bIsValidInitiator)
 				PrintToChat(initiator, "%s Perk not found or invalid info, forcing %s.", CHAT_PREFIX, iApplicats > 1 ? "rolls" : "a roll");
@@ -1136,7 +1136,8 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 			return -5;
 	}
 
-	ApplyPerk(client, iPerkId, iPerkTime, iGroup, bSamePerk ? iPerkId : -1);
+	// TODO: fix me
+	//ApplyPerk(client, iPerkId, iPerkTime, iGroup, bSamePerk ? iPerkId : -1);
 	if(g_bCvarLog){
 		if(bIsValidInitiator)
 			LogMessage("A perk %s(ID: %d) has been forced on %L for %d seconds by %L.", ePerks[iPerkId][sName], iPerkId, client, iPerkTime, initiator);
@@ -1173,32 +1174,38 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 	return perk;
 }
 
-void ApplyPerk(int client, int iPerk, int iPerkTime=-1, int iGroup=-1, int iSamePerk=-1){
+void ApplyPerk(int client, Perk perk, int iPerkTime=-1, int iGroup=-1, int iSamePerk=-1){
 	if(!IsValidClient(client))
 		return;
 
-	EmitSoundToAll(ePerks[iPerk][sSound], client);
-	ManagePerk(client, iPerk, true);
+	perk.EmitSound(client);
+	//ManagePerk(client, perk, true); // TODO: correct signature
+
+	// TODO: Push to queues
+
 	int iDuration = -1;
-	if(ePerks[iPerk][iTime] > -1){
-		iDuration = (iPerkTime > -1) ? iPerkTime : (ePerks[iPerk][iTime] > 0) ? ePerks[iPerk][iTime] : g_iCvarPerkDuration;
+	int iTime = perk.GetTime();
+	if(iTime > -1){
+		iDuration = (iPerkTime > -1) ? iPerkTime : (iTime > 0) ? iTime : g_iCvarPerkDuration;
 		int iSerial = GetClientSerial(client);
 
 		eClients[client][bRolling]	= true;
-		eClients[client][iCurPerk]	= iPerk;
+		//eClients[client][iCurPerk]	= perk; // TODO: fix eClients enum
 		eClients[client][iPerkEnd]	= GetTime() + iDuration;
 		eClients[client][hPerkTimer]= CreateTimer(float(iDuration), Timer_RemovePerk, iSerial);
 		DisplayPerkTimeFrame(client);
 		CreateTimer(1.0, Timer_Countdown, iSerial, TIMER_REPEAT);
 	}else eClients[client][iLastRoll] = GetTime();
 
-	Forward_PerkApplied(client, iPerk, iDuration);
+	//Forward_PerkApplied(client, perk, iDuration); // TODO: fix signature
+	/* TODO: get rid of me
 	eClients[client][iGreatLastPerk]= eClients[client][iLastPerk];
 	eClients[client][iLastPerk]		= iPerk;
+	*/
 
-	PrintToRoller(client, iPerk, iDuration);
+	//PrintToRoller(client, perk, iDuration); // TODO: Correct signature
 	if(iGroup < 0 || iSamePerk < 0){
-		PrintToNonRollers(client, iPerk, iDuration);
+		//PrintToNonRollers(client, iPerk, iDuration); // TODO: as above
 		if(iSamePerk < 0){
 			g_bTempPrint = true;
 			CreateTimer(0.1, Timer_ReloadTempPrint);
