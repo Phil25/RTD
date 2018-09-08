@@ -17,6 +17,7 @@
 */
 
 #include <rtd2>
+#include <tf2_stocks>
 
 #include "rtd/perk_class.sp"
 
