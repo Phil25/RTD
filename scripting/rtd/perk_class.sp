@@ -269,7 +269,7 @@ methodmap Perk < StringMap{
 	public bool IsAptForClassOf(int client){
 		int iClass = view_as<int>(TF2_GetPlayerClass(client));
 		iClass = g_iClassConverter[iClass];
-		return view_as<bool>(this.GetClass() & (1 << iClass));
+		return view_as<bool>(this.GetClass() & (1 << --iClass));
 	}
 
 	public bool IsAptForLoadoutOf(int client){
@@ -302,7 +302,8 @@ methodmap Perk < StringMap{
 		if(!(iRollFlags & ROLLFLAG_OVERRIDE_DISABLED))
 			if(!this.GetEnabled()) return false;
 
-		if(IsValidClient(client)){
+		if(client != 0){
+			/*
 			if(!(iRollFlags & ROLLFLAG_IGNORE_PLAYER_REPEATS))
 				// TODO: if(perk in client queue)
 				return false;
@@ -310,6 +311,7 @@ methodmap Perk < StringMap{
 			if(!(iRollFlags & ROLLFLAG_IGNORE_PERK_REPEATS))
 				// TODO: if(perk in global queue)
 				return false;
+			*/
 		}
 
 		if(!(iRollFlags & ROLLFLAG_OVERRIDE_CLASS))
