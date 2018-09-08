@@ -25,19 +25,22 @@
 int StringToClass(const char[] sClasses){
 	int i = -1, iFlags = 0;
 	while(sClasses[++i] != '\0')
-		iFlags |= 1 << CharToInt(sClasses[i]);
+		iFlags |= ParseClassDigit(sClasses[i]);
 	return iFlags == 0 ? 511 : iFlags;
 }
 
 ArrayList StringToWeaponClass(const char[] sWeapClass){
-	ArrayList list = new ArrayList(32);
 	if(FindCharInString(sWeapClass, '0') != -1)
-		return list;
+		return null;
 
-	int iSize = CountCharInString(sWeapClass, ',')+1;
+	char sWeapClassEsc[127];
+	EscapeString(sWeapClass, ' ', '\0', sWeapClassEsc, 127);
+	ArrayList list = new ArrayList(32);
+
+	int iSize = CountCharInString(sWeapClassEsc, ',')+1;
 	char[][] sPieces = new char[iSize][32];
 
-	ExplodeString(sWeapClass, ",", sPieces, iSize, 64);
+	ExplodeString(sWeapClassEsc, ",", sPieces, iSize, 64);
 	for(int i = 0; i < iSize; i++)
 		list.PushString(sPieces[i]);
 	return list;
@@ -53,6 +56,12 @@ ArrayList StringToTags(const char[] sTags){
 	for(int i = 0; i < iSize; i++)
 		list.PushString(sPieces[i]);
 	return list;
+}
+
+/* return po2 value based on class */
+int ParseClassDigit(char c){
+	int d = CharToInt(c);
+	return !d ? 0 : 1 << --d;
 }
 
 /* return 0 if not a numeric char */
