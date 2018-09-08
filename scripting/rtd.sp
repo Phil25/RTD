@@ -31,8 +31,7 @@
 #include <friendly>
 #include <friendlysimple>
 
-#include "rtd/perk_class.sp"
-#include "rtd/perk_includes.sp"
+#include "rtd/includes.sp"
 
 
 /******* D E F I N E S ******/
