@@ -97,15 +97,6 @@ enum ClientInfo{
 };
 int eClients[MAXPLAYERS+1][ClientInfo];
 
-enum GroupRolls{
-	bool:bActive,
-	iGroupPerkId,
-	Handle:hClientArray,
-	iClientCount
-};
-int eGroup[MAXPLAYERS+1][GroupRolls];
-
-
 
 /********* M A N A G E R ********/
 
@@ -521,8 +512,7 @@ public Action Command_ForceRTD(int client, int args){
 	}
 
 	int		iPerkTime		= -1;
-	//bool	bOverrideClass	= false; // TODO: remove me later (as in v1.1b)
-	char	sPerkString[16]	= "-";
+	char	sPerkString[16]	= "";
 
 	if(args > 1){
 		GetCmdArg(2, sPerkString, sizeof(sPerkString));
@@ -531,38 +521,19 @@ public Action Command_ForceRTD(int client, int args){
 			char sPerkTime[8];
 			GetCmdArg(3, sPerkTime, sizeof(sPerkTime));
 			iPerkTime = StringToInt(sPerkTime);
-
-			/* TODO: strip this later (as in v1.1b)
-			if(args > 3){
-				char sOverrideClass[2];
-				GetCmdArg(4, sOverrideClass, sizeof(sOverrideClass));
-
-				if(StringToInt(sOverrideClass) > 0)
-					bOverrideClass = true;
-			}*/
 		}
 	}
 
-	int iGroup = -1;
+	Group group = null;
 	if(iTrgCount > 1){
-		iGroup = GetNextAvailableGroup();
-		if(iGroup < 0) return Plugin_Handled;
-
-		eGroup[iGroup][bActive]			= true;
-		eGroup[iGroup][iClientCount]	= iTrgCount;
-
-		if(eGroup[iGroup][hClientArray] == INVALID_HANDLE)
-			eGroup[iGroup][hClientArray] = CreateArray();
-
-		ClearArray(eGroup[iGroup][hClientArray]);
+		group = PrepareGroup();
+		for(int i = 0; i < iTrgCount; i++)
+			group.PushClient(aTrgList[i]);
 	}
 
 	for(int i = 0; i < iTrgCount; i++){
-		if(iGroup > -1)
-			PushArrayCell(eGroup[iGroup][hClientArray], GetClientSerial(aTrgList[i]));
-
-		eClients[aTrgList[i]][iGroupRollId] = iGroup;
-		ForcePerk(aTrgList[i], sPerkString, 16, iPerkTime, /*bOverrideClass,*/ iGroup, client);
+		eClients[aTrgList[i]][iGroupRollId] = -1; // TODO: fix me after implementing Roller methodmap
+		ForcePerk(aTrgList[i], sPerkString, 16, iPerkTime, /*bOverrideClass,*/ group, client);
 		// TODO: correct the above
 	}
 	return Plugin_Handled;
@@ -1078,14 +1049,14 @@ void RollPerkForClient(int client){
 		LogMessage("%L rolled %s(ID: %d).", client, ePerks[iPerkId][sName], iPerkId);*/
 }
 
-int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int iPerkTime=-1, /*bool bOverrideClass=false,*/ int iGroup=-1, int initiator=0){
+int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int iPerkTime=-1, /*bool bOverrideClass=false,*/ Group group=null, int initiator=0){
 // TODO: fix the signature
 	if(!IsValidClient(client))
 		return -4;
 
 	bool bIsValidInitiator = IsValidClient(initiator);
 	if(eClients[client][bRolling]){
-		if(iGroup < 0){
+		if(!group){
 			if(bIsValidInitiator)
 				PrintToChat(initiator, "%s %N is already using RTD.", CHAT_PREFIX, client);
 			else PrintToServer("%s %N is already using RTD.", CONS_PREFIX, client);
@@ -1094,7 +1065,7 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 	}
 
 	if(!IsPlayerAlive(client)){
-		if(iGroup < 0){
+		if(!group){
 			if(bIsValidInitiator)
 				PrintToChat(initiator, "%s %N is dead.", CHAT_PREFIX, client);
 			else PrintToServer("%s %N is already using RTD.", CONS_PREFIX, client);
@@ -1102,9 +1073,10 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 		return -2;
 	}
 
-	int iPerkId = GetPerkOfString(sPerkString, iPerkStringSize);
 	//bool bSamePerk = true; TODO: use me
-	int iApplicats = iGroup < 0 ? 1 : eGroup[iGroup][iClientCount];
+	int iPerkId = GetPerkOfString(sPerkString, iPerkStringSize);
+	int iApplicats = !group ? 1 : group.ClientCount;
+
 	if(iPerkId < 0 || iPerkId >= g_iPerkCount){
 		//bSamePerk = false; TODO: use me
 		if(!g_bTempPrint){
@@ -1136,7 +1108,7 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 	}
 
 	// TODO: fix me
-	//ApplyPerk(client, iPerkId, iPerkTime, iGroup, bSamePerk ? iPerkId : -1);
+	//ApplyPerk(client, iPerkId, iPerkTime, iGroup, bSamePerk);
 	if(g_bCvarLog){
 		if(bIsValidInitiator)
 			LogMessage("A perk %s(ID: %d) has been forced on %L for %d seconds by %L.", ePerks[iPerkId][sName], iPerkId, client, iPerkTime, initiator);
@@ -1173,7 +1145,7 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 	return perk;
 }
 
-void ApplyPerk(int client, Perk perk, int iPerkTime=-1, int iGroup=-1, int iSamePerk=-1){
+void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool bSamePerk=false){
 	if(!IsValidClient(client))
 		return;
 
@@ -1203,15 +1175,15 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1, int iGroup=-1, int iSame
 	*/
 
 	//PrintToRoller(client, perk, iDuration); // TODO: Correct signature
-	if(iGroup < 0 || iSamePerk < 0){
+	if(!group || !bSamePerk){
 		//PrintToNonRollers(client, iPerk, iDuration); // TODO: as above
-		if(iSamePerk < 0){
+		if(!bSamePerk){
 			g_bTempPrint = true;
 			CreateTimer(0.1, Timer_ReloadTempPrint);
 		}
 
-		if(iGroup > -1)
-			eGroup[iGroup][iGroupPerkId] = -1;
+		if(group)
+			group.Perk = null;
 
 		return;
 	}
@@ -1219,15 +1191,15 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1, int iGroup=-1, int iSame
 	if(g_bTempPrint)	//----- Past this point, execution happens once -----//
 		return;
 
-	PrintGroupRolls(eGroup[iGroup][iClientCount], iSamePerk, iDuration);
+	PrintGroupRolls(group.ClientCount, perk, iDuration);
 
 	g_bTempPrint = true;
 	CreateTimer(0.1, Timer_ReloadTempPrint);
-	if(ePerks[iSamePerk][iTime] < 0)
+	if(perk.GetTime() < 0)
 		return;
 
-	eGroup[iGroup][iGroupPerkId] = iSamePerk;
-	CreateTimer(float(iDuration), Timer_PrintGroupEnd, iGroup);
+	group.Perk = perk;
+	CreateTimer(float(iDuration), Timer_PrintGroupEnd, group);
 }
 
 //-----[ Descriptions ]-----//
@@ -1270,27 +1242,29 @@ public Action Timer_ReloadTempPrint(Handle hTimer){
 	return Plugin_Stop;
 }
 
-public Action Timer_PrintGroupEnd(Handle hTimer, int iGroup){
-	if(!eGroup[iGroup][bActive])
+public Action Timer_PrintGroupEnd(Handle hTimer, Group group){
+	if(!group || !group.Active)
 		return Plugin_Stop;
 
-	int iSize = eGroup[iGroup][iClientCount];
+	int iSize = group.ClientCount;
 	if(iSize < 1)
 		return Plugin_Stop;
 
-	int iPerk = eGroup[iGroup][iGroupPerkId];
-	if(iPerk > -1){
+	Perk perk = group.Perk;
+	if(perk){
+		char sPerkName[MAX_NAME_LENGTH];
+		perk.GetName(sPerkName, MAX_NAME_LENGTH);
 		char sReason[128];
 		Format(sReason, sizeof(sReason), "%s %T", CHAT_PREFIX,
 			"RTD2_Remove_Perk_Group_Same", LANG_SERVER,
-			ePerks[iPerk][bGood] ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			ePerks[iPerk][sName],
+			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			sPerkName,
 			0x01,
 			iSize);
 		PrintToChatAll(sReason);
 	}
 
-	eGroup[iGroup][bActive] = false;
+	group.Active = false;
 	return Plugin_Stop;
 }
 
@@ -1324,19 +1298,9 @@ int ForceRemovePerk(int client, int iReason=3, const char[] sReason=""){
 		return -1;
 
 	int iClientPerk = eClients[client][iCurPerk];
-	int iGroup = eClients[client][iGroupRollId];
-	if(iGroup > -1){
-		if(eGroup[iGroup][bActive]){
-			int iPos = FindValueInArray(eGroup[iGroup][hClientArray], GetClientSerial(client));
-			if(iPos > -1){
-				RemoveFromArray(eGroup[iGroup][hClientArray], iPos);
-				eGroup[iGroup][iClientCount]--;
-			}
-
-			if(eGroup[iGroup][iClientCount] < 1)
-				eGroup[iGroup][bActive] = false;
-		}
-	}
+	Group group = null;//eClients[client][iGroupRollId]; TODO: fix this after Roller class
+	if(group && group.Active)
+		group.EraseClient(client);
 
 	ManagePerk(client, iClientPerk , false, iReason, sReason);
 	return iClientPerk;
@@ -1349,11 +1313,11 @@ void RemovedPerk(int client, int iReason, const char[] sReason=""){
 	Forward_PerkRemoved(client, eClients[client][iCurPerk], iReason);
 	eClients[client][iCurPerk]	= -1;
 
-	int iGroup = eClients[client][iGroupRollId];
-	if(iGroup < 0)
+	Group group = null;//eClients[client][iGroupRollId]; TODO: after adding Roller
+	if(!group)
 		PrintPerkEndReason(client, iReason, sReason);
-	else if(eGroup[iGroup][iGroupPerkId] < 0)
-			PrintPerkEndReason(client, iReason, sReason);
+	else if(!group.Perk)
+		PrintPerkEndReason(client, iReason, sReason);
 
 	eClients[client][iGroupRollId] = -1;
 	KillTimerSafe(eClients[client][hPerkTimer]);
@@ -1494,14 +1458,15 @@ public int Native_GetClientPerkTime(Handle hPlugin, int iParams){
 public int Native_ForcePerk(Handle hPlugin, int iParams){
 	char sPerkString[32]; int iStringSize = sizeof(sPerkString);
 	GetNativeString(2, sPerkString, iStringSize);
-	return ForcePerk(
+	/*return ForcePerk( TODO: correct me
 		GetNativeCell(1),
 		sPerkString,
 		iStringSize,
 		GetNativeCell(3),
 		GetNativeCell(4) > 0 ? true : false,
 		GetNativeCell(5)
-	);
+	);*/
+	return 0;
 }
 
 public int Native_RollPerk(Handle hPlugin, int iParams){
@@ -1924,13 +1889,6 @@ stock int GetPerkOfString(const char[] sString, int iStringSize){
 
 stock int GetPerkTime(int iPerkId){
 	return (ePerks[iPerkId][iTime] > 0) ? ePerks[iPerkId][iTime] : g_iCvarPerkDuration;
-}
-
-stock int GetNextAvailableGroup(){
-	for(int i = 0; i <= MaxClients; i++)
-		if(!eGroup[i][bActive])
-			return i;
-	return -1;
 }
 
 //-----[ Miscellaneous ]-----//
