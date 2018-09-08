@@ -324,6 +324,12 @@ methodmap Perk < StringMap{
 
 		return true;
 	}
+
+	public void EmitSound(int client){
+		char sSound[64];
+		this.GetSound(sSound, 64);
+		EmitSoundToAll(sSound, client);
+	}
 }
 
 #undef GET_VALUE
