@@ -22,3 +22,4 @@ You may not consider this list if you're not customizing perks in any way.
 
 * Perk group rolls.
 * Perk queues.
+* Perk menu + translations.
