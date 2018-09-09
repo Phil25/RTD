@@ -23,6 +23,7 @@
 #include "rtd/classes/containers.sp"
 #include "rtd/classes/iterators.sp"
 #include "rtd/classes/group.sp"
+#include "rtd/classes/rollers.sp"
 
 
 // Include path your your perk starting from /scripting/ folder here.
