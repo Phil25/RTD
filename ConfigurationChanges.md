@@ -17,3 +17,8 @@ You may not consider this list if you're not customizing perks in any way.
 * You can set custom "good" value to be anything other than 0, 1.
 	* This is not advised and will cause problems.
 	* I left it because there is no reason whatsoever anyone should do this.
+
+# Required testing
+
+* Perk group rolls.
+* Perk queues.
