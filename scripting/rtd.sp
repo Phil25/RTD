@@ -107,7 +107,7 @@ bool	g_bPluginFriendlySimple	= false;
 bool	g_bIsRegisteringOpen	= false;
 bool	g_bIsUpdateForced		= false;
 
-Handle	g_hDescriptionMenu		= INVALID_HANDLE;
+Menu	g_hDescriptionMenu		= null;
 
 bool	g_bIsGameArena			= false;
 
@@ -1035,10 +1035,13 @@ void RollPerkForClient(int client){
 		}
 	}
 
-	/*int iPerkId = RollPerk(client); // TODO: finish me
-	ApplyPerk(client, iPerkId);
-	if(g_bCvarLog)
-		LogMessage("%L rolled %s(ID: %d).", client, ePerks[iPerkId][sName], iPerkId);*/
+	Perk perk = RollPerk(client);
+	//ApplyPerk(client, iPerkId); // TODO: fix sig
+	if(g_bCvarLog){
+		char sBuffer[64];
+		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
+		LogMessage("%L rolled %s.", client, sBuffer);
+	}
 }
 
 int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int iPerkTime=-1, /*bool bOverrideClass=false,*/ Group group=null, int initiator=0){
@@ -1066,10 +1069,11 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 	}
 
 	//bool bSamePerk = true; TODO: use me
-	int iPerkId = GetPerkOfString(sPerkString, iPerkStringSize);
+	Perk perk = null; // TODO: find perk here
+	int iPerkId = GetPerkOfString(sPerkString, iPerkStringSize); // TODO: remove me
 	int iApplicats = !group ? 1 : group.ClientCount;
 
-	if(iPerkId < 0 || iPerkId >= g_iPerkCount){
+	if(iPerkId < 0 || iPerkId >= g_iPerkCount){ // TODO: check if perk == null
 		//bSamePerk = false; TODO: use me
 		if(!g_bTempPrint){
 			if(bIsValidInitiator)
@@ -1102,9 +1106,11 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 	// TODO: fix me
 	//ApplyPerk(client, iPerkId, iPerkTime, iGroup, bSamePerk);
 	if(g_bCvarLog){
+		char sBuffer[64];
+		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
 		if(bIsValidInitiator)
-			LogMessage("A perk %s(ID: %d) has been forced on %L for %d seconds by %L.", ePerks[iPerkId][sName], iPerkId, client, iPerkTime, initiator);
-		else LogMessage("A perk %s(ID: %d) has been forced on %L for %d seconds.", ePerks[iPerkId][sName], iPerkId, client, iPerkTime);
+			LogMessage("A perk %s has been forced on %L for %d seconds by %L.", sBuffer, client, iPerkTime, initiator);
+		else LogMessage("A perk %s has been forced on %L for %d seconds.", sBuffer, client, iPerkTime);
 	}
 
 	return iPerkId;
@@ -1166,9 +1172,9 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool b
 	//Forward_PerkApplied(client, perk, iDuration); // TODO: fix signature
 	// TODO: add to client perk history
 
-	//PrintToRoller(client, perk, iDuration); // TODO: Correct signature
+	PrintToRoller(client, perk, iDuration);
 	if(!group || !bSamePerk){
-		//PrintToNonRollers(client, iPerk, iDuration); // TODO: as above
+		PrintToNonRollers(client, perk, iDuration);
 		if(!bSamePerk){
 			g_bTempPrint = true;
 			CreateTimer(0.1, Timer_ReloadTempPrint);
@@ -1195,34 +1201,50 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool b
 }
 
 //-----[ Descriptions ]-----//
-Handle BuildDesc(){
-	Handle hMenu = CreateMenu(ManagerDesc);
-	SetMenuTitle(hMenu, "%T", "RTD2_Menu_Title", LANG_SERVER);
-	for(int i = 0; i < g_iCorePerkCount; i++)
-		AddMenuItem(hMenu, "", ePerks[i][sName]);
+Menu BuildDesc(){
+	Menu hMenu = new Menu(ManagerDesc);
+	hMenu.SetTitle("%T", "RTD2_Menu_Title", LANG_SERVER);
 
-	SetMenuExitBackButton(hMenu, false);
-	SetMenuExitButton(hMenu, true);
+	char sPerkName[MAX_NAME_LENGTH], sPerkToken[32];
+	PerkIter iter = new PerkContainerIter(-1);
+	Perk perk = null;
+
+	while((perk = (++iter).Perk())){
+		perk.GetToken(sPerkToken, 32);
+		perk.GetName(sPerkName, MAX_NAME_LENGTH);
+		hMenu.AddItem(sPerkToken, sPerkName);
+	}
+
+	delete iter;
+
+	hMenu.ExitBackButton = false;
+	hMenu.ExitButton = true;
 
 	return hMenu;
 }
 
 void ShowDesc(int client, int iPos=0){
 	if(iPos == 0)
-		DisplayMenu(g_hDescriptionMenu, client, MENU_TIME_FOREVER);
-	else DisplayMenuAtItem(g_hDescriptionMenu, client, GetMenuSelectionPosition(), MENU_TIME_FOREVER);
+		g_hDescriptionMenu.Display(client, MENU_TIME_FOREVER);
+	else g_hDescriptionMenu.DisplayAt(client, GetMenuSelectionPosition(), MENU_TIME_FOREVER);
 }
 
-public int ManagerDesc(Handle hMenu, MenuAction maState, int client, int iPos){
+public int ManagerDesc(Menu hMenu, MenuAction maState, int client, int iPos){
 	if(maState != MenuAction_Select)
 		return 0;
 
-	char sTranslatePos[16];
-	Format(sTranslatePos, sizeof(sTranslatePos), "RTD2_Desc_%d", iPos);
+	Perk perk = null;
+	char sPerkToken[32], sPerkName[MAX_NAME_LENGTH], sTranslate[64];
+
+	hMenu.GetItem(iPos, sPerkToken, 32);
+	perk = g_hPerkContainer.Get(sPerkToken);
+	perk.GetName(sPerkName, MAX_NAME_LENGTH);
+	FormatEx(sTranslate, 64, "RTD2_Desc_%s", sPerkToken);
+
 	PrintToChat(client, "%s %s%s%c: \x03%T\x01", CHAT_PREFIX,
-		ePerks[iPos][bGood] ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-		ePerks[iPos][sName], 0x01,
-		sTranslatePos, LANG_SERVER);
+		perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+		sPerkName, 0x01,
+		sTranslate, LANG_SERVER);
 
 	ShowDesc(client, iPos);
 	return 1;
@@ -1320,72 +1342,79 @@ void RemovedPerk(int client, int iReason, const char[] sReason=""){
 }
 
 //-----[ Printing ]-----//
-void PrintToRoller(int client, int iPerk, int iDuration){
+void PrintToRoller(int client, Perk perk, int iDuration){
 	if(!(g_iCvarChat & CHAT_APPROLLER))
 		return;
 
-	if(!g_bCvarShowTime || ePerks[iPerk][iTime] == -1)
+	char sPerkName[MAX_NAME_LENGTH];
+	perk.GetName(sPerkName, MAX_NAME_LENGTH);
+
+	if(!g_bCvarShowTime || perk.GetTime() == -1)
 		PrintToChat(client, "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Roller", LANG_SERVER,
-			ePerks[iPerk][bGood] ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			ePerks[iPerk][sName],
+			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			sPerkName,
 			0x01);
 	else{
-		int iTrueDuration = (iDuration > -1) ? iDuration : (ePerks[iPerk][iTime] > 0) ? ePerks[iPerk][iTime] : g_iCvarPerkDuration;
+		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.GetTime() > 0) ? perk.GetTime() : g_iCvarPerkDuration;
 		PrintToChat(client, "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Roller_Time", LANG_SERVER,
-			ePerks[iPerk][bGood] ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			ePerks[iPerk][sName],
+			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			sPerkName,
 			0x01, 0x03, iTrueDuration, 0x01);
 	}
 }
 
-void PrintToNonRollers(int client, int iPerk, int iDuration){
+void PrintToNonRollers(int client, Perk perk, int iDuration){
 	if(!(g_iCvarChat & CHAT_APPOTHER))
 		return;
 
-	char sOthersPrint[128], sRollerName[MAX_NAME_LENGTH];
+	char sOthersPrint[128], sRollerName[MAX_NAME_LENGTH], sPerkName[MAX_NAME_LENGTH];
 	GetClientName(client, sRollerName, sizeof(sRollerName));
-	if(!g_bCvarShowTime || ePerks[iPerk][iTime] == -1)
+	perk.GetName(sPerkName, MAX_NAME_LENGTH);
+
+	if(!g_bCvarShowTime || perk.GetTime() == -1)
 		Format(sOthersPrint, sizeof(sOthersPrint), "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Others", LANG_SERVER,
 			g_sTeamColors[GetClientTeam(client)],
 			sRollerName,
 			0x01,
-			ePerks[iPerk][bGood] ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			ePerks[iPerk][sName], 0x01);
+			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			sPerkName, 0x01);
 	else{
-		int iTrueDuration = (iDuration > -1) ? iDuration : (ePerks[iPerk][iTime] > 0) ? ePerks[iPerk][iTime] : g_iCvarPerkDuration;
+		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.GetTime() > 0) ? perk.GetTime() : g_iCvarPerkDuration;
 		Format(sOthersPrint, sizeof(sOthersPrint), "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Others_Time", LANG_SERVER,
 			g_sTeamColors[GetClientTeam(client)],
 			sRollerName,
 			0x01,
-			ePerks[iPerk][bGood] ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			ePerks[iPerk][sName], 0x01, 0x03, iTrueDuration, 0x01);
+			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			sPerkName, 0x01, 0x03, iTrueDuration, 0x01);
 	}
 	PrintToChatAllExcept(client, sOthersPrint);
 }
 
-void PrintGroupRolls(int iApplications, int iPerk, int iDuration){
+void PrintGroupRolls(int iApplications, Perk perk, int iDuration){
 	if(!(g_iCvarChat & CHAT_APPOTHER))
 		return;
 
-	char sReason[128];
-	if(!g_bCvarShowTime || ePerks[iPerk][iTime] == -1)
+	char sReason[128], sPerkName[MAX_NAME_LENGTH];
+	perk.GetName(sPerkName, MAX_NAME_LENGTH);
+
+	if(!g_bCvarShowTime || perk.GetTime() == -1)
 		Format(sReason, sizeof(sReason), "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Multi", LANG_SERVER,
 			iApplications,
-			ePerks[iPerk][bGood] ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			ePerks[iPerk][sName],
+			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			sPerkName,
 			0x01);
 	else{
-		int iTrueDuration = (iDuration > -1) ? iDuration : (ePerks[iPerk][iTime] > 0) ? ePerks[iPerk][iTime] : g_iCvarPerkDuration;
+		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.GetTime() > 0) ? perk.GetTime() : g_iCvarPerkDuration;
 		Format(sReason, sizeof(sReason), "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Multi_Time", LANG_SERVER,
 			iApplications,
-			ePerks[iPerk][bGood] ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			ePerks[iPerk][sName],
+			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			sPerkName,
 			0x01, 0x03, iTrueDuration, 0x01);
 	}
 	PrintToChatAll(sReason);
