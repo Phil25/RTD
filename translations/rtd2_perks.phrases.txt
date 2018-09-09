@@ -9,7 +9,7 @@
 		"de"	"RTD Effekte:"
 	}
 
-	"RTD2_Desc_0"
+	"RTD2_Desc_godmode"
 	{
 		"en"	"You are invulnerable to damage."
 		"pl"	"Jesteś nieśmiertelny."
@@ -17,7 +17,7 @@
 		"de"	"Du bist unverwundbar."
 	}
 	
-	"RTD2_Desc_1"
+	"RTD2_Desc_toxic"
 	{
 		"en"	"Your terrible breath hurts nearby enemies."
 		"pl"	"Twój smród boli przeciwników."
@@ -25,7 +25,7 @@
 		"de"	"Dein schrecklicher Atem schädigt Feinde in einem Umkreis."
 	}
 	
-	"RTD2_Desc_2"
+	"RTD2_Desc_luckysandvich"
 	{
 		"en"	"Your health is boosted and the next attack is a crit."
 		"pl"	"Twoje zdrowie jest zwiekszone i następny atak jest krytyczny."
@@ -33,7 +33,7 @@
 		"de"	"Dein Leben ist erhöht und der nächste Schuss ist eine kritischer Schuss."
 	}
 	
-	"RTD2_Desc_3"
+	"RTD2_Desc_increasedspeed"
 	{
 		"en"	"Your speed is boosted."
 		"pl"	"Twoja postać jest przyśpieszona."
@@ -41,7 +41,7 @@
 		"de"	"Dein Lauftempo ist erhöht."
 	}
 	
-	"RTD2_Desc_4"
+	"RTD2_Desc_flying"
 	{
 		"en"	"You can fly around the map."
 		"pl"	"Poleć sobie gdzie chcesz."
@@ -49,7 +49,7 @@
 		"de"	"Du kannst in der Karte herumfliegen"
 	}
 	
-	"RTD2_Desc_5"
+	"RTD2_Desc_lowgravity"
 	{
 		"en"	"Your gravity was set to low."
 		"pl"	"Twoja grawitacja jest słaba."
@@ -57,7 +57,7 @@
 		"de"	"Deine Anziehungskraft wurde zu einer niedriegen Schwerkraft gesetzt."
 	}
 	
-	"RTD2_Desc_6"
+	"RTD2_Desc_fullubercharge"
 	{
 		"en"	"Your Übercharge was set to full."
 		"pl"	"Masz pełny Übercharge."
@@ -65,7 +65,7 @@
 		"de"	"Dein Übercharge wurde aufgeladen."
 	}
 	
-	"RTD2_Desc_7"
+	"RTD2_Desc_invisibility"
 	{
 		"en"	"You are invisible."
 		"pl"	"Jesteś niewidzialny."
@@ -73,7 +73,7 @@
 		"de"	"Du bist unsichtbar."
 	}
 	
-	"RTD2_Desc_8"
+	"RTD2_Desc_infinitecloak"
 	{
 		"en"	"You have infinite cloak."
 		"pl"	"Masz nieskończoną niewidzialność."
@@ -81,7 +81,7 @@
 		"de"	"Du hast unendlich Tarnung."
 	}
 	
-	"RTD2_Desc_9"
+	"RTD2_Desc_criticals"
 	{
 		"en"	"Your attacks are crits."
 		"pl"	"Twoje ataki są krytyczne."
@@ -89,7 +89,7 @@
 		"de"	"Deine Schüsse sind kritische Schüsse."
 	}
 	
-	"RTD2_Desc_10"
+	"RTD2_Desc_infiniteammo"
 	{
 		"en"	"Your ammo never runs out."
 		"pl"	"Masz nieskończoną amunicję."
@@ -97,7 +97,7 @@
 		"de"	"Deine Munition geht niemals leer."
 	}
 	
-	"RTD2_Desc_11"
+	"RTD2_Desc_scarybullets"
 	{
 		"en"	"Stun the enemy with your spooky booollets."
 		"pl"	"Przestrasz przeciwnika swoimi strasznymi pociskami."
@@ -105,7 +105,7 @@
 		"de"	"Erschrecke ein Feind mit deinen gruseligen Kuuuuugeln."
 	}
 	
-	"RTD2_Desc_12"
+	"RTD2_Desc_spawnsentry"
 	{
 		"en"	"You can spawn a Sentry Gun."
 		"pl"	"Możesz postawić Działko."
@@ -113,7 +113,7 @@
 		"de"	"Du kannst eine Sentry spawnen."
 	}
 	
-	"RTD2_Desc_13"
+	"RTD2_Desc_homingprojectiles"
 	{
 		"en"	"Your projectiles are self-aware."
 		"pl"	"Masz samonaprowadzające pociski."
@@ -121,7 +121,7 @@
 		"de"	"Deine Projektile wissen schon bescheid."
 	}
 	
-	"RTD2_Desc_14"
+	"RTD2_Desc_fullriflecharge"
 	{
 		"en"	"Sniper Rifle or Huntsman are constantly charged."
 		"pl"	"Masz zawsze zapełniony pasek naładowania dla Snajperki czy Łowcy."
@@ -129,7 +129,7 @@
 		"de"	"Deine Sniper Rifle oder Huntsman sind immer voll aufgeladen."
 	}
 	
-	"RTD2_Desc_15"
+	"RTD2_Desc_explode"
 	{
 		"en"	"Suddenly, BANG!"
 		"pl"	"Nagle, wybuch."
@@ -137,7 +137,7 @@
 		"de"	"Explosion!"
 	}
 	
-	"RTD2_Desc_16"
+	"RTD2_Desc_snail"
 	{
 		"en"	"You are really slow."
 		"pl"	"Jesteś bardzo wolny."
@@ -145,7 +145,7 @@
 		"de"	"Du bist echt langsam."
 	}
 	
-	"RTD2_Desc_17"
+	"RTD2_Desc_frozen"
 	{
 		"en"	"You are now an ice statue."
 		"pl"	"Zamieniasz się w lód."
@@ -153,7 +153,7 @@
 		"de"	"Du bist jetzt eine Eis Statue."
 	}
 	
-	"RTD2_Desc_18"
+	"RTD2_Desc_timebomb"
 	{
 		"en"	"You head is a bomb now, go kill someone with it."
 		"pl"	"Twoja głowa to teraz bomba, idź kogoś nią zabić."
@@ -161,7 +161,7 @@
 		"de"	"Dein Kopf ist jetzt eine Bombe, jetzt töte jemanden."
 	}
 	
-	"RTD2_Desc_19"
+	"RTD2_Desc_ignition"
 	{
 		"en"	"Go die in a fire."
 		"pl"	"Zgiń w ogniu."
@@ -169,7 +169,7 @@
 		"de"	"Sterb in ein Feuer."
 	}
 	
-	"RTD2_Desc_20"
+	"RTD2_Desc_lowhealth"
 	{
 		"en"	"Your health is now low."
 		"pl"	"Twoje zdrowie jest teraz małe."
@@ -177,7 +177,7 @@
 		"de"	"Dein Leben ist nun niedrig."
 	}
 	
-	"RTD2_Desc_21"
+	"RTD2_Desc_drugged"
 	{
 		"en"	"You feel well, too well."
 		"pl"	"Czujesz się dobrze, zbyt dobrze."
@@ -185,7 +185,7 @@
 		"de"	"Du fühlst dich gut. Zu gut."
 	}
 	
-	"RTD2_Desc_22"
+	"RTD2_Desc_blind"
 	{
 		"en"	"Where did everybody go?"
 		"pl"	"Kto zgasił światło?"
@@ -193,7 +193,7 @@
 		"de"	"Wo ist jeder hin gegangen?"
 	}
 	
-	"RTD2_Desc_23"
+	"RTD2_Desc_striptomelee"
 	{
 		"en"	"You're left with your melee. Good luck!"
 		"pl"	"Zostajesz wyłącznie z bronią ręczną. Powodzenia!"
@@ -201,7 +201,7 @@
 		"de"	"Du hast nurnach deine Nahkampfwaffe. Viel Glück!"
 	}
 	
-	"RTD2_Desc_24"
+	"RTD2_Desc_beacon"
 	{
 		"en"	"Let the enemy know where you are, you're not afraid of them."
 		"pl"	"Pokaż przeciwnikom gdzie jesteś, pokaż, że się ich nie boisz."
@@ -209,7 +209,7 @@
 		"de"	"Lass dein Feind wissen wo du bist, du hast keine Angst vor den."
 	}
 	
-	"RTD2_Desc_25"
+	"RTD2_Desc_forcedtaunt"
 	{
 		"en"	"Can't... stop... showing my superiority!"
 		"pl"	"Nie mogę... przestać... drwić!"
@@ -217,7 +217,7 @@
 		"de"	"Kann...nicht...aufhören...meine Überlegenheit zu zeigen!"
 	}
 	
-	"RTD2_Desc_26"
+	"RTD2_Desc_monochromia"
 	{
 		"en"	"Your vision is black and white."
 		"pl"	"Twój obraz jest czarno biały."
@@ -225,7 +225,7 @@
 		"de"	"Deine Sicht ist Schwarz und Weiß."
 	}
 	
-	"RTD2_Desc_27"
+	"RTD2_Desc_Earthquake"
 	{
 		"en"	"The ground is shakin!"
 		"pl"	"Ziemia się trzęsie!"
@@ -233,7 +233,7 @@
 		"de"	"Der Boden wackelt!"
 	}
 	
-	"RTD2_Desc_28"
+	"RTD2_Desc_funnyfeeling"
 	{
 		"en"	"What happens when you pull your eyelids back."
 		"pl"	"Co się dzieje, kiedy rozciągasz sobie oczy."
@@ -241,7 +241,7 @@
 		"de"	"Das passiert wenn du deine Augenlieder zurück ziehst."
 	}
 	
-	"RTD2_Desc_29"
+	"RTD2_Desc_badsauce"
 	{
 		"en"	"Milk, blood and Jarate."
 		"pl"	"Mleko, krew i Jarate."
@@ -249,7 +249,7 @@
 		"de"	"Milch, Blut und Jarate."
 	}
 	
-	"RTD2_Desc_30"
+	"RTD2_Desc_spawndispenser"
 	{
 		"en"	"You can spawn a Dispenser."
 		"pl"	"Możesz postawić Zasobnik."
@@ -257,7 +257,7 @@
 		"de"	"Du kannst einen Dispenser spawnen."
 	}
 	
-	"RTD2_Desc_31"
+	"RTD2_Desc_infinitejump"
 	{
 		"en"	"You can jump off the air once, so why not multiple times?"
 		"pl"	"Możesz raz odbić się od powietrza, to czemu nie wiele razy?"
@@ -265,7 +265,7 @@
 		"de"	"Du kannst in der Luft springen, warum nicht öfters?"
 	}
 	
-	"RTD2_Desc_32"
+	"RTD2_Desc_powerfulhits"
 	{
 		"en"	"Your damage is buffed."
 		"pl"	"Wzmacnia zadawane obrażenia."
@@ -273,7 +273,7 @@
 		"de"	"Dein Schaden wurde erhöht."
 	}
 	
-	"RTD2_Desc_33"
+	"RTD2_Desc_bighead"
 	{
 		"en"	"Other mercs now make fun behind your back."
 		"pl"	"Inni się teraz śmieją za twoimi plecami."
@@ -281,7 +281,7 @@
 		"de"	"Andere Soldaten lachen dich hinter deinen Rücken aus."
 	}
 	
-	"RTD2_Desc_34"
+	"RTD2_Desc_tinymann"
 	{
 		"en"	"You have shrunk, creep on anyone you want!"
 		"pl"	"Jesteś malutki, zaczaj się na kogo chcesz!"
@@ -289,7 +289,7 @@
 		"de"	"Du bist geschrumpt, schleich dich an die jede an die du willst!"
 	}
 	
-	"RTD2_Desc_35"
+	"RTD2_Desc_firework"
 	{
 		"en"	"Raise up high and go down with awe."
 		"pl"	"Stałeś się fajerwerką."
@@ -297,7 +297,7 @@
 		"de"	"Steig hoch und geh mit einen awe runter."
 	}
 	
-	"RTD2_Desc_36"
+	"RTD2_Desc_deadlyvoice"
 	{
 		"en"	"Voice commands deal damage."
 		"pl"	"Komendy głosowe zadają obrażenia."
@@ -305,7 +305,7 @@
 		"de"	"Sprach Commands teilen Schaden aus."
 	}
 	
-	"RTD2_Desc_37"
+	"RTD2_Desc_stronggravity"
 	{
 		"en"	"Don't trip or you'll break your leg... or both."
 		"pl"	"Nie potknij się bo złamiesz nogę... albo dwie."
@@ -313,7 +313,7 @@
 		"de"	"Fall nicht hin oder du brichst dir dein Bein... oder beide."
 	}
 	
-	"RTD2_Desc_38"
+	"RTD2_Desc_eyeforaneye"
 	{
 		"en"	"This is how it feels."
 		"pl"	"Tak właśnie czują się inni."
@@ -321,7 +321,7 @@
 		"de"	"So fühlt sich das an."
 	}
 	
-	"RTD2_Desc_39"
+	"RTD2_Desc_weakened"
 	{
 		"en"	"You are now a wuss."
 		"pl"	"Jesteś teraz słabiakiem."
@@ -329,7 +329,7 @@
 		"de"	"Du bist jetzt ein Schwächling!"
 	}
 	
-	"RTD2_Desc_40"
+	"RTD2_Desc_necromash"
 	{
 		"en"	"That helmet ain't gonna save ya."
 		"pl"	"Ten hełm ci nie pomoże."
@@ -337,7 +337,7 @@
 		"de"	"Dieser Helm wird dich nich' beschützen."
 	}
 	
-	"RTD2_Desc_41"
+	"RTD2_Desc_extraammo"
 	{
 		"en"	"More ammo, more skill."
 		"pl"	"Więcej amunicji, więcej wprawy."
@@ -345,7 +345,7 @@
 		"de"	"Mehr Munition, mehr Skill.
 	}
 	
-	"RTD2_Desc_42"
+	"RTD2_Desc_suffocation"
 	{
 		"en"	"You forgot how to breathe."
 		"pl"	"Zapomniałeś jak się oddycha."
@@ -353,7 +353,7 @@
 		"de"	"Du hast vergessen zu atmen."
 	}
 	
-	"RTD2_Desc_43"
+	"RTD2_Desc_fasthands"
 	{
 		"en"	"You are now a skillful mercenary."
 		"pl"	"Jesteś teraz sprawnym najemnikiem."
@@ -361,7 +361,7 @@
 		"de"	"Du bist jetzt ein schneller Soldat."
 	}
 	
-	"RTD2_Desc_44"
+	"RTD2_Desc_outline"
 	{
 		"en"	"Your awesomeness glows through walls. And notifies enemies."
 		"pl"	"Twoja wspaniałość błyszczy przez ściany. I powiadamia przeciwnika."
@@ -369,7 +369,7 @@
 		"de"	"Dein schönes Aussehen scheint durch die Wände. Und alarmiert Feinde."
 	}
 	
-	"RTD2_Desc_45"
+	"RTD2_Desc_vital"
 	{
 		"en"	"Your max health is increased."
 		"pl"	"Twoje maksymalne zdrowie zostało podwyższone."
@@ -377,7 +377,7 @@
 		"de"	"Dein Maximales Leben wurde erhöht."
 	}
 	
-	"RTD2_Desc_46"
+	"RTD2_Desc_nogravity"
 	{
 		"en"	"Jump to the moon and get killed in the meantime."
 		"pl"	"Skocz na księżyc i zostań zabitym podczas lotu."
@@ -385,7 +385,7 @@
 		"de"	"Springe zum Mond und werde auf den weg dahin getötet."
 	}
 	
-	"RTD2_Desc_47"
+	"RTD2_Desc_teamcriticals"
 	{
 		"en"	"Stand near a teammate to give them crits."
 		"pl"	"Stań obok przyjaciela aby dać mu krytyczne ataki."
@@ -393,7 +393,7 @@
 		"de"	"Stehe in der nähe eines Teammitglieds und gebe ihn kritische Schüsse."
 	}
 	
-	"RTD2_Desc_48"
+	"RTD2_Desc_firetimebomb"
 	{
 		"en"	"You don't explode but ignite everyone around you."
 		"pl"	"Nie eksplodujesz ale podpalasz wszystkich wokół."
@@ -401,7 +401,7 @@
 		"de"	"Du explodierst nicht, setzt aber jeden in einem Umkreis in Flammen."
 	}
 	
-	"RTD2_Desc_49"
+	"RTD2_Desc_firebreath"
 	{
 		"en"	"The burning you feel? It is PURE FIRE."
 		"pl"	"To palenie w tobie. To CZYSTY OGIEŃ."
@@ -409,7 +409,7 @@
 		"de"	"Das brennen was du fühlst? Es ist PURES FEUER."
 	}
 	
-	"RTD2_Desc_50"
+	"RTD2_Desc_strongrecoil"
 	{
 		"en"	"Your firearm skills are gone."
 		"pl"	"Twoje doświadczenie w broniach palnych gdzieś zniknęło."
@@ -417,7 +417,7 @@
 		"de"	"Deine Schuss Fähigkeiten sind weg."
 	}
 	
-	"RTD2_Desc_51"
+	"RTD2_Desc_cursed"
 	{
 		"en"	"You go left and you go up or back and right or down...?"
 		"pl"	"Idziesz w lewo, a nie w górę czy wstecz? W prawo czy w dół...?"
@@ -425,7 +425,7 @@
 		"de"	"Du gehts nach links und nach oben und nach rechts oder nach unten?"
 	}
 	
-	"RTD2_Desc_52"
+	"RTD2_Desc_extrathrowables"
 	{
 		"en"	"You realize you can actually take more of these with you."
 		"pl"	"Zdajesz sobie sprawę, że możesz wziąć ich więcej."
@@ -433,7 +433,7 @@
 		"de"	"Du hast realisiert das du mehrere davon mitnehmen kannst."
 	}
 	
-	"RTD2_Desc_53"
+	"RTD2_Desc_powerplay"
 	{
 		"en"	"Take that, Robin!"
 		"pl"	"Twój ruch, Robin!"
@@ -441,7 +441,7 @@
 		"de"	"Nehm das, Robin!"
 	}
 	
-	"RTD2_Desc_54"
+	"RTD2_Desc_explosivearrows"
 	{
 		"en"	"Your arrows and crossbow bolts detonate upon impact."
 		"pl"	"Twoje strzały i pociski z kusz wybuchają."
@@ -449,7 +449,7 @@
 		"de"	"Deine Pfeile und Armbrust Pfeile explodieren bei Berührung."
 	}
 	
-	"RTD2_Desc_55"
+	"RTD2_Desc_inclineproblem"
 	{
 		"en"	"You forgot how to use stairs."
 		"pl"	"Zapomniałeś jak się używa schody."
