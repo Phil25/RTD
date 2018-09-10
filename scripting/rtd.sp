@@ -20,6 +20,7 @@
 
 /****** I N C L U D E S *****/
 
+#define RTD2_NO_PERK_METHODMAP
 #include <rtd2>
 #include <sdktools>
 #include <sdkhooks>
@@ -1521,15 +1522,10 @@ public int Native_GetPerkOfString(Handle hPlugin, int iParams){
 }
 
 public int Native_RegisterPerk(Handle hPlugin, int iParams){
-	char sPluginName[32];
-	GetPluginFilename(hPlugin, sPluginName, sizeof(sPluginName));
 	if(!g_bIsRegisteringOpen){
+		char sPluginName[32];
+		GetPluginFilename(hPlugin, sPluginName, sizeof(sPluginName));
 		ThrowNativeError(SP_ERROR_NATIVE, "%s Plugin \"%s\" is trying to register perks before it's possible.\nPlease use the forward RTD2_OnRegOpen() and native RTD2_IsRegOpen() to determine.", CONS_PREFIX, sPluginName);
-		return -1;
-	}
-
-	if(g_iPerkCount >= PERK_MAX_COUNT-1){
-		ThrowNativeError(SP_ERROR_NATIVE, "%s No space for new perks.\nPlease recompile the core increasing \"PERK_MAX_COUNT\" define.", CONS_PREFIX);
 		return -1;
 	}
 
@@ -1566,11 +1562,8 @@ public int Native_RegisterPerk(Handle hPlugin, int iParams){
 	EscapeString(sClassBuffer[0], ' ', '\0', sClassBuffer[1], PERK_MAX_LOW);
 
 	int iClassFlags = ClassStringToFlags(sClassBuffer[1]);
-	if(iClassFlags < 1){
-		PrintToServer("%s WARNING: A plugin \"%s\" is registering a perk with invalid class restriction(s) for perk \"%s\". Assuming it's all-class.", CONS_PREFIX, sPluginName, ePerks[g_iPerkCount][sName]);
-		LogError("%s WARNING: A plugin \"%s\" is registering a perk with invalid class restriction(s) for perk \"%s\". Assuming it's all-class.", CONS_PREFIX, sPluginName, ePerks[g_iPerkCount][sName]);
+	if(iClassFlags < 1)
 		iClassFlags = 511;
-	}
 
 	ePerks[iPerkId][iClasses] = iClassFlags;
 
