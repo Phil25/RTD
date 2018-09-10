@@ -15,24 +15,22 @@ public SharedPlugin:__pl_rtd2 = {
 
 #if !defined REQUIRE_PLUGIN
 public __pl_rtd2_SetNTVOptional(){
-
 	MarkNativeAsOptional("RTD2_GetClientPerkId");
 	MarkNativeAsOptional("RTD2_GetClientPerkTime");
-	
+
 	MarkNativeAsOptional("RTD2_ForcePerk");
 	MarkNativeAsOptional("RTD2_RollPerk");
 	MarkNativeAsOptional("RTD2_RemovePerk");
-	
+
 	MarkNativeAsOptional("RTD2_GetPerkOfString");
-	
+
 	MarkNativeAsOptional("RTD2_RegisterPerk");
 	MarkNativeAsOptional("RTD2_IsRegOpen");
 	MarkNativeAsOptional("RTD2_SetPerkByToken");
 	MarkNativeAsOptional("RTD2_SetPerkById");
 	MarkNativeAsOptional("RTD2_DefaultCorePerk");
-	
-	MarkNativeAsOptional("RTD2_CanPlayerBeHurt");
 
+	MarkNativeAsOptional("RTD2_CanPlayerBeHurt");
 }
 #endif
 
@@ -148,7 +146,7 @@ native RTD2_GetClientPerkTime(client);
  * @param iTime			Custom perk's time. -1 = don't use.
  * @param bOvrClass		0/1 - If perk doesn't match player's class, should it be applied anyway?
  * @param initiator		Entity which initiated forcing the perk.
- * 
+ *
  * @return				-5 if RTD2_CanForcePerk forward was blocked,
  *						-4 if client index is not valid (bots are not valid either),
  *						-3 if client is using RTD,
@@ -169,7 +167,7 @@ native RTD2_ForcePerk(client, String:sPerk[]="-1", iTime=-1, bOvrClass=0, initia
  * @param bOverrideClass		0/1 - Roll perks NOT for player's class?
  * @param bCountRepeat			0/1 - Roll perks which repeated twice in 2 rolls for client? (sm_rtd2_repeat 1 ONLY)
  * @param bCountGreatRepeat		0/1 - Roll perks which repeated twice in 3 rolls for client? (sm_rtd2_repeatgreat 1 ONLY)
- * 
+ *
  * @return						Perk index on success, -1 otherwise
  */
 native RTD2_RollPerk(client=0, bOverrideDisabled=0, bOverrideClass=0, bCountRepeat=1, bCountGreatRepeat=1);
@@ -181,7 +179,7 @@ native RTD2_RollPerk(client=0, bOverrideDisabled=0, bOverrideClass=0, bCountRepe
  * @param client		Client Index.
  * @param iReason		Reason Index (0=plugin unload, 1=death, 2=class change, 3=wear off, 4=disconnect, 5=custom/unknown).
  * @param sReason		Provide custom reason IF iReason=5.
- * 
+ *
  * @return				Perk index which got removed, -1 if client wasn't using RTD.
  */
 native RTD2_RemovePerk(client, iReason=3, const String:sReason[]="");
@@ -206,16 +204,14 @@ native RTD2_GetPerkOfString(const String:sString[]="");
 	\****************************/
 
 /*
+The following are grouped individually,
+because they are meant to be for plugins
+which register their own perks to the RTD.
 
-		The following are grouped individually,
-	because they are meant to be for plugins
-	which register their own perks to the RTD.
-	
-		For a full tutorial on how to use those,
-	see the RTD's thread on AlliedModders:
-	
-	https://forums.alliedmods.net/showthread.php?t=278579
-	
+For a full tutorial on how to use those,
+see the RTD's thread on AlliedModders:
+
+https://forums.alliedmods.net/showthread.php?t=278579
 */
 
 functag RTD2Manager public(client, iPerkId, bool:bEnable);
@@ -306,3 +302,11 @@ native RTD2_DefaultCorePerk(iId=-1, const String:sToken[]="");
  * @return			1 if yes, 0 if not or error.
  */
 native RTD2_CanPlayerBeHurt(client, by=0);
+
+#if !defined RTD2_NO_PERK_METHODMAP
+methodmap Perk < StringMap{
+	public Perk(){
+		return view_as<Perk>(new StringMap());
+	}
+}
+#endif
