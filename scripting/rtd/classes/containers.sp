@@ -68,21 +68,26 @@ methodmap PerkContainer < StringMap{
 		delete this;
 	}
 
-	public int Add(Perk p){
-		char sToken[32]; // TODO: check if token already exists
-		p.GetToken(sToken, 32);
-
-		this.SetValue(sToken, p);
-		int iId = g_hPerkTokenMapper.PushString(sToken);
-
-		p.SetId(iId);
-		return iId;
+	public Perk Get(const char[] sToken){
+		Perk perk = null;
+		this.GetValue(sToken, perk);
+		return perk;
 	}
 
-	public Perk Get(const char[] sToken){
-		Perk p;
-		this.GetValue(sToken, p);
-		return p;
+	public int Add(Perk perk){
+		char sToken[32];
+		perk.GetToken(sToken, 32);
+
+		if(this.Get(sToken) != null){
+			delete perk;
+			return -1;
+		}
+
+		this.SetValue(sToken, perk);
+		int iId = g_hPerkTokenMapper.PushString(sToken);
+
+		perk.SetId(iId);
+		return iId;
 	}
 
 	public Perk GetFromIdEx(int iId){
