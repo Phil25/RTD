@@ -57,8 +57,6 @@ enum PerkPropType{
 /* TF2 class enum offsets numbered accoring to their appearance in-game */
 int g_iClassConverter[10] = {0, 1, 8, 2, 4, 7, 5, 3, 9, 6};
 
-typedef PerkCall = function void(int client, int iPerkId, bool bEnable);
-
 methodmap Perk < StringMap{
 	public Perk(){
 		return view_as<Perk>(new StringMap());
@@ -126,7 +124,7 @@ methodmap Perk < StringMap{
 		return hFwd;
 	}
 
-	public void SetCall(PerkCall func){
+	public void SetCall(RTDCall func){
 		delete this.GetCall();
 		Handle hFwd = CreateForward(ET_Single, Param_Cell, Param_Cell, Param_Cell);
 		AddToForward(hFwd, null, func);
