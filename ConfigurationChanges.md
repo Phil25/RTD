@@ -18,8 +18,18 @@ You may not consider this list if you're not customizing perks in any way.
 	* This is not advised and will cause problems.
 	* I left it because there is no reason whatsoever anyone should do this.
 
+* (For devs) deprecated the following natives:
+	* RTD2\_GetClientPerkId, use RTD2\_GetClientPerk
+	* RTD2\_ForcePerk, use RTD2\_Force
+	* RTD2\_RollPerk, use RTD2\_Roll
+	* RTD2\_RemovePerk, use RTD2\_Remove
+	* RTD2\_GetPerkOfString, use RTD2\_FindPerk or RTD2\_FindPerks
+	* RTD2\_RegisterPerk, use RTD2\_MakePerk
+	* RTD2\_SetPerkByToken, RTD2\_SetPerkById and RTD2\_DefaultCorePerk, use RTD2\_SetPerk*
+
 # Required testing
 
+* Perk calls
 * Perk group rolls.
 * Perk queues.
 * Perk menu + translations.
