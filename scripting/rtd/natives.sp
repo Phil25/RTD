@@ -22,6 +22,14 @@
 #define _natives_included
 
 void CreateNatives(){
+	CreateNative("RTD2_GetPerkAny",			Native_GetPerkAny);
+	CreateNative("RTD2_SetPerkAny",			Native_SetPerkAny);
+	CreateNative("RTD2_GetPerkString",		Native_GetPerkString);
+	CreateNative("RTD2_SetPerkString",		Native_SetPerkString);
+	CreateNative("RTD2_GetPerkHandle",		Native_GetPerkHandle);
+	CreateNative("RTD2_SetPerkCall",		Native_SetPerkCall);
+	// TODO: Add RTDPerk.Format()
+
 	CreateNative("RTD2_GetClientPerkId",	Native_GetClientPerkId); // deprecated
 	CreateNative("RTD2_GetClientPerk",		Native_GetClientPerk);
 	CreateNative("RTD2_GetClientPerkTime",	Native_GetClientPerkTime);
@@ -30,10 +38,10 @@ void CreateNatives(){
 	CreateNative("RTD2_Force",				Native_Force);
 	CreateNative("RTD2_RollPerk",			Native_RollPerk); // deprecated
 	CreateNative("RTD2_Roll",				Native_Roll);
-	CreateNative("RTD2_RemovePerk",			Native_RemovePerk); // deprecated
+	CreateNative("RTD2_RemovePerk",			Native_Remove); // deprecated
 	CreateNative("RTD2_Remove",				Native_Remove);
 
-	CreateNative("RTD2_GetPerkOfString",	Native_GetPerkOfString); // deprecated
+	CreateNative("RTD2_GetPerkOfString",	Native_FindPerk); // deprecated
 	CreateNative("RTD2_FindPerk",			Native_FindPerk);
 	CreateNative("RTD2_FindPerks",			Native_FindPerks);
 
@@ -46,19 +54,108 @@ void CreateNatives(){
 	CreateNative("RTD2_SetPerkById",		Native_SetPerkById); // deprecated
 	CreateNative("RTD2_DefaultCorePerk",	Native_DefaultCorePerk); // deprecated
 
-	CreateNative("RTD2_GetPerkAny",			Native_GetPerkAny);
-	CreateNative("RTD2_SetPerkAny",			Native_SetPerkAny);
-	CreateNative("RTD2_GetPerkString",		Native_GetPerkString);
-	CreateNative("RTD2_SetPerkString",		Native_SetPerkString);
-	CreateNative("RTD2_GetPerkHandle",		Native_GetPerkHandle);
-	CreateNative("RTD2_SetPerkCall",		Native_SetPerkCall);
-
 	CreateNative("RTD2_CanPlayerBeHurt",	Native_CanPlayerBeHurt);
 }
 
+#define GET_PERK \
+	Perk perk = g_hPerkContainer.GetFromId(GetNativeCell(1)); \
+	if(!perk) ThrowNativeError(0, "Invalid perk: %d. Is RTDPerk.Valid true?", GetNativeCell(1));
+
+public int Native_GetPerkAny(Handle hPlugin, int iParams){
+	GET_PERK
+	RTDPerkProp prop = view_as<RTDPerkProp>(GetNativeCell(2));
+
+	switch(prop){
+		case RTDPerk_Good: return perk.Good;
+		case RTDPerk_Time: return perk.Time;
+		case RTDPerk_Classes: return perk.Class;
+		case RTDPerk_Enabled: return perk.Enabled;
+		case RTDPerk_External: return perk.External;
+	}
+
+	ThrowNativeError(0, "Property %d is not of type cell.", prop);
+	return 0;
+}
+
+public int Native_SetPerkAny(Handle hPlugin, int iParams){
+	GET_PERK
+	RTDPerkProp prop = view_as<RTDPerkProp>(GetNativeCell(2));
+	any aVal = GetNativeCell(3);
+
+	switch(prop){
+		case RTDPerk_Good: perk.Good = view_as<bool>(aVal);
+		case RTDPerk_Time: perk.Time = view_as<int>(aVal);
+		case RTDPerk_Enabled: perk.Enabled = view_as<bool>(aVal);
+		case RTDPerk_External: perk.External = view_as<bool>(aVal);
+		default: ThrowNativeError(0, "Property %d is not of type cell.", prop);
+	}
+
+	return 0;
+}
+
+public int Native_GetPerkString(Handle hPlugin, int iParams){
+	GET_PERK
+	RTDPerkProp prop = view_as<RTDPerkProp>(GetNativeCell(2));
+	int iLen = GetNativeCell(4);
+	char[] sBuffer = new char[iLen];
+
+	switch(prop){
+		case RTDPerk_Name: perk.GetName(sBuffer, iLen);
+		case RTDPerk_Sound: perk.GetSound(sBuffer, iLen);
+		case RTDPerk_Token: perk.GetToken(sBuffer, iLen);
+		case RTDPerk_Pref: perk.GetPref(sBuffer, iLen);
+		default: ThrowNativeError(0, "Property %d is not of type char[].", prop);
+	}
+
+	SetNativeString(3, sBuffer, iLen);
+	return 0;
+}
+
+public int Native_SetPerkString(Handle hPlugin, int iParams){
+	GET_PERK
+	RTDPerkProp prop = view_as<RTDPerkProp>(GetNativeCell(2));
+	char sVal[127];
+	GetNativeString(3, sVal, 127);
+
+	switch(prop){
+		case RTDPerk_Name: perk.SetName(sVal);
+		case RTDPerk_Sound: perk.SetSound(sVal);
+		case RTDPerk_Token: ThrowNativeError(0, "Tokens cannot be changed.");
+		case RTDPerk_Classes: perk.SetClass(sVal);
+		case RTDPerk_Pref: perk.SetPref(sVal);
+		default: ThrowNativeError(0, "Property %d is not of type char[].", prop);
+	}
+
+	return 0;
+}
+
+public int Native_GetPerkHandle(Handle hPlugin, int iParams){
+	GET_PERK
+	RTDPerkProp prop = view_as<RTDPerkProp>(GetNativeCell(2));
+	Handle result = null;
+
+	switch(prop){
+		case RTDPerk_WeaponClasses: result = CloneHandle(perk.GetWeaponClass(), hPlugin);
+		case RTDPerk_Tags: result = CloneHandle(perk.GetTags(), hPlugin);
+	}
+
+	if(result == null)
+		ThrowNativeError(0, "Property %d is not of type Handle.", prop);
+
+	return view_as<int>(result);
+}
+
+public int Native_SetPerkCall(Handle hPlugin, int iParams){
+	GET_PERK
+	perk.SetCall(GetNativeCell(2), hPlugin);
+	return 0;
+}
+
+#undef GET_PERK
+
 public int Native_GetClientPerkId(Handle hPlugin, int iParams){ // deprecated
 	Perk perk = g_hRollers.GetPerk(GetNativeCell(1));
-	return perk ? perk.GetId() : -1;
+	return perk ? perk.Id : -1;
 }
 
 public int Native_GetClientPerkTime(Handle hPlugin, int iParams){
@@ -67,66 +164,73 @@ public int Native_GetClientPerkTime(Handle hPlugin, int iParams){
 }
 
 public int Native_GetClientPerk(Handle hPlugin, int iParams){
-	return -1; // TODO: finish me
+	int client = GetNativeCell(1);
+	Perk perk = g_hRollers.GetPerk(client);
+	return perk ? perk.Id : -1;
 }
 
 public int Native_ForcePerk(Handle hPlugin, int iParams){ // deprecated
-	char sPerkString[32]; int iStringSize = sizeof(sPerkString);
-	GetNativeString(2, sPerkString, iStringSize);
-	/*return ForcePerk( TODO: correct me
+	char sQuery[32];
+	GetNativeString(2, sQuery, sizeof(sQuery));
+	return view_as<int>(ForcePerk(
 		GetNativeCell(1),
-		sPerkString,
-		iStringSize,
+		sQuery,
 		GetNativeCell(3),
-		GetNativeCell(4) > 0 ? true : false,
+		null,
 		GetNativeCell(5)
-	);*/
-	return 0;
+	));
 }
 
 public int Native_Force(Handle hPlugin, int iParams){
-	return view_as<int>(RTDForce_Success); // TODO: finish me
+	char sQuery[32];
+	GetNativeString(2, sQuery, sizeof(sQuery));
+	int client = GetNativeCell(1),
+		iPerkTime = GetNativeCell(3),
+		iInitiator = GetNativeCell(4);
+	return view_as<int>(ForcePerk(client, sQuery, iPerkTime, null, iInitiator));
 }
 
 public int Native_RollPerk(Handle hPlugin, int iParams){ // deprecated
-	return view_as<int>(RollPerk(0, 0, "")); // TODO: correct me, view_as too
+	int client = GetNativeCell(1);
+	Perk perk = RollPerk(client, ROLLFLAG_NONE, "");
+	return perk ? perk.Id : -1;
 }
 
 public int Native_Roll(Handle hPlugin, int iParams){
-	return -1; // TODO: finish me
-}
-
-public int Native_RemovePerk(Handle hPlugin, int iParams){ // TODO: figure out what to return // deprecated
-	char sReason[32]; GetNativeString(3, sReason, sizeof(sReason));
-	int client = GetNativeCell(1);
-
-	Forward_OnRemovePerkPre(client);
-	if(!g_hRollers.GetInRoll(client))
-		return -1;
-
-	return ForceRemovePerk(
-		client,
-		GetNativeCell(2),
-		sReason
-	);
+	int client = GetNativeCell(1),
+		iRollFlags = GetNativeCell(2);
+	char sQuery[32];
+	GetNativeString(3, sQuery, sizeof(sQuery));
+	Perk perk = RollPerk(client, iRollFlags, sQuery);
+	return perk ? perk.Id : -1;
 }
 
 public int Native_Remove(Handle hPlugin, int iParams){
-	return -1; // TODO: finish me
-}
+	int client = GetNativeCell(1);
+	RTDRemoveReason iReason = view_as<RTDRemoveReason>(GetNativeCell(2));
+	char sReason[32];
+	if(iReason == RTDRemove_Custom)
+		GetNativeString(3, sReason, sizeof(sReason));
 
-public int Native_GetPerkOfString(Handle hPlugin, int iParams){ // deprecated
-	char sString[32]; int iSize = sizeof(sString);
-	GetNativeString(1, sString, iSize);
-	return GetPerkOfString(sString, iSize);
+	Forward_OnRemovePerkPre(client);
+	Perk perk = ForceRemovePerk(client, iReason, sReason);
+	return perk ? perk.Id : -1;
 }
 
 public int Native_FindPerk(Handle hPlugin, int iParams){
-	return -1; // TODO: finish me
+	char sQuery[32];
+	GetNativeString(1, sQuery, sizeof(sQuery));
+	Perk perk = g_hPerkContainer.FindPerk(sQuery);
+	return perk ? perk.Id : -1;
 }
 
 public int Native_FindPerks(Handle hPlugin, int iParams){
-	return 0; // TODO: finish me
+	char sQuery[32];
+	GetNativeString(1, sQuery, sizeof(sQuery));
+	PerkList results = g_hPerkContainer.FindPerks(sQuery);
+	Handle list = CloneHandle(results, hPlugin);
+	delete results;
+	return view_as<int>(list);
 }
 
 public int Native_RegisterPerk(Handle hPlugin, int iParams){ // deprecated
@@ -136,91 +240,62 @@ public int Native_RegisterPerk(Handle hPlugin, int iParams){ // deprecated
 		ThrowNativeError(SP_ERROR_NATIVE, "%s Plugin \"%s\" is trying to register perks before it's possible.\nPlease use the forward RTD2_OnRegOpen() and native RTD2_IsRegOpen() to determine.", CONS_PREFIX, sPluginName);
 		return -1;
 	}
+	char sBuffer[127];
+	GetNativeString(1, sBuffer, sizeof(sBuffer)); // token
 
-	char sTokenBuffer[2][PERK_MAX_LOW], sClassBuffer[2][PERK_MAX_LOW], sWeaponsBuffer[2][PERK_MAX_HIGH], sTagsBuffer[2][PERK_MAX_VERYH];
+	Perk perk = new Perk();
+	perk.SetToken(sBuffer);
 
-		//---[ Token ]---//
-	GetNativeString(1, sTokenBuffer[0], PERK_MAX_LOW);
-	EscapeString(sTokenBuffer[0], ' ', '\0', sTokenBuffer[1], PERK_MAX_LOW);
-
-	int iPerkId = FindPerkByToken(sTokenBuffer[1]);
-	if(iPerkId == -1){
-		iPerkId = g_iPerkCount;
-		g_iPerkCount++;
+	int iId = g_hPerkContainer.Add(perk);
+	if(iId == -1){
+		delete perk;
+		return -1;
 	}
 
-	strcopy(ePerks[iPerkId][sToken], PERK_MAX_LOW, sTokenBuffer[1]);
+	GetNativeString(2, sBuffer, sizeof(sBuffer)); // name
+	perk.SetName(sBuffer);
 
-		//---[ Name ]---//
-	GetNativeString(2, ePerks[iPerkId][sName], PERK_MAX_LOW);
+	perk.Good = GetNativeCell(3) > 0;
 
-		//---[ Good ]---//
-	ePerks[iPerkId][bGood] = GetNativeCell(3) > 0 ? true : false;
+	GetNativeString(4, sBuffer, sizeof(sBuffer)); // sound
+	perk.SetSound(sBuffer);
 
-		//---[ Sound ]---//
-	GetNativeString(4, ePerks[iPerkId][sSound], PERK_MAX_HIGH);
-	PrecacheSound(ePerks[iPerkId][sSound]);
+	perk.Time = GetNativeCell(5);
 
-		//---[ Time ]---//
-	ePerks[iPerkId][iTime] = GetNativeCell(5);
+	GetNativeString(6, sBuffer, sizeof(sBuffer)); // class
+	perk.SetClass(sBuffer);
 
-		//---[ Class ]---//
-	strcopy(sClassBuffer[1], PERK_MAX_LOW, "");
-	GetNativeString(6, sClassBuffer[0], PERK_MAX_LOW);
-	EscapeString(sClassBuffer[0], ' ', '\0', sClassBuffer[1], PERK_MAX_LOW);
+	GetNativeString(7, sBuffer, sizeof(sBuffer)); // weapons
+	perk.SetWeaponClass(sBuffer);
 
-	int iClassFlags = ClassStringToFlags(sClassBuffer[1]);
-	if(iClassFlags < 1)
-		iClassFlags = 511;
+	GetNativeString(8, sBuffer, sizeof(sBuffer)); // tags
+	perk.SetTags(sBuffer);
 
-	ePerks[iPerkId][iClasses] = iClassFlags;
+	perk.SetCall(GetNativeCell(9), hPlugin);
 
-		//---[ Weapons ]---//
-	strcopy(sWeaponsBuffer[1], PERK_MAX_HIGH, "");
-	GetNativeString(7, sWeaponsBuffer[0], PERK_MAX_HIGH);
-	EscapeString(sWeaponsBuffer[0], ' ', '\0', sWeaponsBuffer[1], PERK_MAX_HIGH);
+	perk.External = true;
 
-	if(ePerks[iPerkId][hWeaponClasses] == INVALID_HANDLE)
-		ePerks[iPerkId][hWeaponClasses] = CreateArray(32);
-	else ClearArray(ePerks[iPerkId][hWeaponClasses]);
-
-	if(FindCharInString(sWeaponsBuffer[1], '0') < 0){
-		int iSize = CountCharInString(sWeaponsBuffer[1], ',')+1;
-		char[][] sPieces = new char[iSize][32];
-
-		ExplodeString(sWeaponsBuffer[1], ",", sPieces, iSize, 64);
-		for(int i = 0; i < iSize; i++)
-			PushArrayString(ePerks[iPerkId][hWeaponClasses], sPieces[i]);
-	}
-
-		//---[ Tags ]---//
-	strcopy(sTagsBuffer[1], PERK_MAX_VERYH, "");
-	GetNativeString(8, sTagsBuffer[0], PERK_MAX_VERYH);
-	EscapeString(sTagsBuffer[0], ' ', '\0', sTagsBuffer[1], PERK_MAX_VERYH);
-
-	if(ePerks[iPerkId][hTags] == INVALID_HANDLE)
-		ePerks[iPerkId][hTags] = CreateArray(32);
-	else ClearArray(ePerks[iPerkId][hTags]);
-
-	if(strlen(sTagsBuffer[1]) > 0){
-		int iTagSize = CountCharInString(sTagsBuffer[1], '|')+1;
-		char[][] sPieces = new char[iTagSize][24];
-
-		ExplodeString(sTagsBuffer[1], "|", sPieces, iTagSize, 24);
-		for(int i = 0; i < iTagSize; i++)
-			PushArrayString(ePerks[iPerkId][hTags], sPieces[i]);
-	}
-
-		//---[ The Rest ]---//
-	ePerks[iPerkId][bIsExternal]	= true;
-	ePerks[iPerkId][funcCallback]	= GetNativeCell(9);
-	ePerks[iPerkId][plParent]		= hPlugin;
-
-	return iPerkId;
+	return iId;
 }
 
 public int Native_MakePerk(Handle hPlugin, int iParams){
-	return -1; // TODO: finish me
+	if(!g_bIsRegisteringOpen){
+		char sPluginName[32];
+		GetPluginFilename(hPlugin, sPluginName, sizeof(sPluginName));
+		ThrowNativeError(SP_ERROR_NATIVE, "%s Plugin \"%s\" is trying to register perks before it's possible.\nPlease use the forward RTD2_OnRegOpen() and native RTD2_IsRegOpen() to determine.", CONS_PREFIX, sPluginName);
+		return -1;
+	}
+	char sPerkToken[32];
+	GetNativeString(1, sPerkToken, sizeof(sPerkToken));
+
+	Perk perk = new Perk();
+	perk.SetToken(sPerkToken);
+
+	int iId = g_hPerkContainer.Add(perk);
+	if(iId == -1) delete perk;
+	else perk.External = true;
+
+	return iId;
 }
 
 public int Native_IsRegisteringOpen(Handle hPlugin, int iParams){
@@ -228,104 +303,56 @@ public int Native_IsRegisteringOpen(Handle hPlugin, int iParams){
 }
 
 public int Native_SetPerkByToken(Handle hPlugin, int iParams){ // deprecated
-	char sTokenBuffer[PERK_MAX_LOW];
-	GetNativeString(1, sTokenBuffer, PERK_MAX_LOW);
+	char sTokenBuffer[32];
+	GetNativeString(1, sTokenBuffer, sizeof(sTokenBuffer));
 
-	int iPerkId = FindPerkByToken(sTokenBuffer);
-	if(iPerkId == -1)
-		return -1;
+	Perk perk = g_hPerkContainer.Get(sTokenBuffer);
+	if(!perk) return -1;
 
 	int iDir = GetNativeCell(2);
 	if(iDir < -1) iDir = -1;
 	else if(iDir > 1) iDir = 1;
 
 	switch(iDir){
-		case -1:ePerks[iPerkId][bIsDisabled] = true;
-		case 0:	ePerks[iPerkId][bIsDisabled] = ePerks[iPerkId][bIsDisabled] ? false : true;
-		case 1:	ePerks[iPerkId][bIsDisabled] = false;
+		case -1:perk.Enabled = false;
+		case 0:	perk.Enabled = !perk.Enabled;
+		case 1:	perk.Enabled = true;
 	}
 
-	return iPerkId;
+	return perk.Id;
 }
 
 public int Native_SetPerkById(Handle hPlugin, int iParams){ // deprecated
-	int iPerkId = GetNativeCell(1);
-	if(iPerkId < 0 || iPerkId >= g_iPerkCount)
-		return -1;
+	Perk perk = g_hPerkContainer.GetFromId(GetNativeCell(1));
+	if(!perk) return -1;
 
 	int iDir = GetNativeCell(2);
 	if(iDir < -1) iDir = -1;
 	else if(iDir > 1) iDir = 1;
 
-	int iChange = 0;
+	bool bPrevState = perk.Enabled;
 	switch(iDir){
-		case -1:{
-			if(!ePerks[iPerkId][bIsDisabled]){
-				ePerks[iPerkId][bIsDisabled] = true;
-				iChange = 1;
-			}
-		}
-
-		case 0:{
-			ePerks[iPerkId][bIsDisabled] = ePerks[iPerkId][bIsDisabled] ? false : true;
-			iChange = 1;
-		}
-
-		case 1:{
-			if(ePerks[iPerkId][bIsDisabled]){
-				ePerks[iPerkId][bIsDisabled] = false;
-				iChange = 1;
-			}
-		}
+		case -1:perk.Enabled = false;
+		case 0:	perk.Enabled = !perk.Enabled;
+		case 1:	perk.Enabled = true;
 	}
-	return iChange;
+	return view_as<int>(perk.Enabled != bPrevState);
 }
 
 public int Native_DefaultCorePerk(Handle hPlugin, int iParams){ // deprecated
-	int iPerkId = GetNativeCell(1);
-	if(iPerkId < 0 || iPerkId >= g_iCorePerkCount){
-		char sTokenBuffer[PERK_MAX_LOW];
-		GetNativeString(2, sTokenBuffer, PERK_MAX_LOW);
-
-		if(strlen(sTokenBuffer) < 1)
-			return -1;
-
-		iPerkId = FindPerkByToken(sTokenBuffer);
-		if(iPerkId == -1)
-			return -1;
+	Perk perk = g_hPerkContainer.GetFromId(GetNativeCell(1));
+	if(!perk){
+		char sTokenBuffer[32];
+		GetNativeString(2, sTokenBuffer, 32);
+		perk = g_hPerkContainer.Get(sTokenBuffer);
+		if(!perk) return -1;
 	}
 
-	int iChange = 0;
-	if(ePerks[iPerkId][bIsExternal]){
-		iChange = 1;
-		ePerks[iPerkId][bIsExternal] = false;
-	}
+	if(!perk.External)
+		return 0;
 
-	return iChange;
-}
-
-public int Native_GetPerkAny(Handle hPlugin, int iParams){
-	return 0; // TODO: finish me
-}
-
-public int Native_SetPerkAny(Handle hPlugin, int iParams){
-	return 0; // TODO: finish me
-}
-
-public int Native_GetPerkString(Handle hPlugin, int iParams){
-	return 0; // TODO: finish me
-}
-
-public int Native_SetPerkString(Handle hPlugin, int iParams){
-	return 0; // TODO: finish me
-}
-
-public int Native_GetPerkHandle(Handle hPlugin, int iParams){
-	return 0; // TODO: finish me
-}
-
-public int Native_SetPerkCall(Handle hPlugin, int iParams){
-	return 0; // TODO: finish me
+	perk.External = false;
+	return 1;
 }
 
 public int Native_CanPlayerBeHurt(Handle hPlugin, int iParams){
