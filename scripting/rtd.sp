@@ -488,11 +488,11 @@ public Action Command_ForceRTD(int client, int args){
 		return Plugin_Handled;
 	}
 
-	int		iPerkTime		= -1;
-	char	sPerkString[16]	= "";
+	int iPerkTime = -1;
+	char sQuery[32] = "";
 
 	if(args > 1){
-		GetCmdArg(2, sPerkString, sizeof(sPerkString));
+		GetCmdArg(2, sQuery, sizeof(sQuery));
 
 		if(args > 2){
 			char sPerkTime[8];
@@ -509,10 +509,10 @@ public Action Command_ForceRTD(int client, int args){
 	}
 
 	for(int i = 0; i < iTrgCount; i++){
-		g_hRollers.SetGroup(i, group);
-		ForcePerk(aTrgList[i], sPerkString, 16, iPerkTime, /*bOverrideClass,*/ group, client);
-		// TODO: correct the above
+		g_hRollers.SetGroup(aTrgList[i], group);
+		ForcePerk(aTrgList[i], sQuery, iPerkTime, group, client);
 	}
+
 	return Plugin_Handled;
 }
 
@@ -542,7 +542,7 @@ public Action Command_RemoveRTD(int client, int args){
 			Call_StartForward(g_hFwdCanRemove);
 			Call_PushCell(client);
 			Call_PushCell(aTrgList[i]);
-			Call_PushCell(g_hRollers.GetPerk(aTrgList[i]).Id); // TODO: figure out what to return
+			Call_PushCell(g_hRollers.GetPerk(aTrgList[i]).Id);
 			Action result = Plugin_Continue;
 			Call_Finish(result);
 
@@ -1029,10 +1029,9 @@ void RollPerkForClient(int client){
 	}
 }
 
-int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int iPerkTime=-1, /*bool bOverrideClass=false,*/ Group group=null, int initiator=0){
-// TODO: fix the signature
+RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, Group group=null, int initiator=0){
 	if(!IsValidClient(client))
-		return -4;
+		return RTDForce_ClientInvalid;
 
 	bool bIsValidInitiator = IsValidClient(initiator);
 	if(g_hRollers.GetInRoll(client)){
@@ -1041,7 +1040,7 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 				PrintToChat(initiator, "%s %N is already using RTD.", CHAT_PREFIX, client);
 			else PrintToServer("%s %N is already using RTD.", CONS_PREFIX, client);
 		}
-		return -3;
+		return RTDForce_ClientInRoll;
 	}
 
 	if(!IsPlayerAlive(client)){
@@ -1050,46 +1049,40 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 				PrintToChat(initiator, "%s %N is dead.", CHAT_PREFIX, client);
 			else PrintToServer("%s %N is already using RTD.", CONS_PREFIX, client);
 		}
-		return -2;
+		return RTDForce_ClientDead;
 	}
 
-	//bool bSamePerk = true; TODO: use me
-	Perk perk = null; // TODO: find perk here
-	int iPerkId = GetPerkOfString(sPerkString, iPerkStringSize); // TODO: remove me
-	int iApplicats = !group ? 1 : group.ClientCount;
-
-	if(iPerkId < 0 || iPerkId >= g_iPerkCount){ // TODO: check if perk == null
-		//bSamePerk = false; TODO: use me
+	Perk perk = g_hPerkContainer.FindPerk(sQuery);
+	if(!perk){
 		if(!g_bTempPrint){
+			int iApplications = group ? group.ClientCount : 1;
 			if(bIsValidInitiator)
-				PrintToChat(initiator, "%s Perk not found or invalid info, forcing %s.", CHAT_PREFIX, iApplicats > 1 ? "rolls" : "a roll");
-			else PrintToServer("%s Perk not found or invalid info, forcing %s.", CONS_PREFIX, iApplicats > 1 ? "rolls" : "a roll");
+				PrintToChat(initiator, "%s Perk not found or invalid info, forcing %s.", CHAT_PREFIX, iApplications > 1 ? "rolls" : "a roll");
+			else PrintToServer("%s Perk not found or invalid info, forcing %s.", CONS_PREFIX, iApplications > 1 ? "rolls" : "a roll");
 		}
 
-		/* TODO: fix me
-		iPerkId = RollPerk(client, true, bOverrideClass, false, false, !StrEqual(sPerkString, "-"), sPerkString);
-		if(iPerkId < 0){
+		perk = RollPerk(client, _, sQuery);
+		if(!perk){
 			if(bIsValidInitiator)
 				PrintToChat(initiator, "%s No perks available for %N.", CHAT_PREFIX, client);
 			else PrintToServer("%s No perks available for %N.", CONS_PREFIX, client);
-			return -1;
-		}*/
+			return RTDForce_NullPerk;
+		}
 	}
 
 	if(bIsValidInitiator && GetForwardFunctionCount(g_hFwdCanForce) > 0){
 		Call_StartForward(g_hFwdCanForce);
 		Call_PushCell(initiator);
 		Call_PushCell(client);
-		Call_PushCell(iPerkId);
+		Call_PushCell(perk.Id);
 		Action result = Plugin_Continue;
 		Call_Finish(result);
 
 		if(result != Plugin_Continue)
-			return -5;
+			return RTDForce_Blocked;
 	}
 
-	// TODO: fix me
-	//ApplyPerk(client, iPerkId, iPerkTime, iGroup, bSamePerk);
+	//ApplyPerk(client, iPerkId, iPerkTime, iGroup, bSamePerk); // TODO: Fix sig
 	if(g_bCvarLog){
 		char sBuffer[64];
 		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
@@ -1098,7 +1091,7 @@ int ForcePerk(int client, const char[] sPerkString, int iPerkStringSize=32, int 
 		else LogMessage("A perk %s has been forced on %L for %d seconds.", sBuffer, client, iPerkTime);
 	}
 
-	return iPerkId;
+	return RTDForce_Success;
 }
 
 //-----[ General ]-----//
@@ -1110,15 +1103,22 @@ bool GoodRoll(int client){
 }
 
 Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter=""){
-	bool bShouldBeGood = GoodRoll(client);
+	bool bFilter = strlen(sFilter) > 0;
 	Perk perk = null;
 	PerkList candidates = g_hPerkContainer.FindPerks(sFilter);
 	PerkList list = new PerkList();
 	PerkIter iter = new PerkListIter(candidates, -1);
 
-	while((perk = (++iter).Perk()))
-		if(perk.Good == bShouldBeGood && perk.IsAptFor(client, iRollFlags))
-			list.Push(perk);
+	if(bFilter){
+		while((perk = (++iter).Perk()))
+			if(perk.IsAptForSetupOf(client, iRollFlags))
+				list.Push(perk);
+	}else{
+		bool bBeGood = GoodRoll(client);
+		while((perk = (++iter).Perk()))
+			if(perk.Good == bBeGood && perk.IsAptFor(client, iRollFlags))
+				list.Push(perk);
+	}
 
 	delete iter;
 	delete candidates;
