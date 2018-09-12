@@ -351,7 +351,7 @@ public void OnPluginEnd(){
 		Forward_OnRemovePerkPre(i);
 
 		if(g_hRollers.GetInRoll(i))
-			ForceRemovePerk(i, 0);
+			ForceRemovePerk(i, RTDRemove_PluginUnload);
 
 		g_hRollers.SetInRoll(i, false);
 		g_hRollers.SetLastRollTime(i, 0);
@@ -393,7 +393,7 @@ public void OnClientDisconnect(int client){
 	Forward_OnRemovePerkPre(client);
 
 	if(g_hRollers.GetInRoll(client))
-		ForceRemovePerk(client, 4);
+		ForceRemovePerk(client, RTDRemove_Disconnect);
 
 	g_hRollers.SetInRoll(client, false);
 	g_hRollers.SetLastRollTime(client, 0);
@@ -552,7 +552,7 @@ public Action Command_RemoveRTD(int client, int args){
 
 		Forward_OnRemovePerkPre(aTrgList[i]);
 		if(g_hRollers.GetInRoll(aTrgList[i]))
-			ForceRemovePerk(aTrgList[i], args > 1 ? 5 : 3, sReason);
+			ForceRemovePerk(aTrgList[i], args > 1 ? RTDRemove_Custom : RTDRemove_WearOff, sReason);
 	}
 	return Plugin_Handled;
 }
@@ -745,7 +745,7 @@ public Action Event_PlayerDeath(Handle hEvent, const char[] sEventName, bool don
 	if(!g_hRollers.GetInRoll(client))
 		return Plugin_Continue;
 
-	ForceRemovePerk(client, 1);
+	ForceRemovePerk(client, RTDRemove_Death);
 	return Plugin_Continue;
 }
 
@@ -758,7 +758,7 @@ public Action Event_ClassChange(Handle hEvent, const char[] sEventName, bool don
 	if(!g_hRollers.GetInRoll(client))
 		return Plugin_Continue;
 
-	ForceRemovePerk(client, 2);
+	ForceRemovePerk(client, RTDRemove_ClassChange);
 	return Plugin_Continue;
 }
 
@@ -1295,17 +1295,18 @@ public Action Timer_RemovePerk(Handle hTimer, int iSerial){
 }
 
 //-----[ Removing ]-----//
-int ForceRemovePerk(int client, int iReason=3, const char[] sReason=""){ // TODO Return perk
+Perk ForceRemovePerk(int client, RTDRemoveReason iReason=RTDRemove_WearOff, const char[] sReason=""){
 	if(!IsValidClient(client))
-		return -1;
+		return null;
 
 	Group group = g_hRollers.GetGroup(client);
 	if(group && group.Active)
 		group.EraseClient(client);
 
-	//ManagePerk(client, g_hRollers.GetPerk(client), false, iReason, sReason); // TODO: fix sig
-	ManagePerk(client, 0, false, iReason, sReason); // TODO: remove me
-	return 0;// TODO: return perk
+	Perk perk = g_hRollers.GetPerk(client);
+	//ManagePerk(client, perk, false, iReason, sReason); // TODO: fix sig
+	ManagePerk(client, 0, false, view_as<int>(iReason), sReason); // TODO: remove me
+	return perk;
 }
 
 void RemovedPerk(int client, int iReason, const char[] sReason=""){
