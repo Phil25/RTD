@@ -39,9 +39,9 @@ public __pl_rtd2_SetNTVOptional(){
 	MarkNativeAsOptional("RTD2_SetPerkById"); // deprecated
 	MarkNativeAsOptional("RTD2_DefaultCorePerk"); // deprecated
 
-	MarkNativeAsOptional("RTD2_GetPerk");
+	MarkNativeAsOptional("RTD2_GetPerkAny");
+	MarkNativeAsOptional("RTD2_SetPerkAny");
 	MarkNativeAsOptional("RTD2_GetPerkString");
-	MarkNativeAsOptional("RTD2_SetPerk");
 	MarkNativeAsOptional("RTD2_SetPerkString");
 	MarkNativeAsOptional("RTD2_GetPerkHandle");
 	MarkNativeAsOptional("RTD2_SetPerkCall");
@@ -116,11 +116,11 @@ enum RTDForceResult{
 
 
 // TODO: document
-native any RTD2_GetPerk(RTDPerk perk, RTDPerkProp prop);
+native any RTD2_GetPerkAny(RTDPerk perk, RTDPerkProp prop);
 
 
 // TODO: document
-native void RTD2_SetPerk(RTDPerk perk, RTDPerkProp prop, any value);
+native void RTD2_SetPerkAny(RTDPerk perk, RTDPerkProp prop, any value);
 
 
 // TODO: document
@@ -161,9 +161,9 @@ methodmap RTDPerk{
 
 	property bool Good{
 		public get(){
-			return view_as<bool>(RTD2_GetPerk(this, RTDPerk_Good));}
+			return view_as<bool>(RTD2_GetPerkAny(this, RTDPerk_Good));}
 		public set(bool bVal){
-			RTD2_SetPerk(this, RTDPerk_Good, bVal);}
+			RTD2_SetPerkAny(this, RTDPerk_Good, bVal);}
 	}
 
 	public void GetSound(char[] sBuffer, int iLen){
@@ -177,16 +177,16 @@ methodmap RTDPerk{
 
 	property int Time{
 		public get(){
-			return view_as<int>(RTD2_GetPerk(this, RTDPerk_Time));}
+			return view_as<int>(RTD2_GetPerkAny(this, RTDPerk_Time));}
 		public set(int iVal){
-			RTD2_SetPerk(this, RTDPerk_Time, iVal);}
+			RTD2_SetPerkAny(this, RTDPerk_Time, iVal);}
 	}
 
 	property int Classes{
 		public get(){
-			return view_as<int>(RTD2_GetPerk(this, RTDPerk_Classes));}
+			return view_as<int>(RTD2_GetPerkAny(this, RTDPerk_Classes));}
 		public set(int iVal){
-			RTD2_SetPerk(this, RTDPerk_Classes, iVal);}
+			RTD2_SetPerkAny(this, RTDPerk_Classes, iVal);}
 	}
 
 	property ArrayList WeaponClasses{
@@ -207,16 +207,16 @@ methodmap RTDPerk{
 
 	property bool Enabled{
 		public get(){
-			return view_as<bool>(RTD2_GetPerk(this, RTDPerk_Enabled));}
+			return view_as<bool>(RTD2_GetPerkAny(this, RTDPerk_Enabled));}
 		public set(bool bVal){
-			RTD2_SetPerk(this, RTDPerk_Enabled, bVal);}
+			RTD2_SetPerkAny(this, RTDPerk_Enabled, bVal);}
 	}
 
 	property bool External{
 		public get(){
-			return view_as<bool>(RTD2_GetPerk(this, RTDPerk_External));}
+			return view_as<bool>(RTD2_GetPerkAny(this, RTDPerk_External));}
 		public set(bool bVal){
-			RTD2_SetPerk(this, RTDPerk_External, bVal);}
+			RTD2_SetPerkAny(this, RTDPerk_External, bVal);}
 	}
 
 	public void SetCall(RTDCall func){
