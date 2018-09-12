@@ -103,7 +103,8 @@ enum RTDForceResult{
 	RTDForce_NullPerk,
 	RTDForce_ClientDead,
 	RTDForce_ClientInRoll,
-	RTDForce_ClientInvalid
+	RTDForce_ClientInvalid,
+	RTDForce_Blocked
 }
 
 
