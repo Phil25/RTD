@@ -318,6 +318,18 @@ methodmap Perk < StringMap{
 		return false;
 	}
 
+	public bool IsAptForSetupOf(int client, int iRollFlags){
+		if(!(iRollFlags & ROLLFLAG_OVERRIDE_CLASS))
+			if(!this.IsAptForClassOf(client))
+				return false;
+
+		if(!(iRollFlags & ROLLFLAG_OVERRIDE_LOADOUT))
+			if(!this.IsAptForLoadoutOf(client))
+				return false;
+
+		return true;
+	}
+
 	public bool IsAptFor(int client, int iRollFlags){
 		if(!(iRollFlags & ROLLFLAG_OVERRIDE_DISABLED))
 			if(!this.Enabled) return false;
@@ -333,16 +345,7 @@ methodmap Perk < StringMap{
 				return false;
 			*/
 		}
-
-		if(!(iRollFlags & ROLLFLAG_OVERRIDE_CLASS))
-			if(!this.IsAptForClassOf(client))
-				return false;
-
-		if(!(iRollFlags & ROLLFLAG_OVERRIDE_LOADOUT))
-			if(!this.IsAptForLoadoutOf(client))
-				return false;
-
-		return true;
+		return this.IsAptForSetupOf(client, iRollFlags);
 	}
 
 	public void EmitSound(int client){
