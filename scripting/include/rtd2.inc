@@ -15,6 +15,13 @@ public SharedPlugin:__pl_rtd2 = {
 
 #if !defined REQUIRE_PLUGIN
 public __pl_rtd2_SetNTVOptional(){
+	MarkNativeAsOptional("RTD2_GetPerkAny");
+	MarkNativeAsOptional("RTD2_SetPerkAny");
+	MarkNativeAsOptional("RTD2_GetPerkString");
+	MarkNativeAsOptional("RTD2_SetPerkString");
+	MarkNativeAsOptional("RTD2_GetPerkHandle");
+	MarkNativeAsOptional("RTD2_SetPerkCall");
+
 	MarkNativeAsOptional("RTD2_GetClientPerkId"); // deprecated
 	MarkNativeAsOptional("RTD2_GetClientPerk");
 	MarkNativeAsOptional("RTD2_GetClientPerkTime");
@@ -38,13 +45,6 @@ public __pl_rtd2_SetNTVOptional(){
 	MarkNativeAsOptional("RTD2_SetPerkByToken"); // deprecated
 	MarkNativeAsOptional("RTD2_SetPerkById"); // deprecated
 	MarkNativeAsOptional("RTD2_DefaultCorePerk"); // deprecated
-
-	MarkNativeAsOptional("RTD2_GetPerkAny");
-	MarkNativeAsOptional("RTD2_SetPerkAny");
-	MarkNativeAsOptional("RTD2_GetPerkString");
-	MarkNativeAsOptional("RTD2_SetPerkString");
-	MarkNativeAsOptional("RTD2_GetPerkHandle");
-	MarkNativeAsOptional("RTD2_SetPerkCall");
 
 	MarkNativeAsOptional("RTD2_CanPlayerBeHurt");
 }
@@ -186,9 +186,9 @@ methodmap RTDPerk{
 	property int Classes{
 		public get(){
 			return view_as<int>(RTD2_GetPerkAny(this, RTDPerk_Classes));}
-		public set(int iVal){
-			RTD2_SetPerkAny(this, RTDPerk_Classes, iVal);}
 	}
+	public void SetClasses(const char[] sClasses){
+		RTD2_SetPerkString(this, RTDPerk_Classes, sClasses);}
 
 	property ArrayList WeaponClasses{
 		public get(){
@@ -278,7 +278,7 @@ forward Action RTD2_CanForcePerk(int client, int iTarget, RTDPerk perk);
  * Called when a perk is about to be removed by an admin (client) from a target (iTarget).
  * Return Plugin_Continue to allow, anything else denies the force.
  *
- * @note Called only by sm_removertd command and RTD2_RemovePerk native.
+ * @note Called only by sm_removertd command and RTD2_Remove native.
  *
  * @param client	Client index.
  * @param iTarget	Target client index.
@@ -310,7 +310,7 @@ forward void RTD2_Removed(int client, RTDPerk perk, RTDRemoveReason reason);
 
 /*
  *=========
- * RTDPerk
+ * NATIVES
  *=========
  */
 
@@ -356,7 +356,7 @@ native int RTD2_ForcePerk(int client, const char[] sQuery="", iTime=-1, bOvrClas
 
 
 // TODO: document
-native RTDForceResult RTD2_Force(int client, RTDPerk perk, int iTime=-1, int iInitiator=0);
+native RTDForceResult RTD2_Force(int client, const char[] sQuery, int iTime=-1, int iInitiator=0);
 
 
 /**
@@ -405,7 +405,7 @@ native RTDPerk RTD2_Remove(int client, RTDRemoveReason reason=RTDRemove_WearOff,
  * @return				Perk's index on success, -1 otherwise.
  */
 #pragma deprecated Use RTD2_FindPerk instead
-native RTD2_GetPerkOfString(const String:sString[]="");
+native RTDPerk RTD2_GetPerkOfString(const char[] sString="");
 
 
 // TODO: document
@@ -458,7 +458,7 @@ functag RTD2Manager public(client, iPerkId, bool:bEnable);
  * @return			Perk's index on success, -1 otherwise (not all paremeters filled).
  */
 #pragma deprecated Use RTD2_MakePerk instead
-native int RTD2_RegisterPerk(const char[] sToken, const char[] sName, bool bGood, const char[] sSound, int iTime, const char[] sClass, const char[] sWeapons, const char[] sTags, RTDCall func);
+native RTDPerk RTD2_RegisterPerk(const char[] sToken, const char[] sName, bool bGood, const char[] sSound, int iTime, const char[] sClass, const char[] sWeapons, const char[] sTags, RTDCall func);
 
 // TODO: document
 native RTDPerk RTD2_MakePerk(const char[] sToken);
