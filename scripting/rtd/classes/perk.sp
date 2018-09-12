@@ -124,10 +124,10 @@ methodmap Perk < StringMap{
 		return hFwd;
 	}
 
-	public void SetCall(RTDCall func){
+	public void SetCall(RTDCall func, Handle plParent){
 		delete this.GetCall();
 		Handle hFwd = CreateForward(ET_Single, Param_Cell, Param_Cell, Param_Cell);
-		AddToForward(hFwd, null, func);
+		AddToForward(hFwd, plParent, func);
 		this.SetValue("m_Call", hFwd);
 	}
 

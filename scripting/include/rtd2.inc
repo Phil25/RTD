@@ -43,6 +43,8 @@ public __pl_rtd2_SetNTVOptional(){
 	MarkNativeAsOptional("RTD2_GetPerkString");
 	MarkNativeAsOptional("RTD2_SetPerk");
 	MarkNativeAsOptional("RTD2_SetPerkString");
+	MarkNativeAsOptional("RTD2_GetPerkHandle");
+	MarkNativeAsOptional("RTD2_SetPerkCall");
 
 	MarkNativeAsOptional("RTD2_CanPlayerBeHurt");
 }
@@ -84,9 +86,7 @@ enum RTDPerkProp{
 	RTDPerk_Pref,
 	RTDPerk_Tags,
 	RTDPerk_Enabled,
-	RTDPerk_External,
-	RTDPerk_Func,
-	RTDPerk_Parent
+	RTDPerk_External
 }
 
 enum RTDRemoveReason{
@@ -103,16 +103,44 @@ enum RTDForceResult{
 	RTDForce_NullPerk,
 	RTDForce_ClientDead,
 	RTDForce_ClientInRoll,
-	RTDForce_ClientInvalid,
+	RTDForce_ClientInvalid
 }
 
 
 
 /*
- *============
- * METHODMAPS
- *============
+ *==========
+ * FETCHING
+ *==========
  */
+
+
+// TODO: document
+native any RTD2_GetPerk(RTDPerk perk, RTDPerkProp prop);
+
+
+// TODO: document
+native void RTD2_SetPerk(RTDPerk perk, RTDPerkProp prop, any value);
+
+
+// TODO: document
+native void RTD2_GetPerkString(RTDPerk perk, RTDPerkProp prop, char[] sBuffer, int iBufferLen);
+
+
+// TODO: document
+native void RTD2_SetPerkString(RTDPerk perk, RTDPerkProp prop, const char[] sStr);
+
+
+// TODO: document
+native any RTD2_GetPerkHandle(RTDPerk perk, RTDPerkProp prop);
+
+
+// TODO: document?
+typedef RTDCall = function void(int client, RTDPerk perk, bool bEnable);
+
+
+// TODO: document
+native any RTD2_SetPerkCall(RTDPerk perk, RTDCall func);
 
 
 // TODO: document
@@ -120,6 +148,79 @@ methodmap RTDPerk{
 	public RTDPerk(const char[] sToken){
 		return view_as<RTDPerk>(0);
 	}
+
+	property bool Valid{
+		public get(){return view_as<int>(this) != -1;}
+	}
+
+	public void GetName(char[] sBuffer, int iLen){
+		RTD2_GetPerkString(this, RTDPerk_Name, sBuffer, iLen);}
+
+	public void SetName(const char[] sVal){
+		RTD2_SetPerkString(this, RTDPerk_Name, sVal);}
+
+	property bool Good{
+		public get(){
+			return view_as<bool>(RTD2_GetPerk(this, RTDPerk_Good));}
+		public set(bool bVal){
+			RTD2_SetPerk(this, RTDPerk_Good, bVal);}
+	}
+
+	public void GetSound(char[] sBuffer, int iLen){
+		RTD2_GetPerkString(this, RTDPerk_Sound, sBuffer, iLen);}
+
+	public void SetSound(const char[] sVal){
+		RTD2_SetPerkString(this, RTDPerk_Sound, sVal);}
+
+	public void GetToken(char[] sBuffer, int iLen){
+		RTD2_GetPerkString(this, RTDPerk_Token, sBuffer, iLen);}
+
+	property int Time{
+		public get(){
+			return view_as<int>(RTD2_GetPerk(this, RTDPerk_Time));}
+		public set(int iVal){
+			RTD2_SetPerk(this, RTDPerk_Time, iVal);}
+	}
+
+	property int Classes{
+		public get(){
+			return view_as<int>(RTD2_GetPerk(this, RTDPerk_Classes));}
+		public set(int iVal){
+			RTD2_SetPerk(this, RTDPerk_Classes, iVal);}
+	}
+
+	property ArrayList WeaponClasses{
+		public get(){
+			return view_as<ArrayList>(RTD2_GetPerkHandle(this, RTDPerk_WeaponClasses));}
+	}
+
+	public void GetPref(char[] sBuffer, int iLen){
+		RTD2_GetPerkString(this, RTDPerk_Pref, sBuffer, iLen);}
+
+	public void SetPref(const char[] sVal){
+		RTD2_SetPerkString(this, RTDPerk_Pref, sVal);}
+
+	property ArrayList Tags{
+		public get(){
+			return view_as<ArrayList>(RTD2_GetPerkHandle(this, RTDPerk_Tags));}
+	}
+
+	property bool Enabled{
+		public get(){
+			return view_as<bool>(RTD2_GetPerk(this, RTDPerk_Enabled));}
+		public set(bool bVal){
+			RTD2_SetPerk(this, RTDPerk_Enabled, bVal);}
+	}
+
+	property bool External{
+		public get(){
+			return view_as<bool>(RTD2_GetPerk(this, RTDPerk_External));}
+		public set(bool bVal){
+			RTD2_SetPerk(this, RTDPerk_External, bVal);}
+	}
+
+	public void SetCall(RTDCall func){
+		RTD2_SetPerkCall(this, func);}
 }
 
 // TODO: document
@@ -336,9 +437,6 @@ https://forums.alliedmods.net/showthread.php?t=278579
 #pragma deprecated Use RTDCall instead
 functag RTD2Manager public(client, iPerkId, bool:bEnable);
 
-// TODO: document?
-typedef RTDCall = function void(int client, RTDPerk perk, bool bEnable);
-
 /**
  * Registers a perk from a different plugin to the core.
  * The parameters match the fields in the KV file.
@@ -419,22 +517,6 @@ native int RTD2_SetPerkById(int iId, int iDir=0);
  */
 #pragma deprecated Use RTD2_SetPerk instead
 native int RTD2_DefaultCorePerk(int iId=-1, const char[] sToken="");
-
-
-// TODO: document
-native any RTD2_GetPerk(RTDPerk perk, RTDPerkProp prop);
-
-
-// TODO: document
-native void RTD2_GetPerkString(RTDPerk perk, RTDPerkProp prop, char[] sBuffer, int iBufferLen);
-
-
-// TODO: document
-native void RTD2_SetPerk(RTDPerk perk, RTDPerkProp prop, any value);
-
-
-// TODO: document
-native void RTD2_SetPerkString(RTDPerk perk, RTDPerkProp prop, const char[] sStr);
 
 
 /**
