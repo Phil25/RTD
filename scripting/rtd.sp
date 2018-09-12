@@ -542,7 +542,7 @@ public Action Command_RemoveRTD(int client, int args){
 			Call_StartForward(g_hFwdCanRemove);
 			Call_PushCell(client);
 			Call_PushCell(aTrgList[i]);
-			Call_PushCell(g_hRollers.GetPerk(aTrgList[i]).GetId()); // TODO: figure out what to return
+			Call_PushCell(g_hRollers.GetPerk(aTrgList[i]).Id); // TODO: figure out what to return
 			Action result = Plugin_Continue;
 			Call_Finish(result);
 
@@ -883,7 +883,7 @@ void PrecachePerkSounds(){
 void ParseDisabledPerks(){
 	PerkIter iter = new PerkContainerIter(-1);
 	while((++iter).Perk())
-		iter.Perk().SetEnabled(true);
+		iter.Perk().Enabled = true;
 	delete iter;
 
 	char sDisabledPre[255], sDisabled[255];
@@ -902,7 +902,7 @@ void ParseDisabledPerks(){
 		perk = g_hPerkContainer.FindPerk(sDisabledPieces[i]);
 		if(perk == null) continue;
 
-		perk.SetEnabled(false);
+		perk.Enabled = false;
 		hDisabledPerks.Push(perk);
 	}
 
@@ -1117,7 +1117,7 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 	PerkIter iter = new PerkListIter(candidates, -1);
 
 	while((perk = (++iter).Perk()))
-		if(perk.GetGood() == bShouldBeGood && perk.IsAptFor(client, iRollFlags))
+		if(perk.Good == bShouldBeGood && perk.IsAptFor(client, iRollFlags))
 			list.Push(perk);
 
 	delete iter;
@@ -1227,7 +1227,7 @@ public int ManagerDesc(Menu hMenu, MenuAction maState, int client, int iPos){
 	FormatEx(sTranslate, 64, "RTD2_Desc_%s", sPerkToken);
 
 	PrintToChat(client, "%s %s%s%c: \x03%T\x01", CHAT_PREFIX,
-		perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+		perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 		sPerkName, 0x01,
 		sTranslate, LANG_SERVER);
 
@@ -1256,7 +1256,7 @@ public Action Timer_PrintGroupEnd(Handle hTimer, Group group){
 		char sReason[128];
 		Format(sReason, sizeof(sReason), "%s %T", CHAT_PREFIX,
 			"RTD2_Remove_Perk_Group_Same", LANG_SERVER,
-			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
 			0x01,
 			iSize);

@@ -86,7 +86,7 @@ methodmap PerkContainer < StringMap{
 		this.SetValue(sToken, perk);
 		int iId = g_hPerkTokenMapper.PushString(sToken);
 
-		perk.SetId(iId);
+		perk.Id = iId;
 		return iId;
 	}
 
@@ -115,12 +115,12 @@ methodmap PerkContainer < StringMap{
 #define READ_IF_EXISTS_BOOL(%1,%2) \
 	if(hKv.JumpToKey(%1)){ \
 		hKv.GoBack(); \
-		perk.Set%2(hKv.GetNum(%1) > 0);}
+		perk.%2 = hKv.GetNum(%1) > 0;}
 
 #define READ_IF_EXISTS_NUM(%1,%2) \
 	if(hKv.JumpToKey(%1)){ \
 		hKv.GoBack(); \
-		perk.Set%2(hKv.GetNum(%1));}
+		perk.%2 = hKv.GetNum(%1);}
 
 
 	public bool ParseAndAdd(KeyValues hKv, int iStats[2]){
@@ -128,15 +128,15 @@ methodmap PerkContainer < StringMap{
 		Perk perk = new Perk();
 
 		READ_STRING("name",Name)
-		perk.SetGood(hKv.GetNum("good") > 0);
+		perk.Good = hKv.GetNum("good") > 0;
 		READ_STRING("sound",Sound)
 		READ_STRING("token",Token)
-		perk.SetTime(hKv.GetNum("time"));
+		perk.Time = hKv.GetNum("time");
 		READ_STRING("class",Class)
 		READ_STRING("weapons",WeaponClass)
 		READ_STRING("settings",Pref)
 		READ_STRING("tags",Tags)
-		iStats[perk.GetGood()]++;
+		iStats[perk.Good]++;
 
 		this.Add(perk);
 		return true;
@@ -243,7 +243,7 @@ methodmap PerkContainer < StringMap{
 			for(;i < iLen; i++)
 				ADD_PERK_IF_TAG_MATCHES
 		}else{
-			int iOtherId = include.GetId();
+			int iOtherId = include.Id;
 			for(;i < iOtherId; i++)
 				ADD_PERK_IF_TAG_MATCHES
 

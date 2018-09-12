@@ -23,6 +23,16 @@
 
 #include "rtd/parsing.sp"
 
+#define GET_PROP(%1,%2) \
+	public get(){ \
+		%1 i; \
+		this.GetValue("m_" ... #%2, i); \
+		return i;}
+
+#define SET_PROP(%1,%2) \
+	public set(%1 i){ \
+		this.SetValue("m_" ... #%2, i);}
+
 #define GET_VALUE(%1,%2) \
 	public %1 Get%2(){ \
 		%1 i; \
@@ -71,14 +81,18 @@ methodmap Perk < StringMap{
 		delete this;
 	}
 
-	GET_VALUE(int,Id)
-	SET_VALUE(int,Id)
+	property int Id{
+		GET_PROP(int,Id)
+		SET_PROP(int,Id)
+	}
 
 	GET_STRING(Name)
 	SET_STRING(Name)
 
-	GET_VALUE(bool,Good)
-	SET_VALUE(bool,Good)
+	property bool Good{
+		GET_PROP(bool,Good)
+		SET_PROP(bool,Good)
+	}
 
 	GET_STRING(Sound)
 	SET_STRING(Sound)
@@ -86,10 +100,14 @@ methodmap Perk < StringMap{
 	GET_STRING(Token)
 	SET_STRING(Token)
 
-	GET_VALUE(int,Time)
-	SET_VALUE(int,Time)
+	property int Time{
+		GET_PROP(int,Time)
+		SET_PROP(int,Time)
+	}
 
-	GET_VALUE(int,Class)
+	property int Class{
+		GET_PROP(int,Class)
+	}
 	public void SetClass(const char[] s){
 		int h = StringToClass(s);
 		this.SetValue("m_Class", h);
@@ -112,11 +130,15 @@ methodmap Perk < StringMap{
 		this.SetValue("m_Tags", hTags);
 	}
 
-	GET_VALUE(bool,Enabled)
-	SET_VALUE(bool,Enabled)
+	property bool Enabled{
+		GET_PROP(bool,Enabled)
+		SET_PROP(bool,Enabled)
+	}
 
-	GET_VALUE(bool,External)
-	SET_VALUE(bool,External)
+	property bool External{
+		GET_PROP(bool,External)
+		SET_PROP(bool,External)
+	}
 
 	public Handle GetCall(){
 		Handle hFwd = null;
@@ -134,7 +156,7 @@ methodmap Perk < StringMap{
 	public void Call(int client, bool bEnable){
 		Call_StartForward(this.GetCall());
 		Call_PushCell(client);
-		Call_PushCell(this.GetId());
+		Call_PushCell(this.Id);
 		Call_PushCell(bEnable);
 		Call_Finish();
 	}
@@ -267,7 +289,7 @@ methodmap Perk < StringMap{
 	public bool IsAptForClassOf(int client){
 		int iClass = view_as<int>(TF2_GetPlayerClass(client));
 		iClass = g_iClassConverter[iClass];
-		return view_as<bool>(this.GetClass() & (1 << --iClass));
+		return view_as<bool>(this.Class & (1 << --iClass));
 	}
 
 	public bool IsAptForLoadoutOf(int client){
@@ -298,7 +320,7 @@ methodmap Perk < StringMap{
 
 	public bool IsAptFor(int client, int iRollFlags){
 		if(!(iRollFlags & ROLLFLAG_OVERRIDE_DISABLED))
-			if(!this.GetEnabled()) return false;
+			if(!this.Enabled) return false;
 
 		if(client != 0){
 			/*
@@ -330,6 +352,8 @@ methodmap Perk < StringMap{
 	}
 }
 
+#undef GET_PROP
+#undef SET_PROP
 #undef GET_VALUE
 #undef SET_VALUE
 #undef GET_STRING
