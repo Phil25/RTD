@@ -28,7 +28,7 @@ void CreateNatives(){
 	CreateNative("RTD2_SetPerkString",		Native_SetPerkString);
 	CreateNative("RTD2_GetPerkHandle",		Native_GetPerkHandle);
 	CreateNative("RTD2_SetPerkCall",		Native_SetPerkCall);
-	// TODO: Add RTDPerk.Format()
+	CreateNative("RTD2_Format",				Native_Format);
 
 	CreateNative("RTD2_GetClientPerkId",	Native_GetClientPerkId); // deprecated
 	CreateNative("RTD2_GetClientPerk",		Native_GetClientPerk);
@@ -148,6 +148,24 @@ public int Native_GetPerkHandle(Handle hPlugin, int iParams){
 public int Native_SetPerkCall(Handle hPlugin, int iParams){
 	GET_PERK
 	perk.SetCall(GetNativeCell(2), hPlugin);
+	return 0;
+}
+
+// 1 perk, 2 buffer, 3 buffer len, 4 format
+public int Native_Format(Handle hPlugin, int iParams){
+	int iFormatLen = 0;
+	GetNativeStringLength(4, iFormatLen);
+	if(!iFormatLen)
+		return 0;
+
+	GET_PERK
+	int iLen = GetNativeCell(3);
+	char[] sBuffer = new char[iLen];
+	char[] sFormat = new char[iFormatLen];
+	GetNativeString(4, sFormat, iFormatLen);
+
+	perk.Format(sBuffer, iLen, sFormat);
+	SetNativeString(2, sBuffer, iLen);
 	return 0;
 }
 

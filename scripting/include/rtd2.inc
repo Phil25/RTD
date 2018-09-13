@@ -21,6 +21,7 @@ public __pl_rtd2_SetNTVOptional(){
 	MarkNativeAsOptional("RTD2_SetPerkString");
 	MarkNativeAsOptional("RTD2_GetPerkHandle");
 	MarkNativeAsOptional("RTD2_SetPerkCall");
+	MarkNativeAsOptional("RTD2_Format");
 
 	MarkNativeAsOptional("RTD2_GetClientPerkId"); // deprecated
 	MarkNativeAsOptional("RTD2_GetClientPerk");
@@ -145,6 +146,10 @@ native any RTD2_SetPerkCall(RTDPerk perk, RTDCall func);
 
 
 // TODO: document
+native any RTD2_Format(RTDPerk perk, char[] sBuffer, int iBufferLen, const char[] sFormat);
+
+
+// TODO: document
 methodmap RTDPerk{
 	public RTDPerk(const char[] sToken){
 		return view_as<RTDPerk>(0);
@@ -154,8 +159,8 @@ methodmap RTDPerk{
 		public get(){return view_as<int>(this) != -1;}
 	}
 
-	public void GetName(char[] sBuffer, int iLen){
-		RTD2_GetPerkString(this, RTDPerk_Name, sBuffer, iLen);}
+	public void GetName(char[] sBuffer, int iBufferLen){
+		RTD2_GetPerkString(this, RTDPerk_Name, sBuffer, iBufferLen);}
 
 	public void SetName(const char[] sVal){
 		RTD2_SetPerkString(this, RTDPerk_Name, sVal);}
@@ -167,14 +172,14 @@ methodmap RTDPerk{
 			RTD2_SetPerkAny(this, RTDPerk_Good, bVal);}
 	}
 
-	public void GetSound(char[] sBuffer, int iLen){
-		RTD2_GetPerkString(this, RTDPerk_Sound, sBuffer, iLen);}
+	public void GetSound(char[] sBuffer, int iBufferLen){
+		RTD2_GetPerkString(this, RTDPerk_Sound, sBuffer, iBufferLen);}
 
 	public void SetSound(const char[] sVal){
 		RTD2_SetPerkString(this, RTDPerk_Sound, sVal);}
 
-	public void GetToken(char[] sBuffer, int iLen){
-		RTD2_GetPerkString(this, RTDPerk_Token, sBuffer, iLen);}
+	public void GetToken(char[] sBuffer, int iBufferLen){
+		RTD2_GetPerkString(this, RTDPerk_Token, sBuffer, iBufferLen);}
 
 	property int Time{
 		public get(){
@@ -195,8 +200,8 @@ methodmap RTDPerk{
 			return view_as<ArrayList>(RTD2_GetPerkHandle(this, RTDPerk_WeaponClasses));}
 	}
 
-	public void GetPref(char[] sBuffer, int iLen){
-		RTD2_GetPerkString(this, RTDPerk_Pref, sBuffer, iLen);}
+	public void GetPref(char[] sBuffer, int iBufferLen){
+		RTD2_GetPerkString(this, RTDPerk_Pref, sBuffer, iBufferLen);}
 
 	public void SetPref(const char[] sVal){
 		RTD2_SetPerkString(this, RTDPerk_Pref, sVal);}
@@ -222,6 +227,9 @@ methodmap RTDPerk{
 
 	public void SetCall(RTDCall func){
 		RTD2_SetPerkCall(this, func);}
+
+	public void Format(char[] sBuffer, int iBufferLen, const char[] sFormat){
+		RTD2_Format(this, sBuffer, iBufferLen, sFormat);}
 }
 
 // TODO: document
