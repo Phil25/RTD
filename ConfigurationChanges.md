@@ -18,6 +18,9 @@ You may not consider this list if you're not customizing perks in any way.
 	* This is not advised and will cause problems.
 	* I left it because there is no reason whatsoever anyone should do this.
 
+* Removed cvars: sm\_rtd2\_repeat & sm\_rtd2\_repeatgreat
+* Added cvars: sm\_rtd2\_repeat\_player & sm\_rtd2\_repeat\_perk
+
 * (For devs) deprecated the following natives:
 	* RTD2\_GetClientPerkId, use RTD2\_GetClientPerk
 	* RTD2\_ForcePerk, use RTD2\_Force
