@@ -109,6 +109,7 @@ bool	g_bIsRegisteringOpen	= false;
 bool	g_bIsUpdateForced		= false;
 
 Menu	g_hDescriptionMenu		= null;
+ArrayList g_hPerkHistory		= null;
 
 bool	g_bIsGameArena			= false;
 
@@ -156,12 +157,10 @@ Handle g_hCvarTeamLimit;			int g_iCvarTeamLimit = 2;
 Handle g_hCvarRespawnStuck;			bool g_bCvarRespawnStuck = true;
 #define DESC_RESPAWN_STUCK "0/1 - Should a player be forcibly respawned when a perk has ended and he's detected stuck?"
 
-/* TODO: get rid of this
-Handle g_hCvarCanRepeatPerk;		bool g_bCvarCanRepeatPerk = false;
-#define DESC_CAN_REPEAT_PERK "0/1 - Can a perk can be allowed to be rolled twice in a row."
-Handle g_hCvarCanRepeatGreatPerk;	bool g_bCvarCanRepeatGreatPerk = false;
-#define DESC_CAN_REPEAT_GREAT_PERK "0/1 - Can a perk can be allowed to be rolled the second time in 3 rolls."
-*/
+Handle g_hCvarRepeatPlayer;			int g_iCvarRepeatPlayer = 2;
+#define DESC_REPEAT_PLAYER			"How many perks are NOT allowed to repeat, per player."
+Handle g_hCvarRepeatPerk;			int g_iCvarRepeatPerk = 2;
+#define DESC_REPEAT_PERK			"How many perks are NOT allowed to repeat, per perk."
 
 Handle g_hCvarGoodChance;			float g_fCvarGoodChance = 0.5;
 #define DESC_GOOD_CHANCE "0.0-1.0 - Chance of rolling a good perk. If there are no good perks available, a bad one will be tried to be rolled instead."
@@ -253,10 +252,8 @@ public void OnPluginStart(){
 	g_hCvarTeamLimit			= CreateConVar("sm_rtd2_teamlimit",		"2",		DESC_TEAM_LIMIT,			FLAGS_CVARS, true, 0.0);
 	g_hCvarRespawnStuck			= CreateConVar("sm_rtd2_respawnstuck",	"1",		DESC_RESPAWN_STUCK,			FLAGS_CVARS, true, 0.0, true, 1.0);
 
-	/* TODO: get rid of this
-	g_hCvarCanRepeatPerk		= CreateConVar("sm_rtd2_repeat", 		"0",		DESC_CAN_REPEAT_PERK,		FLAGS_CVARS, true, 0.0, true, 1.0);
-	g_hCvarCanRepeatGreatPerk	= CreateConVar("sm_rtd2_repeatgreat",	"0",		DESC_CAN_REPEAT_GREAT_PERK,	FLAGS_CVARS, true, 0.0, true, 1.0);
-	*/
+	g_hCvarRepeatPlayer			= CreateConVar("sm_rtd2_repeat_player", "2",		DESC_REPEAT_PLAYER,			FLAGS_CVARS, true, 0.0, true, 6.0);
+	g_hCvarRepeatPerk			= CreateConVar("sm_rtd2_repeat_perk",	"2",		DESC_REPEAT_PERK,			FLAGS_CVARS, true, 0.0, true, 6.0);
 
 	g_hCvarGoodChance			= CreateConVar("sm_rtd2_chance",		"0.5",		DESC_GOOD_CHANCE,			FLAGS_CVARS, true, 0.0, true, 1.0);
 	g_hCvarGoodDonatorChance	= CreateConVar("sm_rtd2_dchance",		"0.75",		DESC_GOOD_DONATOR_CHANCE,	FLAGS_CVARS, true, 0.0, true, 1.0);
@@ -289,10 +286,8 @@ public void OnPluginStart(){
 	HookConVarChange(g_hCvarTeamLimit,			ConVarChange_Rtd	);	g_iCvarTeamLimit			= GetConVarInt(g_hCvarTeamLimit);
 	HookConVarChange(g_hCvarRespawnStuck,		ConVarChange_Rtd	);	g_bCvarRespawnStuck			= GetConVarInt(g_hCvarRespawnStuck) > 0 ? true : false;
 
-	/* TODO: get rid of this
-	HookConVarChange(g_hCvarCanRepeatPerk,		ConVarChange_Repeat	);	g_bCvarCanRepeatPerk		= GetConVarInt(g_hCvarCanRepeatPerk) > 0 ? true : false;
-	HookConVarChange(g_hCvarCanRepeatGreatPerk,	ConVarChange_Repeat	);	g_bCvarCanRepeatGreatPerk	= GetConVarInt(g_hCvarCanRepeatGreatPerk) > 0 ? true : false;
-	*/
+	HookConVarChange(g_hCvarRepeatPlayer,		ConVarChange_Repeat	);	g_iCvarRepeatPlayer			= GetConVarInt(g_hCvarRepeatPlayer);
+	HookConVarChange(g_hCvarRepeatPerk,			ConVarChange_Repeat	);	g_iCvarRepeatPerk			= GetConVarInt(g_hCvarRepeatPerk);
 
 	HookConVarChange(g_hCvarGoodChance,			ConVarChange_Good	);	g_fCvarGoodChance			= GetConVarFloat(g_hCvarGoodChance);
 	HookConVarChange(g_hCvarGoodDonatorChance,	ConVarChange_Good	);	g_fCvarGoodDonatorChance	= GetConVarFloat(g_hCvarGoodDonatorChance);
@@ -333,6 +328,7 @@ public void OnPluginStart(){
 	AddCommandListener(Listener_Voice,	"voicemenu");
 
 	g_hRollers = new Rollers();
+	g_hPerkHistory = new PerkList();
 	for(int i = 1; i <= MaxClients; i++)
 		if(IsValidClient(i))
 			OnClientPutInServer(i);
@@ -353,9 +349,7 @@ public void OnPluginEnd(){
 		if(g_hRollers.GetInRoll(i))
 			ForceRemovePerk(i, RTDRemove_PluginUnload);
 
-		g_hRollers.SetInRoll(i, false);
-		g_hRollers.SetLastRollTime(i, 0);
-		g_hRollers.SetPerk(i, null);
+		g_hRollers.Reset(i);
 	}
 }
 
@@ -379,9 +373,7 @@ public void OnMapEnd(){
 }
 
 public void OnClientPutInServer(int client){
-	g_hRollers.SetInRoll(client, false);
-	g_hRollers.SetLastRollTime(client, 0);
-	g_hRollers.SetPerk(client, null);
+	g_hRollers.Reset(client);
 
 	if(g_hRollers.GetHud(client) == null)
 		g_hRollers.SetHud(client, CreateHudSynchronizer());
@@ -395,9 +387,7 @@ public void OnClientDisconnect(int client){
 	if(g_hRollers.GetInRoll(client))
 		ForceRemovePerk(client, RTDRemove_Disconnect);
 
-	g_hRollers.SetInRoll(client, false);
-	g_hRollers.SetLastRollTime(client, 0);
-	g_hRollers.SetPerk(client, null);
+	g_hRollers.Reset(client);
 }
 
 public void OnAllPluginsLoaded(){
@@ -697,14 +687,15 @@ public int ConVarChange_Rtd(Handle hCvar, const char[] sOld, const char[] sNew){
 		g_bCvarRespawnStuck = StringToInt(sNew) > 0 ? true : false;
 }
 
-/* TODO: get rid of this
 public int ConVarChange_Repeat(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarCanRepeatPerk)
-		g_bCvarCanRepeatPerk = StringToInt(sNew) > 0 ? true : false;
-
-	else if(hCvar == g_hCvarCanRepeatGreatPerk)
-		g_bCvarCanRepeatGreatPerk = StringToInt(sNew) > 0 ? true : false;
-}*/
+	if(hCvar == g_hCvarRepeatPlayer){
+		g_iCvarRepeatPlayer = StringToInt(sNew);
+		g_hRollers.ResetPerkHisories();
+	}else if(hCvar == g_hCvarRepeatPerk){
+		g_iCvarRepeatPerk = StringToInt(sNew);
+		g_hPerkHistory.Clear();
+	}
+}
 
 public int ConVarChange_Good(Handle hCvar, const char[] sOld, const char[] sNew){
 	if(hCvar == g_hCvarGoodChance)
@@ -1135,7 +1126,7 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool b
 	perk.EmitSound(client);
 	//ManagePerk(client, perk, true); // TODO: correct signature
 
-	// TODO: Push to queues
+	g_hPerkHistory.Push(perk.Id);
 
 	int iDuration = -1;
 	int iTime = perk.GetTime();
@@ -1155,7 +1146,7 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool b
 	}else g_hRollers.GetLastRollTime(GetTime());
 
 	//Forward_PerkApplied(client, perk, iDuration); // TODO: fix signature
-	// TODO: add to client perk history
+	g_hRollers.PushToPerkHistory(client, perk);
 
 	PrintToRoller(client, perk, iDuration);
 	if(!group || !bSamePerk){
@@ -1500,6 +1491,14 @@ void Forward_OnRegOpen(){
 			//***********************//
 			//----  S T O C K S  ----//
 			//***********************//
+
+bool IsInPerkHistory(Perk perk){
+	return perk.IsInHistory(g_hPerkHistory, g_iCvarRepeatPerk);
+}
+
+bool IsInClientHistory(int client, Perk perk){
+	return g_hRollers.IsInPerkHistory(client, perk, g_iCvarRepeatPlayer);
+}
 
 //-----[ Strings ]-----//
 stock bool PerkAllowedForClassOf(int client, int iPerkId){

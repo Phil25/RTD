@@ -286,6 +286,19 @@ methodmap Perk < StringMap{
 		return false;
 	}
 
+	public bool IsInHistory(ArrayList history, int iLimit){
+		int i = history.Length;
+		if(i < iLimit) return false;
+
+		iLimit = i -iLimit;
+		int iId = this.Id;
+
+		while(--i >= iLimit)
+			if(history.Get(i) == iId)
+				return true;
+		return false;
+	}
+
 	public bool IsAptForClassOf(int client){
 		int iClass = view_as<int>(TF2_GetPlayerClass(client));
 		iClass = g_iClassConverter[iClass];
@@ -335,15 +348,12 @@ methodmap Perk < StringMap{
 			if(!this.Enabled) return false;
 
 		if(client != 0){
-			/*
 			if(!(iRollFlags & ROLLFLAG_IGNORE_PLAYER_REPEATS))
-				// TODO: if(perk in client queue)
-				return false;
-
+				if(IsInClientHistory(client, this))
+					return false;
 			if(!(iRollFlags & ROLLFLAG_IGNORE_PERK_REPEATS))
-				// TODO: if(perk in global queue)
-				return false;
-			*/
+				if(IsInPerkHistory(this))
+					return false;
 		}
 		return this.IsAptForSetupOf(client, iRollFlags);
 	}

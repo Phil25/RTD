@@ -83,4 +83,21 @@ methodmap Rollers < ArrayList{
 				return true;
 		return false;
 	}
+
+	public void ResetPerkHistory(int client){
+		delete this.GetPerkHistory(client);
+		this.SetPerkHistory(client, null);
+	}
+
+	public void Reset(int client){
+		this.SetInRoll(client, false);
+		this.SetLastRollTime(client, 0);
+		this.SetPerk(client, null);
+		this.ResetPerkHistory(client);
+	}
+
+	public void ResetPerkHisories(){
+		for(int i = 1; i <= MaxClients; ++i)
+			this.ResetPerkHistory(i);
+	}
 }
