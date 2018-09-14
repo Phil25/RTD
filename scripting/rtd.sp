@@ -68,23 +68,6 @@
 
 /********* E N U M S ********/
 
-enum Perks{
-	String:sName[PERK_MAX_LOW],
-	bool:bGood,
-	String:sSound[PERK_MAX_HIGH],
-	String:sToken[PERK_MAX_LOW],
-	iTime,
-	iClasses,
-	Handle:hWeaponClasses,
-	String:sPref[PERK_MAX_HIGH],
-	Handle:hTags,
-	bool:bIsDisabled,
-	bool:bIsExternal,
-	Function:funcCallback,
-	Handle:plParent
-};
-int ePerks[PERK_MAX_COUNT][Perks];
-
 Rollers g_hRollers = null;
 
 
@@ -1012,7 +995,7 @@ void RollPerkForClient(int client){
 	}
 
 	Perk perk = RollPerk(client);
-	//ApplyPerk(client, iPerkId); // TODO: fix sig
+	ApplyPerk(client, perk);
 	if(g_bCvarLog){
 		char sBuffer[64];
 		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
@@ -1044,7 +1027,9 @@ RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, Grou
 	}
 
 	Perk perk = g_hPerkContainer.FindPerk(sQuery);
+	bool bSamePerk = true;
 	if(!perk){
+		bSamePerk = false;
 		if(!g_bTempPrint){
 			int iApplications = group ? group.ClientCount : 1;
 			if(bIsValidInitiator)
@@ -1073,7 +1058,7 @@ RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, Grou
 			return RTDForce_Blocked;
 	}
 
-	//ApplyPerk(client, iPerkId, iPerkTime, iGroup, bSamePerk); // TODO: Fix sig
+	ApplyPerk(client, perk, iPerkTime, group, bSamePerk);
 	if(g_bCvarLog){
 		char sBuffer[64];
 		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
@@ -1124,12 +1109,12 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool b
 		return;
 
 	perk.EmitSound(client);
-	//ManagePerk(client, perk, true); // TODO: correct signature
+	ManagePerk(client, perk, true);
 
 	g_hPerkHistory.Push(perk.Id);
 
 	int iDuration = -1;
-	int iTime = perk.GetTime();
+	int iTime = perk.Time;
 	if(iTime > -1){
 		iDuration = (iPerkTime > -1) ? iPerkTime : (iTime > 0) ? iTime : g_iCvarPerkDuration;
 		int iSerial = GetClientSerial(client);
@@ -1145,7 +1130,7 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool b
 		CreateTimer(1.0, Timer_Countdown, iSerial, TIMER_REPEAT);
 	}else g_hRollers.GetLastRollTime(GetTime());
 
-	//Forward_PerkApplied(client, perk, iDuration); // TODO: fix signature
+	Forward_PerkApplied(client, perk, iDuration);
 	g_hRollers.PushToPerkHistory(client, perk);
 
 	PrintToRoller(client, perk, iDuration);
@@ -1169,7 +1154,7 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool b
 
 	g_bTempPrint = true;
 	CreateTimer(0.1, Timer_ReloadTempPrint);
-	if(perk.GetTime() < 0)
+	if(perk.Time < 0)
 		return;
 
 	group.Perk = perk;
@@ -1281,12 +1266,12 @@ public Action Timer_RemovePerk(Handle hTimer, int iSerial){
 		LogMessage("Perk %s ended on %L.", sBuffer, client);
 	}
 
-	//ManagePerk(client, g_hRollers.GetPerk(client), false); // TODO: fix sig
+	ManagePerk(client, g_hRollers.GetPerk(client), false);
 	return Plugin_Handled;
 }
 
 //-----[ Removing ]-----//
-Perk ForceRemovePerk(int client, RTDRemoveReason iReason=RTDRemove_WearOff, const char[] sReason=""){
+Perk ForceRemovePerk(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
 	if(!IsValidClient(client))
 		return null;
 
@@ -1295,23 +1280,20 @@ Perk ForceRemovePerk(int client, RTDRemoveReason iReason=RTDRemove_WearOff, cons
 		group.EraseClient(client);
 
 	Perk perk = g_hRollers.GetPerk(client);
-	//ManagePerk(client, perk, false, iReason, sReason); // TODO: fix sig
-	ManagePerk(client, 0, false, view_as<int>(iReason), sReason); // TODO: remove me
+	ManagePerk(client, perk, false, reason, sReason);
 	return perk;
 }
 
-void RemovedPerk(int client, int iReason, const char[] sReason=""){
+void RemovedPerk(int client, RTDRemoveReason reason, const char[] sReason=""){
 	g_hRollers.SetInRoll(client, false);
 	g_hRollers.SetLastRollTime(client, GetTime());
 
-	//Forward_PerkRemoved(client, g_hRollers.GetPerk(client), iReason); // TODO: fix sig
+	Forward_PerkRemoved(client, g_hRollers.GetPerk(client), reason);
 	g_hRollers.SetPerk(client, null);
 
 	Group group = g_hRollers.GetGroup(client);
-	if(!group)
-		PrintPerkEndReason(client, iReason, sReason);
-	else if(!group.Perk)
-		PrintPerkEndReason(client, iReason, sReason);
+	if(!group || !group.Perk)
+		PrintPerkEndReason(client, reason, sReason);
 
 	g_hRollers.SetGroup(client, null);
 	Handle hTimer = g_hRollers.GetTimer(client);
@@ -1326,17 +1308,17 @@ void PrintToRoller(int client, Perk perk, int iDuration){
 	char sPerkName[MAX_NAME_LENGTH];
 	perk.GetName(sPerkName, MAX_NAME_LENGTH);
 
-	if(!g_bCvarShowTime || perk.GetTime() == -1)
+	if(!g_bCvarShowTime || perk.Time == -1)
 		PrintToChat(client, "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Roller", LANG_SERVER,
-			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
 			0x01);
 	else{
-		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.GetTime() > 0) ? perk.GetTime() : g_iCvarPerkDuration;
+		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		PrintToChat(client, "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Roller_Time", LANG_SERVER,
-			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
 			0x01, 0x03, iTrueDuration, 0x01);
 	}
@@ -1350,22 +1332,22 @@ void PrintToNonRollers(int client, Perk perk, int iDuration){
 	GetClientName(client, sRollerName, sizeof(sRollerName));
 	perk.GetName(sPerkName, MAX_NAME_LENGTH);
 
-	if(!g_bCvarShowTime || perk.GetTime() == -1)
+	if(!g_bCvarShowTime || perk.Time == -1)
 		Format(sOthersPrint, sizeof(sOthersPrint), "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Others", LANG_SERVER,
 			g_sTeamColors[GetClientTeam(client)],
 			sRollerName,
 			0x01,
-			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName, 0x01);
 	else{
-		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.GetTime() > 0) ? perk.GetTime() : g_iCvarPerkDuration;
+		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		Format(sOthersPrint, sizeof(sOthersPrint), "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Others_Time", LANG_SERVER,
 			g_sTeamColors[GetClientTeam(client)],
 			sRollerName,
 			0x01,
-			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName, 0x01, 0x03, iTrueDuration, 0x01);
 	}
 	PrintToChatAllExcept(client, sOthersPrint);
@@ -1378,67 +1360,67 @@ void PrintGroupRolls(int iApplications, Perk perk, int iDuration){
 	char sReason[128], sPerkName[MAX_NAME_LENGTH];
 	perk.GetName(sPerkName, MAX_NAME_LENGTH);
 
-	if(!g_bCvarShowTime || perk.GetTime() == -1)
+	if(!g_bCvarShowTime || perk.Time == -1)
 		Format(sReason, sizeof(sReason), "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Multi", LANG_SERVER,
 			iApplications,
-			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
 			0x01);
 	else{
-		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.GetTime() > 0) ? perk.GetTime() : g_iCvarPerkDuration;
+		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		Format(sReason, sizeof(sReason), "%s %T", CHAT_PREFIX,
 			"RTD2_Rolled_Perk_Multi_Time", LANG_SERVER,
 			iApplications,
-			perk.GetGood() ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
 			0x01, 0x03, iTrueDuration, 0x01);
 	}
 	PrintToChatAll(sReason);
 }
 
-void PrintPerkEndReason(int client, int iReason=3, const char[] sCustomReason=""){
+void PrintPerkEndReason(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sCustomReason=""){
 	char sReasonSelf[32], sReasonOthers[32];
-	switch(iReason){
-		case 0:{
+	switch(reason){
+		case RTDRemove_PluginUnload:{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "RTD2_Remove_Perk_Unload_Self");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_Unload_Others");
 		}
 
-		case 1:{
+		case RTDRemove_Death:{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "RTD2_Remove_Perk_Died_Self");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_Died_Others");
 		}
 
-		case 2:{
+		case RTDRemove_ClassChange:{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "RTD2_Remove_Perk_Class_Self");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_Class_Others");
 		}
 
-		case 3:{
+		case RTDRemove_WearOff:{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "RTD2_Remove_Perk_End_Self");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_End_Others");
 		}
 
-		case 4:{
+		case RTDRemove_Disconnect:{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "0");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_Disconnected");
 		}
 
-		case 5:{
+		case RTDRemove_Custom:{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "RTD2_Remove_Perk_Custom_Self");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_Custom_Others");
 		}
 	}
 
 	if(sReasonSelf[0] != '0' && (g_iCvarChat & CHAT_REMROLLER))
-		PrintToChat(client, "%s %T", CHAT_PREFIX, sReasonSelf, LANG_SERVER, iReason > 4 ? sCustomReason : "");
+		PrintToChat(client, "%s %T", CHAT_PREFIX, sReasonSelf, LANG_SERVER, reason == RTDRemove_Custom ? sCustomReason : "");
 
 	if(!(g_iCvarChat & CHAT_REMOTHER))
 		return;
 
 	char sPrintReasonToOthers[128];
-	Format(sPrintReasonToOthers, sizeof(sPrintReasonToOthers), "%s %T", CHAT_PREFIX, sReasonOthers, LANG_SERVER, g_sTeamColors[GetClientTeam(client)], client, 0x01, iReason > 4 ? sCustomReason : "");
+	Format(sPrintReasonToOthers, sizeof(sPrintReasonToOthers), "%s %T", CHAT_PREFIX, sReasonOthers, LANG_SERVER, g_sTeamColors[GetClientTeam(client)], client, 0x01, reason == RTDRemove_Custom ? sCustomReason : "");
 	PrintToChatAllExcept(client, sPrintReasonToOthers);
 }
 
@@ -1456,25 +1438,25 @@ void PrintPerkEndReason(int client, int iReason=3, const char[] sCustomReason=""
 			//----  F O R W A R D S  ----//
 			//***************************//
 
-void Forward_PerkApplied(int client, int iPerk, int iDuration){
+void Forward_PerkApplied(int client, Perk perk, int iDuration){
 	if(GetForwardFunctionCount(g_hFwdRolled) < 1)
 		return;
 
 	Call_StartForward(g_hFwdRolled);
 	Call_PushCell(client);
-	Call_PushCell(iPerk);
+	Call_PushCell(perk);
 	Call_PushCell(iDuration);
 	Call_Finish();
 }
 
-void Forward_PerkRemoved(int client, int iPerk, int iReason){
+void Forward_PerkRemoved(int client, Perk perk, RTDRemoveReason reason){
 	if(GetForwardFunctionCount(g_hFwdRemoved) < 1)
 		return;
 
 	Call_StartForward(g_hFwdRemoved);
 	Call_PushCell(client);
-	Call_PushCell(iPerk);
-	Call_PushCell(iReason);
+	Call_PushCell(perk);
+	Call_PushCell(reason);
 	Call_Finish();
 }
 
@@ -1501,64 +1483,6 @@ bool IsInClientHistory(int client, Perk perk){
 }
 
 //-----[ Strings ]-----//
-stock bool PerkAllowedForClassOf(int client, int iPerkId){
-	switch(TF2_GetPlayerClass(client)){
-		case TFClass_Scout:		{if(ePerks[iPerkId][iClasses] & 1)		return true;}
-		case TFClass_Soldier:	{if(ePerks[iPerkId][iClasses] & 2)		return true;}
-		case TFClass_Pyro:		{if(ePerks[iPerkId][iClasses] & 4)		return true;}
-		case TFClass_DemoMan:	{if(ePerks[iPerkId][iClasses] & 8)		return true;}
-		case TFClass_Heavy:		{if(ePerks[iPerkId][iClasses] & 16)		return true;}
-		case TFClass_Engineer:	{if(ePerks[iPerkId][iClasses] & 32)		return true;}
-		case TFClass_Medic:		{if(ePerks[iPerkId][iClasses] & 64)		return true;}
-		case TFClass_Sniper:	{if(ePerks[iPerkId][iClasses] & 128)	return true;}
-		case TFClass_Spy:		{if(ePerks[iPerkId][iClasses] & 256)	return true;}
-	}
-	return false;
-}
-
-stock bool PerkAllowedForWeaponsOf(int client, int iPerkId){
-	if(ePerks[iPerkId][hWeaponClasses] == INVALID_HANDLE)
-		return true;
-
-	int iSize = GetArraySize(ePerks[iPerkId][hWeaponClasses]);
-	if(iSize < 1)
-		return true;
-
-	char sClass[32], sWeapClass[32];
-	int iWeapon = 0;
-	for(int i = 0; i < 5; i++){
-		iWeapon = GetPlayerWeaponSlot(client, i);
-		if(iWeapon <= MaxClients)
-			continue;
-
-		if(!IsValidEntity(iWeapon))
-			continue;
-
-		GetEntityClassname(iWeapon, sWeapClass, 32);
-		for(int j = 0; j < iSize; j++){
-			GetArrayString(ePerks[iPerkId][hWeaponClasses], j, sClass, 32);
-			if(StrContains(sWeapClass, sClass, false) > -1)
-				return true;
-		}
-	}
-	return false;
-}
-
-stock bool IsPerkInTags(int iPerkId, const char[] sTagString, iTagNum){
-	char[][] sPieces = new char[iTagNum][32];
-	ExplodeString(sTagString, "|", sPieces, iTagNum, 32);
-
-	int iPerkTags = GetArraySize(ePerks[iPerkId][hTags]);
-	char sThisTag[16];
-	for(int i = 0; i < iTagNum; i++)
-		for(int j = 0; j < iPerkTags; j++){
-			GetArrayString(ePerks[iPerkId][hTags], j, sThisTag, 16);
-			if(StrEqual(sThisTag, sPieces[i], false))
-				return true;
-		}
-	return false;
-}
-
 stock int CountTagOccurences(const char[] sTag, int iTagSize){
 	int count = 0;
 	for(int i = 0; i < g_iPerkCount; i++){
@@ -1615,56 +1539,9 @@ stock void DisplayPerkTimeFrame(client){
 }
 
 //-----[ Perks ]-----//
-stock int ClassStringToFlags(char[] sClasses){
-	if(FindCharInString(sClasses, '0') > -1)
-		return 511;
-
-	int iLength = strlen(sClasses);
-	if(iLength < 2){
-		int iClass = StringToInt(sClasses);
-		if(iClass < 1) return 0;
-		else return iPow(2, iClass-1);
-	}else{
-		int iCharSize = (iLength+1)/2;
-		char[][] sPieces = new char[iCharSize][4];
-		ExplodeString(sClasses, ",", sPieces, iCharSize, 4);
-
-		int iValue = 0, iPowed = 0, iFlags = 0;
-		for(int i = 0; i < iCharSize; i++){
-			iValue = StringToInt(sPieces[i]);
-			if(iValue > 9)
-				continue;
-
-			iPowed = iPow(2, iValue-1);
-			if(iFlags & iPowed)
-				continue;
-
-			iFlags |= iPowed;
-		}
-		return iFlags;
-	}
-}
-
-stock int GetPerkOfString(const char[] sString, int iStringSize){
-	int iString = StringToInt(sString);
-	if(!(FindCharInString(sString, '0') < 0 && iString == 0))
-		return iString;
-
-	for(int i = 0; i < g_iPerkCount; i++){
-		if(StrEqual(sString, ePerks[i][sToken]))
-			return i;
-	}
-
-	if(CountTagOccurences(sString, iStringSize) == 1)
-		for(int j = 0; j < g_iPerkCount; j++){
-			if(IsPerkInTags(j, sString, 1))
-				return j;
-		}
-	return -1;
-}
-
 stock int GetPerkTime(int iPerkId){
-	return (ePerks[iPerkId][iTime] > 0) ? ePerks[iPerkId][iTime] : g_iCvarPerkDuration;
+	int iTime = g_hPerkContainer.GetFromId(iPerkId).Time;
+	return (iTime > 0) ? iTime : g_iCvarPerkDuration;
 }
 
 //-----[ Miscellaneous ]-----//
@@ -1775,13 +1652,6 @@ public Action Timer_FixStuck(Handle hTimer, int iSerial){
 }
 
 //-----[ Checks ]-----//
-stock int FindPerkByToken(const char[] sCheckToken){
-	for(int i = 0; i < g_iPerkCount; i++)
-		if(StrEqual(sCheckToken, ePerks[i][sToken], false))
-			return i;
-	return -1;
-}
-
 stock bool IsArgumentTrigger(const char[] sArg){
 	char sTrigger[16];
 	for(int i = 0; i < g_iCvarTriggers; i++){

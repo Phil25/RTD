@@ -32,7 +32,7 @@
 \**********************************************************************************/
 
 /*
-	• Editing ManagePerk() is REQUIRED for your perk to work
+	• Editing ManagePerk() is REQUIRED for your perk to work TODO recodument
 
 	• Fired when a perk is just about to be applied or removed
 
@@ -47,27 +47,23 @@
 		- (string)	fPref:		(part of perks' enum) the optional value, found under each "settings" in rtd2_perks.cfg
 		- (bool)	enable:		should the perk be applied(enabled) or removed(disabled)
 */
-void ManagePerk(int client, int iPerkId, bool enable, int iReason=3, const char[] sReason=""){
-
+void ManagePerk(int client, Perk perk, bool enable, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
 	//If the perk effect is NOT in this plugin, execute the function and stop, check if it's not being disabled and just stop right there.
-	if(ePerks[iPerkId][bIsExternal]){
-		Call_StartFunction(ePerks[iPerkId][plParent], ePerks[iPerkId][funcCallback]);
-		Call_PushCell(client);
-		Call_PushCell(iPerkId);
-		Call_PushCell(enable);
-		Call_Finish();
+	if(perk.External){
+		perk.Call(client, enable);
 
 		if(!enable)	//Check if anything is needing to be printed.
-			RemovedPerk(client, iReason, sReason);
+			RemovedPerk(client, reason, sReason);
 		return;	//Stop further exectuion of ManagePerk()
 	}
 
 	//This is the optional value for perks, found under "special" in rtd2_perks.cfg
-	char sSettings[PERK_MAX_HIGH];
-	strcopy(sSettings, PERK_MAX_HIGH, ePerks[iPerkId][sPref]);
+	char sSettings[127];
+	perk.GetPref(sSettings, 127);
 
 	//template: case <your_perk_id>:{YourPerk_Function(client, sSettings, enable);}
-	switch(iPerkId){
+	int iId = perk.Id;
+	switch(iId){
 		case 0:	Godmode_Perk			(client, sSettings, enable);
 		case 1:	Toxic_Perk				(client, sSettings, enable);
 		case 2:	LuckySandvich_Perk		(client, sSettings, enable);
@@ -127,7 +123,7 @@ void ManagePerk(int client, int iPerkId, bool enable, int iReason=3, const char[
 	}
 
 	if(!enable)
-		RemovedPerk(client, iReason, sReason);
+		RemovedPerk(client, reason, sReason);
 }
 
 
