@@ -80,8 +80,6 @@ Rollers g_hRollers = null;
 /***** V A R I A B L E S ****/
 
 char	g_sTeamColors[][]		= {"\x07B2B2B2", "\x07B2B2B2", "\x07FF4040", "\x0799CCFF"};
-int		g_iPerkCount			= 0;
-int		g_iCorePerkCount		= 0;
 bool	g_bTempPrint			= false;
 
 bool	g_bPluginUpdater		= false;
@@ -1483,24 +1481,7 @@ bool IsInClientHistory(int client, Perk perk){
 }
 
 //-----[ Strings ]-----//
-stock int CountTagOccurences(const char[] sTag, int iTagSize){
-	int count = 0;
-	for(int i = 0; i < g_iPerkCount; i++){
-		if(IsPerkInTags(i, sTag, 1))
-			count++;
-	}
-	return count;
-}
-
-/*stock int CountCharInString(const char[] sString, char cChar){
-	int i = 0, count = 0;
-	while(sString[i] != '\0')
-		if(sString[i++] == cChar)
-			count++;
-	return count;
-}*/
-
-stock int EscapeString(const char[] input, int escape, int escaper, char[] output, int maxlen){
+int EscapeString(const char[] input, int escape, int escaper, char[] output, int maxlen){
 	/*
 		Thanks Popoklopsi for EscapeString()
 		https://forums.alliedmods.net/showthread.php?t=212230
@@ -1519,7 +1500,7 @@ stock int EscapeString(const char[] input, int escape, int escaper, char[] outpu
 }
 
 //-----[ Feedback ]-----//
-stock void PrintToChatAllExcept(int client, char[] sMessage){
+void PrintToChatAllExcept(int client, char[] sMessage){
 	for(int i = 1; i <= MaxClients; i++){
 		if(!IsValidClient(i) || i == client)
 			continue;
@@ -1527,7 +1508,7 @@ stock void PrintToChatAllExcept(int client, char[] sMessage){
 	}
 }
 
-stock void DisplayPerkTimeFrame(client){
+void DisplayPerkTimeFrame(client){
 	int iTeam	= GetClientTeam(client);
 	int iRed	= (iTeam == 2) ? 255 : 32;
 	int iBlue	= (iTeam == 3) ? 255 : 32;
@@ -1539,19 +1520,19 @@ stock void DisplayPerkTimeFrame(client){
 }
 
 //-----[ Perks ]-----//
-stock int GetPerkTime(int iPerkId){
+int GetPerkTime(int iPerkId){
 	int iTime = g_hPerkContainer.GetFromId(iPerkId).Time;
 	return (iTime > 0) ? iTime : g_iCvarPerkDuration;
 }
 
 //-----[ Miscellaneous ]-----//
-stock int ReadFlagFromConVar(Handle hCvar){
+int ReadFlagFromConVar(Handle hCvar){
 	char sBuffer[32];
 	GetConVarString(hCvar, sBuffer, sizeof(sBuffer));
 	return ReadFlagString(sBuffer);
 }
 
-stock int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int iBlue=255, float fStartWidth=1.0, float fEndWidth=1.0, float fAmp=1.35){
+int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int iBlue=255, float fStartWidth=1.0, float fEndWidth=1.0, float fAmp=1.35){
 	int iBeam = CreateEntityByName("env_beam");
 	if(iBeam <= MaxClients)
 		return -1;
@@ -1574,10 +1555,10 @@ stock int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int
 	SetEntProp(iBeam, Prop_Send, "m_nNumBeamEnts", 2);
 	SetEntProp(iBeam, Prop_Send, "m_nBeamType", 2);
 
-	SetEntPropFloat(iBeam, Prop_Data, "m_fWidth", 1.0);
-	SetEntPropFloat(iBeam, Prop_Data, "m_fEndWidth", 1.0);
+	SetEntPropFloat(iBeam, Prop_Data, "m_fWidth", fStartWidth);
+	SetEntPropFloat(iBeam, Prop_Data, "m_fEndWidth", fEndWidth);
 
-	SetEntPropFloat(iBeam, Prop_Data, "m_fAmplitude", 1.35);
+	SetEntPropFloat(iBeam, Prop_Data, "m_fAmplitude", fAmp);
 
 	SetVariantFloat(32.0);
 	AcceptEntityInput(iBeam, "Amplitude");
@@ -1585,7 +1566,7 @@ stock int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int
 	return iBeam;
 }
 
-stock int CreateParticle(int iClient, char[] strParticle, bool bAttach=true, char[] strAttachmentPoint="", float fOffset[3]={0.0, 0.0, 36.0}){
+int CreateParticle(int iClient, char[] strParticle, bool bAttach=true, char[] strAttachmentPoint="", float fOffset[3]={0.0, 0.0, 36.0}){
 	//Thanks J-Factor for CreateParticle()
 	int iParticle = CreateEntityByName("info_particle_system");
 	if(!IsValidEdict(iParticle)) return 0;
@@ -1619,7 +1600,7 @@ stock int CreateParticle(int iClient, char[] strParticle, bool bAttach=true, cha
 	return iParticle;
 }
 
-stock void FixPotentialStuck(int client){
+void FixPotentialStuck(int client){
 	if(!g_bCvarRespawnStuck)
 		return;
 
@@ -1652,7 +1633,7 @@ public Action Timer_FixStuck(Handle hTimer, int iSerial){
 }
 
 //-----[ Checks ]-----//
-stock bool IsArgumentTrigger(const char[] sArg){
+bool IsArgumentTrigger(const char[] sArg){
 	char sTrigger[16];
 	for(int i = 0; i < g_iCvarTriggers; i++){
 		GetArrayString(g_arrCvarTriggers, i, sTrigger, 16);
@@ -1662,7 +1643,7 @@ stock bool IsArgumentTrigger(const char[] sArg){
 	return false;
 }
 
-stock bool IsEntityStuck(int iEntity){
+bool IsEntityStuck(int iEntity){
 	float fPos[3], fMins[3], fMaxs[3];
 	GetEntPropVector(iEntity, Prop_Send, "m_vecOrigin", fPos);
 	GetEntPropVector(iEntity, Prop_Send, "m_vecMins", fMins);
@@ -1672,19 +1653,19 @@ stock bool IsEntityStuck(int iEntity){
 	return TR_DidHit();
 }
 
-stock bool IsRollerAllowed(int client){
+bool IsRollerAllowed(int client){
 	if(g_iCvarAllowed > 0)
 		return view_as<bool>(GetUserFlagBits(client) & g_iCvarAllowed);
 	return true;
 }
 
-stock bool IsRollerDonator(int client){
+bool IsRollerDonator(int client){
 	if(g_iCvarDonatorFlag > 0)
 		return view_as<bool>(GetUserFlagBits(client) & g_iCvarDonatorFlag);
 	return false;
 }
 
-stock bool CanBuildAtPos(float fPos[3], bool bSentry){
+bool CanBuildAtPos(float fPos[3], bool bSentry){
 	//TODO: Figure out a neat way of checking nobuild areas. I've spent 5h non stop trying to do it, help pls.
 	float fMins[3], fMaxs[3];
 	if(bSentry){
@@ -1708,7 +1689,7 @@ stock bool CanBuildAtPos(float fPos[3], bool bSentry){
 	return !TR_DidHit();
 }
 
-stock bool CanPlayerBeHurt(int client, int by=0){
+bool CanPlayerBeHurt(int client, int by=0){
 	if(IsValidClient(by))
 		if(GetClientTeam(by) == GetClientTeam(client))
 			return false;
@@ -1725,7 +1706,7 @@ stock bool CanPlayerBeHurt(int client, int by=0){
 	return true;
 }
 
-stock bool IsPlayerFriendly(int client){
+bool IsPlayerFriendly(int client){
 	if(g_bPluginFriendly)
 		if(TF2Friendly_IsFriendly(client))
 			return true;
@@ -1737,7 +1718,7 @@ stock bool IsPlayerFriendly(int client){
 	return false;
 }
 
-stock bool CanEntitySeeTarget(int entity, int iTarget){
+bool CanEntitySeeTarget(int entity, int iTarget){
 	float fStart[3], fEnd[3];
 	if(IsValidClient(entity))
 		GetClientEyePosition(entity, fStart);
@@ -1758,7 +1739,7 @@ stock bool CanEntitySeeTarget(int entity, int iTarget){
 	return true;
 }
 
-stock bool IsRTDInRound(){
+bool IsRTDInRound(){
 	if(GameRules_GetProp("m_bInWaitingForPlayers", 1))
 		return false;
 
@@ -1791,7 +1772,7 @@ public bool TraceFilterIgnorePlayersAndSelf(int iEntity, int iContentsMask, any 
 	return true;
 }
 
-stock bool GetClientLookPosition(int client, float fPosition[3]){
+bool GetClientLookPosition(int client, float fPosition[3]){
 	float fPos[3], fAng[3];
 	GetClientEyePosition(client, fPos);
 	GetClientEyeAngles(client, fAng);
@@ -1805,7 +1786,7 @@ stock bool GetClientLookPosition(int client, float fPosition[3]){
 }
 
 //-----[ Helpers ]-----//
-stock int AccountIDToClient(int iAccountID){
+int AccountIDToClient(int iAccountID){
 	for(int i = 1; i <= MaxClients; i++)
 		if(IsClientInGame(i))
 			if(GetSteamAccountID(i) == iAccountID)
@@ -1813,17 +1794,12 @@ stock int AccountIDToClient(int iAccountID){
 	return -1;
 }
 
-stock void KillTimerSafe(Handle &hTimer){
+void KillTimerSafe(Handle &hTimer){
 	if(hTimer == INVALID_HANDLE)
 		return;
 
 	KillTimer(hTimer);
 	hTimer = INVALID_HANDLE;
-}
-
-stock int iPow(int iValue, int iExponent){
-	//Thanks, D.Moder
-	return RoundFloat(Pow(float(iValue), float(iExponent)));
 }
 
 public bool IsValidClient(int client){
