@@ -161,9 +161,6 @@ methodmap Perk < StringMap{
 		Call_Finish();
 	}
 
-	GET_VALUE(Handle,Parent)
-	SET_VALUE(Handle,Parent) // TODO: leak when setting multiple times
-
 	public PerkPropType GetPropType(const char[] sProp){
 		if(strlen(sProp) < 4)
 			return Type_Invalid;
