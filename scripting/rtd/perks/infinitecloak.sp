@@ -62,9 +62,10 @@ void InfiniteCloak_ApplyPerk(int client){
 public Action Timer_RefreshCloak(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
+	if(client == 0) return Plugin_Stop;
 
-	if(!IsValidClient(client))		return Plugin_Stop;
-	if(!g_bInfiniteCloak[client])	return Plugin_Stop;
+	if(!g_bInfiniteCloak[client])
+		return Plugin_Stop;
 	
 	SetEntPropFloat(client, Prop_Send, "m_flCloakMeter", 105.0);
 	

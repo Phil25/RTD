@@ -116,7 +116,7 @@ public Action Timer_HomingProjectiles_CheckOwnership(Handle hTimer, any iRef){
 	
 	int iLauncher = GetEntPropEnt(iProjectile, Prop_Send, "m_hOwnerEntity");
 	
-	if(iLauncher < 1 || !IsValidClient(iLauncher) || !IsPlayerAlive(iLauncher))
+	if(!IsValidClient(iLauncher) || !IsPlayerAlive(iLauncher))
 		return Plugin_Handled;
 	
 	if(!g_bHasHomingProjectiles[iLauncher])
@@ -276,7 +276,7 @@ stock bool IsHomingPerkPresent(){
 
 	for(int i = 1; i <= MaxClients; i++){
 	
-		if(!IsValidClient(i))
+		if(!IsClientInGame(i))
 			continue;
 		
 		if(!IsPlayerAlive(i))

@@ -41,9 +41,10 @@ public void NecroMash_Perk(int client, const char[] sPref, bool apply){
 public Action Timer_NecroMash_Retry(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
+	if(client == 0) return Plugin_Stop;
 
-	if(!IsValidClient(client))		return Plugin_Stop;
-	if(!g_bShouldBeSmashed[client])	return Plugin_Stop;
+	if(!g_bShouldBeSmashed[client])
+		return Plugin_Stop;
 	
 	if(GetEntProp(client, Prop_Send, "m_hGroundEntity") < 0)
 		return Plugin_Continue;

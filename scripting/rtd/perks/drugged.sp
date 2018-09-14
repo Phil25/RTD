@@ -69,9 +69,7 @@ void Drugged_ApplyPerk(int client, float fInterval){
 public Action Timer_DrugTick(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
-
-	if(!IsValidClient(client))
-		return Plugin_Stop;
+	if(client == 0) return Plugin_Stop;
 	
 	if(!g_bIsDrugged[client]){
 	

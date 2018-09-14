@@ -76,9 +76,10 @@ void InfiniteAmmo_ApplyPerk(int client, int iNoReload){
 public Action Timer_ResupplyAmmo(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
+	if(client == 0) return Plugin_Stop;
 
-	if(!IsValidClient(client))		return Plugin_Stop;
-	if(!g_bResupplyAmmo[client])	return Plugin_Stop;
+	if(!g_bResupplyAmmo[client])
+		return Plugin_Stop;
 	
 	InfiniteAmmo_Resupply(client);
 	

@@ -86,7 +86,7 @@ public Action TinyMann_SoundHook(int iClients[64], int &iClientsNum, char sSampl
 		return Plugin_Continue;
 	
 	if(iChannel != SNDCHAN_VOICE)	return Plugin_Continue;
-	if(!IsValidClient(iEntity))		return Plugin_Continue;
+	if(!IsClientInGame(iEntity))	return Plugin_Continue;
 	if(!g_bIsTinyMann[iEntity])		return Plugin_Continue;
 	
 	int iTempPitch = RoundToFloor(100.0 *Pow(g_fTinyMannScale, -1.0));

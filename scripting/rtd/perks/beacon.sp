@@ -77,9 +77,10 @@ void Beacon_ApplyPerk(int client, const char[] sSettings){
 public Action Timer_BeaconBeep(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
+	if(client == 0) return Plugin_Stop;
 
-	if(!IsValidClient(client))	return Plugin_Stop;
-	if(!g_bIsBeaconed[client])	return Plugin_Stop;
+	if(!g_bIsBeaconed[client])
+		return Plugin_Stop;
 	
 	Beacon_Beep(client);
 	

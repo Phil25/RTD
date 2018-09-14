@@ -91,7 +91,7 @@ void FullRifleCharge_SetSniperPrimary(int client){
 
 void FullRifleCharge_OnConditionAdded(int client, TFCond condition){
 
-	if(!IsValidClient(client))		return;
+	if(!IsClientInGame(client))		return;
 	if(!g_bHasFullCharge[client])	return;
 	if(condition != TFCond_Slowed)	return;
 
@@ -107,8 +107,10 @@ void FullRifleCharge_OnConditionAdded(int client, TFCond condition){
 public void Event_FullRifleCharge_Resupply(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
 
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if(!IsValidClient(client))		return;
-	if(!g_bHasFullCharge[client])	return;
+	if(client == 0) return;
+
+	if(!g_bHasFullCharge[client])
+		return;
 	
 	FullRifleCharge_SetSniperPrimary(client);
 

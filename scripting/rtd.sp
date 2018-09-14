@@ -311,7 +311,7 @@ public void OnPluginStart(){
 	g_hRollers = new Rollers();
 	g_hPerkHistory = new PerkList();
 	for(int i = 1; i <= MaxClients; i++)
-		if(IsValidClient(i))
+		if(IsClientInGame(i))
 			OnClientPutInServer(i);
 }
 
@@ -430,14 +430,14 @@ public int Updater_OnPluginUpdated(){
 			//***************************//
 
 public Action Command_RTD(int client, int args){
-	if(IsValidClient(client))
+	if(client != 0)
 		RollPerkForClient(client);
 
 	return Plugin_Handled;
 }
 
 public Action Command_DescMenu(int client, int args){
-	if(IsValidClient(client))
+	if(client != 0)
 		ShowDesc(client);
 
 	return Plugin_Handled;
@@ -705,7 +705,7 @@ public int ConVarChange_Timer(Handle hCvar, const char[] sOld, const char[] sNew
 
 public Action Event_PlayerDeath(Handle hEvent, const char[] sEventName, bool dontBroadcast){
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if(!IsValidClient(client))
+	if(client == 0)
 		return Plugin_Continue;
 
 	int flags = GetEventInt(hEvent, "death_flags");
@@ -723,7 +723,7 @@ public Action Event_PlayerDeath(Handle hEvent, const char[] sEventName, bool don
 
 public Action Event_ClassChange(Handle hEvent, const char[] sEventName, bool dontBroadcast){
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if(!IsValidClient(client))
+	if(client == 0)
 		return Plugin_Continue;
 
 	Forward_OnRemovePerkPre(client);
@@ -1103,8 +1103,7 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 }
 
 void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool bSamePerk=false){
-	if(!IsValidClient(client))
-		return;
+	if(!IsValidClient(client)) return;
 
 	perk.EmitSound(client);
 	ManagePerk(client, perk, true);
@@ -1243,7 +1242,7 @@ public Action Timer_PrintGroupEnd(Handle hTimer, Group group){
 
 public Action Timer_Countdown(Handle hTimer, int iSerial){
 	int client = GetClientFromSerial(iSerial);
-	if(!IsValidClient(client))
+	if(client == 0)
 		return Plugin_Stop;
 
 	if(!g_hRollers.GetInRoll(client))
@@ -1255,7 +1254,7 @@ public Action Timer_Countdown(Handle hTimer, int iSerial){
 
 public Action Timer_RemovePerk(Handle hTimer, int iSerial){
 	int client = GetClientFromSerial(iSerial);
-	if(!IsValidClient(client))
+	if(client == 0)
 		return Plugin_Stop;
 
 	if(g_bCvarLog){
@@ -1270,8 +1269,7 @@ public Action Timer_RemovePerk(Handle hTimer, int iSerial){
 
 //-----[ Removing ]-----//
 Perk ForceRemovePerk(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
-	if(!IsValidClient(client))
-		return null;
+	if(!IsValidClient(client)) return null;
 
 	Group group = g_hRollers.GetGroup(client);
 	if(group && group.Active)
@@ -1502,7 +1500,7 @@ int EscapeString(const char[] input, int escape, int escaper, char[] output, int
 //-----[ Feedback ]-----//
 void PrintToChatAllExcept(int client, char[] sMessage){
 	for(int i = 1; i <= MaxClients; i++){
-		if(!IsValidClient(i) || i == client)
+		if(!IsClientInGame(i) || i == client)
 			continue;
 		PrintToChat(i, sMessage);
 	}
@@ -1601,25 +1599,13 @@ int CreateParticle(int iClient, char[] strParticle, bool bAttach=true, char[] st
 }
 
 void FixPotentialStuck(int client){
-	if(!g_bCvarRespawnStuck)
-		return;
-
-	if(client < 1 || client > MaxClients)
-		return;
-
-	if(!IsClientInGame(client))
-		return;
-
-	CreateTimer(0.1, Timer_FixStuck, GetClientSerial(client));
+	if(g_bCvarRespawnStuck && IsValidClient(client))
+		CreateTimer(0.1, Timer_FixStuck, GetClientSerial(client));
 }
 
 public Action Timer_FixStuck(Handle hTimer, int iSerial){
 	int client = GetClientFromSerial(iSerial);
-	if(client < 1 || client > MaxClients)
-		return Plugin_Stop;
-
-	if(!IsClientInGame(client))
-		return Plugin_Stop;
+	if(client == 0) return Plugin_Stop;
 
 	if(!IsPlayerAlive(client))
 		return Plugin_Stop;
@@ -1759,14 +1745,14 @@ public bool TraceFilterIgnoreSelf(int iEntity, int iContentsMask, any iTarget){
 }
 
 public bool TraceFilterIgnorePlayers(int iEntity, int iContentsMask, any data){
-	return !(iEntity >= 1 && iEntity <= MaxClients);
+	return !(1 <= iEntity <= MaxClients);
 }
 
 public bool TraceFilterIgnorePlayersAndSelf(int iEntity, int iContentsMask, any iTarget){
-	if(iEntity >= 1 && iEntity <= MaxClients)
+	if(iEntity == iTarget)
 		return false;
 
-	if(iEntity == iTarget)
+	if(1 <= iEntity <= MaxClients)
 		return false;
 
 	return true;
@@ -1802,13 +1788,6 @@ void KillTimerSafe(Handle &hTimer){
 	hTimer = INVALID_HANDLE;
 }
 
-public bool IsValidClient(int client){
-	if(client > 4096)
-		client = EntRefToEntIndex(client);
-
-	if(client < 1 || client > MaxClients)				return false;
-	if(!IsClientInGame(client))							return false;
-	if(IsFakeClient(client))							return false;
-	if(GetEntProp(client, Prop_Send, "m_bIsCoaching"))	return false;
-	return true;
+bool IsValidClient(int client){
+	return (1 <= client <= MaxClients) && IsClientInGame(client);
 }

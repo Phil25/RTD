@@ -86,7 +86,7 @@ void ScaryBullets_RemovePerk(int client){
 public void Event_ScaryBullets_PlayerHurt(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
 	
 	int attacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
-	if(!IsValidClient(attacker))			return;
+	if(attacker == 0) return;
 
 	if(!g_bHasScaryBullets[attacker])		return;
 

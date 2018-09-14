@@ -68,9 +68,7 @@ void Suffocation_ApplyPerk(client, const char[] sPref){
 public Action Timer_Suffocation_Begin(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
-
-	if(!IsValidClient(client))
-		return Plugin_Stop;
+	if(client == 0) return Plugin_Stop;
 	
 	if(!g_bIsSuffocating[client])
 		return Plugin_Stop;
@@ -86,9 +84,7 @@ public Action Timer_Suffocation_Begin(Handle hTimer, int iSerial){
 public Action Timer_Suffocation_Cont(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
-
-	if(!IsValidClient(client))
-		return Plugin_Stop;
+	if(client == 0) return Plugin_Stop;
 	
 	if(!g_bIsSuffocating[client])
 		return Plugin_Stop;

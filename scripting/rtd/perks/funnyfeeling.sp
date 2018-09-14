@@ -75,7 +75,7 @@ void FunnyFeeling_RemovePerk(int client){
 
 void FunnyFeeling_OnConditionRemoved(int client, TFCond condition){
 
-	if(!IsValidClient(client))		return;
+	if(!IsClientInGame(client))		return;
 	if(!g_bHasFunnyFeeling[client])	return;
 	if(condition != TFCond_Zoomed)	return;
 	

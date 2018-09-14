@@ -128,7 +128,7 @@ public Action Timer_DeadlyVoice_DestroyParticle(Handle hTimer, int iSerial){
 
 void DeadlyVoice_HurtSurroundings(client){
 
-	if(!IsValidClient(client)) return;
+	if(!IsClientInGame(client)) return;
 	
 	float fClientPos[3];
 	GetClientAbsOrigin(client, fClientPos);
@@ -154,7 +154,7 @@ void DeadlyVoice_HurtSurroundings(client){
 
 void DeadlyVoice_ShakeScreen(int client){
 
-	if(!IsValidClient(client))	return;
+	if(IsFakeClient(client))	return;
 	
 	float vec[3];
 	vec[0] = GetRandomFloat(-15.0, 15.0);

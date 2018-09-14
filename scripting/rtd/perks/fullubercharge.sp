@@ -97,9 +97,7 @@ void FullUbercharge_RemovePerk(int client){
 public Action Timer_RefreshUber(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
-
-	if(!IsValidClient(client))
-		return Plugin_Stop;
+	if(client == 0) return Plugin_Stop;
 	
 	if(!g_bRefreshUber[client])
 		return Plugin_Stop;
@@ -113,9 +111,7 @@ public Action Timer_RefreshUber(Handle hTimer, int iSerial){
 public Action Timer_UberchargeEnd(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
-
-	if(!IsValidClient(client))
-		return Plugin_Stop;
+	if(client == 0) return Plugin_Stop;
 	
 	if(GetEntPropFloat(g_iMediGun[client], Prop_Send, "m_flChargeLevel") > 0.05)
 		return Plugin_Continue;

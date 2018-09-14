@@ -127,7 +127,7 @@ void Invisibility_Set(int client, int iValue){
 public void Event_Invisibility_Resupply(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
 
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if(!IsValidClient(client))	return;
+	if(client == 0)				return;
 	if(!g_bHasInvis[client])	return;
 	
 	Invisibility_Set(client, g_iInvisValue);

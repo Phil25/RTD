@@ -91,9 +91,7 @@ void TeamCriticals_RemovePerk(int client){
 public Action Timer_DrawBeamsFor(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
-
-	if(!IsValidClient(client))
-		return Plugin_Stop;
+	if(client == 0) return Plugin_Stop;
 	
 	if(!g_bHasTeamCriticals[client])
 		return Plugin_Stop;

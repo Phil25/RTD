@@ -83,9 +83,10 @@ void ForcedTaunt_ApplyPerk(int client, float fInterval){
 public Action Timer_ForceTaunt(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
+	if(client == 0) return Plugin_Stop;
 
-	if(!IsValidClient(client))		return Plugin_Stop;
-	if(!g_bIsForcedTaunt[client])	return Plugin_Stop;
+	if(!g_bIsForcedTaunt[client])
+		return Plugin_Stop;
 	
 	ForceTaunt_PerformTaunt(client);
 	
@@ -108,10 +109,10 @@ void ForceTaunt_PerformTaunt(int client){
 public Action Timer_RetryForceTaunt(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
+	if(client == 0) return Plugin_Stop;
 
-	if(!IsValidClient(client))		return Plugin_Stop;
-	if(!g_bIsForcedTaunt[client])	return Plugin_Stop;
-	if(!g_bShouldTaunt[client])		return Plugin_Stop;
+	if(!g_bIsForcedTaunt[client] || !g_bShouldTaunt[client])
+		return Plugin_Stop;
 	
 	if(GetEntProp(client, Prop_Send, "m_hGroundEntity") < 0)
 		return Plugin_Continue;

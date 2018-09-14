@@ -94,9 +94,7 @@ void Timebomb_Perk(int client, const char[] sPref, bool apply){
 public Action Timer_Timebomb_Tick(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
-
-	if(!IsValidClient(client))
-		return Plugin_Stop;
+	if(client == 0) return Plugin_Stop;
 	
 	if(!g_bHasTimebomb[client])
 		return Plugin_Stop;
@@ -126,9 +124,7 @@ public Action Timer_Timebomb_Tick(Handle hTimer, int iSerial){
 public Action Timer_Timebomb_Beep(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
-
-	if(!IsValidClient(client))
-		return Plugin_Stop;
+	if(client == 0) return Plugin_Stop;
 	
 	if(!g_bHasTimebomb[client])
 		return Plugin_Stop;

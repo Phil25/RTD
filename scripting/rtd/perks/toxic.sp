@@ -73,8 +73,7 @@ void Toxic_ApplyPerk(int client, const char[] sSettings){
 public Action Timer_Toxic(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
-
-	if(!IsValidClient(client))	return Plugin_Stop;
+	if(client == 0) return Plugin_Stop;
 	
 	if(!g_bIsToxic[client]){
 	
@@ -94,8 +93,6 @@ public Action Timer_Toxic(Handle hTimer, int iSerial){
 }
 
 void Toxic_HurtSurroundings(client){
-
-	if(!IsValidClient(client)) return;
 	
 	float fClientPos[3];
 	GetClientAbsOrigin(client, fClientPos);

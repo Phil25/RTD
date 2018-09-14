@@ -146,10 +146,10 @@ void FastHands_EditClientWeapons(int client, bool apply){
 public void FastHands_Resupply(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
 
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if(!IsValidClient(client))		return;
-	if(!g_bHasFastHands[client])	return;
-	
-	FastHands_EditClientWeapons(client, true);
+	if(client == 0) return;
+
+	if(g_bHasFastHands[client])
+		FastHands_EditClientWeapons(client, true);
 
 }
 

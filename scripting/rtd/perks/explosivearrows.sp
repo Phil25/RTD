@@ -70,7 +70,7 @@ public void Timer_ExplosiveArrows_ProjectileSpawn(int iProjectile){
 	
 	int iLauncher = GetEntPropEnt(iProjectile, Prop_Send, "m_hOwnerEntity");
 	
-	if(iLauncher < 1 || !IsValidClient(iLauncher) || !IsPlayerAlive(iLauncher))
+	if(!IsValidClient(iLauncher) || !IsPlayerAlive(iLauncher))
 		return;
 	
 	if(!g_bHasExplosiveArrows[iLauncher])
