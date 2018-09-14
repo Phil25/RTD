@@ -23,7 +23,11 @@
 
 methodmap Rollers < ArrayList{
 	public Rollers(){
-		return view_as<Rollers>(new ArrayList(8, MAXPLAYERS+1));
+		ArrayList data = new ArrayList(8, MAXPLAYERS+1);
+		for(int i = 1; i <= MaxClients; ++i)
+			for(int block = 0; block <= 7; ++block)
+				data.Set(i, 0, block); // init to false/0/null
+		return view_as<Rollers>(data);
 	}
 
 #define GET_PROP(%1,%2,%3) \
@@ -63,11 +67,11 @@ methodmap Rollers < ArrayList{
 
 	public int PushToPerkHistory(int client, Perk perk){
 		PerkList list = this.GetPerkHistory(client);
-		if(list == null){
+		if(!list){
 			list = new PerkList();
 			this.SetPerkHistory(client, list);
 		}
-		list.Push(perk);
+		return list.Push(perk);
 	}
 
 	public bool IsInPerkHistory(int client, Perk perk, int iLimit){
@@ -85,8 +89,8 @@ methodmap Rollers < ArrayList{
 	}
 
 	public void ResetPerkHistory(int client){
-		delete this.GetPerkHistory(client);
-		this.SetPerkHistory(client, null);
+		PerkList list = this.GetPerkHistory(client);
+		if(list) list.Clear();
 	}
 
 	public void Reset(int client){
