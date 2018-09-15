@@ -1127,7 +1127,7 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool b
 
 		DisplayPerkTimeFrame(client);
 		CreateTimer(1.0, Timer_Countdown, iSerial, TIMER_REPEAT);
-	}else g_hRollers.GetLastRollTime(GetTime());
+	}else g_hRollers.SetLastRollTime(client, GetTime());
 
 	Forward_PerkApplied(client, perk, iDuration);
 	g_hRollers.PushToPerkHistory(client, perk);
