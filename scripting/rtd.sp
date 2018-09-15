@@ -308,8 +308,10 @@ public void OnPluginStart(){
 	AddCommandListener(Listener_Say,	"say_team");
 	AddCommandListener(Listener_Voice,	"voicemenu");
 
+	g_hGroups = new ArrayList();
 	g_hRollers = new Rollers();
 	g_hPerkHistory = new PerkList();
+
 	for(int i = 1; i <= MaxClients; i++)
 		if(IsClientInGame(i))
 			OnClientPutInServer(i);
