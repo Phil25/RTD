@@ -196,7 +196,7 @@ methodmap PerkContainer < StringMap{
 	public int ParseCustomFile(const char[] sPath){
 		KeyValues hKv = new KeyValues("Effects");
 
-		int iPerksParsed = -1;
+		int iPerksParsed = 0;
 		if(hKv.ImportFromFile(sPath) && hKv.GotoFirstSubKey())
 			iPerksParsed = this.ParseCustomKv(hKv);
 
