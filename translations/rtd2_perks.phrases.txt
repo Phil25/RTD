@@ -1,6 +1,5 @@
 ﻿"Phrases"
 {
-
 	"RTD2_Menu_Title"
 	{
 		"en"	"RTD Effects:"
@@ -16,7 +15,7 @@
 		"sv"	"Du är osårbar mot skada."
 		"de"	"Du bist unverwundbar."
 	}
-	
+
 	"RTD2_Desc_toxic"
 	{
 		"en"	"Your terrible breath hurts nearby enemies."
@@ -24,7 +23,7 @@
 		"sv"	"Din hemska andedräkt skadar nära fiender."
 		"de"	"Dein schrecklicher Atem schädigt Feinde in einem Umkreis."
 	}
-	
+
 	"RTD2_Desc_luckysandvich"
 	{
 		"en"	"Your health is boosted and the next attack is a crit."
@@ -32,7 +31,7 @@
 		"sv"	"Du får ökad hälsa och nästa attack gör kritisk skada."
 		"de"	"Dein Leben ist erhöht und der nächste Schuss ist eine kritischer Schuss."
 	}
-	
+
 	"RTD2_Desc_increasedspeed"
 	{
 		"en"	"Your speed is boosted."
@@ -40,7 +39,7 @@
 		"sv"	"Du får ökad fart."
 		"de"	"Dein Lauftempo ist erhöht."
 	}
-	
+
 	"RTD2_Desc_flying"
 	{
 		"en"	"You can fly around the map."
@@ -48,7 +47,7 @@
 		"sv"	"Du kan flyga runt i kartan."
 		"de"	"Du kannst in der Karte herumfliegen"
 	}
-	
+
 	"RTD2_Desc_lowgravity"
 	{
 		"en"	"Your gravity was set to low."
@@ -56,7 +55,7 @@
 		"sv"	"Du får låg gravitation."
 		"de"	"Deine Anziehungskraft wurde zu einer niedriegen Schwerkraft gesetzt."
 	}
-	
+
 	"RTD2_Desc_fullubercharge"
 	{
 		"en"	"Your Übercharge was set to full."
@@ -64,7 +63,7 @@
 		"sv"	"Du får full Übercharge."
 		"de"	"Dein Übercharge wurde aufgeladen."
 	}
-	
+
 	"RTD2_Desc_invisibility"
 	{
 		"en"	"You are invisible."
@@ -72,7 +71,7 @@
 		"sv"	"Du är osynlig."
 		"de"	"Du bist unsichtbar."
 	}
-	
+
 	"RTD2_Desc_infinitecloak"
 	{
 		"en"	"You have infinite cloak."
@@ -80,7 +79,7 @@
 		"sv"	"Du får oändlig cloak."
 		"de"	"Du hast unendlich Tarnung."
 	}
-	
+
 	"RTD2_Desc_criticals"
 	{
 		"en"	"Your attacks are crits."
@@ -88,7 +87,7 @@
 		"sv"	"Dina attacker gör kritisk skada."
 		"de"	"Deine Schüsse sind kritische Schüsse."
 	}
-	
+
 	"RTD2_Desc_infiniteammo"
 	{
 		"en"	"Your ammo never runs out."
@@ -96,7 +95,7 @@
 		"sv"	"Du får aldrig slut på ammunition."
 		"de"	"Deine Munition geht niemals leer."
 	}
-	
+
 	"RTD2_Desc_scarybullets"
 	{
 		"en"	"Stun the enemy with your spooky booollets."
@@ -104,7 +103,7 @@
 		"sv"	"Stunna fienden med dina kusliga kulor."
 		"de"	"Erschrecke ein Feind mit deinen gruseligen Kuuuuugeln."
 	}
-	
+
 	"RTD2_Desc_spawnsentry"
 	{
 		"en"	"You can spawn a Sentry Gun."
@@ -112,7 +111,7 @@
 		"sv"	"Du kan lägga ner en Sentry Gun."
 		"de"	"Du kannst eine Sentry spawnen."
 	}
-	
+
 	"RTD2_Desc_homingprojectiles"
 	{
 		"en"	"Your projectiles are self-aware."
@@ -120,7 +119,7 @@
 		"sv"	"Dina projektiler följer efter närmsta fiende."
 		"de"	"Deine Projektile wissen schon bescheid."
 	}
-	
+
 	"RTD2_Desc_fullriflecharge"
 	{
 		"en"	"Sniper Rifle or Huntsman are constantly charged."
@@ -128,7 +127,7 @@
 		"sv"	"Skyttegeväret eller Pilbågen är alltid fullt utdraget."
 		"de"	"Deine Sniper Rifle oder Huntsman sind immer voll aufgeladen."
 	}
-	
+
 	"RTD2_Desc_explode"
 	{
 		"en"	"Suddenly, BANG!"
@@ -136,7 +135,7 @@
 		"sv"	"Du exploderar."
 		"de"	"Explosion!"
 	}
-	
+
 	"RTD2_Desc_snail"
 	{
 		"en"	"You are really slow."
@@ -144,7 +143,7 @@
 		"sv"	"Du blir väldigt långsam."
 		"de"	"Du bist echt langsam."
 	}
-	
+
 	"RTD2_Desc_frozen"
 	{
 		"en"	"You are now an ice statue."
@@ -152,7 +151,7 @@
 		"sv"	"Du är nu en isstaty."
 		"de"	"Du bist jetzt eine Eis Statue."
 	}
-	
+
 	"RTD2_Desc_timebomb"
 	{
 		"en"	"You head is a bomb now, go kill someone with it."
@@ -160,7 +159,7 @@
 		"sv"	"Ditt huvud är en bomb nu, döda någon med det."
 		"de"	"Dein Kopf ist jetzt eine Bombe, jetzt töte jemanden."
 	}
-	
+
 	"RTD2_Desc_ignition"
 	{
 		"en"	"Go die in a fire."
@@ -168,7 +167,7 @@
 		"sv"	"Brinn till döds."
 		"de"	"Sterb in ein Feuer."
 	}
-	
+
 	"RTD2_Desc_lowhealth"
 	{
 		"en"	"Your health is now low."
@@ -176,7 +175,7 @@
 		"sv"	"Din hälsa är väldigt låg nu."
 		"de"	"Dein Leben ist nun niedrig."
 	}
-	
+
 	"RTD2_Desc_drugged"
 	{
 		"en"	"You feel well, too well."
@@ -184,7 +183,7 @@
 		"sv"	"Du känner att du mår bra, för bra."
 		"de"	"Du fühlst dich gut. Zu gut."
 	}
-	
+
 	"RTD2_Desc_blind"
 	{
 		"en"	"Where did everybody go?"
@@ -192,7 +191,7 @@
 		"sv"	"Vart tog alla vägen?"
 		"de"	"Wo ist jeder hin gegangen?"
 	}
-	
+
 	"RTD2_Desc_striptomelee"
 	{
 		"en"	"You're left with your melee. Good luck!"
@@ -200,7 +199,7 @@
 		"sv"	"Nu är det dags för närstrid! Lycka till!"
 		"de"	"Du hast nurnach deine Nahkampfwaffe. Viel Glück!"
 	}
-	
+
 	"RTD2_Desc_beacon"
 	{
 		"en"	"Let the enemy know where you are, you're not afraid of them."
@@ -208,7 +207,7 @@
 		"sv"	"Låt dina fiender veta vart du är, du är inte rädd för dem."
 		"de"	"Lass dein Feind wissen wo du bist, du hast keine Angst vor den."
 	}
-	
+
 	"RTD2_Desc_forcedtaunt"
 	{
 		"en"	"Can't... stop... showing my superiority!"
@@ -216,7 +215,7 @@
 		"sv"	"Kan... inte... sluta... visa min överlägsenhet!"
 		"de"	"Kann...nicht...aufhören...meine Überlegenheit zu zeigen!"
 	}
-	
+
 	"RTD2_Desc_monochromia"
 	{
 		"en"	"Your vision is black and white."
@@ -224,15 +223,15 @@
 		"sv"	"Du ser i svart och vitt."
 		"de"	"Deine Sicht ist Schwarz und Weiß."
 	}
-	
-	"RTD2_Desc_Earthquake"
+
+	"RTD2_Desc_earthquake"
 	{
 		"en"	"The ground is shakin!"
 		"pl"	"Ziemia się trzęsie!"
 		"sv"	"Marken skakar!"
 		"de"	"Der Boden wackelt!"
 	}
-	
+
 	"RTD2_Desc_funnyfeeling"
 	{
 		"en"	"What happens when you pull your eyelids back."
@@ -240,7 +239,7 @@
 		"sv"	"Vad som händer när du drar bak dina ögonlock."
 		"de"	"Das passiert wenn du deine Augenlieder zurück ziehst."
 	}
-	
+
 	"RTD2_Desc_badsauce"
 	{
 		"en"	"Milk, blood and Jarate."
@@ -248,7 +247,7 @@
 		"sv"	"Mjölk, blood och Jarate."
 		"de"	"Milch, Blut und Jarate."
 	}
-	
+
 	"RTD2_Desc_spawndispenser"
 	{
 		"en"	"You can spawn a Dispenser."
@@ -256,7 +255,7 @@
 		"sv"	"Du kan lägga ner en Dispenser."
 		"de"	"Du kannst einen Dispenser spawnen."
 	}
-	
+
 	"RTD2_Desc_infinitejump"
 	{
 		"en"	"You can jump off the air once, so why not multiple times?"
@@ -264,7 +263,7 @@
 		"sv"	"Du kan hoppa i luften en gång, så varför inte fler gånger?"
 		"de"	"Du kannst in der Luft springen, warum nicht öfters?"
 	}
-	
+
 	"RTD2_Desc_powerfulhits"
 	{
 		"en"	"Your damage is buffed."
@@ -272,7 +271,7 @@
 		"sv"	"Din skada är ökad."
 		"de"	"Dein Schaden wurde erhöht."
 	}
-	
+
 	"RTD2_Desc_bighead"
 	{
 		"en"	"Other mercs now make fun behind your back."
@@ -280,7 +279,7 @@
 		"sv"	"Nu skrattar andra åt dig bakom ryggen."
 		"de"	"Andere Soldaten lachen dich hinter deinen Rücken aus."
 	}
-	
+
 	"RTD2_Desc_tinymann"
 	{
 		"en"	"You have shrunk, creep on anyone you want!"
@@ -288,7 +287,7 @@
 		"sv"	"Du har krympt, creepa på vem du vill!"
 		"de"	"Du bist geschrumpt, schleich dich an die jede an die du willst!"
 	}
-	
+
 	"RTD2_Desc_firework"
 	{
 		"en"	"Raise up high and go down with awe."
@@ -296,7 +295,7 @@
 		"sv"	"Du flyger upp i luften och exploderar."
 		"de"	"Steig hoch und geh mit einen awe runter."
 	}
-	
+
 	"RTD2_Desc_deadlyvoice"
 	{
 		"en"	"Voice commands deal damage."
@@ -304,7 +303,7 @@
 		"sv"	"Röstkommandon gör skada."
 		"de"	"Sprach Commands teilen Schaden aus."
 	}
-	
+
 	"RTD2_Desc_stronggravity"
 	{
 		"en"	"Don't trip or you'll break your leg... or both."
@@ -312,7 +311,7 @@
 		"sv"	"Ramla inte, annars bryter du benet... eller båda."
 		"de"	"Fall nicht hin oder du brichst dir dein Bein... oder beide."
 	}
-	
+
 	"RTD2_Desc_eyeforaneye"
 	{
 		"en"	"This is how it feels."
@@ -320,7 +319,7 @@
 		"sv"	"Det är såhär det känns."
 		"de"	"So fühlt sich das an."
 	}
-	
+
 	"RTD2_Desc_weakened"
 	{
 		"en"	"You are now a wuss."
@@ -328,7 +327,7 @@
 		"sv"	"Du är nu en mes."
 		"de"	"Du bist jetzt ein Schwächling!"
 	}
-	
+
 	"RTD2_Desc_necromash"
 	{
 		"en"	"That helmet ain't gonna save ya."
@@ -336,7 +335,7 @@
 		"sv"	"That helmet ain't gonna save ya."
 		"de"	"Dieser Helm wird dich nich' beschützen."
 	}
-	
+
 	"RTD2_Desc_extraammo"
 	{
 		"en"	"More ammo, more skill."
@@ -344,7 +343,7 @@
 		"sv"	"Mer ammo, mer skill."
 		"de"	"Mehr Munition, mehr Skill.
 	}
-	
+
 	"RTD2_Desc_suffocation"
 	{
 		"en"	"You forgot how to breathe."
@@ -352,7 +351,7 @@
 		"sv"	"Du har glömt hur man andas."
 		"de"	"Du hast vergessen zu atmen."
 	}
-	
+
 	"RTD2_Desc_fasthands"
 	{
 		"en"	"You are now a skillful mercenary."
@@ -360,7 +359,7 @@
 		"sv"	"Nu är du en skicklig soldat."
 		"de"	"Du bist jetzt ein schneller Soldat."
 	}
-	
+
 	"RTD2_Desc_outline"
 	{
 		"en"	"Your awesomeness glows through walls. And notifies enemies."
@@ -368,7 +367,7 @@
 		"sv"	"Din awesomeness glöder genom väggar. Fienden märker dig."
 		"de"	"Dein schönes Aussehen scheint durch die Wände. Und alarmiert Feinde."
 	}
-	
+
 	"RTD2_Desc_vital"
 	{
 		"en"	"Your max health is increased."
@@ -376,7 +375,7 @@
 		"sv"	"Din maxhälsa är ökad."
 		"de"	"Dein Maximales Leben wurde erhöht."
 	}
-	
+
 	"RTD2_Desc_nogravity"
 	{
 		"en"	"Jump to the moon and get killed in the meantime."
@@ -384,7 +383,7 @@
 		"sv"	"Hoppa till månen och bli dödad på vägen."
 		"de"	"Springe zum Mond und werde auf den weg dahin getötet."
 	}
-	
+
 	"RTD2_Desc_teamcriticals"
 	{
 		"en"	"Stand near a teammate to give them crits."
@@ -392,7 +391,7 @@
 		"sv"	"Stå nära en lagkamrat för att ge dem kritisk skada."
 		"de"	"Stehe in der nähe eines Teammitglieds und gebe ihn kritische Schüsse."
 	}
-	
+
 	"RTD2_Desc_firetimebomb"
 	{
 		"en"	"You don't explode but ignite everyone around you."
@@ -400,7 +399,7 @@
 		"sv"	"Du exploderar inte, men tänder fyr på alla andra runtomkring."
 		"de"	"Du explodierst nicht, setzt aber jeden in einem Umkreis in Flammen."
 	}
-	
+
 	"RTD2_Desc_firebreath"
 	{
 		"en"	"The burning you feel? It is PURE FIRE."
@@ -408,7 +407,7 @@
 		"sv"	"The burning you feel? It is PURE FIRE."
 		"de"	"Das brennen was du fühlst? Es ist PURES FEUER."
 	}
-	
+
 	"RTD2_Desc_strongrecoil"
 	{
 		"en"	"Your firearm skills are gone."
@@ -416,7 +415,7 @@
 		"sv"	"Dina vapenfärdigheter är borta."
 		"de"	"Deine Schuss Fähigkeiten sind weg."
 	}
-	
+
 	"RTD2_Desc_cursed"
 	{
 		"en"	"You go left and you go up or back and right or down...?"
@@ -424,7 +423,7 @@
 		"sv"	"Går du till vänster och upp eller  bak och höger eller neråt?"
 		"de"	"Du gehts nach links und nach oben und nach rechts oder nach unten?"
 	}
-	
+
 	"RTD2_Desc_extrathrowables"
 	{
 		"en"	"You realize you can actually take more of these with you."
@@ -432,7 +431,7 @@
 		"sv"	"Du inser att du faktiskt kan ta flera av dessa med dig."
 		"de"	"Du hast realisiert das du mehrere davon mitnehmen kannst."
 	}
-	
+
 	"RTD2_Desc_powerplay"
 	{
 		"en"	"Take that, Robin!"
@@ -440,7 +439,7 @@
 		"sv"	"Take that, Robin!"
 		"de"	"Nehm das, Robin!"
 	}
-	
+
 	"RTD2_Desc_explosivearrows"
 	{
 		"en"	"Your arrows and crossbow bolts detonate upon impact."
@@ -448,7 +447,7 @@
 		"sv"	"Dina pilar och armborst sprutor detoneras vid nedslag."
 		"de"	"Deine Pfeile und Armbrust Pfeile explodieren bei Berührung."
 	}
-	
+
 	"RTD2_Desc_inclineproblem"
 	{
 		"en"	"You forgot how to use stairs."
@@ -456,5 +455,4 @@
 		"sv"	"Du har glömt hur trappor fungerar."
 		"de"	"Du hast vergessen wie man Treppen steigt."
 	}
-
 }
