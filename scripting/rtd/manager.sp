@@ -143,7 +143,6 @@ void Forward_OnMapStart(){
 	ForcedTaunt_Start();
 	Earthquake_Start();
 	ScaryBullets_Start();
-	TinyMann_Start();
 	Firework_Start();
 	DeadlyVoice_Start();
 	EyeForAnEye_Start();

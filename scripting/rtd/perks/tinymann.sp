@@ -44,12 +44,6 @@ float	g_fBaseTinyMann[MAXPLAYERS+1]	= {1.0, ...};
 bool	g_bIsTinyMann[MAXPLAYERS+1]		= {false, ...};
 float	g_fTinyMannScale				= 0.15;
 
-void TinyMann_Start(){
-
-	AddNormalSoundHook(NormalSHook:TinyMann_SoundHook);
-
-}
-
 void TinyMann_Perk(int client, const char[] sPref, bool apply){
 
 	if(apply)
@@ -65,6 +59,7 @@ void TinyMann_ApplyPerk(int client, float fMultiplayer){
 	g_bIsTinyMann[client]	= true;
 	g_fTinyMannScale		= fMultiplayer;
 	
+	TF2Attrib_SetByDefIndex(client, 2048, 1/g_fTinyMannScale/2);
 	g_fBaseTinyMann[client] = GetEntPropFloat(client, Prop_Send, "m_flModelScale");
 	SetEntPropFloat(client, Prop_Send, "m_flModelScale", fMultiplayer);
 
@@ -74,27 +69,9 @@ void TinyMann_RemovePerk(int client){
 
 	g_bIsTinyMann[client] = false;
 	
+	TF2Attrib_RemoveByDefIndex(client, 2048);
 	SetEntPropFloat(client, Prop_Send, "m_flModelScale", g_fBaseTinyMann[client]);
 	
 	FixPotentialStuck(client);
-
-}
-
-public Action TinyMann_SoundHook(int iClients[64], int &iClientsNum, char sSample[PLATFORM_MAX_PATH], int &iEntity, int &iChannel, float &fVolume, int &iLevel, int &iPitch, int &iSoundFlags){
-	
-	if(StrContains(sSample, "/footstep", false) > -1)
-		return Plugin_Continue;
-	
-	if(iChannel != SNDCHAN_VOICE)	return Plugin_Continue;
-	if(!IsClientInGame(iEntity))	return Plugin_Continue;
-	if(!g_bIsTinyMann[iEntity])		return Plugin_Continue;
-	
-	int iTempPitch = RoundToFloor(100.0 *Pow(g_fTinyMannScale, -1.0));
-	if(iTempPitch < 25)			iTempPitch = 25;
-	else if(iTempPitch > 250)	iTempPitch = 250;
-	
-	iPitch = iTempPitch;
-	iSoundFlags |= SND_CHANGEPITCH;
-	return Plugin_Changed;
 
 }
