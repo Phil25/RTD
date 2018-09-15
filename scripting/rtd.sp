@@ -1386,7 +1386,7 @@ void RTDPrint(int to, const char[] sFormat, any ...){
 
 void RTDPrintAll(const char[] sFormat, any ...){
 	char sMsg[255];
-	VFormat(sMsg, 255, sFormat, 3);
+	VFormat(sMsg, 255, sFormat, 2);
 	PrintToChatAll("%s %s", CHAT_PREFIX, sMsg);
 }
 
