@@ -22,7 +22,6 @@
 #include "rtd/classes/perk.sp"
 #include "rtd/classes/containers.sp"
 #include "rtd/classes/iterators.sp"
-#include "rtd/classes/group.sp"
 #include "rtd/classes/rollers.sp"
 
 

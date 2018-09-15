@@ -194,7 +194,6 @@ public int Native_ForcePerk(Handle hPlugin, int iParams){ // deprecated
 		GetNativeCell(1),
 		sQuery,
 		GetNativeCell(3),
-		null,
 		GetNativeCell(5)
 	));
 }
@@ -205,7 +204,7 @@ public int Native_Force(Handle hPlugin, int iParams){
 	int client = GetNativeCell(1),
 		iPerkTime = GetNativeCell(3),
 		iInitiator = GetNativeCell(4);
-	return view_as<int>(ForcePerk(client, sQuery, iPerkTime, null, iInitiator));
+	return view_as<int>(ForcePerk(client, sQuery, iPerkTime, iInitiator));
 }
 
 public int Native_RollPerk(Handle hPlugin, int iParams){ // deprecated

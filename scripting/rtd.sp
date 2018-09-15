@@ -80,7 +80,6 @@ Rollers g_hRollers = null;
 /***** V A R I A B L E S ****/
 
 char	g_sTeamColors[][]		= {"\x07B2B2B2", "\x07B2B2B2", "\x07FF4040", "\x0799CCFF"};
-bool	g_bTempPrint			= false;
 
 bool	g_bPluginUpdater		= false;
 bool	g_bPluginFriendly		= false;
@@ -308,7 +307,6 @@ public void OnPluginStart(){
 	AddCommandListener(Listener_Say,	"say_team");
 	AddCommandListener(Listener_Voice,	"voicemenu");
 
-	g_hGroups = new ArrayList();
 	g_hRollers = new Rollers();
 	g_hPerkHistory = new PerkList();
 
@@ -474,17 +472,8 @@ public Action Command_ForceRTD(int client, int args){
 		}
 	}
 
-	Group group = null;
-	if(iTrgCount > 1){
-		group = PrepareGroup();
-		for(int i = 0; i < iTrgCount; i++)
-			group.PushClient(aTrgList[i]);
-	}
-
-	for(int i = 0; i < iTrgCount; i++){
-		g_hRollers.SetGroup(aTrgList[i], group);
-		ForcePerk(aTrgList[i], sQuery, iPerkTime, group, client);
-	}
+	for(int i = 0; i < iTrgCount; i++)
+		ForcePerk(aTrgList[i], sQuery, iPerkTime, client);
 
 	return Plugin_Handled;
 }
@@ -1003,39 +992,30 @@ void RollPerkForClient(int client){
 	}
 }
 
-RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, Group group=null, int initiator=0){
+RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, int initiator=0){
 	if(!IsValidClient(client))
 		return RTDForce_ClientInvalid;
 
 	bool bIsValidInitiator = IsValidClient(initiator);
 	if(g_hRollers.GetInRoll(client)){
-		if(!group){
-			if(bIsValidInitiator)
-				PrintToChat(initiator, "%s %N is already using RTD.", CHAT_PREFIX, client);
-			else PrintToServer("%s %N is already using RTD.", CONS_PREFIX, client);
-		}
+		if(bIsValidInitiator)
+			PrintToChat(initiator, "%s %N is already using RTD.", CHAT_PREFIX, client);
+		else PrintToServer("%s %N is already using RTD.", CONS_PREFIX, client);
 		return RTDForce_ClientInRoll;
 	}
 
 	if(!IsPlayerAlive(client)){
-		if(!group){
-			if(bIsValidInitiator)
-				PrintToChat(initiator, "%s %N is dead.", CHAT_PREFIX, client);
-			else PrintToServer("%s %N is already using RTD.", CONS_PREFIX, client);
-		}
+		if(bIsValidInitiator)
+			PrintToChat(initiator, "%s %N is dead.", CHAT_PREFIX, client);
+		else PrintToServer("%s %N is already using RTD.", CONS_PREFIX, client);
 		return RTDForce_ClientDead;
 	}
 
 	Perk perk = g_hPerkContainer.FindPerk(sQuery);
-	bool bSamePerk = true;
 	if(!perk){
-		bSamePerk = false;
-		if(!g_bTempPrint){
-			int iApplications = group ? group.ClientCount : 1;
-			if(bIsValidInitiator)
-				PrintToChat(initiator, "%s Perk not found or invalid info, forcing %s.", CHAT_PREFIX, iApplications > 1 ? "rolls" : "a roll");
-			else PrintToServer("%s Perk not found or invalid info, forcing %s.", CONS_PREFIX, iApplications > 1 ? "rolls" : "a roll");
-		}
+		if(bIsValidInitiator)
+			PrintToChat(initiator, "%s Perk not found or invalid info, forcing a roll.", CHAT_PREFIX);
+		else PrintToServer("%s Perk not found or invalid info, forcing a roll.", CONS_PREFIX);
 
 		perk = RollPerk(client, _, sQuery);
 		if(!perk){
@@ -1058,7 +1038,7 @@ RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, Grou
 			return RTDForce_Blocked;
 	}
 
-	ApplyPerk(client, perk, iPerkTime, group, bSamePerk);
+	ApplyPerk(client, perk, iPerkTime);
 	if(g_bCvarLog){
 		char sBuffer[64];
 		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
@@ -1104,7 +1084,7 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 	return perk;
 }
 
-void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool bSamePerk=false){
+void ApplyPerk(int client, Perk perk, int iPerkTime=-1){
 	if(!IsValidClient(client)) return;
 
 	perk.EmitSound(client);
@@ -1133,31 +1113,7 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1, Group group=null, bool b
 	g_hRollers.PushToPerkHistory(client, perk);
 
 	PrintToRoller(client, perk, iDuration);
-	if(!group || !bSamePerk){
-		PrintToNonRollers(client, perk, iDuration);
-		if(!bSamePerk){
-			g_bTempPrint = true;
-			CreateTimer(0.1, Timer_ReloadTempPrint);
-		}
-
-		if(group)
-			group.Perk = null;
-
-		return;
-	}
-
-	if(g_bTempPrint)	//----- Past this point, execution happens once -----//
-		return;
-
-	PrintGroupRolls(group.ClientCount, perk, iDuration);
-
-	g_bTempPrint = true;
-	CreateTimer(0.1, Timer_ReloadTempPrint);
-	if(perk.Time < 0)
-		return;
-
-	group.Perk = perk;
-	CreateTimer(float(iDuration), Timer_PrintGroupEnd, group);
+	PrintToNonRollers(client, perk, iDuration);
 }
 
 //-----[ Descriptions ]-----//
@@ -1211,37 +1167,6 @@ public int ManagerDesc(Menu hMenu, MenuAction maState, int client, int iPos){
 }
 
 //-----[ Timers ]-----//
-public Action Timer_ReloadTempPrint(Handle hTimer){
-	g_bTempPrint = false;
-	return Plugin_Stop;
-}
-
-public Action Timer_PrintGroupEnd(Handle hTimer, Group group){
-	if(!group || !group.Active)
-		return Plugin_Stop;
-
-	int iSize = group.ClientCount;
-	if(iSize < 1)
-		return Plugin_Stop;
-
-	Perk perk = group.Perk;
-	if(perk){
-		char sPerkName[MAX_NAME_LENGTH];
-		perk.GetName(sPerkName, MAX_NAME_LENGTH);
-		char sReason[128];
-		Format(sReason, sizeof(sReason), "%s %T", CHAT_PREFIX,
-			"RTD2_Remove_Perk_Group_Same", LANG_SERVER,
-			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			sPerkName,
-			0x01,
-			iSize);
-		PrintToChatAll(sReason);
-	}
-
-	group.Active = false;
-	return Plugin_Stop;
-}
-
 public Action Timer_Countdown(Handle hTimer, int iSerial){
 	int client = GetClientFromSerial(iSerial);
 	if(client == 0)
@@ -1273,10 +1198,6 @@ public Action Timer_RemovePerk(Handle hTimer, int iSerial){
 Perk ForceRemovePerk(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
 	if(!IsValidClient(client)) return null;
 
-	Group group = g_hRollers.GetGroup(client);
-	if(group && group.Active)
-		group.EraseClient(client);
-
 	Perk perk = g_hRollers.GetPerk(client);
 	ManagePerk(client, perk, false, reason, sReason);
 	return perk;
@@ -1288,12 +1209,8 @@ void RemovedPerk(int client, RTDRemoveReason reason, const char[] sReason=""){
 
 	Forward_PerkRemoved(client, g_hRollers.GetPerk(client), reason);
 	g_hRollers.SetPerk(client, null);
+	PrintPerkEndReason(client, reason, sReason);
 
-	Group group = g_hRollers.GetGroup(client);
-	if(!group || !group.Perk)
-		PrintPerkEndReason(client, reason, sReason);
-
-	g_hRollers.SetGroup(client, null);
 	Handle hTimer = g_hRollers.GetTimer(client);
 	KillTimerSafe(hTimer);
 }
@@ -1349,32 +1266,6 @@ void PrintToNonRollers(int client, Perk perk, int iDuration){
 			sPerkName, 0x01, 0x03, iTrueDuration, 0x01);
 	}
 	PrintToChatAllExcept(client, sOthersPrint);
-}
-
-void PrintGroupRolls(int iApplications, Perk perk, int iDuration){
-	if(!(g_iCvarChat & CHAT_APPOTHER))
-		return;
-
-	char sReason[128], sPerkName[MAX_NAME_LENGTH];
-	perk.GetName(sPerkName, MAX_NAME_LENGTH);
-
-	if(!g_bCvarShowTime || perk.Time == -1)
-		Format(sReason, sizeof(sReason), "%s %T", CHAT_PREFIX,
-			"RTD2_Rolled_Perk_Multi", LANG_SERVER,
-			iApplications,
-			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			sPerkName,
-			0x01);
-	else{
-		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
-		Format(sReason, sizeof(sReason), "%s %T", CHAT_PREFIX,
-			"RTD2_Rolled_Perk_Multi_Time", LANG_SERVER,
-			iApplications,
-			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			sPerkName,
-			0x01, 0x03, iTrueDuration, 0x01);
-	}
-	PrintToChatAll(sReason);
 }
 
 void PrintPerkEndReason(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sCustomReason=""){

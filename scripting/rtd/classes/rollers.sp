@@ -23,9 +23,9 @@
 
 methodmap Rollers < ArrayList{
 	public Rollers(){
-		ArrayList data = new ArrayList(8, MAXPLAYERS+1);
+		ArrayList data = new ArrayList(7, MAXPLAYERS+1);
 		for(int i = 1; i <= MaxClients; ++i)
-			for(int block = 0; block <= 7; ++block)
+			for(int block = 0; block <= 6; ++block)
 				data.Set(i, 0, block); // init to false/0/null
 		return view_as<Rollers>(data);
 	}
@@ -58,9 +58,6 @@ methodmap Rollers < ArrayList{
 
 	GET_PROP(Handle,Hud,6)
 	SET_PROP(Handle,Hud,6)
-
-	GET_PROP(Group,Group,7)
-	SET_PROP(Group,Group,7)
 
 #undef SET_PROP
 #undef GET_PROP
