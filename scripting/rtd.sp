@@ -187,7 +187,7 @@ public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int iErr
 	char sGame[32]; sGame[0] = '\0';
 	GetGameFolderName(sGame, sizeof(sGame));
 	if(!StrEqual(sGame, "tf")){
-		Format(sError, iErrorSize, "%s This plugin only works for Team Fortress 2.", CONS_PREFIX);
+		Format(sError, iErrorSize, CONS_PREFIX ... " This plugin only works for Team Fortress 2.");
 		return APLRes_Failure;
 	}
 
@@ -537,8 +537,7 @@ public Action Command_PerkSearchup(int client, int args){
 		PrintToConsole(client, sBuffer);
 	}
 
-	if(client > 0)
-		PrintToChat(client, "%s %d perk%s found matching given criteria.", CHAT_PREFIX, iLen, iLen != 1 ? "s" : "");
+	RTDPrint(client, "%d perk%s found matching given criteria.", iLen, iLen != 1 ? "s" : "");
 
 	delete list;
 	return Plugin_Handled;
@@ -552,14 +551,14 @@ public Action Command_Reload(int client, int args){
 
 public Action Command_Update(int client, int args){
 	if(!g_bPluginUpdater){
-		ReplyToCommand(client, "%s Updater is not installed.", CONS_PREFIX);
+		ReplyToCommand(client, CONS_PREFIX ... " Updater is not installed.");
 		return Plugin_Handled;
 	}
 
 	g_bIsUpdateForced = true;
 	if(Updater_ForceUpdate())
-		ReplyToCommand(client, "%s New RTD version available!", CONS_PREFIX);
-	else ReplyToCommand(client, "%s This RTD version is up to date or unable to update.", CONS_PREFIX);
+		ReplyToCommand(client, CONS_PREFIX ... " New RTD version available!");
+	else ReplyToCommand(client, CONS_PREFIX ... " This RTD version is up to date or unable to update.");
 
 	g_bIsUpdateForced = false;
 	return Plugin_Handled;
@@ -727,7 +726,7 @@ public Action Event_ClassChange(Handle hEvent, const char[] sEventName, bool don
 
 public Action Event_RoundActive(Handle hEvent, const char[] sEventName, bool dontBroadcast){
 	if(g_bCvarPluginEnabled && (g_iCvarChat & CHAT_AD) && IsRTDInRound())
-		PrintToChatAll("%s %T", CHAT_PREFIX, "RTD2_Ad", LANG_SERVER, 0x03, 0x01);
+		RTDPrintAll("%T", "RTD2_Ad", LANG_SERVER, 0x03, 0x01);
 
 	return Plugin_Continue;
 }
@@ -799,7 +798,7 @@ bool ParseEffects(){
 	char sPath[255];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.default.cfg");
 	if(!FileExists(sPath)){
-		LogError("%s Failed to find rtd2_perks.default.cfg in configs/ folder!", CONS_PREFIX);
+		LogError(CONS_PREFIX ... " Failed to find rtd2_perks.default.cfg in configs/ folder!");
 		SetFailState("Failed to find rtd2_perks.default.cfg in configs/ folder!");
 		return false;
 	}
@@ -811,12 +810,12 @@ bool ParseEffects(){
 	int iStatus[2];
 	int iParsed = g_hPerkContainer.ParseFile(sPath, iStatus);
 	if(iParsed == -1){
-		LogError("%s Parsing rtd2_perks.default.cfg failed!", CONS_PREFIX);
+		LogError(CONS_PREFIX ... " Parsing rtd2_perks.default.cfg failed!");
 		SetFailState("Parsing rtd2_perks.default.cfg failed!");
 		return false;
 	}
 
-	PrintToServer("%s Loaded %d perk%s (%d good, %d bad).", CONS_PREFIX, iParsed, iParsed > 1 ? "s" : "", iStatus[1], iStatus[0]);
+	PrintToServer(CONS_PREFIX ... " Loaded %d perk%s (%d good, %d bad).", iParsed, iParsed > 1 ? "s" : "", iStatus[1], iStatus[0]);
 	return true;
 }
 
@@ -829,7 +828,7 @@ void ParseCustomEffects(){
 	}
 
 	int iPerksCustomized = g_hPerkContainer.ParseCustomFile(sPath);
-	PrintToServer("%s Customized %d perk%s.", CONS_PREFIX, iPerksCustomized, iPerksCustomized == 1 ? "" : "s");
+	PrintToServer(CONS_PREFIX ... " Customized %d perk%s.", iPerksCustomized, iPerksCustomized == 1 ? "" : "s");
 	PrecachePerkSounds();
 }
 
@@ -877,15 +876,15 @@ void ParseDisabledPerks(){
 		case 1:{
 			hDisabledPerks.Get(0).GetName(sNameBuffer, 64);
 			if(g_bCvarLog)
-				LogMessage("%s Perk disabled: %s.", CONS_PREFIX, sNameBuffer);
-			PrintToServer("%s Perk disabled: %s.", CONS_PREFIX, sNameBuffer);
+				LogMessage(CONS_PREFIX ... " Perk disabled: %s.", sNameBuffer);
+			PrintToServer(CONS_PREFIX ... " Perk disabled: %s.", sNameBuffer);
 		}
 
 		default:{
 			hDisabledPerks.Get(0).GetName(sNameBuffer, 64);
 			if(g_bCvarLog)
-				LogMessage("%s %d perks disabled:", CONS_PREFIX, iLen);
-			PrintToServer("%s %d perks disabled:", CONS_PREFIX, iLen);
+				LogMessage(CONS_PREFIX ... " %d perks disabled:", iLen);
+			PrintToServer(CONS_PREFIX ... " %d perks disabled:", iLen);
 			for(int i = 0; i < iLen; ++i){
 				hDisabledPerks.Get(i).GetName(sNameBuffer, 64);
 				if(g_bCvarLog)
@@ -901,25 +900,25 @@ void ParseDisabledPerks(){
 void RollPerkForClient(int client){
 	if(!g_bCvarPluginEnabled){
 		if(g_iCvarChat & CHAT_REASONS)
-			PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Cant_Roll_Disabled", LANG_SERVER);
+			RTDPrint(client, "%T", "RTD2_Cant_Roll_Disabled", LANG_SERVER);
 		return;
 	}
 
 	if(!IsRollerAllowed(client)){
 		if(g_iCvarChat & CHAT_REASONS)
-			PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Cant_Roll_No_Access", LANG_SERVER);
+			RTDPrint(client, "%T", "RTD2_Cant_Roll_No_Access", LANG_SERVER);
 		return;
 	}
 
 	if(!IsRTDInRound()){
 		if(g_iCvarChat & CHAT_REASONS)
-			PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Not_In_Round", LANG_SERVER);
+			RTDPrint(client, "%T", "RTD2_Not_In_Round", LANG_SERVER);
 		return;
 	}
 
 	if(g_iCvarRtdTeam > 0 && g_iCvarRtdTeam == GetClientTeam(client)-1){
 		if(g_iCvarChat & CHAT_REASONS)
-			PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Cant_Roll_Team", LANG_SERVER);
+			RTDPrint(client, "%T", "RTD2_Cant_Roll_Team", LANG_SERVER);
 		return;
 	}
 
@@ -935,20 +934,20 @@ void RollPerkForClient(int client){
 
 	if(!IsPlayerAlive(client)){
 		if(g_iCvarChat & CHAT_REASONS)
-			PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Cant_Roll_Alive", LANG_SERVER);
+			RTDPrint(client, "%T", "RTD2_Cant_Roll_Alive", LANG_SERVER);
 		return;
 	}
 
 	if(g_hRollers.GetInRoll(client)){
 		if(g_iCvarChat & CHAT_REASONS)
-			PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Cant_Roll_Using", LANG_SERVER);
+			RTDPrint(client, "%T", "RTD2_Cant_Roll_Using", LANG_SERVER);
 		return;
 	}
 
 	int iTimeLeft = g_hRollers.GetLastRollTime(client) +g_iCvarRollInterval;
 	if(GetTime() < iTimeLeft){
 		if(g_iCvarChat & CHAT_REASONS)
-			PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Cant_Roll_Wait", LANG_SERVER, 0x04, iTimeLeft -GetTime(), 0x01);
+			RTDPrint(client, "%T", "RTD2_Cant_Roll_Wait", LANG_SERVER, 0x04, iTimeLeft -GetTime(), 0x01);
 		return;
 	}
 
@@ -962,7 +961,7 @@ void RollPerkForClient(int client){
 
 			if(iCount >= g_iCvarClientLimit){
 				if(g_iCvarChat & CHAT_REASONS)
-					PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Cant_Roll_Mode1", LANG_SERVER);
+					RTDPrint(client, "%T", "RTD2_Cant_Roll_Mode1", LANG_SERVER);
 				return;
 			}
 		}
@@ -977,7 +976,7 @@ void RollPerkForClient(int client){
 
 			if(iCount >= g_iCvarTeamLimit){
 				if(g_iCvarChat & CHAT_REASONS)
-					PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Cant_Roll_Mode2", LANG_SERVER);
+					RTDPrint(client, "%T", "RTD2_Cant_Roll_Mode2", LANG_SERVER);
 				return;
 			}
 		}
@@ -998,30 +997,21 @@ RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, int 
 
 	bool bIsValidInitiator = IsValidClient(initiator);
 	if(g_hRollers.GetInRoll(client)){
-		if(bIsValidInitiator)
-			PrintToChat(initiator, "%s %N is already using RTD.", CHAT_PREFIX, client);
-		else PrintToServer("%s %N is already using RTD.", CONS_PREFIX, client);
+		RTDPrint(initiator, "%N is already using RTD.", client);
 		return RTDForce_ClientInRoll;
 	}
 
 	if(!IsPlayerAlive(client)){
-		if(bIsValidInitiator)
-			PrintToChat(initiator, "%s %N is dead.", CHAT_PREFIX, client);
-		else PrintToServer("%s %N is already using RTD.", CONS_PREFIX, client);
+		RTDPrint(initiator, "%N is dead.", client);
 		return RTDForce_ClientDead;
 	}
 
 	Perk perk = g_hPerkContainer.FindPerk(sQuery);
 	if(!perk){
-		if(bIsValidInitiator)
-			PrintToChat(initiator, "%s Perk not found or invalid info, forcing a roll.", CHAT_PREFIX);
-		else PrintToServer("%s Perk not found or invalid info, forcing a roll.", CONS_PREFIX);
-
+		RTDPrint(initiator, "Perk not found or invalid info, forcing a roll.");
 		perk = RollPerk(client, _, sQuery);
 		if(!perk){
-			if(bIsValidInitiator)
-				PrintToChat(initiator, "%s No perks available for %N.", CHAT_PREFIX, client);
-			else PrintToServer("%s No perks available for %N.", CONS_PREFIX, client);
+			RTDPrint(initiator, "No perks available for %N.", client);
 			return RTDForce_NullPerk;
 		}
 	}
@@ -1157,7 +1147,7 @@ public int ManagerDesc(Menu hMenu, MenuAction maState, int client, int iPos){
 	perk.GetName(sPerkName, MAX_NAME_LENGTH);
 	FormatEx(sTranslate, 64, "RTD2_Desc_%s", sPerkToken);
 
-	PrintToChat(client, "%s %s%s%c: \x03%T\x01", CHAT_PREFIX,
+	RTDPrint(client, "%s%s%c: \x03%T\x01",
 		perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 		sPerkName, 0x01,
 		sTranslate, LANG_SERVER);
@@ -1224,14 +1214,14 @@ void PrintToRoller(int client, Perk perk, int iDuration){
 	perk.GetName(sPerkName, MAX_NAME_LENGTH);
 
 	if(!g_bCvarShowTime || perk.Time == -1)
-		PrintToChat(client, "%s %T", CHAT_PREFIX,
+		RTDPrint(client, "%T",
 			"RTD2_Rolled_Perk_Roller", LANG_SERVER,
 			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
 			0x01);
 	else{
 		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
-		PrintToChat(client, "%s %T", CHAT_PREFIX,
+		RTDPrint(client, "%T",
 			"RTD2_Rolled_Perk_Roller_Time", LANG_SERVER,
 			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
@@ -1243,12 +1233,12 @@ void PrintToNonRollers(int client, Perk perk, int iDuration){
 	if(!(g_iCvarChat & CHAT_APPOTHER))
 		return;
 
-	char sOthersPrint[128], sRollerName[MAX_NAME_LENGTH], sPerkName[MAX_NAME_LENGTH];
+	char sRollerName[MAX_NAME_LENGTH], sPerkName[MAX_NAME_LENGTH];
 	GetClientName(client, sRollerName, sizeof(sRollerName));
 	perk.GetName(sPerkName, MAX_NAME_LENGTH);
 
 	if(!g_bCvarShowTime || perk.Time == -1)
-		Format(sOthersPrint, sizeof(sOthersPrint), "%s %T", CHAT_PREFIX,
+		RTDPrintAllExcept(client, "%T",
 			"RTD2_Rolled_Perk_Others", LANG_SERVER,
 			g_sTeamColors[GetClientTeam(client)],
 			sRollerName,
@@ -1257,7 +1247,7 @@ void PrintToNonRollers(int client, Perk perk, int iDuration){
 			sPerkName, 0x01);
 	else{
 		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
-		Format(sOthersPrint, sizeof(sOthersPrint), "%s %T", CHAT_PREFIX,
+		RTDPrintAllExcept(client, "%T",
 			"RTD2_Rolled_Perk_Others_Time", LANG_SERVER,
 			g_sTeamColors[GetClientTeam(client)],
 			sRollerName,
@@ -1265,7 +1255,6 @@ void PrintToNonRollers(int client, Perk perk, int iDuration){
 			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName, 0x01, 0x03, iTrueDuration, 0x01);
 	}
-	PrintToChatAllExcept(client, sOthersPrint);
 }
 
 void PrintPerkEndReason(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sCustomReason=""){
@@ -1303,14 +1292,10 @@ void PrintPerkEndReason(int client, RTDRemoveReason reason=RTDRemove_WearOff, co
 	}
 
 	if(sReasonSelf[0] != '0' && (g_iCvarChat & CHAT_REMROLLER))
-		PrintToChat(client, "%s %T", CHAT_PREFIX, sReasonSelf, LANG_SERVER, reason == RTDRemove_Custom ? sCustomReason : "");
+		RTDPrint(client, "%T", sReasonSelf, LANG_SERVER, reason == RTDRemove_Custom ? sCustomReason : "");
 
-	if(!(g_iCvarChat & CHAT_REMOTHER))
-		return;
-
-	char sPrintReasonToOthers[128];
-	Format(sPrintReasonToOthers, sizeof(sPrintReasonToOthers), "%s %T", CHAT_PREFIX, sReasonOthers, LANG_SERVER, g_sTeamColors[GetClientTeam(client)], client, 0x01, reason == RTDRemove_Custom ? sCustomReason : "");
-	PrintToChatAllExcept(client, sPrintReasonToOthers);
+	if(g_iCvarChat & CHAT_REMOTHER)
+		RTDPrintAllExcept(client, "%T", sReasonOthers, LANG_SERVER, g_sTeamColors[GetClientTeam(client)], client, 0x01, reason == RTDRemove_Custom ? sCustomReason : "");
 }
 
 
@@ -1391,12 +1376,32 @@ int EscapeString(const char[] input, int escape, int escaper, char[] output, int
 }
 
 //-----[ Feedback ]-----//
-void PrintToChatAllExcept(int client, char[] sMessage){
-	for(int i = 1; i <= MaxClients; i++){
-		if(!IsClientInGame(i) || i == client)
-			continue;
-		PrintToChat(i, sMessage);
-	}
+void RTDPrint(int to, const char[] sFormat, any ...){
+	char sMsg[255];
+	VFormat(sMsg, 255, sFormat, 3);
+	if(IsValidClient(to))
+		PrintToChat(to, "%s %s", CHAT_PREFIX, sMsg);
+	else PrintToServer("%s %s", CONS_PREFIX, sMsg);
+}
+
+void RTDPrintAll(const char[] sFormat, any ...){
+	char sMsg[255];
+	VFormat(sMsg, 255, sFormat, 3);
+	PrintToChatAll("%s %s", CHAT_PREFIX, sMsg);
+}
+
+void RTDPrintAllExcept(int client, char[] sFormat, any ...){
+	char sMsg[255];
+	VFormat(sMsg, 255, sFormat, 3);
+	int i = 0;
+
+	while(++i < client)
+		if(IsClientInGame(i))
+			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
+
+	while(++i <= MaxClients)
+		if(IsClientInGame(i))
+			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
 }
 
 void DisplayPerkTimeFrame(client){
@@ -1506,7 +1511,7 @@ public Action Timer_FixStuck(Handle hTimer, int iSerial){
 	if(!IsEntityStuck(client))
 		return Plugin_Stop;
 
-	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Stuck_Respawn", LANG_SERVER);
+	RTDPrint(client, "%T", "RTD2_Stuck_Respawn", LANG_SERVER);
 	TF2_RespawnPlayer(client);
 	return Plugin_Stop;
 }
