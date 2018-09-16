@@ -1190,7 +1190,7 @@ Perk ForceRemovePerk(int client, RTDRemoveReason reason=RTDRemove_WearOff, const
 	if(!IsValidClient(client)) return null;
 
 	Perk perk = g_hRollers.GetPerk(client);
-	ManagePerk(client, perk, false, reason, sReason);
+	if(perk) ManagePerk(client, perk, false, reason, sReason);
 	return perk;
 }
 
