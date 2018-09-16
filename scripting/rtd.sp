@@ -42,11 +42,6 @@
 #define CHAT_PREFIX 	"\x07FFD700[RTD]\x01"
 #define CONS_PREFIX 	"[RTD]"
 
-#define PERK_MAX_COUNT	64
-#define PERK_MAX_LOW	32
-#define PERK_MAX_HIGH	64
-#define PERK_MAX_VERYH	128
-
 #define CHAT_AD			1
 #define CHAT_APPROLLER	2
 #define CHAT_APPOTHER	4
