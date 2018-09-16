@@ -1319,7 +1319,7 @@ void Forward_PerkApplied(int client, Perk perk, int iDuration){
 
 	Call_StartForward(g_hFwdRolled);
 	Call_PushCell(client);
-	Call_PushCell(perk);
+	Call_PushCell(perk.Id);
 	Call_PushCell(iDuration);
 	Call_Finish();
 }
@@ -1330,7 +1330,7 @@ void Forward_PerkRemoved(int client, Perk perk, RTDRemoveReason reason){
 
 	Call_StartForward(g_hFwdRemoved);
 	Call_PushCell(client);
-	Call_PushCell(perk);
+	Call_PushCell(perk.Id);
 	Call_PushCell(reason);
 	Call_Finish();
 }
