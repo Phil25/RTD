@@ -19,13 +19,45 @@
 #include <rtd2>
 #include <tf2_stocks>
 
-RTDPerk perk = view_as<RTDPerk>(-1);
-
 public void OnPluginStart(){
 	if(RTD2_IsRegOpen())
-		perk = RTD2_ObtainPerk("token");
+		RegisterPerk();
 }
 
 public void RTD2_OnRegOpen(){
-	perk = RTD2_ObtainPerk("token");
+	RegisterPerk();
+}
+
+void RegisterPerk(){
+	RTDPerk perk = RTD2_ObtainPerk("token");
+	perk.SetName("Name");
+	perk.Good = true;
+	perk.SetSound("Sound");
+	perk.Time = 10;
+	perk.SetClasses("123");
+	perk.WeaponClasses.Clear();
+	perk.WeaponClasses.PushString("weapon1");
+	perk.WeaponClasses.PushString("weapon2");
+	perk.WeaponClasses.PushString("weapon3");
+	perk.SetPref("Preferece string");
+	perk.Tags.Clear();
+	perk.Tags.PushString("tag1");
+	perk.Tags.PushString("tag2");
+	perk.Tags.PushString("tag3");
+	perk.Enabled = true;
+	perk.External = true;
+	perk.SetCall(PerkCall);
+	char sPrint[1024];
+	perk.Format(sPrint, 1024, "Token: $Token$\nName: $Name$\nGood: $Good$\nTime: $Time$\nClasses: $Class$\nWeapon Classes: $WeaponClass$\nPref: $Pref$\nTags: $Tags$");
+	PrintToServer("%s\nEnabled: %d\nExternal: %d", sPrint, perk.Enabled, perk.External);
+	RTD2_ObtainPerk("godmode").SetCall(GodmodeOverride);
+	RTD2_ObtainPerk("godmode").External = true;
+}
+
+public void PerkCall(int client, RTDPerk perk, bool bEnable){
+	PrintToServer("Perk %s on client %d", bEnable ? "enabled" : "disabled", client);
+}
+
+public void GodmodeOverride(int client, RTDPerk perk, bool bEnable){
+	PrintToChat(client, "%s godmode", bEnable ? "Applying" : "Disabling");
 }
