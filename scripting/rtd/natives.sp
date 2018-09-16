@@ -246,8 +246,14 @@ public int Native_FindPerks(Handle hPlugin, int iParams){
 	char sQuery[32];
 	GetNativeString(1, sQuery, sizeof(sQuery));
 	PerkList results = g_hPerkContainer.FindPerks(sQuery);
-	Handle list = CloneHandle(results, hPlugin);
+	int i = results.Length;
+
+	ArrayList idList = new ArrayList(_, i);
+	while(--i >= 0) idList.Set(i, results.Get(i).Id);
 	delete results;
+
+	Handle list = CloneHandle(idList, hPlugin);
+	delete idList;
 	return view_as<int>(list);
 }
 
