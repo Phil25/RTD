@@ -69,7 +69,10 @@ int g_iClassConverter[10] = {0, 1, 8, 2, 4, 7, 5, 3, 9, 6};
 
 methodmap Perk < StringMap{
 	public Perk(){
-		return view_as<Perk>(new StringMap());
+		StringMap map = new StringMap();
+		map.SetValue("m_WeaponClass", new ArrayList(127));
+		map.SetValue("m_Tags", new ArrayList(32));
+		return view_as<Perk>(map);
 	}
 
 	public void Dispose(){
@@ -147,6 +150,7 @@ methodmap Perk < StringMap{
 	}
 
 	public void SetCall(RTDCall func, Handle plParent){
+		RemovePerkFromClients(this);
 		delete this.GetCall();
 		Handle hFwd = CreateForward(ET_Single, Param_Cell, Param_Cell, Param_Cell);
 		AddToForward(hFwd, plParent, func);

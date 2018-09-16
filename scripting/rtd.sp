@@ -1421,6 +1421,12 @@ int GetPerkTime(int iPerkId){
 	return (iTime > 0) ? iTime : g_iCvarPerkDuration;
 }
 
+void RemovePerkFromClients(Perk perk){
+	for(int i = 1; i <= MaxClients; ++i)
+		if(IsClientInGame(i) && g_hRollers.GetPerk(i) == perk)
+			ForceRemovePerk(i);
+}
+
 //-----[ Miscellaneous ]-----//
 int ReadFlagFromConVar(Handle hCvar){
 	char sBuffer[32];
