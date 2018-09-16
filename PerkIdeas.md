@@ -14,7 +14,7 @@ Tracer Bullets | Machina bullets on all weapons | No
 Sickness | Coughing and health deacrease | No
 Melee Backstab | Backstab on any class | Yes
 Negative Gravity | Negates roller's gravity | No
-Drug Bullets | Druggs the victim | Yes
+Drug Bullets | Drugs the victim | Yes
 Knockback Bullets | Increased knockback on attacks | Yes
 Attractor Bullets | Reversed knockback on attacks | Yes
 Incendiary Bullets | Ignite victims | Yes
