@@ -19,70 +19,13 @@
 #include <rtd2>
 #include <tf2_stocks>
 
-#include "rtd/perk_class.sp"
+RTDPerk perk = view_as<RTDPerk>(-1);
 
 public void OnPluginStart(){
-	ParseEffects();
-	RegServerCmd("sm_rtdstest", Command_PerkSearchupTest);
-	char sBuffer[255];
-
-	Perk perk = null;
-	PerkList list = g_hPerkContainer.FindPerks("crit");
-	PerkIter iter = new PerkListIter(list, -1);
-
-	int i = 0;
-	while((perk = (++iter).Perk())){
-		perk.Format(sBuffer, 255, "$Id$. $Name$");
-		PrintToServer(sBuffer);
-		if(++i > 5) break;
-	}
-
-	PrintToServer("Getting 5 random perks from the list above...");
-
-	i = 0;
-	while(++i <= 5){
-		perk = list.GetRandom();
-		perk.Format(sBuffer, 255, "Random: $Name$");
-		PrintToServer(sBuffer);
-	}
-
-	delete list;
-	delete iter;
-
-	PrintToServer("Now showing all perks...");
-
-	iter = new PerkContainerIter(-1);
-	while((perk = (++iter).Perk())){
-		perk.Format(sBuffer, 255, "$Id$. $Name$");
-		PrintToServer(sBuffer);
-	}
+	if(RTD2_IsRegOpen())
+		perk = RTD2_ObtainPerk("token");
 }
 
-bool ParseEffects(){
-	if(g_hPerkContainer == null)
-		g_hPerkContainer = new PerkContainer();
-	g_hPerkContainer.DisposePerks();
-
-	char sPath[255];
-	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.default.cfg");
-	int iStatus[2];
-	return FileExists(sPath) && g_hPerkContainer.ParseFile(sPath, iStatus) != -1;
-}
-
-public Action Command_PerkSearchupTest(int args){
-	if(args < 1)
-		return Plugin_Handled;
-
-	char sQuery[255];
-	GetCmdArg(1, sQuery, 255);
-	PerkList list = g_hPerkContainer.FindPerks(sQuery);
-
-	char sBuffer[255];
-	for(int i = 0; i < list.Length; i++){
-		list.Get(i).Format(sBuffer, 255, "$Id$. $Name$");
-		PrintToServer(sBuffer);
-	}
-
-	delete list;
-	return Plugin_Handled;
+public void RTD2_OnRegOpen(){
+	perk = RTD2_ObtainPerk("token");
 }

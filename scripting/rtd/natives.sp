@@ -46,7 +46,7 @@ void CreateNatives(){
 	CreateNative("RTD2_FindPerks",			Native_FindPerks);
 
 	CreateNative("RTD2_RegisterPerk",		Native_RegisterPerk); // deprecated
-	CreateNative("RTD2_MakePerk",			Native_MakePerk);
+	CreateNative("RTD2_ObtainPerk",			Native_ObtainPerk);
 
 	CreateNative("RTD2_IsRegOpen",			Native_IsRegisteringOpen);
 
@@ -260,14 +260,13 @@ public int Native_RegisterPerk(Handle hPlugin, int iParams){ // deprecated
 	char sBuffer[127];
 	GetNativeString(1, sBuffer, sizeof(sBuffer)); // token
 
-	Perk perk = new Perk();
-	perk.SetToken(sBuffer);
-
-	int iId = g_hPerkContainer.Add(perk);
-	if(iId == -1){
-		delete perk;
-		return -1;
-	}
+	Perk perk = g_hPerkContainer.Get(sBuffer);
+	int iId = -1;
+	if(!perk){
+		perk = new Perk();
+		perk.SetToken(sBuffer);
+		iId = g_hPerkContainer.Add(perk);
+	}else iId = perk.Id;
 
 	GetNativeString(2, sBuffer, sizeof(sBuffer)); // name
 	perk.SetName(sBuffer);
@@ -295,22 +294,25 @@ public int Native_RegisterPerk(Handle hPlugin, int iParams){ // deprecated
 	return iId;
 }
 
-public int Native_MakePerk(Handle hPlugin, int iParams){
+public int Native_ObtainPerk(Handle hPlugin, int iParams){
 	if(!g_bIsRegisteringOpen){
 		char sPluginName[32];
 		GetPluginFilename(hPlugin, sPluginName, sizeof(sPluginName));
 		ThrowNativeError(SP_ERROR_NATIVE, "%s Plugin \"%s\" is trying to register perks before it's possible.\nPlease use the forward RTD2_OnRegOpen() and native RTD2_IsRegOpen() to determine.", CONS_PREFIX, sPluginName);
 		return -1;
 	}
-	char sPerkToken[32];
-	GetNativeString(1, sPerkToken, sizeof(sPerkToken));
+	char sToken[32];
+	GetNativeString(1, sToken, sizeof(sToken));
 
-	Perk perk = new Perk();
-	perk.SetToken(sPerkToken);
+	int iId = 0;
+	Perk perk = g_hPerkContainer.Get(sToken);
+	if(perk) return perk.Id;
 
-	int iId = g_hPerkContainer.Add(perk);
-	if(iId == -1) delete perk;
-	else perk.External = true;
+	perk = new Perk();
+	perk.SetToken(sToken);
+
+	iId = g_hPerkContainer.Add(perk);
+	perk.External = true;
 
 	return iId;
 }

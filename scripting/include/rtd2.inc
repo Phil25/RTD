@@ -39,7 +39,7 @@ public __pl_rtd2_SetNTVOptional(){
 	MarkNativeAsOptional("RTD2_FindPerks");
 
 	MarkNativeAsOptional("RTD2_RegisterPerk"); // deprecated
-	MarkNativeAsOptional("RTD2_MakePerk");
+	MarkNativeAsOptional("RTD2_ObtainPerk");
 
 	MarkNativeAsOptional("RTD2_IsRegOpen");
 
@@ -465,11 +465,11 @@ functag RTD2Manager public(client, iPerkId, bool:bEnable);
  *
  * @return			Perk's index on success, -1 otherwise (not all paremeters filled).
  */
-#pragma deprecated Use RTD2_MakePerk instead
+#pragma deprecated Use RTD2_ObtainPerk instead
 native RTDPerk RTD2_RegisterPerk(const char[] sToken, const char[] sName, bool bGood, const char[] sSound, int iTime, const char[] sClass, const char[] sWeapons, const char[] sTags, RTDCall func);
 
 // TODO: document
-native RTDPerk RTD2_MakePerk(const char[] sToken);
+native RTDPerk RTD2_ObtainPerk(const char[] sToken);
 
 
 /**
