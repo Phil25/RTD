@@ -47,6 +47,7 @@ void CreateNatives(){
 
 	CreateNative("RTD2_RegisterPerk",		Native_RegisterPerk); // deprecated
 	CreateNative("RTD2_ObtainPerk",			Native_ObtainPerk);
+	CreateNative("RTD2_DisableModulePerks",	Native_DisableModulePerks);
 
 	CreateNative("RTD2_IsRegOpen",			Native_IsRegisteringOpen);
 
@@ -315,6 +316,11 @@ public int Native_ObtainPerk(Handle hPlugin, int iParams){
 	perk.External = true;
 
 	return iId;
+}
+
+public int Native_DisableModulePerks(Handle hPlugin, int iParams){
+	DisableModulePerks(hPlugin);
+	return 0;
 }
 
 public int Native_IsRegisteringOpen(Handle hPlugin, int iParams){

@@ -72,6 +72,7 @@ methodmap Perk < StringMap{
 		StringMap map = new StringMap();
 		map.SetValue("m_WeaponClass", new ArrayList(127));
 		map.SetValue("m_Tags", new ArrayList(32));
+		map.SetValue("m_Class", 511);
 		return view_as<Perk>(map);
 	}
 
@@ -112,8 +113,8 @@ methodmap Perk < StringMap{
 		GET_PROP(int,Class)
 	}
 	public void SetClass(const char[] s){
-		int h = StringToClass(s);
-		this.SetValue("m_Class", h);
+		int iClassFlags = StringToClass(s);
+		this.SetValue("m_Class", iClassFlags);
 	}
 
 	GET_VALUE(ArrayList,WeaponClass) // ArrayList storing strings of weapon classes
@@ -143,17 +144,27 @@ methodmap Perk < StringMap{
 		SET_PROP(bool,External)
 	}
 
+	property Handle Parent{
+		GET_PROP(Handle,Parent)
+		SET_PROP(Handle,Parent)
+	}
+
 	public Handle GetCall(){
 		Handle hFwd = null;
 		this.GetValue("m_Call", hFwd);
 		return hFwd;
 	}
 
-	public void SetCall(RTDCall func, Handle plParent){
+	public void SetCall(RTDCall func, Handle hPlugin){
 		RemovePerkFromClients(this);
 		delete this.GetCall();
+
 		Handle hFwd = CreateForward(ET_Single, Param_Cell, Param_Cell, Param_Cell);
-		AddToForward(hFwd, plParent, func);
+		AddToForward(hFwd, hPlugin, func);
+
+		this.Parent = hPlugin;
+		this.External = true;
+		this.Enabled = true;
 		this.SetValue("m_Call", hFwd);
 	}
 

@@ -90,6 +90,7 @@ bool	g_bIsUpdateForced		= false;
 
 Menu	g_hDescriptionMenu		= null;
 ArrayList g_hPerkHistory		= null;
+int		g_iCorePerks			= 0;
 
 bool	g_bIsGameArena			= false;
 
@@ -808,14 +809,14 @@ bool ParseEffects(){
 	g_hPerkContainer.DisposePerks();
 
 	int iStatus[2];
-	int iParsed = g_hPerkContainer.ParseFile(sPath, iStatus);
-	if(iParsed == -1){
+	g_iCorePerks = g_hPerkContainer.ParseFile(sPath, iStatus);
+	if(g_iCorePerks == -1){
 		LogError(CONS_PREFIX ... " Parsing rtd2_perks.default.cfg failed!");
 		SetFailState("Parsing rtd2_perks.default.cfg failed!");
 		return false;
 	}
 
-	PrintToServer(CONS_PREFIX ... " Loaded %d perk%s (%d good, %d bad).", iParsed, iParsed > 1 ? "s" : "", iStatus[1], iStatus[0]);
+	PrintToServer(CONS_PREFIX ... " Loaded %d perk%s (%d good, %d bad).", g_iCorePerks, g_iCorePerks > 1 ? "s" : "", iStatus[1], iStatus[0]);
 	return true;
 }
 
@@ -1425,6 +1426,27 @@ void RemovePerkFromClients(Perk perk){
 	for(int i = 1; i <= MaxClients; ++i)
 		if(IsClientInGame(i) && g_hRollers.GetPerk(i) == perk)
 			ForceRemovePerk(i);
+}
+
+void DisableModulePerks(Handle hPlugin){
+	Perk perk = null;
+	for(int i = 1; i <= MaxClients; ++i){
+		if(!IsClientInGame(i))
+			continue;
+
+		perk = g_hRollers.GetPerk(i);
+		if(perk && perk.External && perk.Parent == hPlugin)
+			perk.Call(i, false);
+	}
+
+	PerkIter iter = new PerkContainerIter(-1);
+	while((perk = (++iter).Perk())){
+		if(perk.External && perk.Parent == hPlugin){
+			perk.Enabled = perk.Id < g_iCorePerks; // disable if external
+			perk.External = false; // set perk to unaltered call
+		}
+	}
+	delete iter;
 }
 
 //-----[ Miscellaneous ]-----//
