@@ -11,10 +11,10 @@ Super Jump | Super jump with no falling damage | Yes
 Health Teleport | Teleports to random healthkit | Yes
 Spawn Teleport | Teleports to spawn | Yes
 Tracer Bullets | Machina bullets on all weapons | No
-Sickness | Caughing and health deacrease | No
+Sickness | Coughing and health deacrease | No
 Melee Backstab | Backstab on any class | Yes
 Negative Gravity | Negates roller's gravity | No
-Drug Bullets | Drugges the victim | Yes
+Drug Bullets | Druggs the victim | Yes
 Knockback Bullets | Increased knockback on attacks | Yes
 Attractor Bullets | Reversed knockback on attacks | Yes
 Incendiary Bullets | Ignite victims | Yes
