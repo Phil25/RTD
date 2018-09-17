@@ -1,17 +1,17 @@
 /**
 * Perk manager.
 * Copyright (C) 2018 Filip Tomaszewski
-* 
+*
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
-* 
+*
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -23,30 +23,10 @@
 	This script is responsible for actually applying and removing perks,
 	so after all the logic goes off in the core rtd2.sp first.
 
-	If you have a custom perk you want to add:
-
-	REMEMBER ABOUT INCLUDING IT IN rtd2.sp!
-	If you're done with the above, editing #manager.sp is all you are left with.
-
-	After you're done, remember to compile the rtd2.sp, and nothing else.
+	If you have a custom perk you want to add: WRITE A MODULE.
+	(editing this plugin is bad)
 \**********************************************************************************/
 
-/*
-	• Editing ManagePerk() is REQUIRED for your perk to work TODO recodument
-
-	• Fired when a perk is just about to be applied or removed
-
-	• parameters:
-		- (int)		client:		the client's index
-		- (int)		iPerkId:	unique ID of the perk undergoing changes
-		- (bool)	enable:		should the perk be applied(enabled) or removed(disabled)
-		- (int)		iReason:	ID of the reason to display (only on disabling perks)
-
-	• It will switch through the perk ID and fire the specified command with parameters:
-		- (int)		client:		the client's index
-		- (string)	fPref:		(part of perks' enum) the optional value, found under each "settings" in rtd2_perks.cfg
-		- (bool)	enable:		should the perk be applied(enabled) or removed(disabled)
-*/
 void ManagePerk(int client, Perk perk, bool enable, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
 	//If the perk effect is NOT in this plugin, execute the function and stop, check if it's not being disabled and just stop right there.
 	if(perk.External){
@@ -57,7 +37,7 @@ void ManagePerk(int client, Perk perk, bool enable, RTDRemoveReason reason=RTDRe
 		return;	//Stop further exectuion of ManagePerk()
 	}
 
-	//This is the optional value for perks, found under "special" in rtd2_perks.cfg
+	//This is the optional value for perks, found under "settings" in rtd2_perks.cfg
 	char sSettings[127];
 	perk.GetPref(sSettings, 127);
 
