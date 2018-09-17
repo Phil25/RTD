@@ -118,54 +118,165 @@ enum RTDForceResult{
  */
 
 
-// TODO: document
+/**
+ * Gets perk property of type any.
+ *
+ * @note Prefer to use RTDPerk methodmap over this.
+ *
+ * @param perk		RTDPerk object
+ * @param prop		RTDPerkProp property
+ *
+ * @return			Value of specified property
+ */
 native any RTD2_GetPerkAny(RTDPerk perk, RTDPerkProp prop);
 
 
-// TODO: document
+/**
+ * Sets perk property of type any.
+ *
+ * @note Prefer to use RTDPerk methodmap over this.
+ *
+ * @param perk		RTDPerk object
+ * @param prop		RTDPerkProp property
+ * @param value	Value to set the property to
+ *
+ * @noreturn
+ */
 native void RTD2_SetPerkAny(RTDPerk perk, RTDPerkProp prop, any value);
 
 
-// TODO: document
+/**
+ * Gets perk property of type char[].
+ *
+ * @note Prefer to use RTDPerk methodmap over this.
+ *
+ * @param perk			RTDPerk object
+ * @param prop			RTDPerkProp property
+ * @param sBuffer		char[] buffer to store the result in
+ * @param iBufferLen	Length of the buffer
+ *
+ * @noreturn
+ */
 native void RTD2_GetPerkString(RTDPerk perk, RTDPerkProp prop, char[] sBuffer, int iBufferLen);
 
 
-// TODO: document
+/**
+ * Sets perk property of type char[].
+ *
+ * @note Prefer to use RTDPerk methodmap over this.
+ *
+ * @param perk		RTDPerk object
+ * @param prop		RTDPerkProp property
+ * @param sStr		Value to set the property to
+ *
+ * @noreturn
+ */
 native void RTD2_SetPerkString(RTDPerk perk, RTDPerkProp prop, const char[] sStr);
 
 
-// TODO: document
+/**
+ * Gets perk property of type Handle. TODO: remove this, handles should not be cloned
+ *
+ * @note Prefer to use RTDPerk methodmap over this.
+ *
+ * @param perk		RTDPerk object
+ * @param prop		RTDPerkProp property
+ *
+ * @return			Handle reference of specified property
+ */
 native any RTD2_GetPerkHandle(RTDPerk perk, RTDPerkProp prop);
 
 
-// TODO: document?
+/**
+ * Prototype for external perk calls.
+ *
+ * @param client	Client to edit the perk on, guaranteed valid
+ * @param perk		RTDPerk object
+ * @param bEeable	Wether the perk should be enabled or disabled
+ */
 typedef RTDCall = function void(int client, RTDPerk perk, bool bEnable);
 
 
-// TODO: document
-native any RTD2_SetPerkCall(RTDPerk perk, RTDCall func);
+/**
+ * Set the function to call when perk should operate on client.
+ *
+ * @note Prefer to use RTDPerk methodmap over this.
+ *
+ * @param perk		RTDPerk object
+ * @param func		RTDCall function
+ *
+ * @noreturn
+ */
+native void RTD2_SetPerkCall(RTDPerk perk, RTDCall func);
 
 
-// TODO: document
-native any RTD2_Format(RTDPerk perk, char[] sBuffer, int iBufferLen, const char[] sFormat);
+/**
+ * Format specific perk properties into a buffer.
+ * Available specifiers: $Id$, $Name, $Good$,
+ * $Sound$, $Token$, $Time$, $Tags$, $Class$,
+ * $WeaponClass$, $Pref$
+ *
+ * @note Format example: "Perk: $Id$ - $Name$"
+ * @note Mind the capitalization.
+ * @note Prefer to use RTDPerk methodmap over this.
+ *
+ * @param perk			RTDPerk object
+ * @param sBuffer		Buffer to store the result in
+ * @param iBufferLen	Length of the buffer
+ * @param sFormat		Formatting rules
+ *
+ * @noreturn
+ */
+native void RTD2_Format(RTDPerk perk, char[] sBuffer, int iBufferLen, const char[] sFormat);
 
 
-// TODO: document
+/* Object-oriented wrapper for perk management */
 methodmap RTDPerk{
+
+	// Specifies a perk. The perk is defined by the perk's ID.
+	// Defines getters and setters for accessing all of the
+	// perk's properties.
+	//
+	// RTDPerk methodmap would most of the times be obtained
+	// through other natives or passed as an argument in a
+	// forward. You probably don't want to call this
+	// constructor at all.
+	//
+	// For creating perks, use RTD2_ObtainPerk().
+	// For finding perks, use RTD2_FindPerk() and RTD2_FindPerks().
+	//
+	// RTDPerk is a cell under the hood, therefor doesn't need
+	// to be freed with delete or CloseHandle().
+	//
+	// @param sToken	Token to bind the ID of
+	// @return			RTDPerk object
 	public RTDPerk(const char[] sToken){
 		return view_as<RTDPerk>(0);
 	}
 
+	// Check if the perk is valid. This should be called after RTD2_FindPerk().
 	property bool Valid{
 		public get(){return view_as<int>(this) != -1;}
 	}
 
+	// Get name of the perk.
+	//
+	// @param sBuffer		Buffer to store the result in
+	// @param iBufferLen	Length of the buffer
+	//
+	// @noreturn
 	public void GetName(char[] sBuffer, int iBufferLen){
 		RTD2_GetPerkString(this, RTDPerk_Name, sBuffer, iBufferLen);}
 
+	// Set name of the perk.
+	//
+	// @param sVal		Value to set the name to
+	//
+	// @noreturn
 	public void SetName(const char[] sVal){
 		RTD2_SetPerkString(this, RTDPerk_Name, sVal);}
 
+	// Retrieves or sets whether the perk is good.
 	property bool Good{
 		public get(){
 			return view_as<bool>(RTD2_GetPerkAny(this, RTDPerk_Good));}
@@ -173,15 +284,33 @@ methodmap RTDPerk{
 			RTD2_SetPerkAny(this, RTDPerk_Good, bVal);}
 	}
 
+	// Get sound path of the perk.
+	//
+	// @param sBuffer		Buffer to store the result in
+	// @param iBufferLen	Length of the buffer
+	//
+	// @noreturn
 	public void GetSound(char[] sBuffer, int iBufferLen){
 		RTD2_GetPerkString(this, RTDPerk_Sound, sBuffer, iBufferLen);}
 
+	// Set sound path of the perk.
+	//
+	// @param sVal		Value to set the sound path to
+	//
+	// @noreturn
 	public void SetSound(const char[] sVal){
 		RTD2_SetPerkString(this, RTDPerk_Sound, sVal);}
 
+	// Get token of the perk.
+	//
+	// @param sBuffer		Buffer to store the result in
+	// @param iBufferLen	Length of the buffer
+	//
+	// @noreturn
 	public void GetToken(char[] sBuffer, int iBufferLen){
 		RTD2_GetPerkString(this, RTDPerk_Token, sBuffer, iBufferLen);}
 
+	// Retrieves or sets custom time of the perk.
 	property int Time{
 		public get(){
 			return view_as<int>(RTD2_GetPerkAny(this, RTDPerk_Time));}
@@ -189,29 +318,52 @@ methodmap RTDPerk{
 			RTD2_SetPerkAny(this, RTDPerk_Time, iVal);}
 	}
 
+	// Retrieves perk class flags.
 	property int Classes{
 		public get(){
 			return view_as<int>(RTD2_GetPerkAny(this, RTDPerk_Classes));}
 	}
+
+	// Set class flags the perk is applicable to.
+	//
+	// @note This string is parsed the same way its config equivalent is.
+	//
+	// @param sClasses	String with digits representing classes.
+	//
+	// @noreturn
 	public void SetClasses(const char[] sClasses){
 		RTD2_SetPerkString(this, RTDPerk_Classes, sClasses);}
 
+	// Retrieves ArrayList of weapon classes the perk is applicable to.
 	property ArrayList WeaponClasses{
 		public get(){
 			return view_as<ArrayList>(RTD2_GetPerkHandle(this, RTDPerk_WeaponClasses));}
 	}
 
+	// Get settings string of the perk.
+	//
+	// @param sBuffer		Buffer to store the result in
+	// @param iBufferLen	Length of the buffer
+	//
+	// @noreturn
 	public void GetPref(char[] sBuffer, int iBufferLen){
 		RTD2_GetPerkString(this, RTDPerk_Pref, sBuffer, iBufferLen);}
 
+	// Set settings string of the perk.
+	//
+	// @param sVal		Value to set the settings to
+	//
+	// @noreturn
 	public void SetPref(const char[] sVal){
 		RTD2_SetPerkString(this, RTDPerk_Pref, sVal);}
 
+	// Retrieves ArrayList of perk's tags.
 	property ArrayList Tags{
 		public get(){
 			return view_as<ArrayList>(RTD2_GetPerkHandle(this, RTDPerk_Tags));}
 	}
 
+	// Retrieves or sets whether the perk is enabled.
 	property bool Enabled{
 		public get(){
 			return view_as<bool>(RTD2_GetPerkAny(this, RTDPerk_Enabled));}
@@ -219,6 +371,7 @@ methodmap RTDPerk{
 			RTD2_SetPerkAny(this, RTDPerk_Enabled, bVal);}
 	}
 
+	// Retrieves or sets whether the perk should call an external function.
 	property bool External{
 		public get(){
 			return view_as<bool>(RTD2_GetPerkAny(this, RTDPerk_External));}
@@ -226,23 +379,58 @@ methodmap RTDPerk{
 			RTD2_SetPerkAny(this, RTDPerk_External, bVal);}
 	}
 
+	// Set external call of the perk.
+	//
+	// @note This also sets Enable and External to true.
+	//
+	// @param func		RTDCall function
+	//
+	// @noreturn
 	public void SetCall(RTDCall func){
 		RTD2_SetPerkCall(this, func);}
 
+	// Format specific perk properties into a buffer.
+	// Available specifiers: $Id$, $Name, $Good$,
+	// $Sound$, $Token$, $Time$, $Tags$, $Class$,
+	// $WeaponClass$, $Pref$
+	//
+	// @note Format example: "Perk: $Id$ - $Name$"
+	// @note Mind the capitalization.
+	//
+	// @param sBuffer		Buffer to store the result in
+	// @param iBufferLen	Length of the buffer
+	// @param sFormat		Formatting rules
+	//
+	// @noreturn
 	public void Format(char[] sBuffer, int iBufferLen, const char[] sFormat){
 		RTD2_Format(this, sBuffer, iBufferLen, sFormat);}
 }
 
-// TODO: document
+// Object-oriented wrapper for ArrayList of RTDPerk's
 methodmap RTDPerkList < ArrayList{
+
+	// Creates a RTDPerkList. RTDPerkLits inherits from ArrayList and holds
+	// RTDPerks, which in turn are simply IDs of perks.
+	//
+	// The RTDPerkList must be freed via delete or CloseHandle().
+	//
+	// @return	RTDPerkList object
 	public RTDPerkList(){
 		return view_as<RTDPerkList>(new ArrayList());
 	}
 
+	// Wrapper for receiving contents as RTDPerk.
+	//
+	// @param i		Index to retrieve the perk at.
+	//
+	// @return		RTDPerk object
 	public RTDPerk Get(int i){
 		return view_as<RTDPerk>(this.Get(i));
 	}
 
+	// Get random perk from the list.
+	//
+	// @return	RTDPerk object
 	public RTDPerk GetRandom(){
 		int iLen = this.Length;
 		if(!iLen) return view_as<RTDPerk>(-1);
@@ -263,7 +451,7 @@ methodmap RTDPerkList < ArrayList{
  * Called everytime rtd is activated to determine if the player can use the dice mod.
  * Return Plugin_Continue to allow, anything else denies them access.
  *
- * @note sm_forcertd command and RTD2_Force native does not call this.
+ * @note sm_forcertd command and RTD2_Force native do not call this.
  *
  * @param client		Client index.
  */
@@ -278,7 +466,7 @@ forward Action RTD2_CanRollDice(int client);
  *
  * @param client	Client index.
  * @param iTarget	Target client index.
- * @param perk		Perk methodmap.
+ * @param perk		Perk object.
  */
 forward Action RTD2_CanForcePerk(int client, int iTarget, RTDPerk perk);
 
@@ -291,7 +479,7 @@ forward Action RTD2_CanForcePerk(int client, int iTarget, RTDPerk perk);
  *
  * @param client	Client index.
  * @param iTarget	Target client index.
- * @param perk		Perk methodmap.
+ * @param perk		Perk object.
  */
 forward Action RTD2_CanRemovePerk(int client, int iTarget, RTDPerk perk);
 
@@ -300,14 +488,14 @@ forward Action RTD2_CanRemovePerk(int client, int iTarget, RTDPerk perk);
  * Called when a perk has just been activated on a player.
  *
  * @param client		Client Index.
- * @param perk			Perk methodmap.
+ * @param perk			Perk object.
  * @param iDuration		Perk Duration (-1 if no time).
  */
 forward void RTD2_Rolled(int client, RTDPerk perk, int iDuration);
 
 
 /**
- * Called when a perk has just been activated on a player.
+ * Called when a perk has just been removed from a player.
  *
  * @param client		Client Index.
  * @param perk			Removed Perk's Index.
@@ -335,7 +523,15 @@ forward void RTD2_Removed(int client, RTDPerk perk, RTDRemoveReason reason);
 native int RTD2_GetClientPerkId(int client);
 
 
-// TODO: document
+/**
+ * Returns player's current RTDPerk. Can be used to check if the player is in roll.
+ *
+ * @note RTDPerk.Valid is false if client was not in roll.
+ *
+ * @param client		Client Index.
+ *
+ * @return				RTDPerk object
+ */
 native RTDPerk RTD2_GetClientPerk(int client);
 
 
@@ -358,13 +554,22 @@ native int RTD2_GetClientPerkTime(int client);
  * @param bOvrClass		0/1 - If perk doesn't match player's class, should it be applied anyway?
  * @param initiator		Entity which initiated forcing the perk.
  *
- * @return				-1 because depricated
+ * @return				-1 because deprecated
  */
 #pragma deprecated Use RTD2_Force instead
 native int RTD2_ForcePerk(int client, const char[] sQuery="", iTime=-1, bOvrClass=0, initiator=0);
 
 
-// TODO: document
+/**
+ * Forces a perk on a player
+ *
+ * @param client		Client Index.
+ * @param sQuery		Query string, containing id, token or a tag. If invalid a roll will occur.
+ * @param iTime			Custom perk's time. -1 = don't use.
+ * @param iInitiator	Entity which initiated forcing the perk.
+ *
+ * @return				RTDForceResult enum value
+ */
 native RTDForceResult RTD2_Force(int client, const char[] sQuery, int iTime=-1, int iInitiator=0);
 
 
@@ -385,7 +590,18 @@ native RTDForceResult RTD2_Force(int client, const char[] sQuery, int iTime=-1, 
 native int RTD2_RollPerk(int client=0, int bOverrideDisabled=0, int bOverrideClass=0, int bCountRepeat=1, int bCountGreatRepeat=1);
 
 
-// TODO: document
+/**
+ * Rolls a perk with given data.
+ *
+ * @note This does NOT apply the perk to the client.
+ * @note RTDPerk.Valid is false is no applicable perks are found.
+ *
+ * @param client		Client Index.
+ * @param iRollFlags	Roll flag definitions.
+ * @param sFilter		Query by which to filter the applicable perks.
+ *
+ * @return				RTDPerk object
+ */
 native RTDPerk RTD2_Roll(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="");
 
 
@@ -402,7 +618,17 @@ native RTDPerk RTD2_Roll(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[
 native RTDPerk RTD2_RemovePerk(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason="");
 
 
-//TODO: document
+/**
+ * Removes current perk from the client.
+ *
+ * @note RTDPerk.Valid is falce if client was not in roll.
+ *
+ * @param client		Client Index.
+ * @param reason		Reason enum.
+ * @param sReason		Provide custom reason IF reason=RTDRemove_Custom.
+ *
+ * @return				RTDPerk object
+ */
 native RTDPerk RTD2_Remove(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason="");
 
 
@@ -417,11 +643,28 @@ native RTDPerk RTD2_Remove(int client, RTDRemoveReason reason=RTDRemove_WearOff,
 native RTDPerk RTD2_GetPerkOfString(const char[] sString="");
 
 
-// TODO: document
+/**
+ * Finds a perk by token or ID, where token is prioritized.
+ *
+ * @note RTDPerk.Valid is false if perk is not found.
+ *
+ * @param sQuery		Query to search by.
+ *
+ * @return				RTDPerk object
+ */
 native RTDPerk RTD2_FindPerk(const char[] sQuery="");
 
 
-// TODO: document
+/**
+ * Finds perks by token, ID or tags.
+ *
+ * @note Will not be null, might be empty.
+ * @note Must be freed via delete or CloseHandle().
+ *
+ * @param sQuery		Query to search by.
+ *
+ * @return				RTDPerkList object
+ */
 native RTDPerkList RTD2_FindPerks(const char[] sQuery="");
 
 
@@ -470,27 +713,49 @@ functag RTD2Manager public(client, iPerkId, bool:bEnable);
 native RTDPerk RTD2_RegisterPerk(const char[] sToken, const char[] sName, bool bGood, const char[] sSound, int iTime, const char[] sClass, const char[] sWeapons, const char[] sTags, RTDCall func);
 
 
-// TODO: document
+/**
+ * Gets a perk by token, or registers one if not found.
+ * Perks cannot be unregistered, disable them instead.
+ * If a perk is registered, a new ID is automatically assigned.
+ * For in-depth information, see the RTD thread on AlliedModders.
+ *
+ * @note This sets External to true on that perk.
+ *
+ * @param sToken	Unique token used for addressing the perk.
+ *
+ * @return			RTDPerk object
+ */
 native RTDPerk RTD2_ObtainPerk(const char[] sToken);
 
 
-// TODO: document
-native RTDPerk RTD2_DisableModulePerks();
+/**
+ * Disables all the perks that were registered by the plugin this
+ * native is called from, and sets all overriden core perks back
+ * to the default state.
+ *
+ * If registering perks, this must be called in the OnPluginEnd.
+ * This will make sure perks registered by the module will be
+ * properly disposed on clients who currently are using them,
+ * by calling the RTDCall function that disables them.
+ *
+ * @noreturn
+ */
+native void RTD2_DisableModulePerks();
 
 
 /**
  * Registering a perk via external plugin is possible only after all the core ones were registered.
- * You can register new perks in OnPluginStart() when this native returns 1 (if late-loaded).
+ * You can register new perks in OnPluginStart() when this native returns true (if late-loaded).
  * Otherwise, register them in the RTD2_OnRegOpen() forward.
  *
- * @return			1 if registering is open, 0 otherwise.
+ * @return	true if registering is open, false otherwise.
  */
 native bool RTD2_IsRegOpen();
 
 
 /**
  * This forward will fire when RTD is ready handle perk registration.
- * RTD2_RegisterPerk() should ALWAYS be executed in this forward.
+ * RTD2_ObtainPerk() should ALWAYS be executed in this forward.
  */
 forward void RTD2_OnRegOpen();
 
@@ -498,8 +763,8 @@ forward void RTD2_OnRegOpen();
 /**
  * Enables/disables perk by token.
  *
- * @params sToken	The token to find the perk by.
- * @params iDir		(direction) -1 = disable, 0 = toggle, 1 = enable
+ * @param sToken	The token to find the perk by.
+ * @param iDir		(direction) -1 = disable, 0 = toggle, 1 = enable
  *
  * @return			ID of the perk, -1 if not found.
  */
@@ -510,8 +775,8 @@ native int RTD2_SetPerkByToken(const char[] sToken, int iDir=0);
 /**
  * Enables/disables perk by ID.
  *
- * @params iId		Perk's ID.
- * @params iDir		(direction) -1 = disable, 0 = toggle, 1 = enable
+ * @param iId		Perk's ID.
+ * @param iDir		(direction) -1 = disable, 0 = toggle, 1 = enable
  *
  * @return			1 if anything changed, 0 if was already in the requested state, -1 on error.
  */
@@ -525,8 +790,8 @@ native int RTD2_SetPerkById(int iId, int iDir=0);
  * It will accept either the perk's ID or its token (id > token).
  * You should use it only on core perks.
  *
- * @params iId		Perk's ID.
- * @params sToken	Perk's token.
+ * @param iId		Perk's ID.
+ * @param sToken	Perk's token.
  *
  * @return			1 if anything was changed, 0 nothing was changed, -1 on error.
  */
@@ -539,8 +804,8 @@ native int RTD2_DefaultCorePerk(int iId=-1, const char[] sToken="");
  * Optionally, hurt by whom.
  * It is adived to use this as it checks if the client is in Friendly Mode.
  *
- * @params client	Can this client be hurt...
- * @params by		...by this client?
+ * @param client	Can this client be hurt...
+ * @param by		...by this client?
  *
  * @return			1 if yes, 0 if not or error.
  */
