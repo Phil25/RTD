@@ -57,7 +57,7 @@
 
 #define LASERBEAM		"sprites/laserbeam.vmt"
 
-#define UPDATE_URL		"https://bitbucket.org/Phil25/rtd/raw/default/update.txt"
+#define UPDATE_URL		"https://phil25.github.io/RTD/update.txt"
 
 
 
