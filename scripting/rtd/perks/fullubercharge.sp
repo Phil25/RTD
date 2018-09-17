@@ -63,7 +63,7 @@ void FullUbercharge_ApplyPerk(int client){
 		char sClass[20];GetEdictClassname(iWeapon, sClass, sizeof(sClass));
 		if(strcmp(sClass, "tf_weapon_medigun") == 0){
 		
-			g_iMediGun[client]		= iWeapon;
+			g_iMediGun[client]		= EntIndexToEntRef(iWeapon);
 			g_bRefreshUber[client]	= true;
 			g_bUberComplete[client]	= false;
 			
@@ -102,8 +102,11 @@ public Action Timer_RefreshUber(Handle hTimer, int iSerial){
 	if(!g_bRefreshUber[client])
 		return Plugin_Stop;
 	
-	SetEntPropFloat(g_iMediGun[client], Prop_Send, "m_flChargeLevel", 1.0);
-	
+	int iMediGun = EntRefToEntIndex(g_iMediGun[client]);
+	if(iMediGun <= MaxClients)
+		return Plugin_Stop;
+
+	SetEntPropFloat(iMediGun, Prop_Send, "m_flChargeLevel", 1.0);
 	return Plugin_Continue;
 
 }
@@ -112,8 +115,14 @@ public Action Timer_UberchargeEnd(Handle hTimer, int iSerial){
 
 	int client = GetClientFromSerial(iSerial);
 	if(client == 0) return Plugin_Stop;
+
+	int iMediGun = EntRefToEntIndex(g_iMediGun[client]);
+	if(iMediGun <= MaxClients){
+		g_bUberComplete[client] = true;
+		return Plugin_Stop;
+	}
 	
-	if(GetEntPropFloat(g_iMediGun[client], Prop_Send, "m_flChargeLevel") > 0.05)
+	if(GetEntPropFloat(iMediGun, Prop_Send, "m_flChargeLevel") > 0.05)
 		return Plugin_Continue;
 	
 	g_bUberComplete[client] = true;
@@ -129,7 +138,7 @@ void FullUbercharge_OnConditionRemoved(int client, TFCond cond){
 	if(view_as<int>(cond) != g_iMediGunCond[client])
 		return;
 
-	if(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == g_iMediGun[client])
+	if(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == EntRefToEntIndex(g_iMediGun[client]))
 		TF2_AddCondition(client, cond, 2.0);
 
 }
