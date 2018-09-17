@@ -29,7 +29,3 @@ You may not consider this list if you're not customizing perks in any way.
 	* RTD2\_GetPerkOfString, use RTD2\_FindPerk or RTD2\_FindPerks
 	* RTD2\_RegisterPerk, use RTD2\_MakePerk
 	* RTD2\_SetPerkByToken, RTD2\_SetPerkById and RTD2\_DefaultCorePerk, use RTD2\_SetPerk*
-
-# Required testing
-
-* Perk removing
