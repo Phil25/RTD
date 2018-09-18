@@ -87,3 +87,4 @@
 #include "rtd/perks/explosivearrows.sp"		//	54
 #include "rtd/perks/inclineproblem.sp"		//	55
 #include "rtd/perks/springshoes.sp"			//	56
+#include "rtd/perks/lag.sp"					//	57

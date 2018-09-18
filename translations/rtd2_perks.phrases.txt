@@ -463,4 +463,12 @@
 		"sv"	""
 		"de"	""
 	}
+
+	"RTD2_Desc_lag"
+	{
+		"en"	"Must be the busy hour."
+		"pl"	"Musi być godzina szczytu."
+		"sv"	""
+		"de"	""
+	}
 }
