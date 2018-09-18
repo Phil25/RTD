@@ -102,6 +102,7 @@ void ManagePerk(int client, Perk perk, bool enable, RTDRemoveReason reason=RTDRe
 		case 55:InclineProblem_Perk		(client, sSettings, enable);
 		case 56:SpringShoes_Perk		(client, sSettings, enable);
 		case 57:Lag_Perk				(client, sSettings, enable);
+		case 58:DrugBullets_Perk		(client, sSettings, enable);
 	}
 
 	if(!enable)
@@ -135,6 +136,7 @@ void Forward_OnMapStart(){
 	FireBreath_Start();
 	ExplosiveArrows_Start();
 	SpringShoes_Start();
+	DrugBullets_Start();
 }
 
 

@@ -471,4 +471,12 @@
 		"sv"	""
 		"de"	""
 	}
+
+	"RTD2_Desc_drugbullets"
+	{
+		"en"	"Drug the enemy from a distance."
+		"pl"	"Rozprzestrzeniaj narkotyki na odległość."
+		"sv"	""
+		"de"	""
+	}
 }
