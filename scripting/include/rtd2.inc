@@ -19,7 +19,6 @@ public __pl_rtd2_SetNTVOptional(){
 	MarkNativeAsOptional("RTD2_SetPerkAny");
 	MarkNativeAsOptional("RTD2_GetPerkString");
 	MarkNativeAsOptional("RTD2_SetPerkString");
-	MarkNativeAsOptional("RTD2_GetPerkHandle");
 	MarkNativeAsOptional("RTD2_SetPerkCall");
 	MarkNativeAsOptional("RTD2_Format");
 
@@ -119,9 +118,11 @@ enum RTDForceResult{
 
 
 /**
- * Gets perk property of type any.
+ * Gets perk property of type any or Handle.
  *
  * @note Prefer to use RTDPerk methodmap over this.
+ * @note Handle type properties are not null.
+ * @note Handle type properties are not cloned.
  *
  * @param perk		RTDPerk object
  * @param prop		RTDPerkProp property
@@ -135,6 +136,7 @@ native any RTD2_GetPerkAny(RTDPerk perk, RTDPerkProp prop);
  * Sets perk property of type any.
  *
  * @note Prefer to use RTDPerk methodmap over this.
+ * @note Unlike RTD2_GetPerkAny, cannot interact with Handle type properties.
  *
  * @param perk		RTDPerk object
  * @param prop		RTDPerkProp property
@@ -172,19 +174,6 @@ native void RTD2_GetPerkString(RTDPerk perk, RTDPerkProp prop, char[] sBuffer, i
  * @noreturn
  */
 native void RTD2_SetPerkString(RTDPerk perk, RTDPerkProp prop, const char[] sStr);
-
-
-/**
- * Gets perk property of type Handle. TODO: remove this, handles should not be cloned
- *
- * @note Prefer to use RTDPerk methodmap over this.
- *
- * @param perk		RTDPerk object
- * @param prop		RTDPerkProp property
- *
- * @return			Handle reference of specified property
- */
-native any RTD2_GetPerkHandle(RTDPerk perk, RTDPerkProp prop);
 
 
 /**
@@ -334,10 +323,10 @@ methodmap RTDPerk{
 	public void SetClasses(const char[] sClasses){
 		RTD2_SetPerkString(this, RTDPerk_Classes, sClasses);}
 
-	// Retrieves ArrayList of weapon classes the perk is applicable to.
+	// Retrieves ArrayList of weapon classes the perk is applicable to. This is never null and is not cloned.
 	property ArrayList WeaponClasses{
 		public get(){
-			return view_as<ArrayList>(RTD2_GetPerkHandle(this, RTDPerk_WeaponClasses));}
+			return view_as<ArrayList>(RTD2_GetPerkAny(this, RTDPerk_WeaponClasses));}
 	}
 
 	// Get settings string of the perk.
@@ -357,10 +346,10 @@ methodmap RTDPerk{
 	public void SetPref(const char[] sVal){
 		RTD2_SetPerkString(this, RTDPerk_Pref, sVal);}
 
-	// Retrieves ArrayList of perk's tags.
+	// Retrieves ArrayList of perk's tags. This is never null and is not cloned.
 	property ArrayList Tags{
 		public get(){
-			return view_as<ArrayList>(RTD2_GetPerkHandle(this, RTDPerk_Tags));}
+			return view_as<ArrayList>(RTD2_GetPerkAny(this, RTDPerk_Tags));}
 	}
 
 	// Retrieves or sets whether the perk is enabled.

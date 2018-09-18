@@ -26,7 +26,6 @@ void CreateNatives(){
 	CreateNative("RTD2_SetPerkAny",			Native_SetPerkAny);
 	CreateNative("RTD2_GetPerkString",		Native_GetPerkString);
 	CreateNative("RTD2_SetPerkString",		Native_SetPerkString);
-	CreateNative("RTD2_GetPerkHandle",		Native_GetPerkHandle);
 	CreateNative("RTD2_SetPerkCall",		Native_SetPerkCall);
 	CreateNative("RTD2_Format",				Native_Format);
 
@@ -70,6 +69,8 @@ public int Native_GetPerkAny(Handle hPlugin, int iParams){
 		case RTDPerk_Good: return perk.Good;
 		case RTDPerk_Time: return perk.Time;
 		case RTDPerk_Classes: return perk.Class;
+		case RTDPerk_WeaponClasses: return view_as<int>(perk.GetWeaponClass());
+		case RTDPerk_Tags: return view_as<int>(perk.GetTags());
 		case RTDPerk_Enabled: return perk.Enabled;
 		case RTDPerk_External: return perk.External;
 	}
@@ -128,22 +129,6 @@ public int Native_SetPerkString(Handle hPlugin, int iParams){
 	}
 
 	return 0;
-}
-
-public int Native_GetPerkHandle(Handle hPlugin, int iParams){
-	GET_PERK
-	RTDPerkProp prop = view_as<RTDPerkProp>(GetNativeCell(2));
-	Handle result = null;
-
-	switch(prop){
-		case RTDPerk_WeaponClasses: result = CloneHandle(perk.GetWeaponClass(), hPlugin);
-		case RTDPerk_Tags: result = CloneHandle(perk.GetTags(), hPlugin);
-	}
-
-	if(result == null)
-		ThrowNativeError(0, "Property %d is not of type Handle.", prop);
-
-	return view_as<int>(result);
 }
 
 public int Native_SetPerkCall(Handle hPlugin, int iParams){
