@@ -455,4 +455,12 @@
 		"sv"	"Du har glömt hur trappor fungerar."
 		"de"	"Du hast vergessen wie man Treppen steigt."
 	}
+
+	"RTD2_Desc_springshoes"
+	{
+		"en"	"Cannot stop jumping."
+		"pl"	"Nie możesz przestać skakać."
+		"sv"	""
+		"de"	""
+	}
 }
