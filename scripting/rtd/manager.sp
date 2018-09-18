@@ -100,6 +100,7 @@ void ManagePerk(int client, Perk perk, bool enable, RTDRemoveReason reason=RTDRe
 		case 53:PowerPlay_Perk			(client, sSettings, enable);
 		case 54:ExplosiveArrows_Perk	(client, sSettings, enable);
 		case 55:InclineProblem_Perk		(client, sSettings, enable);
+		case 56:SpringShoes_Perk		(client, sSettings, enable);
 	}
 
 	if(!enable)
@@ -132,6 +133,7 @@ void Forward_OnMapStart(){
 	FireTimebomb_Start();
 	FireBreath_Start();
 	ExplosiveArrows_Start();
+	SpringShoes_Start();
 }
 
 

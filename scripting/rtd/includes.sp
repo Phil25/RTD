@@ -86,3 +86,4 @@
 #include "rtd/perks/powerplay.sp"			//	53
 #include "rtd/perks/explosivearrows.sp"		//	54
 #include "rtd/perks/inclineproblem.sp"		//	55
+#include "rtd/perks/springshoes.sp"			//	56
