@@ -142,9 +142,9 @@ native any RTD2_GetPerkAny(RTDPerk perk, RTDPerkProp prop);
  * @param prop		RTDPerkProp property
  * @param value	Value to set the property to
  *
- * @noreturn
+ * @return			Same RTDPerk object
  */
-native void RTD2_SetPerkAny(RTDPerk perk, RTDPerkProp prop, any value);
+native RTDPerk RTD2_SetPerkAny(RTDPerk perk, RTDPerkProp prop, any value);
 
 
 /**
@@ -171,9 +171,9 @@ native void RTD2_GetPerkString(RTDPerk perk, RTDPerkProp prop, char[] sBuffer, i
  * @param prop		RTDPerkProp property
  * @param sStr		Value to set the property to
  *
- * @noreturn
+ * @return			Same RTDPerk object
  */
-native void RTD2_SetPerkString(RTDPerk perk, RTDPerkProp prop, const char[] sStr);
+native RTDPerk RTD2_SetPerkString(RTDPerk perk, RTDPerkProp prop, const char[] sStr);
 
 
 /**
@@ -194,9 +194,9 @@ typedef RTDCall = function void(int client, RTDPerk perk, bool bEnable);
  * @param perk		RTDPerk object
  * @param func		RTDCall function
  *
- * @noreturn
+ * @return			Same RTDPerk object
  */
-native void RTD2_SetPerkCall(RTDPerk perk, RTDCall func);
+native RTDPerk RTD2_SetPerkCall(RTDPerk perk, RTDCall func);
 
 
 /**
@@ -214,9 +214,9 @@ native void RTD2_SetPerkCall(RTDPerk perk, RTDCall func);
  * @param iBufferLen	Length of the buffer
  * @param sFormat		Formatting rules
  *
- * @noreturn
+ * @return				Same RTDPerk object
  */
-native void RTD2_Format(RTDPerk perk, char[] sBuffer, int iBufferLen, const char[] sFormat);
+native RTDPerk RTD2_Format(RTDPerk perk, char[] sBuffer, int iBufferLen, const char[] sFormat);
 
 
 /* Object-oriented wrapper for perk management */
@@ -261,9 +261,9 @@ methodmap RTDPerk{
 	//
 	// @param sVal		Value to set the name to
 	//
-	// @noreturn
-	public void SetName(const char[] sVal){
-		RTD2_SetPerkString(this, RTDPerk_Name, sVal);}
+	// @return			Same RTDPerk object
+	public RTDPerk SetName(const char[] sVal){
+		return RTD2_SetPerkString(this, RTDPerk_Name, sVal);}
 
 	// Retrieves or sets whether the perk is good.
 	property bool Good{
@@ -272,6 +272,16 @@ methodmap RTDPerk{
 		public set(bool bVal){
 			RTD2_SetPerkAny(this, RTDPerk_Good, bVal);}
 	}
+
+	// Sets whether the perk is good.
+	//
+	// @note Prefer the property if not chaining methods.
+	//
+	// @param bSet		Value to determine whether the perk is good
+	//
+	// @return			Same RTDPerk object
+	public RTDPerk SetGood(bool bSet){
+		return RTD2_SetPerkAny(this, RTDPerk_Good, bSet);}
 
 	// Get sound path of the perk.
 	//
@@ -286,9 +296,9 @@ methodmap RTDPerk{
 	//
 	// @param sVal		Value to set the sound path to
 	//
-	// @noreturn
-	public void SetSound(const char[] sVal){
-		RTD2_SetPerkString(this, RTDPerk_Sound, sVal);}
+	// @return			Same RTDPerk object
+	public RTDPerk SetSound(const char[] sVal){
+		return RTD2_SetPerkString(this, RTDPerk_Sound, sVal);}
 
 	// Get token of the perk.
 	//
@@ -307,6 +317,16 @@ methodmap RTDPerk{
 			RTD2_SetPerkAny(this, RTDPerk_Time, iVal);}
 	}
 
+	// Sets custom time of the perk.
+	//
+	// @note Prefer the property if not chaining methods.
+	//
+	// @param iVal		Value to set the time to
+	//
+	// @return			Same RTDPerk object
+	public RTDPerk SetTime(int iVal){
+		return RTD2_SetPerkAny(this, RTDPerk_Time, iVal);}
+
 	// Retrieves perk class flags.
 	property int Classes{
 		public get(){
@@ -319,15 +339,27 @@ methodmap RTDPerk{
 	//
 	// @param sClasses	String with digits representing classes.
 	//
-	// @noreturn
-	public void SetClasses(const char[] sClasses){
-		RTD2_SetPerkString(this, RTDPerk_Classes, sClasses);}
+	// @return			Same RTDPerk object
+	public RTDPerk SetClasses(const char[] sClasses){
+		return RTD2_SetPerkString(this, RTDPerk_Classes, sClasses);}
 
 	// Retrieves ArrayList of weapon classes the perk is applicable to. This is never null and is not cloned.
 	property ArrayList WeaponClasses{
 		public get(){
 			return view_as<ArrayList>(RTD2_GetPerkAny(this, RTDPerk_WeaponClasses));}
 	}
+
+	// Set weapon classes the perk is applicable to.
+	//
+	// @note Prefer the property if not chaining methods. Manually pushing classes is faster.
+	// @note This string is parsed the same way its config equivalent is.
+	// @note This will destroy and create the tags Handle.
+	//
+	// @param sWeapClasses	String representing weapon classes or parts of them.
+	//
+	// @return				Same RTDPerk object
+	public RTDPerk SetWeaponClasses(const char[] sWeapClasses){
+		return RTD2_SetPerkString(this, RTDPerk_WeaponClasses, sWeapClasses);}
 
 	// Get settings string of the perk.
 	//
@@ -342,15 +374,27 @@ methodmap RTDPerk{
 	//
 	// @param sVal		Value to set the settings to
 	//
-	// @noreturn
-	public void SetPref(const char[] sVal){
-		RTD2_SetPerkString(this, RTDPerk_Pref, sVal);}
+	// @return			Same RTDPerk object
+	public RTDPerk SetPref(const char[] sVal){
+		return RTD2_SetPerkString(this, RTDPerk_Pref, sVal);}
 
 	// Retrieves ArrayList of perk's tags. This is never null and is not cloned.
 	property ArrayList Tags{
 		public get(){
 			return view_as<ArrayList>(RTD2_GetPerkAny(this, RTDPerk_Tags));}
 	}
+
+	// Set search tags of the perk.
+	//
+	// @note Prefer the property if not chaining methods. Manually pushing tags is faster.
+	// @note This string is parsed the same way its config equivalent is.
+	// @note This will destroy and create the tags Handle.
+	//
+	// @param sTags		String representing tags, separated by | (vertical line)
+	//
+	// @return			Same RTDPerk object
+	public RTDPerk SetTags(const char[] sTags){
+		return RTD2_SetPerkString(this, RTDPerk_Tags, sTags);}
 
 	// Retrieves or sets whether the perk is enabled.
 	property bool Enabled{
@@ -360,6 +404,17 @@ methodmap RTDPerk{
 			RTD2_SetPerkAny(this, RTDPerk_Enabled, bVal);}
 	}
 
+	// Sets whether the perk is enabled
+	//
+	// @note Prefer the property if not chaining methods.
+	// @note Perk is automatically enabled on registration.
+	//
+	// @param bVal		Value to determine whether the perk is enabled
+	//
+	// @return			Same RTDPerk object
+	public RTDPerk SetEnabled(bool bVal){
+		return RTD2_SetPerkAny(this, RTDPerk_Enabled, bVal);}
+
 	// Retrieves or sets whether the perk should call an external function.
 	property bool External{
 		public get(){
@@ -368,15 +423,26 @@ methodmap RTDPerk{
 			RTD2_SetPerkAny(this, RTDPerk_External, bVal);}
 	}
 
+	// Sets whether the perk should call an external function.
+	//
+	// @note Prefer the property if not chaining methods.
+	// @note Perk is automatically set to call an external function on registration.
+	//
+	// @param bVal		Value to determine whether the perk should call an external function
+	//
+	// @return			Same RTDPerk object
+	public RTDPerk SetExternal(bool bVal){
+		return RTD2_SetPerkAny(this, RTDPerk_External, bVal);}
+
 	// Set external call of the perk.
 	//
 	// @note This also sets Enable and External to true.
 	//
 	// @param func		RTDCall function
 	//
-	// @noreturn
-	public void SetCall(RTDCall func){
-		RTD2_SetPerkCall(this, func);}
+	// @return			Same RTDPerk object
+	public RTDPerk SetCall(RTDCall func){
+		return RTD2_SetPerkCall(this, func);}
 
 	// Format specific perk properties into a buffer.
 	// Available specifiers: $Id$, $Name, $Good$,
@@ -390,9 +456,9 @@ methodmap RTDPerk{
 	// @param iBufferLen	Length of the buffer
 	// @param sFormat		Formatting rules
 	//
-	// @noreturn
-	public void Format(char[] sBuffer, int iBufferLen, const char[] sFormat){
-		RTD2_Format(this, sBuffer, iBufferLen, sFormat);}
+	// @return				Same RTDPerk object
+	public RTDPerk Format(char[] sBuffer, int iBufferLen, const char[] sFormat){
+		return RTD2_Format(this, sBuffer, iBufferLen, sFormat);}
 }
 
 // Object-oriented wrapper for ArrayList of RTDPerk's

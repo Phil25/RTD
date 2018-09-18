@@ -58,7 +58,8 @@ void CreateNatives(){
 }
 
 #define GET_PERK \
-	Perk perk = g_hPerkContainer.GetFromId(GetNativeCell(1)); \
+	int iId = GetNativeCell(1); \
+	Perk perk = g_hPerkContainer.GetFromId(iId); \
 	if(!perk) ThrowNativeError(0, "Invalid perk: %d. Is RTDPerk.Valid true?", GetNativeCell(1));
 
 public int Native_GetPerkAny(Handle hPlugin, int iParams){
@@ -92,7 +93,7 @@ public int Native_SetPerkAny(Handle hPlugin, int iParams){
 		default: ThrowNativeError(0, "Property %d is not of type cell.", prop);
 	}
 
-	return 0;
+	return iId;
 }
 
 public int Native_GetPerkString(Handle hPlugin, int iParams){
@@ -124,17 +125,19 @@ public int Native_SetPerkString(Handle hPlugin, int iParams){
 		case RTDPerk_Sound: perk.SetSound(sVal);
 		case RTDPerk_Token: ThrowNativeError(0, "Tokens cannot be changed.");
 		case RTDPerk_Classes: perk.SetClass(sVal);
+		case RTDPerk_WeaponClasses: perk.SetWeaponClass(sVal);
 		case RTDPerk_Pref: perk.SetPref(sVal);
+		case RTDPerk_Tags: perk.SetTags(sVal);
 		default: ThrowNativeError(0, "Property %d is not of type char[].", prop);
 	}
 
-	return 0;
+	return iId;
 }
 
 public int Native_SetPerkCall(Handle hPlugin, int iParams){
 	GET_PERK
 	perk.SetCall(GetNativeCell(2), hPlugin);
-	return 0;
+	return iId;
 }
 
 // 1 perk, 2 buffer, 3 buffer len, 4 format
@@ -152,7 +155,7 @@ public int Native_Format(Handle hPlugin, int iParams){
 
 	perk.Format(sBuffer, iLen, sFormat);
 	SetNativeString(2, sBuffer, iLen);
-	return 0;
+	return iId;
 }
 
 #undef GET_PERK
