@@ -320,6 +320,10 @@ public void OnConfigsExecuted(){
 }
 
 public void OnPluginEnd(){
+	ReloadPluginState();
+}
+
+void ReloadPluginState(){
 	for(int i = 1; i <= MaxClients; i++){
 		Forward_OnRemovePerkPre(i);
 
@@ -540,6 +544,7 @@ public Action Command_PerkSearchup(int client, int args){
 }
 
 public Action Command_Reload(int client, int args){
+	ReloadPluginState();
 	ParseEffects();
 	ParseCustomEffects();
 	Forward_OnRegOpen();
