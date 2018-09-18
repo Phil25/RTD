@@ -355,7 +355,7 @@ methodmap RTDPerk{
 	// @note This string is parsed the same way its config equivalent is.
 	// @note This will destroy and create the tags Handle.
 	//
-	// @param sWeapClasses	String representing weapon classes or parts of them.
+	// @param sWeapClasses	String representing weapon classes or parts of them, separated by comma.
 	//
 	// @return				Same RTDPerk object
 	public RTDPerk SetWeaponClasses(const char[] sWeapClasses){
@@ -390,7 +390,7 @@ methodmap RTDPerk{
 	// @note This string is parsed the same way its config equivalent is.
 	// @note This will destroy and create the tags Handle.
 	//
-	// @param sTags		String representing tags, separated by | (vertical line)
+	// @param sTags		String representing tags, separated by comma
 	//
 	// @return			Same RTDPerk object
 	public RTDPerk SetTags(const char[] sTags){

@@ -30,12 +30,12 @@ int StringToClass(const char[] sClasses){
 }
 
 ArrayList StringToWeaponClass(const char[] sWeapClass){
+	ArrayList list = new ArrayList(32);
 	if(FindCharInString(sWeapClass, '0') != -1)
-		return null;
+		return list;
 
 	char sWeapClassEsc[127];
 	EscapeString(sWeapClass, ' ', '\0', sWeapClassEsc, 127);
-	ArrayList list = new ArrayList(32);
 
 	int iSize = CountCharInString(sWeapClassEsc, ',')+1;
 	char[][] sPieces = new char[iSize][32];
@@ -49,10 +49,13 @@ ArrayList StringToWeaponClass(const char[] sWeapClass){
 ArrayList StringToTags(const char[] sTags){
 	ArrayList list = new ArrayList(32);
 
-	int iSize = CountCharInString(sTags, '|')+1;
+	char sTagsEsc[127];
+	EscapeString(sTags, ' ', '\0', sTagsEsc, 127);
+
+	int iSize = CountCharInString(sTagsEsc, ',')+1;
 	char[][] sPieces = new char[iSize][24];
 
-	ExplodeString(sTags, "|", sPieces, iSize, 24);
+	ExplodeString(sTagsEsc, ",", sPieces, iSize, 24);
 	for(int i = 0; i < iSize; i++)
 		list.PushString(sPieces[i]);
 	return list;
