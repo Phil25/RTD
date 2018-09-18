@@ -542,6 +542,7 @@ public Action Command_PerkSearchup(int client, int args){
 public Action Command_Reload(int client, int args){
 	ParseEffects();
 	ParseCustomEffects();
+	Forward_OnRegOpen();
 	return Plugin_Handled;
 }
 
