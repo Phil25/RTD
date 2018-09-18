@@ -12,7 +12,11 @@ if [ ! -f "./compiled/$smxfile" ]; then
 fi
 
 echo "Moving \"$smxfile\" to the testing server...";
-sshpass -f "./compiled/passfile" scp -r "./compiled/$smxfile" "`cat ./compiled/destination`:/home/steam/test/tf/addons/sourcemod/plugins/"
+
+destroot=`cat ./compiled/destination`;
+sshpass -f "./compiled/passfile" scp -r "./compiled/$smxfile" "$destroot:/home/steam/test/tf/addons/sourcemod/plugins/"
+sshpass -f "./compiled/passfile" scp -r "../configs/rtd2_perks.default.cfg" "$destroot:/home/steam/test/tf/addons/sourcemod/configs/"
+sshpass -f "./compiled/passfile" scp -r "../translations/rtd2_perks.phrases.txt" "$destroot:/home/steam/test/tf/addons/sourcemod/translations/"
 
 echo "Removing local \"$smxfile\"...";
 rm "./compiled/$smxfile";

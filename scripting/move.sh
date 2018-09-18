@@ -19,7 +19,10 @@ shithappened=0;
 destination=`cat ./compiled/destination`;
 for server in $servers; do
 	echo "Moving \"$smxfile\" to $server...";
+
 	sshpass -f "./compiled/passfile" scp -r "./compiled/$smxfile" "$destination:/home/steam/$server/tf/addons/sourcemod/plugins/";
+	sshpass -f "./compiled/passfile" scp -r "../configs/rtd2_perks.default.cfg" "$destination:/home/steam/$server/tf/addons/sourcemod/configs/";
+	sshpass -f "./compiled/passfile" scp -r "../translations/rtd2_perks.phrases.txt" "$destination:/home/steam/$server/tf/addons/sourcemod/translations/";
 
 	if [ $? -eq 0 ]; then
 		shithappened=1;
