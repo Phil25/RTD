@@ -41,6 +41,7 @@ A quick note: This tutorial may not be kept up to date; for an updated one, go t
 */
 
 #define SPRING_JUMP "misc/halloween/duck_pickup_neg_01.wav"
+#define ATTRIB_JUMP_BLOCK 819
 
 bool g_bIsSpringJumping[MAXPLAYERS+1] = {false, ...};
 
@@ -50,7 +51,10 @@ void SpringShoes_Start(){
 
 public void SpringShoes_Perk(int client, const char[] sPref, bool apply){
 	g_bIsSpringJumping[client] = apply;
-	if(apply) CreateTimer(0.25, Timer_ForceSpringJump, GetClientUserId(client), TIMER_REPEAT);
+	if(apply){
+		CreateTimer(0.25, Timer_ForceSpringJump, GetClientUserId(client), TIMER_REPEAT);
+		TF2Attrib_SetByDefIndex(client, ATTRIB_JUMP_BLOCK, 1.0);
+	}else TF2Attrib_RemoveByDefIndex(client, ATTRIB_JUMP_BLOCK);
 }
 
 public Action Timer_ForceSpringJump(Handle hTimer, int iUserId){
