@@ -64,11 +64,7 @@ public void FastHands_OnEntityCreated(int iEnt, const char[] sClassname){
 public void FastHands_OnDroppedWeaponSpawn(int iEnt){
 
 	int client = AccountIDToClient(GetEntProp(iEnt, Prop_Send, "m_iAccountID"));
-
-	if(client == -1)
-		return;
-	
-	if(g_bHasFastHands2[client])
+	if(client && g_bHasFastHands2[client])
 		AcceptEntityInput(iEnt, "Kill");
 
 } 

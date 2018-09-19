@@ -1703,7 +1703,7 @@ int AccountIDToClient(int iAccountID){
 		if(IsClientInGame(i))
 			if(GetSteamAccountID(i) == iAccountID)
 				return i;
-	return -1;
+	return 0;
 }
 
 void KillTimerSafe(Handle &hTimer){
