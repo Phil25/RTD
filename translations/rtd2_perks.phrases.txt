@@ -479,4 +479,12 @@
 		"sv"	""
 		"de"	""
 	}
+
+	"RTD2_Desc_longmelee"
+	{
+		"en"	"Extends arms."
+		"pl"	"Wydłuża ramiona."
+		"sv"	""
+		"de"	""
+	}
 }

@@ -89,3 +89,4 @@
 #include "rtd/perks/springshoes.sp"			//	56
 #include "rtd/perks/lag.sp"					//	57
 #include "rtd/perks/drugbullets.sp"			//	58
+#include "rtd/perks/longmelee.sp"			//	59

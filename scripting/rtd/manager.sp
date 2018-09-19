@@ -103,6 +103,7 @@ void ManagePerk(int client, Perk perk, bool enable, RTDRemoveReason reason=RTDRe
 		case 56:SpringShoes_Perk		(client, sSettings, enable);
 		case 57:Lag_Perk				(client, sSettings, enable);
 		case 58:DrugBullets_Perk		(client, sSettings, enable);
+		case 59:LongMelee_Perk			(client, sSettings, enable);
 	}
 
 	if(!enable)
@@ -137,6 +138,7 @@ void Forward_OnMapStart(){
 	ExplosiveArrows_Start();
 	SpringShoes_Start();
 	DrugBullets_Start();
+	LongMelee_Start();
 }
 
 
@@ -173,6 +175,7 @@ void Forward_OnEntityCreated(int iEntity, const char[] sClassname){
 	HomingProjectiles_OnEntityCreated(iEntity, sClassname);
 	FastHands_OnEntityCreated(iEntity, sClassname);
 	ExplosiveArrows_OnEntityCreated(iEntity, sClassname);
+	LongMelee_OnEntityCreated(iEntity, sClassname);
 }
 
 
