@@ -20,7 +20,6 @@
 
 /****** I N C L U D E S *****/
 
-#define RTD2_NO_PERK_METHODMAP
 #include <rtd2>
 #include <sdktools>
 #include <sdkhooks>
