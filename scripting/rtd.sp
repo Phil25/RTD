@@ -1717,3 +1717,15 @@ void KillTimerSafe(Handle &hTimer){
 bool IsValidClient(int client){
 	return (1 <= client <= MaxClients) && IsClientInGame(client);
 }
+
+void KillIn10(int iEnt){
+	SetVariantString("OnUser1 !self:Kill::10.0:1");
+	AcceptEntityInput(iEnt, "AddOutput");
+	AcceptEntityInput(iEnt, "FireUser1");
+}
+
+void KillIn1(int iEnt){
+	SetVariantString("OnUser1 !self:Kill::1.0:1");
+	AcceptEntityInput(iEnt, "AddOutput");
+	AcceptEntityInput(iEnt, "FireUser1");
+}
