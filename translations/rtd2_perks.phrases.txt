@@ -487,4 +487,12 @@
 		"sv"	""
 		"de"	""
 	}
+
+	"RTD2_Desc_hatthrow"
+	{
+		"en"	"Finally, a proper use for those."
+		"pl"	"Nareszcie, dobry z nich pożytek."
+		"sv"	""
+		"de"	""
+	}
 }

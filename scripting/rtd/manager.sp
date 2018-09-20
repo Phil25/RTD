@@ -104,6 +104,7 @@ void ManagePerk(int client, Perk perk, bool enable, RTDRemoveReason reason=RTDRe
 		case 57:Lag_Perk				(client, sSettings, enable);
 		case 58:DrugBullets_Perk		(client, sSettings, enable);
 		case 59:LongMelee_Perk			(client, sSettings, enable);
+		case 60:HatThrow_Perk			(client, sSettings, enable);
 	}
 
 	if(!enable)
@@ -139,6 +140,7 @@ void Forward_OnMapStart(){
 	SpringShoes_Start();
 	DrugBullets_Start();
 	LongMelee_Start();
+	HatThrow_Start();
 }
 
 
@@ -163,6 +165,7 @@ void Forward_Voice(int client){
 	SpawnDispenser_Voice(client);
 	DeadlyVoice_Voice(client);
 	FireBreath_Voice(client);
+	HatThrow_Voice(client);
 }
 
 

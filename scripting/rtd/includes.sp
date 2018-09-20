@@ -90,3 +90,4 @@
 #include "rtd/perks/lag.sp"					//	57
 #include "rtd/perks/drugbullets.sp"			//	58
 #include "rtd/perks/longmelee.sp"			//	59
+#include "rtd/perks/hatthrow.sp"			//	60
