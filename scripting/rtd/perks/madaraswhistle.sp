@@ -79,6 +79,7 @@ public Action Timer_MadarasWhistle_Whistle(Handle hTimer, DataPack hPack){
 	fPos[1] = hPack.ReadFloat();
 	fPos[2] = hPack.ReadFloat();
 
+	delete hPack;
 	MadarasWhistle_Summon(client, fPos);
 	return Plugin_Stop;
 }
