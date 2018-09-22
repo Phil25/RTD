@@ -16,33 +16,36 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <sdktools>
+#include <sdkhooks>
 #include <rtd2>
 
+bool g_bStress = false;
+
 public void OnPluginStart(){
-	if(RTD2_IsRegOpen())
-		RegisterPerk();
+	RegAdminCmd("sm_rtdstress", Command_Stress, 0);
+	for(int i = 1; i <= MaxClients; ++i)
+		if(IsClientInGame(i))
+			OnClientPutInServer(i);
 }
 
-public void OnPluginEnd(){
-	RTD2_DisableModulePerks();
+public Action Command_Stress(int client, int args){
+	g_bStress = !g_bStress;
+	PrintToChatAll("Stress test %d", g_bStress);
+	return Plugin_Handled;
 }
 
-public void RTD2_OnRegOpen(){
-	RegisterPerk();
+public void OnClientPutInServer(int client){
+	if(!IsFakeClient(client)) return;
+	CreateTimer(GetRandomFloat(1.0, 2.0), Timer_Roll, GetClientUserId(client));
 }
 
-void RegisterPerk(){
-	//RTD2_ObtainPerk("godmode").SetCall(GodmodeOverride);
-	/*RTDPerk perk = RTD2_ObtainPerk("token");
-	perk.Good = true;
-	perk.SetClasses("0");
-	perk.SetCall(TestCall);*/
-}
+public Action Timer_Roll(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(!client || !IsFakeClient(client))
+		return Plugin_Stop;
 
-public void GodmodeOverride(int client, RTDPerk perk, bool bEnable){
-	PrintToChat(client, "%s godmode", bEnable ? "Applying" : "Disabling");
-}
-
-public void TestCall(int client, RTDPerk perk, bool bEnable){
-	PrintToChat(client, "%s test", bEnable ? "Applying" : "Disabling");
+	if(g_bStress) FakeClientCommand(client, "sm_rtd");
+	CreateTimer(GetRandomFloat(1.0, 2.0), Timer_Roll, iUserId);
+	return Plugin_Stop;
 }
