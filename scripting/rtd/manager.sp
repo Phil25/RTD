@@ -107,6 +107,7 @@ void ManagePerk(int client, Perk perk, bool enable, RTDRemoveReason reason=RTDRe
 		case 60:HatThrow_Perk			(client, sSettings, enable);
 		case 61:MadarasWhistle_Perk		(client, sSettings, enable);
 		case 62:Sickness_Perk			(client, sSettings, enable);
+		case 63:{} // Wasted Roll
 	}
 
 	if(!enable)

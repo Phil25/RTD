@@ -93,3 +93,4 @@
 #include "rtd/perks/hatthrow.sp"			//	60
 #include "rtd/perks/madaraswhistle.sp"		//	61
 #include "rtd/perks/sickness.sp"			//	62
+//include Wasted Roll						//	63
