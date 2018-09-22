@@ -4,7 +4,7 @@
 
 bool g_bHasHatThrow[MAXPLAYERS+1] = {false, ...};
 float g_fHatThrowLastAttack[MAXPLAYERS+1] = {0.0, ...};
-float g_fHatThrowDamage = 100.0;
+float g_fHatThrowDamage = 150.0;
 float g_fHatThrowRate = 2.0;
 
 char g_sSoundSwoosh[][] = {
@@ -100,9 +100,9 @@ void HatThrow_Launch(int client, int iHat){
 
 	float fVel[3], fBuf[3];
 	GetAngleVectors(fAng, fBuf, NULL_VECTOR, NULL_VECTOR);
-	fVel[0] = fBuf[0]*800.0;
-	fVel[1] = fBuf[1]*800.0;
-	fVel[2] = fBuf[2]*800.0;
+	fVel[0] = fBuf[0]*1100.0; // rocket speed
+	fVel[1] = fBuf[1]*1100.0;
+	fVel[2] = fBuf[2]*1100.0;
 
 	SetEntPropEnt(iCarrier, Prop_Send, "m_hOwnerEntity", client);
 	DispatchKeyValue(iCarrier, "model", MODEL_HAT);
