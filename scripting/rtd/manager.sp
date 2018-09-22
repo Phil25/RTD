@@ -106,6 +106,7 @@ void ManagePerk(int client, Perk perk, bool enable, RTDRemoveReason reason=RTDRe
 		case 59:LongMelee_Perk			(client, sSettings, enable);
 		case 60:HatThrow_Perk			(client, sSettings, enable);
 		case 61:MadarasWhistle_Perk		(client, sSettings, enable);
+		case 62:Sickness_Perk			(client, sSettings, enable);
 	}
 
 	if(!enable)
@@ -143,6 +144,7 @@ void Forward_OnMapStart(){
 	LongMelee_Start();
 	HatThrow_Start();
 	MadarasWhistle_Start();
+	Sickness_Start();
 }
 
 

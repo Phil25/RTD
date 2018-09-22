@@ -503,4 +503,12 @@
 		"sv"	""
 		"de"	""
 	}
+
+	"RTD2_Desc_sickness"
+	{
+		"en"	"Calling for medic won't help you."
+		"pl"	"Medyk ci nie pomoże."
+		"sv"	""
+		"de"	""
+	}
 }
