@@ -91,3 +91,4 @@
 #include "rtd/perks/drugbullets.sp"			//	58
 #include "rtd/perks/longmelee.sp"			//	59
 #include "rtd/perks/hatthrow.sp"			//	60
+#include "rtd/perks/madaraswhistle.sp"		//	61

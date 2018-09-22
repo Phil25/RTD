@@ -495,4 +495,12 @@
 		"sv"	""
 		"de"	""
 	}
+
+	"RTD2_Desc_madaraswhistle"
+	{
+		"en"	"Inhuman kinship with an alligator."
+		"pl"	"Przyjaźń z aligatorem."
+		"sv"	""
+		"de"	""
+	}
 }
