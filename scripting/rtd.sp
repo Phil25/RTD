@@ -1601,10 +1601,12 @@ bool CanBuildAtPos(float fPos[3], bool bSentry){
 	return !TR_DidHit();
 }
 
-bool CanPlayerBeHurt(int client, int by=0){
+bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
 	if(IsValidClient(by))
-		if(GetClientTeam(by) == GetClientTeam(client))
-			return false;
+		if(GetClientTeam(by) == GetClientTeam(client)){
+			if(client != by || !bCanHurtSelf)
+				return false;
+		}
 
 	if(IsPlayerFriendly(client))
 		return false;
@@ -1616,6 +1618,20 @@ bool CanPlayerBeHurt(int client, int by=0){
 		return false;
 
 	return true;
+}
+
+void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRadius, float fDamage, int iFlags=0, bool bCanHurtSelf=false){
+	fRadius *= fRadius;
+	float fOtherPos[3];
+	for(int i = 1; i <= MaxClients; ++i){
+		if(!IsClientInGame(i))
+			continue;
+
+		GetClientAbsOrigin(i, fOtherPos);
+		if(GetVectorDistance(fOrigin, fOtherPos, true) <= fRadius)
+			if(CanPlayerBeHurt(i, iAttacker, bCanHurtSelf))
+				SDKHooks_TakeDamage(i, iInflictor, iAttacker, fDamage, iFlags);
+	}
 }
 
 bool IsPlayerFriendly(int client){
