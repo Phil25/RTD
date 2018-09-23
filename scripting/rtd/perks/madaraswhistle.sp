@@ -85,7 +85,7 @@ void MadarasWhistle_Whistle(int client){
 
 	int iParticle = CreateParticle(client, "waterfall_bottomsplash", false, "", view_as<float>({0.0, 0.0, 0.0}));
 	EmitSoundToAll(g_sGatorRumble[GetRandomInt(0, 4)], iParticle);
-	KillIn1(iParticle); // TODO: adjust for delay
+	KillEntIn(iParticle, 1.0); // TODO: read delay from config
 }
 
 public Action Timer_MadarasWhistle_Whistle(Handle hTimer, DataPack hPack){
@@ -108,7 +108,7 @@ void MadarasWhistle_Summon(int client, float fPos[3]){
 	if(iGator == 0) return;
 
 	DamageRadius(fPos, iGator, client, g_fMadarasWhistleRange, g_fMadarasWhistleDamage, DMG_BLAST|DMG_ALWAYSGIB, true);
-	KillIn1(iGator);
+	KILL_ENT_IN(iGator,1.0)
 }
 
 int MadarasWhistle_SpawnGator(float fPos[3]){

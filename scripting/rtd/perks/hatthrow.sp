@@ -69,11 +69,11 @@ void HatThrow_Voice(int client){
 void HatThrow_Spawn(int client){
 	int iHat = CreateEntityByName("prop_dynamic");
 	if(iHat == -1) return;
-	KillIn10(iHat);
+	KILL_ENT_IN(iHat,10.0)
 
 	int iRot = CreateEntityByName("func_door_rotating");
 	if(iRot == -1) return;
-	KillIn10(iRot);
+	KILL_ENT_IN(iRot,10.0)
 
 	float fPos[3];
 	GetClientEyePosition(client, fPos);
@@ -114,7 +114,7 @@ void HatThrow_Launch(int client, int iHat){
 
 	int iCarrier = CreateEntityByName("prop_physics_override");
 	if(iCarrier == -1) return;
-	KillIn10(iCarrier);
+	KILL_ENT_IN(iCarrier,10.0)
 
 	float fVel[3], fBuf[3];
 	GetAngleVectors(fAng, fBuf, NULL_VECTOR, NULL_VECTOR);
@@ -171,7 +171,7 @@ void HatThrow_SpawnCorpse(float fPos[3]){
 
 	TeleportEntity(iHat, NULL_VECTOR, fAng, NULL_VECTOR);
 	SetEntityRenderFx(iHat, RENDERFX_FADE_SLOW);
-	KillIn1(iHat);
+	KILL_ENT_IN(iHat,1.0)
 }
 
 void HatThrow_ProcessString(const char[] sSettings){

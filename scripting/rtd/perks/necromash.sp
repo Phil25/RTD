@@ -139,30 +139,21 @@ void NecroMash_SmashClient(int client){
 		EmitSoundToAll("misc/halloween/strongman_fast_swing_01.wav", _, _, _, _, _, _, _, flPpos);
 	}
 	
-	SetVariantString("OnUser1 !self:SetAnimation:smash:0:1");
-	AcceptEntityInput(gears, "AddOutput");
-	AcceptEntityInput(gears, "FireUser1");
-	
-	SetVariantString("OnUser1 !self:SetAnimation:smash:0:1");
-	AcceptEntityInput(hammer, "AddOutput");
-	AcceptEntityInput(hammer, "FireUser1");
-	
-	SetVariantString("OnUser1 !self:SetAnimation:hit:1.3:1");
-	AcceptEntityInput(button, "AddOutput");
-	AcceptEntityInput(button, "FireUser1");
-	
-	SetVariantString("OnUser2 !self:Kill::5.0:1");
+	SetVariantString("OnUser2 !self:SetAnimation:smash:0:1");
 	AcceptEntityInput(gears, "AddOutput");
 	AcceptEntityInput(gears, "FireUser2");
 	
-	SetVariantString("OnUser2 !self:Kill::5.0:1");
+	SetVariantString("OnUser2 !self:SetAnimation:smash:0:1");
 	AcceptEntityInput(hammer, "AddOutput");
 	AcceptEntityInput(hammer, "FireUser2");
 	
-	SetVariantString("OnUser2 !self:Kill::5.0:1");
+	SetVariantString("OnUser2 !self:SetAnimation:hit:1.3:1");
 	AcceptEntityInput(button, "AddOutput");
 	AcceptEntityInput(button, "FireUser2");
-
+	
+	KILL_ENT_IN(gears,5.0)
+	KILL_ENT_IN(hammer,5.0)
+	KILL_ENT_IN(button,5.0)
 }
 
 public Action Timer_NecroMash_Hit(Handle timer, any pack){
@@ -187,10 +178,7 @@ public Action Timer_NecroMash_Hit(Handle timer, any pack){
 		DispatchSpawn(shaker);
 		AcceptEntityInput(shaker, "StartShake");
 		
-		SetVariantString("OnUser1 !self:Kill::1.0:1");
-		AcceptEntityInput(shaker, "AddOutput");
-		AcceptEntityInput(shaker, "FireUser1");
-	
+		KILL_ENT_IN(shaker,1.0)
 	}
 	
 	EmitSoundToAll("ambient/explosions/explode_1.wav", _, _, _, _, _, _, _, pos);

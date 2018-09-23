@@ -68,9 +68,7 @@ public Action Timer_Sickness_Tick2(Handle hTimer, int iUserId){
 
 void Sickness_Cough(int client){
 	int iParticle = CreateParticle(client, SICKNESS_PARTICLE);
-	SetVariantString("OnUser1 !self:Kill::0.1:1");
-	AcceptEntityInput(iParticle, "AddOutput");
-	AcceptEntityInput(iParticle, "FireUser1");
+	KILL_ENT_IN(iParticle,0.1)
 
 	float fDamage = GetRandomFloat(g_fSicknessDamageMin, g_fSicknessDamageMax);
 	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_PREVENT_PHYSICS_FORCE);

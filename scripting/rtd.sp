@@ -17,6 +17,13 @@
 */
 #pragma semicolon 1
 
+/****** M A C R O S *****/
+
+#define KILL_ENT_IN(%1,%2) \
+	SetVariantString("OnUser1 !self:Kill::" ... #%2 ... ":1"); \
+	AcceptEntityInput(%1, "AddOutput"); \
+	AcceptEntityInput(%1, "FireUser1");
+
 
 /****** I N C L U D E S *****/
 
@@ -1734,14 +1741,10 @@ bool IsValidClient(int client){
 	return (1 <= client <= MaxClients) && IsClientInGame(client);
 }
 
-void KillIn10(int iEnt){
-	SetVariantString("OnUser1 !self:Kill::10.0:1");
-	AcceptEntityInput(iEnt, "AddOutput");
-	AcceptEntityInput(iEnt, "FireUser1");
-}
-
-void KillIn1(int iEnt){
-	SetVariantString("OnUser1 !self:Kill::1.0:1");
+void KillEntIn(int iEnt, float fTime){
+	char sStr[32];
+	Format(sStr, 32, "OnUser1 !self:Kill::%f:1", fTime);
+	SetVariantString(sStr);
 	AcceptEntityInput(iEnt, "AddOutput");
 	AcceptEntityInput(iEnt, "FireUser1");
 }
