@@ -118,7 +118,7 @@ void HatThrow_Launch(int client, int iHat){
 
 	float fVel[3], fBuf[3];
 	GetAngleVectors(fAng, fBuf, NULL_VECTOR, NULL_VECTOR);
-	fVel[0] = fBuf[0]*1100.0; // rocket speed
+	fVel[0] = fBuf[0]*1100.0; // rocket speed TODO: read from config
 	fVel[1] = fBuf[1]*1100.0;
 	fVel[2] = fBuf[2]*1100.0;
 

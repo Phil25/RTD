@@ -77,7 +77,7 @@ void MadarasWhistle_Whistle(int client){
 	EmitSoundToAll(SOUND_WHISTLE, client, _, _, _, _, 180);
 	DataPack hPack = new DataPack();
 
-	CreateTimer(1.0, Timer_MadarasWhistle_Whistle, hPack);
+	CreateTimer(1.0, Timer_MadarasWhistle_Whistle, hPack); // TODO: read delay from config
 	hPack.WriteCell(GetClientUserId(client));
 	hPack.WriteFloat(fPos[0]);
 	hPack.WriteFloat(fPos[1]);
@@ -85,7 +85,7 @@ void MadarasWhistle_Whistle(int client){
 
 	int iParticle = CreateParticle(client, "waterfall_bottomsplash", false, "", view_as<float>({0.0, 0.0, 0.0}));
 	EmitSoundToAll(g_sGatorRumble[GetRandomInt(0, 4)], iParticle);
-	KillIn1(iParticle);
+	KillIn1(iParticle); // TODO: adjust for delay
 }
 
 public Action Timer_MadarasWhistle_Whistle(Handle hTimer, DataPack hPack){
