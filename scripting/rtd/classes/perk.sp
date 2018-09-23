@@ -124,8 +124,37 @@ methodmap Perk < StringMap{
 		this.SetValue("m_WeaponClass", hWeapClass);
 	}
 
-	GET_STRING(Pref) // preference string
-	SET_STRING(Pref)
+	//GET_STRING(Pref) // preference string
+	//SET_STRING(Pref) // TODO: clean me up
+	public bool GetPrefString(const char[] sKey, char[] sBuffer, int iLen){
+		return this.GetString(sKey, sBuffer, iLen);
+	}
+
+	public int GetPrefCell(const char[] sKey, int iDefault=0){
+		int iVal;
+		if(this.GetValue(sKey, iVal))
+			return iVal;
+		else return iDefault;
+	}
+
+	public float GetPrefFloat(char[] sKey, float fDefault=0.0){
+		float fVal;
+		if(this.GetValue(sKey, fVal))
+			return fVal;
+		else return fDefault;
+	}
+
+	public bool SetPref(const char[] sKey, const char[] sVal){
+		if(strlen(sKey) > 1 && sKey[0] == 'm' && sKey[1] == '_')
+			return false; // prevent overriding member attributes
+
+		float fVal;
+		if(StringToFloatEx(sVal, fVal) == strlen(sVal))
+			this.SetValue(sKey, fVal);
+		else this.SetString(sKey, sVal);
+
+		return true;
+	}
 
 	GET_VALUE(ArrayList,Tags) // ArrayList storing strings of perk tags
 	public void SetTags(const char[] s){
@@ -268,7 +297,7 @@ methodmap Perk < StringMap{
 		return i;
 	}
 
-	public void Format(char[] sBuffer, int iLen, const char[] sFormat){
+	public void Format(char[] sBuffer, int iLen, const char[] sFormat){ // TODO: remove $Pref$
 		int iFormatLen = strlen(sFormat);
 		char sProp[32] = "m_";
 		int i = 0, j = 0;

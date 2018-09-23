@@ -122,6 +122,20 @@ methodmap PerkContainer < StringMap{
 		hKv.GoBack(); \
 		perk.%2 = hKv.GetNum(%1);}
 
+	public void ParseSetting(KeyValues& hKv, Perk& perk){
+		char sKey[16], sVal[32];
+		hKv.GetSectionName(sKey, sizeof(sKey));
+		hKv.GetString(NULL_STRING, sVal, sizeof(sVal), "0");
+		perk.SetPref(sKey, sVal);
+	}
+
+	public void ParseSettings(KeyValues& hKv, Perk& perk){
+		if(hKv.GotoFirstSubKey(false)){
+			do this.ParseSetting(hKv, perk);
+			while(hKv.GotoNextKey(false));
+		}
+		hKv.GoBack();
+	}
 
 	public bool ParseAndAdd(KeyValues hKv, int iStats[2]){
 		char sBuffer[127];
@@ -134,7 +148,13 @@ methodmap PerkContainer < StringMap{
 		perk.Time = hKv.GetNum("time");
 		READ_STRING("class",Class)
 		READ_STRING("weapons",WeaponClass)
-		READ_STRING("settings",Pref)
+		//READ_STRING("settings",Pref)
+
+		if(hKv.JumpToKey("settings")){
+			this.ParseSettings(hKv, perk);
+			hKv.GoBack();
+		}
+
 		READ_STRING("tags",Tags)
 		iStats[perk.Good]++;
 
@@ -156,7 +176,7 @@ methodmap PerkContainer < StringMap{
 		READ_IF_EXISTS_NUM("time",Time)
 		READ_IF_EXISTS_STRING("class",Class)
 		READ_IF_EXISTS_STRING("weapons",WeaponClass)
-		READ_IF_EXISTS_STRING("settings",Pref)
+		//READ_IF_EXISTS_STRING("settings",Pref) // TODO: parse custom settings
 		READ_IF_EXISTS_STRING("tags",Tags)
 
 		return true;
