@@ -17,21 +17,12 @@
 */
 
 
-float g_fNoGravBaseGravity[MAXPLAYERS+1] = {0.0, ...};
-
-public void NoGravity_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		NoGravity_ApplyPerk(client);
-	
-	else
-		SetEntityGravity(client, g_fNoGravBaseGravity[client]);
-
+void NoGravity_Perk(int client, bool apply){
+	if(apply) NoGravity_ApplyPerk(client);
+	else SetEntityGravity(client, GetFloatCache(client));
 }
 
 void NoGravity_ApplyPerk(int client){
-
-	g_fBaseGravity[client] = GetEntityGravity(client);
-	SetEntityGravity(client, 0.01);
-
+	SetFloatCache(client, GetEntityGravity(client));
+	SetEntityGravity(client, 0.0001);
 }

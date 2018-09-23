@@ -17,21 +17,12 @@
 */
 
 
-float g_fBaseGravity[MAXPLAYERS+1] = {0.0, ...};
-
-void LowGravity_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		LowGravity_ApplyPerk(client, StringToFloat(sPref));
-	
-	else
-		SetEntityGravity(client, g_fBaseGravity[client]);
-
+void LowGravity_Perk(int client, Perk perk, bool apply){
+	if(apply) LowGravity_ApplyPerk(client, perk);
+	else SetEntityGravity(client, GetFloatCache(client));
 }
 
-void LowGravity_ApplyPerk(int client, float fMultp){
-
-	g_fBaseGravity[client] = GetEntityGravity(client);
-	SetEntityGravity(client, fMultp);
-
+void LowGravity_ApplyPerk(int client, Perk perk){
+	SetFloatCache(client, GetEntityGravity(client));
+	SetEntityGravity(client, perk.GetPrefFloat("multiplier"));
 }

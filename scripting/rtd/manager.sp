@@ -87,7 +87,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 2:	LuckySandvich_Perk		(client, perk, bEnable);
 		case 3:	IncreasedSpeed_Perk		(client, perk, bEnable);
 		case 4:	Noclip_Perk				(client, perk, bEnable);
-		case 5:	LowGravity_Perk			(client, sSettings, bEnable);
+		case 5:	LowGravity_Perk			(client, perk, bEnable);
 		case 6:	FullUbercharge_Perk		(client, sSettings, bEnable);
 		case 7:	Invisibility_Perk		(client, sSettings, bEnable);
 		case 8:	InfiniteCloak_Perk		(client, sSettings, bEnable);
@@ -128,7 +128,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 43:FastHands_Perk			(client, sSettings, bEnable);
 		case 44:Outline_Perk			(client, sSettings, bEnable);
 		case 45:Vital_Perk				(client, sSettings, bEnable);
-		case 46:NoGravity_Perk			(client, sSettings, bEnable);
+		case 46:NoGravity_Perk			(client, bEnable);
 		case 47:TeamCriticals_Perk		(client, sSettings, bEnable);
 		case 48:FireTimebomb_Perk		(client, sSettings, bEnable);
 		case 49:FireBreath_Perk			(client, sSettings, bEnable);
