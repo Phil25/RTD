@@ -19,22 +19,18 @@
 
 bool g_bLuckySandvich_HasCrit[MAXPLAYERS+1] = {false, ...};
 
-void LuckySandvich_Perk(int client, const char[] sPref, bool apply){
+void LuckySandvich_Perk(int client, Perk perk, bool apply){
+	if(!apply) return;
 
-	if(!apply)
-		return;
-
-	SetEntityHealth(client, GetEntProp(client, Prop_Data, "m_iHealth") +StringToInt(sPref));
+	int iHealth = perk.GetPrefCell("amount");
+	SetEntityHealth(client, GetEntProp(client, Prop_Data, "m_iHealth") +iHealth);
 	g_bLuckySandvich_HasCrit[client] = true;
-
 }
 
 bool LuckySandvich_SetCritical(int client){
-
 	if(!g_bLuckySandvich_HasCrit[client])
 		return false;
-	
+
 	g_bLuckySandvich_HasCrit[client] = false;
 	return true;
-
 }
