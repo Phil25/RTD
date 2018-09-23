@@ -27,6 +27,20 @@
 	(editing this plugin is bad)
 \**********************************************************************************/
 
+int g_iEntCache[MAXPLAYERS+1] = {0, ...}; // Used throughout perks to store temporary entities they can create
+
+void SetEntCache(int client, int iEnt){
+	if(g_iEntCache[client])
+		AcceptEntityInput(g_iEntCache[client], "Kill");
+	g_iEntCache[client] = iEnt;
+}
+
+void KillEntCache(int client){
+	if(g_iEntCache[client])
+		AcceptEntityInput(g_iEntCache[client], "Kill");
+	g_iEntCache[client] = 0;
+}
+
 void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
 	//If the perk effect is NOT in this plugin, execute the function and stop, check if it's not being disabled and just stop right there.
 	if(perk.External){
@@ -43,7 +57,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 	//template: case <your_perk_id>:{YourPerk_Function(client, sSettings, bEnable);}
 	int iId = perk.Id;
 	switch(iId){
-		case 0:	Godmode_Perk			(client, sSettings, bEnable);
+		case 0:	Godmode_Perk			(client, perk, bEnable);
 		case 1:	Toxic_Perk				(client, sSettings, bEnable);
 		case 2:	LuckySandvich_Perk		(client, sSettings, bEnable);
 		case 3:	IncreasedSpeed_Perk		(client, sSettings, bEnable);

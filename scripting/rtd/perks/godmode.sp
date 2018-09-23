@@ -19,57 +19,46 @@
 
 #define GODMODE_PARTICLE "powerup_supernova_ready"
 
-int g_iGodmodeParticle[MAXPLAYERS+1] = {0, ...};
-int	g_iPref_Godmode = 0;
-
-void Godmode_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		Godmode_ApplyPerk(client, StringToInt(sPref));
-	
-	else
-		Godmode_RemovePerk(client);
-
+void Godmode_Perk(int client, Perk perk, bool bApply){
+	if(bApply) Godmode_ApplyPerk(client, perk);
+	else Godmode_RemovePerk(client);
 }
 
-void Godmode_ApplyPerk(int client, int iValue){
-
+void Godmode_ApplyPerk(int client, Perk perk){
 	float fParticleOffset[3] = {0.0, 0.0, 12.0};
 
-	g_iGodmodeParticle[client] = CreateParticle(client, GODMODE_PARTICLE, _, _, fParticleOffset);
+	SetEntCache(client, CreateParticle(client, GODMODE_PARTICLE, _, _, fParticleOffset));
 
-	g_iPref_Godmode = iValue;
-	SDKHook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage);
-
+	int iMode = perk.GetPrefCell("mode");
+	switch(iMode){
+		case -1: // no self damage
+			SDKHook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_NoSelf);
+		case 0: // pushback only
+			SDKHook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Pushback);
+		case 1: // deal self damage
+			SDKHook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Self);
+	}
 }
 
 void Godmode_RemovePerk(int client){
-
-	if(g_iGodmodeParticle[client] > MaxClients && IsValidEntity(g_iGodmodeParticle[client])){
-	
-		AcceptEntityInput(g_iGodmodeParticle[client], "Kill");
-		g_iGodmodeParticle[client] = 0;
-	
-	}
-
-	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage);
-
+	KillEntCache(client);
+	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_NoSelf);
+	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Pushback);
+	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Self);
 }
 
-public Action Godmode_OnTakeDamage(int iVic, int &iAttacker){//, int &iInflictor, float &fDamage, int &iDamageType, int &weapon, float damageForce[3], float damagePosition[3]){
+public Action Godmode_OnTakeDamage_NoSelf(int client, int &iAttacker){
+	return Plugin_Handled;
+}
 
-	if(iVic != iAttacker)
+public Action Godmode_OnTakeDamage_Pushback(int client, int &iAttacker){
+	if(client != iAttacker)
 		return Plugin_Handled;
-	
-	if(g_iPref_Godmode > 0)
-		return Plugin_Continue;
-	
-	if(g_iPref_Godmode > -1)
-		TF2_AddCondition(iVic, TFCond_Bonked, 0.001);
-	
-	else
-		return Plugin_Handled;
-	
+
+	TF2_AddCondition(client, TFCond_Bonked, 0.01);
 	return Plugin_Continue;
+}
 
+public Action Godmode_OnTakeDamage_Self(int client, int &iAttacker){
+	return client == iAttacker ? Plugin_Continue : Plugin_Handled;
 }
