@@ -18,18 +18,20 @@
 
 
 #define TOXIC_PARTICLE "eb_aura_angry01"
+int g_iToxicId = 1;
 
 void Toxic_Perk(int client, Perk perk, bool apply){
 	if(apply) Toxic_ApplyPerk(client, perk);
-	else UnsetClientPerkCache(client, 1);
+	else UnsetClientPerkCache(client, g_iToxicId);
 }
 
 void Toxic_ApplyPerk(int client, Perk perk){
+	g_iToxicId = perk.Id;
 	SetFloatCache(client, perk.GetPrefFloat("radius"), 0);
 	SetFloatCache(client, perk.GetPrefFloat("interval"), 1);
 	SetFloatCache(client, perk.GetPrefFloat("damage"), 2);
 
-	SetClientPerkCache(client, 1);
+	SetClientPerkCache(client, g_iToxicId);
 	SetEntCache(client, CreateParticle(client, TOXIC_PARTICLE));
 
 	CreateTimer(GetFloatCache(client, 1), Timer_Toxic, GetClientUserId(client), TIMER_REPEAT);
@@ -39,7 +41,7 @@ public Action Timer_Toxic(Handle hTimer, int iUserId){
 	int client = GetClientOfUserId(iUserId);
 	if(client == 0) return Plugin_Stop;
 
-	if(!CheckClientPerkCache(client, 1)){
+	if(!CheckClientPerkCache(client, g_iToxicId)){
 		KillEntCache(client);
 		return Plugin_Stop;
 	}
