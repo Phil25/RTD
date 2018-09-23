@@ -1627,7 +1627,7 @@ bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
 	return true;
 }
 
-void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRadius, float fDamage, int iFlags=0, bool bCanHurtSelf=false){
+void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRadius, float fDamage, int iFlags=0, bool bCanHurtSelf=false, bool bCheckSight=true){
 	fRadius *= fRadius;
 	float fOtherPos[3];
 	for(int i = 1; i <= MaxClients; ++i){
@@ -1637,7 +1637,8 @@ void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRa
 		GetClientAbsOrigin(i, fOtherPos);
 		if(GetVectorDistance(fOrigin, fOtherPos, true) <= fRadius)
 			if(CanPlayerBeHurt(i, iAttacker, bCanHurtSelf))
-				SDKHooks_TakeDamage(i, iInflictor, iAttacker, fDamage, iFlags);
+				if(!bCheckSight || (bCheckSight && CanEntitySeeTarget(iAttacker, i)))
+					SDKHooks_TakeDamage(i, iInflictor, iAttacker, fDamage, iFlags);
 	}
 }
 
@@ -1653,17 +1654,19 @@ bool IsPlayerFriendly(int client){
 	return false;
 }
 
-bool CanEntitySeeTarget(int entity, int iTarget){
+bool CanEntitySeeTarget(int iEnt, int iTarget){
+	if(!iEnt) return false;
+
 	float fStart[3], fEnd[3];
-	if(IsValidClient(entity))
-		GetClientEyePosition(entity, fStart);
-	else GetEntPropVector(entity, Prop_Send, "m_vecOrigin", fStart);
+	if(IsValidClient(iEnt))
+		GetClientEyePosition(iEnt, fStart);
+	else GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", fStart);
 
 	if(IsValidClient(iTarget))
 		GetClientEyePosition(iTarget, fEnd);
 	else GetEntPropVector(iTarget, Prop_Send, "m_vecOrigin", fEnd);
 
-	Handle hTrace = TR_TraceRayFilterEx(fStart, fEnd, MASK_SOLID, RayType_EndPoint, TraceFilterIgnorePlayersAndSelf, entity);
+	Handle hTrace = TR_TraceRayFilterEx(fStart, fEnd, MASK_SOLID, RayType_EndPoint, TraceFilterIgnorePlayersAndSelf, iEnt);
 	if(hTrace != INVALID_HANDLE){
 		if(TR_DidHit(hTrace)){
 			CloseHandle(hTrace);
