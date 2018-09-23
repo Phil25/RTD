@@ -19,39 +19,30 @@
 
 #define ATTRIB_SPEED 107 //the player speed attribute
 
-float g_fBaseSpeed[MAXPLAYERS+1] = {0.0, ...};
-
-void IncreasedSpeed_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		IncreasedSpeed_ApplyPerk(client, StringToFloat(sPref));
-	
-	else
-		IncreasedSpeed_RemovePerk(client);
-
+void IncreasedSpeed_Perk(int client, Perk perk, bool apply){
+	if(apply) IncreasedSpeed_ApplyPerk(client, perk);
+	else IncreasedSpeed_RemovePerk(client);
 }
 
-void IncreasedSpeed_ApplyPerk(int client, float fValue){
+void IncreasedSpeed_ApplyPerk(int client, Perk perk){
+	float fValue = perk.GetPrefFloat("multiplier");
+	float fBaseSpeed = 300.0;
 
-	switch(TF2_GetPlayerClass(client)){
-	
-		case TFClass_Scout:		{g_fBaseSpeed[client] = 400.0;}
-		case TFClass_Soldier:	{g_fBaseSpeed[client] = 240.0;}
-		case TFClass_DemoMan:	{g_fBaseSpeed[client] = 280.0;}
-		case TFClass_Heavy:		{g_fBaseSpeed[client] = 230.0;}
-		case TFClass_Medic:		{g_fBaseSpeed[client] = 320.0;}
-		default:				{g_fBaseSpeed[client] = 300.0;}
-	
+	TFClassType class = TF2_GetPlayerClass(client);
+	switch(class){
+		case TFClass_Scout:		fBaseSpeed = 400.0;
+		case TFClass_Soldier:	fBaseSpeed = 240.0;
+		case TFClass_DemoMan:	fBaseSpeed = 280.0;
+		case TFClass_Heavy:		fBaseSpeed = 230.0;
+		case TFClass_Medic:		fBaseSpeed = 320.0;
 	}
+	SetFloatCache(client, fBaseSpeed);
 
 	TF2Attrib_SetByDefIndex(client, ATTRIB_SPEED, fValue);
-	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", g_fBaseSpeed[client]*fValue);
-
+	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBaseSpeed*fValue);
 }
 
 void IncreasedSpeed_RemovePerk(int client){
-
 	TF2Attrib_RemoveByDefIndex(client, ATTRIB_SPEED);
-	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", g_fBaseSpeed[client]);
-
+	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", GetFloatCache(client));
 }
