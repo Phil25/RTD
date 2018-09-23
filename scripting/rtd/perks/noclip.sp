@@ -17,16 +17,11 @@
 */
 
 
-void Noclip_Perk(int client, const char[] sPref, bool apply){
-
+void Noclip_Perk(int client, Perk perk, bool apply){
 	if(apply)
-		SetEntityMoveType(client, StringToInt(sPref) < 1 ? MOVETYPE_FLY : MOVETYPE_NOCLIP);
-	
+		SetEntityMoveType(client, !perk.GetPrefCell("mode") ? MOVETYPE_FLY : MOVETYPE_NOCLIP);
 	else{
-	
 		SetEntityMoveType(client, MOVETYPE_WALK);
 		FixPotentialStuck(client);
-	
 	}
-
 }
