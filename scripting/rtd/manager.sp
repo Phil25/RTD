@@ -27,8 +27,12 @@
 	(editing this plugin is bad)
 \**********************************************************************************/
 
+int g_iClientPerkCache[MAXPLAYERS+1] = {-1, ...}; // Used to check if client has the current perk
 int g_iEntCache[MAXPLAYERS+1] = {0, ...}; // Used throughout perks to store temporary entities they can create
 
+float g_fFloatCache[MAXPLAYERS+1][4];
+
+// TODO: move these functions down
 void SetEntCache(int client, int iEnt){
 	if(g_iEntCache[client])
 		AcceptEntityInput(g_iEntCache[client], "Kill");
@@ -39,6 +43,27 @@ void KillEntCache(int client){
 	if(g_iEntCache[client])
 		AcceptEntityInput(g_iEntCache[client], "Kill");
 	g_iEntCache[client] = 0;
+}
+
+void SetClientPerkCache(int client, int iPerkId){
+	g_iClientPerkCache[client] = iPerkId;
+}
+
+void UnsetClientPerkCache(int client, int iPerkId){
+	if(g_iClientPerkCache[client] == iPerkId)
+		g_iClientPerkCache[client] = -1;
+}
+
+bool CheckClientPerkCache(int client, int iPerkId){
+	return g_iClientPerkCache[client] == iPerkId;
+}
+
+float GetFloatCache(client, int iOffset=0){
+	return g_fFloatCache[client][iOffset];
+}
+
+float SetFloatCache(client, float fVal, int iOffset=0){
+	g_fFloatCache[client][iOffset] = fVal;
 }
 
 void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
@@ -58,7 +83,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 	int iId = perk.Id;
 	switch(iId){
 		case 0:	Godmode_Perk			(client, perk, bEnable);
-		case 1:	Toxic_Perk				(client, sSettings, bEnable);
+		case 1:	Toxic_Perk				(client, perk, bEnable);
 		case 2:	LuckySandvich_Perk		(client, sSettings, bEnable);
 		case 3:	IncreasedSpeed_Perk		(client, sSettings, bEnable);
 		case 4:	Noclip_Perk				(client, sSettings, bEnable);
