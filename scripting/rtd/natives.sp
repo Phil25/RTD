@@ -106,7 +106,7 @@ public int Native_GetPerkString(Handle hPlugin, int iParams){
 		case RTDPerk_Name: perk.GetName(sBuffer, iLen);
 		case RTDPerk_Sound: perk.GetSound(sBuffer, iLen);
 		case RTDPerk_Token: perk.GetToken(sBuffer, iLen);
-		case RTDPerk_Pref: perk.GetPref(sBuffer, iLen);
+		//case RTDPerk_Pref: perk.GetPref(sBuffer, iLen); // TODO: create new natives
 		default: ThrowNativeError(0, "Property %d is not of type char[].", prop);
 	}
 
@@ -126,7 +126,7 @@ public int Native_SetPerkString(Handle hPlugin, int iParams){
 		case RTDPerk_Token: ThrowNativeError(0, "Tokens cannot be changed.");
 		case RTDPerk_Classes: perk.SetClass(sVal);
 		case RTDPerk_WeaponClasses: perk.SetWeaponClass(sVal);
-		case RTDPerk_Pref: perk.SetPref(sVal);
+		//case RTDPerk_Pref: perk.SetPref(sVal); // TODO: create new natives
 		case RTDPerk_Tags: perk.SetTags(sVal);
 		default: ThrowNativeError(0, "Property %d is not of type char[].", prop);
 	}

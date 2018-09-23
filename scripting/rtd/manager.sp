@@ -27,90 +27,89 @@
 	(editing this plugin is bad)
 \**********************************************************************************/
 
-void ManagePerk(int client, Perk perk, bool enable, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
+void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
 	//If the perk effect is NOT in this plugin, execute the function and stop, check if it's not being disabled and just stop right there.
 	if(perk.External){
-		perk.Call(client, enable);
+		perk.Call(client, bEnable);
 
-		if(!enable)	//Check if anything is needing to be printed.
+		if(!bEnable) //Check if anything is needing to be printed.
 			RemovedPerk(client, reason, sReason);
 		return;	//Stop further exectuion of ManagePerk()
 	}
 
 	//This is the optional value for perks, found under "settings" in rtd2_perks.cfg
 	char sSettings[127];
-	perk.GetPref(sSettings, 127);
 
-	//template: case <your_perk_id>:{YourPerk_Function(client, sSettings, enable);}
+	//template: case <your_perk_id>:{YourPerk_Function(client, sSettings, bEnable);}
 	int iId = perk.Id;
 	switch(iId){
-		case 0:	Godmode_Perk			(client, sSettings, enable);
-		case 1:	Toxic_Perk				(client, sSettings, enable);
-		case 2:	LuckySandvich_Perk		(client, sSettings, enable);
-		case 3:	IncreasedSpeed_Perk		(client, sSettings, enable);
-		case 4:	Noclip_Perk				(client, sSettings, enable);
-		case 5:	LowGravity_Perk			(client, sSettings, enable);
-		case 6:	FullUbercharge_Perk		(client, sSettings, enable);
-		case 7:	Invisibility_Perk		(client, sSettings, enable);
-		case 8:	InfiniteCloak_Perk		(client, sSettings, enable);
-		case 9:	Criticals_Perk			(client, sSettings, enable);
-		case 10:InfiniteAmmo_Perk		(client, sSettings, enable);
-		case 11:ScaryBullets_Perk		(client, sSettings, enable);
-		case 12:SpawnSentry_Perk		(client, sSettings, enable);
-		case 13:HomingProjectiles_Perk	(client, sSettings, enable);
-		case 14:FullRifleCharge_Perk	(client, sSettings, enable);
-		case 15:Explode_Perk			(client, sSettings, enable);
-		case 16:Snail_Perk				(client, sSettings, enable);
-		case 17:Frozen_Perk				(client, sSettings, enable);
-		case 18:Timebomb_Perk			(client, sSettings, enable);
-		case 19:Ignition_Perk			(client, sSettings, enable);
-		case 20:LowHealth_Perk			(client, sSettings, enable);
-		case 21:Drugged_Perk			(client, sSettings, enable);
-		case 22:Blind_Perk				(client, sSettings, enable);
-		case 23:StripToMelee_Perk		(client, sSettings, enable);
-		case 24:Beacon_Perk				(client, sSettings, enable);
-		case 25:ForcedTaunt_Perk		(client, sSettings, enable);
-		case 26:Monochromia_Perk		(client, sSettings, enable);
-		case 27:Earthquake_Perk			(client, sSettings, enable);
-		case 28:FunnyFeeling_Perk		(client, sSettings, enable);
-		case 29:BadSauce_Perk			(client, sSettings, enable);
-		case 30:SpawnDispenser_Perk		(client, sSettings, enable);
-		case 31:InfiniteJump_Perk		(client, sSettings, enable);
-		case 32:PowerfulHits_Perk		(client, sSettings, enable);
-		case 33:BigHead_Perk			(client, sSettings, enable);
-		case 34:TinyMann_Perk			(client, sSettings, enable);
-		case 35:Firework_Perk			(client, sSettings, enable);
-		case 36:DeadlyVoice_Perk		(client, sSettings, enable);
-		case 37:StrongGravity_Perk		(client, sSettings, enable);
-		case 38:EyeForAnEye_Perk		(client, sSettings, enable);
-		case 39:Weakened_Perk			(client, sSettings, enable);
-		case 40:NecroMash_Perk			(client, sSettings, enable);
-		case 41:ExtraAmmo_Perk			(client, sSettings, enable);
-		case 42:Suffocation_Perk		(client, sSettings, enable);
-		case 43:FastHands_Perk			(client, sSettings, enable);
-		case 44:Outline_Perk			(client, sSettings, enable);
-		case 45:Vital_Perk				(client, sSettings, enable);
-		case 46:NoGravity_Perk			(client, sSettings, enable);
-		case 47:TeamCriticals_Perk		(client, sSettings, enable);
-		case 48:FireTimebomb_Perk		(client, sSettings, enable);
-		case 49:FireBreath_Perk			(client, sSettings, enable);
-		case 50:StrongRecoil_Perk		(client, sSettings, enable);
-		case 51:Cursed_Perk				(client, sSettings, enable);
-		case 52:ExtraThrowables_Perk	(client, sSettings, enable);
-		case 53:PowerPlay_Perk			(client, sSettings, enable);
-		case 54:ExplosiveArrows_Perk	(client, sSettings, enable);
-		case 55:InclineProblem_Perk		(client, sSettings, enable);
-		case 56:SpringShoes_Perk		(client, sSettings, enable);
-		case 57:Lag_Perk				(client, sSettings, enable);
-		case 58:DrugBullets_Perk		(client, sSettings, enable);
-		case 59:LongMelee_Perk			(client, sSettings, enable);
-		case 60:HatThrow_Perk			(client, sSettings, enable);
-		case 61:MadarasWhistle_Perk		(client, sSettings, enable);
-		case 62:Sickness_Perk			(client, sSettings, enable);
+		case 0:	Godmode_Perk			(client, sSettings, bEnable);
+		case 1:	Toxic_Perk				(client, sSettings, bEnable);
+		case 2:	LuckySandvich_Perk		(client, sSettings, bEnable);
+		case 3:	IncreasedSpeed_Perk		(client, sSettings, bEnable);
+		case 4:	Noclip_Perk				(client, sSettings, bEnable);
+		case 5:	LowGravity_Perk			(client, sSettings, bEnable);
+		case 6:	FullUbercharge_Perk		(client, sSettings, bEnable);
+		case 7:	Invisibility_Perk		(client, sSettings, bEnable);
+		case 8:	InfiniteCloak_Perk		(client, sSettings, bEnable);
+		case 9:	Criticals_Perk			(client, sSettings, bEnable);
+		case 10:InfiniteAmmo_Perk		(client, sSettings, bEnable);
+		case 11:ScaryBullets_Perk		(client, sSettings, bEnable);
+		case 12:SpawnSentry_Perk		(client, sSettings, bEnable);
+		case 13:HomingProjectiles_Perk	(client, sSettings, bEnable);
+		case 14:FullRifleCharge_Perk	(client, sSettings, bEnable);
+		case 15:Explode_Perk			(client, sSettings, bEnable);
+		case 16:Snail_Perk				(client, sSettings, bEnable);
+		case 17:Frozen_Perk				(client, sSettings, bEnable);
+		case 18:Timebomb_Perk			(client, sSettings, bEnable);
+		case 19:Ignition_Perk			(client, sSettings, bEnable);
+		case 20:LowHealth_Perk			(client, sSettings, bEnable);
+		case 21:Drugged_Perk			(client, sSettings, bEnable);
+		case 22:Blind_Perk				(client, sSettings, bEnable);
+		case 23:StripToMelee_Perk		(client, sSettings, bEnable);
+		case 24:Beacon_Perk				(client, sSettings, bEnable);
+		case 25:ForcedTaunt_Perk		(client, sSettings, bEnable);
+		case 26:Monochromia_Perk		(client, sSettings, bEnable);
+		case 27:Earthquake_Perk			(client, sSettings, bEnable);
+		case 28:FunnyFeeling_Perk		(client, sSettings, bEnable);
+		case 29:BadSauce_Perk			(client, sSettings, bEnable);
+		case 30:SpawnDispenser_Perk		(client, sSettings, bEnable);
+		case 31:InfiniteJump_Perk		(client, sSettings, bEnable);
+		case 32:PowerfulHits_Perk		(client, sSettings, bEnable);
+		case 33:BigHead_Perk			(client, sSettings, bEnable);
+		case 34:TinyMann_Perk			(client, sSettings, bEnable);
+		case 35:Firework_Perk			(client, sSettings, bEnable);
+		case 36:DeadlyVoice_Perk		(client, sSettings, bEnable);
+		case 37:StrongGravity_Perk		(client, sSettings, bEnable);
+		case 38:EyeForAnEye_Perk		(client, sSettings, bEnable);
+		case 39:Weakened_Perk			(client, sSettings, bEnable);
+		case 40:NecroMash_Perk			(client, sSettings, bEnable);
+		case 41:ExtraAmmo_Perk			(client, sSettings, bEnable);
+		case 42:Suffocation_Perk		(client, sSettings, bEnable);
+		case 43:FastHands_Perk			(client, sSettings, bEnable);
+		case 44:Outline_Perk			(client, sSettings, bEnable);
+		case 45:Vital_Perk				(client, sSettings, bEnable);
+		case 46:NoGravity_Perk			(client, sSettings, bEnable);
+		case 47:TeamCriticals_Perk		(client, sSettings, bEnable);
+		case 48:FireTimebomb_Perk		(client, sSettings, bEnable);
+		case 49:FireBreath_Perk			(client, sSettings, bEnable);
+		case 50:StrongRecoil_Perk		(client, sSettings, bEnable);
+		case 51:Cursed_Perk				(client, sSettings, bEnable);
+		case 52:ExtraThrowables_Perk	(client, sSettings, bEnable);
+		case 53:PowerPlay_Perk			(client, sSettings, bEnable);
+		case 54:ExplosiveArrows_Perk	(client, sSettings, bEnable);
+		case 55:InclineProblem_Perk		(client, sSettings, bEnable);
+		case 56:SpringShoes_Perk		(client, sSettings, bEnable);
+		case 57:Lag_Perk				(client, sSettings, bEnable);
+		case 58:DrugBullets_Perk		(client, sSettings, bEnable);
+		case 59:LongMelee_Perk			(client, sSettings, bEnable);
+		case 60:HatThrow_Perk			(client, sSettings, bEnable);
+		case 61:MadarasWhistle_Perk		(client, sSettings, bEnable);
+		case 62:Sickness_Perk			(client, sSettings, bEnable);
 		case 63:{} // Wasted Roll
 	}
 
-	if(!enable)
+	if(!bEnable)
 		RemovedPerk(client, reason, sReason);
 }
 
