@@ -131,9 +131,9 @@ methodmap Perk < StringMap{
 	}
 
 	public int GetPrefCell(const char[] sKey, int iDefault=0){
-		int iVal;
-		if(this.GetValue(sKey, iVal))
-			return iVal;
+		float fVal;
+		if(this.GetValue(sKey, fVal))
+			return RoundFloat(fVal);
 		else return iDefault;
 	}
 
