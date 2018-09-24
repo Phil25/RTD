@@ -16,86 +16,77 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define LEVEL 0
+#define KEEP 1
+#define AMOUNT 2
 
-bool	g_bCanSpawnDispenser[MAXPLAYERS+1]	= {false, ...};
-Handle	g_iSpawnedDispensers[MAXPLAYERS+1]	= INVALID_HANDLE;
+int g_iSpawnDispenserId = 30;
 
-int		g_iDispenserLevel		= 2;
-bool	g_bShouldDispenserStay	= true;
-int		g_iMaxDispensers		= 1;
-
-public SpawnDispenser_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		SpawnDispenser_ApplyPerk(client, sPref);
-	
-	else
-		SpawnDispenser_RemovePerk(client);
-
+public SpawnDispenser_Perk(int client, Perk perk, bool apply){
+	if(apply) SpawnDispenser_ApplyPerk(client, perk);
+	else SpawnDispenser_RemovePerk(client);
 }
 
-void SpawnDispenser_ApplyPerk(int client, const char[] sPref){
+void SpawnDispenser_ApplyPerk(int client, Perk perk){
+	g_iSpawnDispenserId = perk.Id;
+	SetClientPerkCache(client, g_iSpawnDispenserId);
 
-	SpawnDispenser_ProcessSettings(sPref);
-	
-	if(g_iSpawnedDispensers[client] == INVALID_HANDLE)
-		g_iSpawnedDispensers[client] = CreateArray();
-	else
-		ClearArray(g_iSpawnedDispensers[client]);
-	
-	g_bCanSpawnDispenser[client] = true;
+	SetIntCache(client, perk.GetPrefCell("level"), LEVEL);
+	SetIntCache(client, perk.GetPrefCell("keep") > 0, KEEP);
+	SetIntCache(client, perk.GetPrefCell("amount"), AMOUNT);
+
+	PrepareArrayCache(client);
+
 	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Dispenser_Initialization", LANG_SERVER, 0x03, 0x01);
-
 }
 
 void SpawnDispenser_RemovePerk(int client){
+	UnsetClientPerkCache(client, g_iSpawnDispenserId);
 
-	g_bCanSpawnDispenser[client] = false;
-
-	if(g_bShouldDispenserStay)
+	if(GetIntCacheBool(client, KEEP))
 		return;
 
-	int iSize = GetArraySize(g_iSpawnedDispensers[client]);
-	for(int i = 0; i < iSize; i++){
-	
-		int iEnt = EntRefToEntIndex(GetArrayCell(g_iSpawnedDispensers[client], i));
-		
+	ArrayList list = GetArrayCache(client);
+	int iLen = list.Length;
+	for(int i = 0; i < iLen; i++){
+		int iEnt = EntRefToEntIndex(list.Get(i));
 		if(iEnt > MaxClients && IsValidEntity(iEnt))
-		AcceptEntityInput(iEnt, "Kill");
-	
+			AcceptEntityInput(iEnt, "Kill");
 	}
-
 }
 
 void SpawnDispenser_Voice(int client){
-
-	if(!g_bCanSpawnDispenser[client])
+	if(!CheckClientPerkCache(client, g_iSpawnDispenserId))
 		return;
 	
 	float fPos[3];
-	if(GetClientLookPosition(client, fPos)){
+	if(!GetClientLookPosition(client, fPos))
+		return;
 	
-		if(CanBuildAtPos(fPos, false)){
-		
-			float fDispenserAng[3], fClientAng[3];
-			GetClientEyeAngles(client, fClientAng);
-			
-			fDispenserAng[1] = fClientAng[1];
-			PushArrayCell(g_iSpawnedDispensers[client], EntIndexToEntRef(SpawnDispenser(client, fPos, fDispenserAng, g_iDispenserLevel)));
-			
-			int iSpawned = GetArraySize(g_iSpawnedDispensers[client]);
-			PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Dispenser_Spawned", LANG_SERVER, 0x03, iSpawned, g_iMaxDispensers, 0x01);
-			
-			if(iSpawned >= g_iMaxDispensers)
-				if(g_bShouldDispenserStay)
-					ForceRemovePerk(client);
-				else
-					g_bCanSpawnDispenser[client] = false;
-		
-		}
-	
-	}
+	if(!CanBuildAtPos(fPos, false))
+		return;
 
+	float fDispenserAng[3], fClientAng[3];
+	GetClientEyeAngles(client, fClientAng);
+	fDispenserAng[1] = fClientAng[1];
+
+	int iLevel = GetIntCache(client, LEVEL);
+	int iDispenser = SpawnDispenser(client, fPos, fDispenserAng, iLevel);
+
+	ArrayList list = GetArrayCache(client);
+	list.Push(EntIndexToEntRef(iDispenser));
+
+	int iSpawned = list.Length;
+	int iMax = GetIntCache(client, AMOUNT);
+
+	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Dispenser_Spawned", LANG_SERVER, 0x03, iSpawned, iMax, 0x01);
+
+	if(iSpawned < iMax)
+		return;
+
+	if(GetIntCacheBool(client, KEEP))
+		ForceRemovePerk(client);
+	else UnsetClientPerkCache(client, g_iSpawnDispenserId);
 }
 
 /*
@@ -105,36 +96,27 @@ void SpawnDispenser_Voice(int client){
 stock int SpawnDispenser(int builder, float Position[3], float Angle[3], int level, int flags=4){
 
 	int dispenser = CreateEntityByName("obj_dispenser");
-	
 	if(!IsValidEntity(dispenser)) return 0;
-	
+
 	int iTeam = GetClientTeam(builder);
-	
+
 	DispatchKeyValueVector(dispenser, "origin", Position);
 	DispatchKeyValueVector(dispenser, "angles", Angle);
 	SetEntProp(dispenser, Prop_Send, "m_iHighestUpgradeLevel", level);
 	SetEntProp(dispenser, Prop_Data, "m_spawnflags", flags);
 	SetEntProp(dispenser, Prop_Send, "m_bBuilding", 1);
 	DispatchSpawn(dispenser); 
-	
+
 	SetVariantInt(iTeam);
 	AcceptEntityInput(dispenser, "SetTeam");
 	SetEntProp(dispenser, Prop_Send, "m_nSkin", iTeam -2);
-	
+
 	ActivateEntity(dispenser);
 	SetEntPropEnt(dispenser, Prop_Send, "m_hBuilder", builder);
-	
-	return dispenser;
 
+	return dispenser;
 } 
 
-void SpawnDispenser_ProcessSettings(const char[] sSettings){
-	
-	char[][] sPieces = new char[3][8];
-	ExplodeString(sSettings, ",", sPieces, 3, 8);
-
-	g_iDispenserLevel		= StringToInt(sPieces[0]);
-	g_bShouldDispenserStay	= StringToInt(sPieces[1]) > 0 ? true : false;
-	g_iMaxDispensers		= StringToInt(sPieces[2]);
-
-}
+#define LEVEL 0
+#define KEEP 1
+#define AMOUNT 2
