@@ -1440,11 +1440,6 @@ void DisplayPerkTimeFrame(client){
 }
 
 //-----[ Perks ]-----//
-int GetPerkTime(int iPerkId){ // TODO: remove me
-	int iTime = g_hPerkContainer.GetFromId(iPerkId).Time;
-	return (iTime > 0) ? iTime : g_iCvarPerkDuration;
-}
-
 int GetPerkTimeEx(Perk perk){
 	int iTime = perk.Time;
 	return (iTime > 0) ? iTime : g_iCvarPerkDuration;
