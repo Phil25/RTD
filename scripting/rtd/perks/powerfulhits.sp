@@ -16,39 +16,29 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-bool	g_bHasPowerfulHits[MAXPLAYERS+1]	= {false, ...};
-float	g_fPowerFulHitsMultiplayer			= 5.0;
+int g_iPowerfulHitsId = 32;
 
 void PowerfulHits_OnClientPutInServer(int client){
-
 	SDKHook(client, SDKHook_OnTakeDamage, PowerfulHits_OnTakeDamage);
-
 }
 
-void PowerfulHits_Perk(int client, const char[] sPref, bool apply){
-
-	g_bHasPowerfulHits[client]	= apply;
-	g_fPowerFulHitsMultiplayer	= StringToFloat(sPref);
-
+void PowerfulHits_Perk(int client, Perk perk, bool apply){
+	if(apply) PowerfulHits_Apply(client, perk);
+	else UnsetClientPerkCache(client, g_iPowerfulHitsId);
 }
 
-public Action PowerfulHits_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype){
+void PowerfulHits_Apply(int client, Perk perk){
+	g_iPowerfulHitsId = perk.Id;
+	SetClientPerkCache(client, g_iPowerfulHitsId);
+	SetFloatCache(client, perk.GetPrefFloat("multiplier"));
+}
 
-	if(victim == attacker)
+public Action PowerfulHits_OnTakeDamage(int client, int &iAtk, int &iInflictor, float &fDmg, int &iType){
+	if(client == iAtk) return Plugin_Continue;
+	if(!IsValidClient(client)) return Plugin_Continue;
+	if(!CheckClientPerkCache(iAtk, g_iPowerfulHitsId))
 		return Plugin_Continue;
-	
-	if(attacker < 1 || attacker > MaxClients)
-		return Plugin_Continue;
-	
-	if(!IsClientInGame(attacker))
-		return Plugin_Continue;
-	
-	if(!g_bHasPowerfulHits[attacker])
-		return Plugin_Continue;
-	
-	damage *= g_fPowerFulHitsMultiplayer;
-	
+
+	fDmg *= GetFloatCache(iAtk);
 	return Plugin_Changed;
-
 }

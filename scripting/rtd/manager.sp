@@ -65,8 +65,8 @@ bool CheckClientPerkCache(int client, int iPerkId){
 	return g_iClientPerkCache[client] == iPerkId;
 }
 
-float GetFloatCache(int client, int iOffset=0){
-	return g_fCache[client][iOffset];
+float GetFloatCache(int client, int iBlock=0){
+	return g_fCache[client][iBlock];
 }
 
 void SetFloatCache(int client, float fVal, int iBlock=0){
@@ -151,7 +151,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 29:BadSauce_Perk			(client, perk, bEnable);
 		case 30:SpawnDispenser_Perk		(client, perk, bEnable);
 		case 31:InfiniteJump_Perk		(client, perk, bEnable);
-		case 32:PowerfulHits_Perk		(client, sSettings, bEnable);
+		case 32:PowerfulHits_Perk		(client, perk, bEnable);
 		case 33:BigHead_Perk			(client, sSettings, bEnable);
 		case 34:TinyMann_Perk			(client, sSettings, bEnable);
 		case 35:Firework_Perk			(client, sSettings, bEnable);
