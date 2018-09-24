@@ -29,9 +29,9 @@
 
 int g_iClientPerkCache[MAXPLAYERS+1] = {-1, ...}; // Used to check if client has the current perk
 int g_iEntCache[MAXPLAYERS+1] = {INVALID_ENT_REFERENCE, ...}; // Used throughout perks to store their entities
-
 float g_fCache[MAXPLAYERS+1][4];
 int g_iCache[MAXPLAYERS+1][4];
+ArrayList g_aCache[MAXPLAYERS+1] = {null, ...};
 
 // TODO: move these functions down
 void SetEntCache(int client, int iEnt){
@@ -65,24 +65,35 @@ bool CheckClientPerkCache(int client, int iPerkId){
 	return g_iClientPerkCache[client] == iPerkId;
 }
 
-float GetFloatCache(client, int iOffset=0){
+float GetFloatCache(int client, int iOffset=0){
 	return g_fCache[client][iOffset];
 }
 
-void SetFloatCache(client, float fVal, int iOffset=0){
+void SetFloatCache(int client, float fVal, int iOffset=0){
 	g_fCache[client][iOffset] = fVal;
 }
 
-int GetIntCache(client, int iOffset=0){
+int GetIntCache(int client, int iOffset=0){
 	return g_iCache[client][iOffset];
 }
 
-bool GetIntCacheBool(client, int iOffset=0){
+bool GetIntCacheBool(int client, int iOffset=0){
 	return view_as<bool>(g_iCache[client][iOffset]);
 }
 
-void SetIntCache(client, int iVal, int iOffset=0){
+void SetIntCache(int client, int iVal, int iOffset=0){
 	g_iCache[client][iOffset] = iVal;
+}
+
+ArrayList PrepareArrayCache(int client){
+	if(g_aCache[client] == null)
+		g_aCache[client] = new ArrayList();
+	else g_aCache[client].Clear();
+	return g_aCache[client];
+}
+
+ArrayList GetArrayCache(int client){
+	return g_aCache[client];
 }
 
 void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
@@ -113,7 +124,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 9:	Criticals_Perk			(client, perk, bEnable);
 		case 10:InfiniteAmmo_Perk		(client, perk, bEnable);
 		case 11:ScaryBullets_Perk		(client, perk, bEnable);
-		case 12:SpawnSentry_Perk		(client, sSettings, bEnable);
+		case 12:SpawnSentry_Perk		(client, perk, bEnable);
 		case 13:HomingProjectiles_Perk	(client, sSettings, bEnable);
 		case 14:FullRifleCharge_Perk	(client, sSettings, bEnable);
 		case 15:Explode_Perk			(client, sSettings, bEnable);

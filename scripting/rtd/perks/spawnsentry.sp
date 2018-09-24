@@ -17,85 +17,77 @@
 */
 
 
-bool	g_bCanSpawnSentry[MAXPLAYERS+1]	= {false, ...};
-Handle	g_hSpawnedSentries[MAXPLAYERS+1]= INVALID_HANDLE;
+#define LEVEL 0
+#define KEEP 1
+#define AMOUNT 2
 
-int		g_iSentryLevel	= 2;
-bool	g_bShouldStay	= true;
-int		g_iMaxSentries	= 1;
+int g_iSpawnSentryId = 12;
 
-void SpawnSentry_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		SpawnSentry_ApplyPerk(client, sPref);
-	
-	else
-		SpawnSentry_RemovePerk(client);
-
+void SpawnSentry_Perk(int client, Perk perk, bool apply){
+	if(apply) SpawnSentry_ApplyPerk(client, perk);
+	else SpawnSentry_RemovePerk(client);
 }
 
-void SpawnSentry_ApplyPerk(int client, const char[] sPref){
+void SpawnSentry_ApplyPerk(int client, Perk perk){
+	g_iSpawnSentryId = perk.Id;
+	SetClientPerkCache(client, g_iSpawnSentryId);
 
-	SpawnSentry_ProcessSettings(sPref);
-	
-	if(g_hSpawnedSentries[client] == INVALID_HANDLE)
-		g_hSpawnedSentries[client] = CreateArray();
-	else
-		ClearArray(g_hSpawnedSentries[client]);
-	
-	g_bCanSpawnSentry[client] = true;
+	SetIntCache(client, perk.GetPrefCell("level"), LEVEL);
+	SetIntCache(client, perk.GetPrefCell("keep") > 0, KEEP);
+	SetIntCache(client, perk.GetPrefCell("amount"), AMOUNT);
+
+	PrepareArrayCache(client);
+
 	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Sentry_Initialization", LANG_SERVER, 0x03, 0x01);
-
 }
 
 void SpawnSentry_RemovePerk(int client){
+	UnsetClientPerkCache(client, g_iSpawnSentryId);
 
-	g_bCanSpawnSentry[client] = false;
-
-	if(g_bShouldStay)
+	if(GetIntCacheBool(client, KEEP))
 		return;
-	
-	int iSize = GetArraySize(g_hSpawnedSentries[client]);
-	for(int i = 0; i < iSize; i++){
-	
-		int iEnt = EntRefToEntIndex(GetArrayCell(g_hSpawnedSentries[client], i));
-		
-		if(iEnt > MaxClients && IsValidEntity(iEnt))
-		AcceptEntityInput(iEnt, "Kill");
-	
-	}
 
+	ArrayList list = GetArrayCache(client);
+	int iLen = list.Length;
+	for(int i = 0; i < iLen; i++){
+		int iEnt = EntRefToEntIndex(list.Get(i));
+		if(iEnt > MaxClients && IsValidEntity(iEnt))
+			AcceptEntityInput(iEnt, "Kill");
+	}
 }
 
 void SpawnSentry_Voice(int client){
-
-	if(!g_bCanSpawnSentry[client])
+	if(!CheckClientPerkCache(client, g_iSpawnSentryId))
 		return;
-	
-	float fPos[3];
-	if(GetClientLookPosition(client, fPos)){
-	
-		if(CanBuildAtPos(fPos, true)){
-		
-			float fSentryAng[3], fClientAng[3];
-			GetClientEyeAngles(client, fClientAng);
-			
-			fSentryAng[1] = fClientAng[1];
-			PushArrayCell(g_hSpawnedSentries[client], EntIndexToEntRef(SpawnSentry(client, fPos, fSentryAng, g_iSentryLevel > 0 ? g_iSentryLevel : 1, g_iSentryLevel < 1 ? true : false)));
-			
-			int iSpawned = GetArraySize(g_hSpawnedSentries[client]);
-			PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Sentry_Spawned", LANG_SERVER, 0x03, iSpawned, g_iMaxSentries, 0x01);
-			
-			if(iSpawned >= g_iMaxSentries)
-				if(g_bShouldStay)
-					ForceRemovePerk(client);
-				else
-					g_bCanSpawnSentry[client] = false;
-		
-		}
-	
-	}
 
+	float fPos[3];
+	if(!GetClientLookPosition(client, fPos))
+		return;
+
+	if(!CanBuildAtPos(fPos, true))
+		return;
+
+	float fSentryAng[3], fClientAng[3];
+	GetClientEyeAngles(client, fClientAng);
+	fSentryAng[1] = fClientAng[1];
+
+	int iLevel = GetIntCache(client, LEVEL);
+	int iSentry = SpawnSentry(client, fPos, fSentryAng, iLevel > 0 ? iLevel : 1, iLevel == 0);
+
+	ArrayList list = GetArrayCache(client);
+	list.Push(EntIndexToEntRef(iSentry));
+
+	int iSpawned = list.Length;
+	int iMax = GetIntCache(client, AMOUNT);
+
+	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Sentry_Spawned", LANG_SERVER, 0x03, iSpawned, iMax, 0x01);
+
+	if(iSpawned < iMax)
+		return;
+
+	if(GetIntCacheBool(client, KEEP))
+		ForceRemovePerk(client);
+	else UnsetClientPerkCache(client, g_iSpawnSentryId);
 }
 
 /*
@@ -106,23 +98,22 @@ stock int SpawnSentry(int builder, float Position[3], float Angle[3], int level,
 
 	float m_vecMinsMini[3] = {-15.0, -15.0, 0.0}, m_vecMaxsMini[3] = {15.0, 15.0, 49.5};
 	float m_vecMinsDisp[3] = {-13.0, -13.0, 0.0}, m_vecMaxsDisp[3] = {13.0, 13.0, 42.9};
-	
+
 	int sentry = CreateEntityByName("obj_sentrygun");
-	
+
 	if(!IsValidEntity(sentry)) return 0;
-	
+
 	int iTeam = GetClientTeam(builder);
-	
+
 	SetEntPropEnt(sentry, Prop_Send, "m_hBuilder", builder);
-	
+
 	SetVariantInt(iTeam);
 	AcceptEntityInput(sentry, "SetTeam");
 
 	DispatchKeyValueVector(sentry, "origin", Position);
 	DispatchKeyValueVector(sentry, "angles", Angle);
-	
+
 	if(mini){
-	
 		SetEntProp(sentry, Prop_Send, "m_bMiniBuilding", 1);
 		SetEntProp(sentry, Prop_Send, "m_iUpgradeLevel", level);
 		SetEntProp(sentry, Prop_Send, "m_iHighestUpgradeLevel", level);
@@ -130,16 +121,14 @@ stock int SpawnSentry(int builder, float Position[3], float Angle[3], int level,
 		SetEntProp(sentry, Prop_Send, "m_bBuilding", 1);
 		SetEntProp(sentry, Prop_Send, "m_nSkin", level == 1 ? iTeam : iTeam -2);
 		DispatchSpawn(sentry);
-		
+
 		SetVariantInt(100);
 		AcceptEntityInput(sentry, "SetHealth");
-		
+
 		SetEntPropFloat(sentry, Prop_Send, "m_flModelScale", 0.75);
 		SetEntPropVector(sentry, Prop_Send, "m_vecMins", m_vecMinsMini);
 		SetEntPropVector(sentry, Prop_Send, "m_vecMaxs", m_vecMaxsMini);
-	
 	}else if(disposable){
-	
 		SetEntProp(sentry, Prop_Send, "m_bMiniBuilding", 1);
 		SetEntProp(sentry, Prop_Send, "m_bDisposableBuilding", 1);
 		SetEntProp(sentry, Prop_Send, "m_iUpgradeLevel", level);
@@ -148,36 +137,24 @@ stock int SpawnSentry(int builder, float Position[3], float Angle[3], int level,
 		SetEntProp(sentry, Prop_Send, "m_bBuilding", 1);
 		SetEntProp(sentry, Prop_Send, "m_nSkin", level == 1 ? iTeam : iTeam -2);
 		DispatchSpawn(sentry);
-		
+
 		SetVariantInt(100);
 		AcceptEntityInput(sentry, "SetHealth");
-		
+
 		SetEntPropFloat(sentry, Prop_Send, "m_flModelScale", 0.60);
 		SetEntPropVector(sentry, Prop_Send, "m_vecMins", m_vecMinsDisp);
 		SetEntPropVector(sentry, Prop_Send, "m_vecMaxs", m_vecMaxsDisp);
-	
 	}else{
-	
 		SetEntProp(sentry, Prop_Send, "m_iUpgradeLevel", level);
 		SetEntProp(sentry, Prop_Send, "m_iHighestUpgradeLevel", level);
 		SetEntProp(sentry, Prop_Data, "m_spawnflags", flags);
 		SetEntProp(sentry, Prop_Send, "m_bBuilding", 1);
 		SetEntProp(sentry, Prop_Send, "m_nSkin", iTeam -2);
 		DispatchSpawn(sentry);
-	
 	}
-	
 	return sentry;
-
 }
 
-void SpawnSentry_ProcessSettings(const char[] sSettings){
-	
-	char[][] sPieces = new char[3][8];
-	ExplodeString(sSettings, ",", sPieces, 3, 8);
-
-	g_iSentryLevel	= StringToInt(sPieces[0]);
-	g_bShouldStay	= StringToInt(sPieces[1]) > 0 ? true : false;
-	g_iMaxSentries	= StringToInt(sPieces[2]);
-
-}
+#undef LEVEL
+#undef KEEP
+#undef AMOUNT
