@@ -17,61 +17,45 @@
 */
 
 
-bool	g_bIsDrugged[MAXPLAYERS+1]	= {false, ...};
+int g_iDruggedId = 21;
 UserMsg g_DruggedMsgId;
 
 void Drugged_Start(){
-
 	g_DruggedMsgId = GetUserMessageId("Fade");
-
 }
 
-void Drugged_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		Drugged_ApplyPerk(client, StringToFloat(sPref));
-	
-	else
-		g_bIsDrugged[client] = false;
-
+void Drugged_Perk(int client, Perk perk, bool apply){
+	if(apply) Drugged_ApplyPerk(client, perk);
+	else UnsetClientPerkCache(client, g_iDruggedId);
 }
 
-void Drugged_ApplyPerk(int client, float fInterval){
-
-	CreateTimer(fInterval, Timer_DrugTick, GetClientSerial(client), TIMER_REPEAT);
-	g_bIsDrugged[client] = true;
-
+void Drugged_ApplyPerk(int client, Perk perk){
+	g_iDruggedId = perk.Id;
+	SetClientPerkCache(client, g_iDruggedId);
+	CreateTimer(perk.GetPrefFloat("interval"), Timer_DrugTick, GetClientUserId(client), TIMER_REPEAT);
 }
 
-public Action Timer_DrugTick(Handle hTimer, int iSerial){
+public Action Timer_DrugTick(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(!client) return Plugin_Stop;
 
-	int client = GetClientFromSerial(iSerial);
-	if(client == 0) return Plugin_Stop;
-	
-	if(!g_bIsDrugged[client]){
-	
-		Drugged_RemovePerk(client);
+	if(!CheckClientPerkCache(client, g_iDruggedId))
 		return Plugin_Stop;
-	
-	}
-	
-	Drugged_Tick(client);
-	
-	return Plugin_Continue;
 
+	Drugged_Tick(client);
+	return Plugin_Continue;
 }
 
 void Drugged_Tick(int client){
-	
 	float fPunch[3];
 	fPunch[0] = GetRandomFloat(-45.0, 45.0);
 	fPunch[1] = GetRandomFloat(-45.0, 45.0);
 	fPunch[2] = GetRandomFloat(-45.0, 45.0);
 	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fPunch);
-	
+
 	int iClients[2];
 	iClients[0] = client;
-	
+
 	Handle hMsg = StartMessageEx(g_DruggedMsgId, iClients, 1);
 	BfWriteShort(hMsg, 255);
 	BfWriteShort(hMsg, 255);
@@ -80,31 +64,6 @@ void Drugged_Tick(int client){
 	BfWriteByte(hMsg, GetRandomInt(0,255));
 	BfWriteByte(hMsg, GetRandomInt(0,255));
 	BfWriteByte(hMsg, 128);
-	
+
 	EndMessage();
-
-}
-
-void Drugged_RemovePerk(int client){
-	
-	float fAng[3]; GetClientEyeAngles(client, fAng);
-	fAng[2] = 0.0;
-	
-	TeleportEntity(client, NULL_VECTOR, fAng, NULL_VECTOR);
-	
-	int iClients[2];
-	iClients[0] = client;
-		
-	Handle hMsg = StartMessageEx(g_DruggedMsgId, iClients, 1);
-	
-	BfWriteShort(hMsg, 1536);
-	BfWriteShort(hMsg, 1536);
-	BfWriteShort(hMsg, (0x0001 | 0x0010));
-	BfWriteByte(hMsg, 0);
-	BfWriteByte(hMsg, 0);
-	BfWriteByte(hMsg, 0);
-	BfWriteByte(hMsg, 0);
-	
-	EndMessage();
-
 }
