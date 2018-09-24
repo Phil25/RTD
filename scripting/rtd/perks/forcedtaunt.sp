@@ -17,10 +17,8 @@
 */
 
 
-bool	g_bIsForcedTaunt[MAXPLAYERS+1]	= {false, ...};
-float	g_fTauntInterval				= 1.0;
-bool	g_bShouldTaunt[MAXPLAYERS+1]	= {false, ...};
-char	g_sSoundScoutBB[][] = {
+int g_iForcedTauntId = 25;
+char g_sSoundScoutBB[][] = {
 	"items/scout_boombox_02.wav",
 	"items/scout_boombox_03.wav",
 	"items/scout_boombox_04.wav",
@@ -28,89 +26,69 @@ char	g_sSoundScoutBB[][] = {
 };
 
 void ForcedTaunt_Start(){
-
-	for(int i = 0; i < sizeof(g_sSoundScoutBB); i++){
-	
+	for(int i = 0; i < sizeof(g_sSoundScoutBB); ++i)
 		PrecacheSound(g_sSoundScoutBB[i]);
-	
-	}
-
 }
 
-void ForcedTaunt_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		ForcedTaunt_ApplyPerk(client, StringToFloat(sPref));
-	
-	else
-		g_bIsForcedTaunt[client] = false;
-
+void ForcedTaunt_Perk(int client, Perk perk, bool apply){
+	if(apply) ForcedTaunt_ApplyPerk(client, perk);
+	else UnsetClientPerkCache(client, g_iForcedTauntId);
 }
 
-void ForcedTaunt_ApplyPerk(int client, float fInterval){
+void ForcedTaunt_ApplyPerk(int client, Perk perk){
+	g_iForcedTauntId = perk.Id;
+	SetClientPerkCache(client, g_iForcedTauntId);
+	SetFloatCache(client, perk.GetPrefFloat("interval"));
+	SetIntCache(client, false);
 
-	g_fTauntInterval = fInterval;
-	
 	ForceTaunt_PerformTaunt(client);
-
-	g_bIsForcedTaunt[client] = true;
-
 }
 
-public Action Timer_ForceTaunt(Handle hTimer, int iSerial){
+public Action Timer_ForceTaunt(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(!client) return Plugin_Stop;
 
-	int client = GetClientFromSerial(iSerial);
-	if(client == 0) return Plugin_Stop;
-
-	if(!g_bIsForcedTaunt[client])
+	if(!CheckClientPerkCache(client, g_iForcedTauntId))
 		return Plugin_Stop;
-	
-	ForceTaunt_PerformTaunt(client);
-	
-	return Plugin_Stop;
 
+	ForceTaunt_PerformTaunt(client);
+	return Plugin_Stop;
 }
 
 void ForceTaunt_PerformTaunt(int client){
-
 	if(GetEntProp(client, Prop_Send, "m_hGroundEntity") > -1){
 		FakeClientCommand(client, "taunt");
 		return;
 	}
-	
-	g_bShouldTaunt[client] = true;
-	CreateTimer(0.1, Timer_RetryForceTaunt, GetClientSerial(client), TIMER_REPEAT);
 
+	SetIntCache(client, true);
+	CreateTimer(0.1, Timer_RetryForceTaunt, GetClientUserId(client), TIMER_REPEAT);
 }
 
-public Action Timer_RetryForceTaunt(Handle hTimer, int iSerial){
+public Action Timer_RetryForceTaunt(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(!client) return Plugin_Stop;
 
-	int client = GetClientFromSerial(iSerial);
-	if(client == 0) return Plugin_Stop;
-
-	if(!g_bIsForcedTaunt[client] || !g_bShouldTaunt[client])
+	if(!CheckClientPerkCache(client, g_iForcedTauntId))
 		return Plugin_Stop;
-	
+
+	if(!GetIntCacheBool(client))
+		return Plugin_Stop;
+
 	if(GetEntProp(client, Prop_Send, "m_hGroundEntity") < 0)
 		return Plugin_Continue;
-	
-	g_bShouldTaunt[client] = false;
-	FakeClientCommand(client, "taunt");
-	
-	return Plugin_Stop;
 
+	SetIntCache(client, false);
+	FakeClientCommand(client, "taunt");
+	return Plugin_Stop;
 }
 
 void ForcedTaunt_OnConditionAdded(int client, TFCond condition){
-
-	if(g_bIsForcedTaunt[client] && condition == TFCond_Taunting)
+	if(condition == TFCond_Taunting && CheckClientPerkCache(client, g_iForcedTauntId))
 		EmitSoundToAll(g_sSoundScoutBB[GetRandomInt(0, sizeof(g_sSoundScoutBB)-1)], client);
-
 }
 
 void ForcedTaunt_OnConditionRemoved(int client, TFCond condition){
-
-	if(g_bIsForcedTaunt[client] && condition == TFCond_Taunting)
-		CreateTimer(g_fTauntInterval, Timer_ForceTaunt, GetClientSerial(client));
-
+	if(condition == TFCond_Taunting && CheckClientPerkCache(client, g_iForcedTauntId))
+		CreateTimer(GetFloatCache(client), Timer_ForceTaunt, GetClientUserId(client));
 }
