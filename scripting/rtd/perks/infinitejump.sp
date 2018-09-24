@@ -17,20 +17,19 @@
 */
 
 
-bool g_bHasInfiniteDoubleJump[MAXPLAYERS+1] = {false, ...};
+int g_iInfiniteJumpId = 31;
 
-public void InfiniteJump_Perk(int client, const char[] sPref, bool apply){
-
-	g_bHasInfiniteDoubleJump[client] = apply;
-
+public void InfiniteJump_Perk(int client, Perk perk, bool apply){
+	if(apply){
+		g_iInfiniteJumpId = perk.Id;
+		SetClientPerkCache(client, g_iInfiniteJumpId);
+	}else UnsetClientPerkCache(client, g_iInfiniteJumpId);
 }
 
 void InfiniteJump_OnPlayerRunCmd(int client, int iButtons){
-
-	if(!g_bHasInfiniteDoubleJump[client])
+	if(!CheckClientPerkCache(client, g_iInfiniteJumpId))
 		return;
-	
+
 	if(iButtons & IN_JUMP)
 		SetEntProp(client, Prop_Send, "m_iAirDash", 0);
-
 }
