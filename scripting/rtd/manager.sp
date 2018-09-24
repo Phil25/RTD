@@ -77,6 +77,10 @@ int GetIntCache(client, int iOffset=0){
 	return g_iCache[client][iOffset];
 }
 
+bool GetIntCacheBool(client, int iOffset=0){
+	return view_as<bool>(g_iCache[client][iOffset]);
+}
+
 void SetIntCache(client, int iVal, int iOffset=0){
 	g_iCache[client][iOffset] = iVal;
 }
@@ -104,7 +108,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 4:	Noclip_Perk				(client, perk, bEnable);
 		case 5:	LowGravity_Perk			(client, perk, bEnable);
 		case 6:	FullUbercharge_Perk		(client, perk, bEnable);
-		case 7:	Invisibility_Perk		(client, sSettings, bEnable);
+		case 7:	Invisibility_Perk		(client, perk, bEnable);
 		case 8:	InfiniteCloak_Perk		(client, sSettings, bEnable);
 		case 9:	Criticals_Perk			(client, sSettings, bEnable);
 		case 10:InfiniteAmmo_Perk		(client, sSettings, bEnable);
@@ -173,7 +177,6 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 	• This is a forward of OnMapStart() from rtd2.sp
 */
 void Forward_OnMapStart(){
-	Invisibility_Start();
 	InfiniteAmmo_Start();
 	HomingProjectiles_Start();
 	FullRifleCharge_Start();
@@ -238,6 +241,15 @@ void Forward_OnEntityCreated(int iEntity, const char[] sClassname){
 	FastHands_OnEntityCreated(iEntity, sClassname);
 	ExplosiveArrows_OnEntityCreated(iEntity, sClassname);
 	LongMelee_OnEntityCreated(iEntity, sClassname);
+}
+
+
+/*
+	• Editing Forward_Resupply() is OPTIONAL
+	• Client is guaranteed to be valid
+*/
+void Forward_Resupply(int client){
+	Invisibility_Resupply(client);
 }
 
 

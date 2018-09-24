@@ -21,130 +21,99 @@
 	IF YOU TELL ME HOW TO GET THE INSIDE OF THE B.A.S.E. JUMPER TO DISAPPEAR I WILL LOVE YOU FOREVER
 */
 
-int		g_iBaseAlpha[MAXPLAYERS+1]	= {255, ...};
-bool	g_bBaseSentry[MAXPLAYERS+1]	= {true, ...};
-bool	g_bHasInvis[MAXPLAYERS+1]	= {false, ...};
-int		g_iInvisValue				= 0;
+#define BASE_ALPHA 0
+#define BASE_SENTRY 1
+#define INVIS_VALUE 2
 
-void Invisibility_Start(){
+int g_iInvisibilityId = 7;
 
-	HookEvent("post_inventory_application", Event_Invisibility_Resupply, EventHookMode_Post);
-
+void Invisibility_Perk(int client, Perk perk, bool apply){
+	if(apply) Invisibility_ApplyPerk(client, perk);
+	else Invisibility_RemovePerk(client);
 }
 
-void Invisibility_Perk(int client, const char[] sPref, bool apply){
+void Invisibility_ApplyPerk(int client, Perk perk){
+	g_iInvisibilityId = perk.Id;
+	SetClientPerkCache(client, g_iInvisibilityId);
 
-	if(apply)
-		Invisibility_ApplyPerk(client, StringToInt(sPref));
+	int iValue = perk.GetPrefCell("alpha");
+	SetIntCache(client, iValue, INVIS_VALUE);
+	SetIntCache(client, GetEntityAlpha(client), BASE_ALPHA);
+	SetIntCache(client, GetEntityFlags(client) & FL_NOTARGET, BASE_SENTRY);
 
-	else
-		Invisibility_RemovePerk(client);
-
-}
-
-void Invisibility_ApplyPerk(int client, int iValue){
-
-	g_bHasInvis[client]		= true;
-	g_iInvisValue			= iValue;
-	
-	g_iBaseAlpha[client]	= GetEntityAlpha(client);
-	g_bBaseSentry[client]	= (GetEntityFlags(client) & FL_NOTARGET) ? true : false;
-	
 	Invisibility_Set(client, iValue);
-	
 	SetSentryTarget(client, false);
-
 }
 
 void Invisibility_RemovePerk(int client){
-
-	g_bHasInvis[client]		= false;
-	
-	Invisibility_Set(client, g_iBaseAlpha[client]);
-	
-	SetSentryTarget(client, g_bBaseSentry[client]);
-
+	UnsetClientPerkCache(client, g_iInvisibilityId);
+	Invisibility_Set(client, GetIntCache(client, BASE_ALPHA));
+	SetSentryTarget(client, !GetIntCacheBool(client, BASE_SENTRY));
 }
 
 void Invisibility_Set(int client, int iValue){
-	
 	if(GetEntityRenderMode(client) == RENDER_NORMAL)
 		SetEntityRenderMode(client, RENDER_TRANSCOLOR);
-	
+
 	SetEntityAlpha(client, iValue);
-	
+
 	int iWeapon = 0;
 	for(int i = 0; i < 5; i++){
-	
 		iWeapon = GetPlayerWeaponSlot(client, i);
 		if(iWeapon <= MaxClients || !IsValidEntity(iWeapon))
 			continue;
-		
+
 		if(GetEntityRenderMode(iWeapon) == RENDER_NORMAL)
 			SetEntityRenderMode(iWeapon, RENDER_TRANSCOLOR);
-		
+
 		SetEntityAlpha(iWeapon, iValue);
-	
 	}
-	
+
 	char sClass[24];
 	for(int i = MaxClients+1; i < GetMaxEntities(); i++){
-	
-		if(!IsCorrectWearable(client, i, sClass, sizeof(sClass))) continue;
-		
+		if(!IsCorrectWearable(client, i, sClass, sizeof(sClass)))
+			continue;
+
 		if(GetEntityRenderMode(i) == RENDER_NORMAL)
 			SetEntityRenderMode(i, RENDER_TRANSCOLOR);
-		
-		SetEntityAlpha(i, iValue);
-	
-	}
 
+		SetEntityAlpha(i, iValue);
+	}
 }
 
-public void Event_Invisibility_Resupply(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
-
-	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if(client == 0)				return;
-	if(!g_bHasInvis[client])	return;
-	
-	Invisibility_Set(client, g_iInvisValue);
-
+void Invisibility_Resupply(int client){
+	if(CheckClientPerkCache(client, g_iInvisibilityId))
+		Invisibility_Set(client, GetIntCache(client, INVIS_VALUE));
 }
 
 stock int GetEntityAlpha(int iEntity){
-
 	return GetEntData(iEntity, GetEntSendPropOffs(iEntity, "m_clrRender") + 3, 1);
-
 }
 
 stock void SetEntityAlpha(int iEntity, int iValue){
-
 	SetEntData(iEntity, GetEntSendPropOffs(iEntity, "m_clrRender") + 3, iValue, 1, true);
-
 }
 
-bool IsCorrectWearable(int client, int i, char[] sClass, iBufferSize){
-
+bool IsCorrectWearable(int client, int i, char[] sClass, int iBufferSize){
 	if(!IsValidEntity(i))
 		return false;
 
 	GetEdictClassname(i, sClass, iBufferSize);
 	if(StrContains(sClass, "tf_wearable", false) < 0 && StrContains(sClass, "tf_powerup", false) < 0)
 		return false;
-	
+
 	if(GetEntPropEnt(i, Prop_Send, "m_hOwnerEntity") != client)
 		return false;
-	
-	return true;
 
+	return true;
 }
 
 void SetSentryTarget(int client, bool bTarget){
-
-	int iFlags = GetEntityFlags(client);	
-	if(bTarget)
-		SetEntityFlags(client, iFlags &~ FL_NOTARGET);
-	else
-		SetEntityFlags(client, iFlags | FL_NOTARGET);
-
+	int iFlags = GetEntityFlags(client);
+	if(bTarget) SetEntityFlags(client, iFlags &~ FL_NOTARGET);
+	else SetEntityFlags(client, iFlags | FL_NOTARGET);
 }
+
+#undef BASE_ALPHA
+#undef BASE_SENTRY
+#undef INVIS_VALUE
