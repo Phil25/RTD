@@ -341,9 +341,10 @@ void ReloadPluginState(){
 }
 
 public void OnMapStart(){
-	HookEvent("player_death",			Event_PlayerDeath);
-	HookEvent("player_changeclass",		Event_ClassChange);
-	HookEvent("teamplay_round_active",	Event_RoundActive);
+	HookEvent("player_death",				Event_PlayerDeath);
+	HookEvent("player_changeclass",			Event_ClassChange);
+	HookEvent("teamplay_round_active",		Event_RoundActive);
+	HookEvent("post_inventory_application",	Event_Resupply, EventHookMode_Post);
 
 	PrecacheModel(LASERBEAM);
 
@@ -357,6 +358,7 @@ public void OnMapEnd(){
 	UnhookEvent("player_death",				Event_PlayerDeath);
 	UnhookEvent("player_changeclass",		Event_ClassChange);
 	UnhookEvent("teamplay_round_active",	Event_RoundActive);
+	UnhookEvent("post_inventory_application",Event_Resupply, EventHookMode_Post);
 }
 
 public void OnClientPutInServer(int client){
@@ -736,6 +738,12 @@ public Action Event_RoundActive(Handle hEvent, const char[] sEventName, bool don
 	if(g_bCvarPluginEnabled && (g_iCvarChat & CHAT_AD) && IsRTDInRound())
 		RTDPrintAll("%T", "RTD2_Ad", LANG_SERVER, 0x03, 0x01);
 
+	return Plugin_Continue;
+}
+
+public Action Event_Resupply(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
+	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+	if(client) Forward_Resupply(client);
 	return Plugin_Continue;
 }
 
