@@ -17,8 +17,6 @@
 */
 
 
-public void Ignition_Perk(int client, const char[] sPref, bool apply){
-
+void Ignition_Perk(int client){
 	TF2_IgnitePlayer(client, client);
-
 }
