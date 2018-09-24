@@ -109,7 +109,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 5:	LowGravity_Perk			(client, perk, bEnable);
 		case 6:	FullUbercharge_Perk		(client, perk, bEnable);
 		case 7:	Invisibility_Perk		(client, perk, bEnable);
-		case 8:	InfiniteCloak_Perk		(client, sSettings, bEnable);
+		case 8:	InfiniteCloak_Perk		(client, perk, bEnable);
 		case 9:	Criticals_Perk			(client, sSettings, bEnable);
 		case 10:InfiniteAmmo_Perk		(client, sSettings, bEnable);
 		case 11:ScaryBullets_Perk		(client, sSettings, bEnable);

@@ -17,35 +17,26 @@
 */
 
 
-bool	g_bInfiniteCloak[MAXPLAYERS+1]	= {false, ...};
+int g_iInfiniteCloakId = 8;
 
-public void InfiniteCloak_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		InfiniteCloak_ApplyPerk(client);
-	
-	else
-		g_bInfiniteCloak[client] = false;
-
+public void InfiniteCloak_Perk(int client, Perk perk, bool apply){
+	if(apply) InfiniteCloak_ApplyPerk(client, perk);
+	else UnsetClientPerkCache(client, g_iInfiniteCloakId);
 }
 
-void InfiniteCloak_ApplyPerk(int client){
-
-	g_bInfiniteCloak[client] = true;
-	CreateTimer(0.25, Timer_RefreshCloak, GetClientSerial(client), TIMER_REPEAT);
-
+void InfiniteCloak_ApplyPerk(int client, Perk perk){
+	g_iInfiniteCloakId = perk.Id;
+	SetClientPerkCache(client, g_iInfiniteCloakId);
+	CreateTimer(0.25, Timer_RefreshCloak, GetClientUserId(client), TIMER_REPEAT);
 }
 
-public Action Timer_RefreshCloak(Handle hTimer, int iSerial){
+public Action Timer_RefreshCloak(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(!client) return Plugin_Stop;
 
-	int client = GetClientFromSerial(iSerial);
-	if(client == 0) return Plugin_Stop;
-
-	if(!g_bInfiniteCloak[client])
+	if(!CheckClientPerkCache(client, g_iInfiniteCloakId))
 		return Plugin_Stop;
-	
-	SetEntPropFloat(client, Prop_Send, "m_flCloakMeter", 105.0);
-	
-	return Plugin_Continue;
 
+	SetEntPropFloat(client, Prop_Send, "m_flCloakMeter", 105.0);
+	return Plugin_Continue;
 }
