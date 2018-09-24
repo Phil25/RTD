@@ -134,7 +134,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 12:SpawnSentry_Perk		(client, perk, bEnable);
 		case 13:HomingProjectiles_Perk	(client, perk, bEnable);
 		case 14:FullRifleCharge_Perk	(client, perk, bEnable);
-		case 15:Explode_Perk			(client, sSettings, bEnable);
+		case 15:Explode_Perk			(client);
 		case 16:Snail_Perk				(client, sSettings, bEnable);
 		case 17:Frozen_Perk				(client, sSettings, bEnable);
 		case 18:Timebomb_Perk			(client, sSettings, bEnable);

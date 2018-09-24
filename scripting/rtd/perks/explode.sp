@@ -17,8 +17,6 @@
 */
 
 
-public void Explode_Perk(int client, const char[] sPref, bool apply){
-
+void Explode_Perk(int client){
 	FakeClientCommand(client, "explode");
-
 }
