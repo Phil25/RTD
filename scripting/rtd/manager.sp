@@ -28,28 +28,28 @@
 \**********************************************************************************/
 
 int g_iClientPerkCache[MAXPLAYERS+1] = {-1, ...}; // Used to check if client has the current perk
-int g_iEntCache[MAXPLAYERS+1] = {INVALID_ENT_REFERENCE, ...}; // Used throughout perks to store their entities
+int g_iEntCache[MAXPLAYERS+1][2]; // Used throughout perks to store their entities
 float g_fCache[MAXPLAYERS+1][4];
 int g_iCache[MAXPLAYERS+1][4];
 ArrayList g_aCache[MAXPLAYERS+1] = {null, ...};
 
 // TODO: move these functions down
-void SetEntCache(int client, int iEnt){
-	g_iEntCache[client] = EntIndexToEntRef(iEnt);
+void SetEntCache(int client, int iEnt, int iBlock=0){
+	g_iEntCache[client][iBlock] = EntIndexToEntRef(iEnt);
 }
 
-int GetEntCache(int client){
-	return EntRefToEntIndex(g_iEntCache[client]);
+int GetEntCache(int client, int iBlock=0){
+	return EntRefToEntIndex(g_iEntCache[client][iBlock]);
 }
 
-void KillEntCache(int client){
-	if(g_iEntCache[client] == INVALID_ENT_REFERENCE)
+void KillEntCache(int client, int iBlock=0){
+	if(g_iEntCache[client][iBlock] == INVALID_ENT_REFERENCE)
 		return;
 
-	int iEnt = EntRefToEntIndex(g_iEntCache[client]);
+	int iEnt = EntRefToEntIndex(g_iEntCache[client][iBlock]);
 	if(iEnt > MaxClients) AcceptEntityInput(iEnt, "Kill");
 
-	g_iEntCache[client] = INVALID_ENT_REFERENCE;
+	g_iEntCache[client][iBlock] = INVALID_ENT_REFERENCE;
 }
 
 void SetClientPerkCache(int client, int iPerkId){
@@ -69,20 +69,20 @@ float GetFloatCache(int client, int iOffset=0){
 	return g_fCache[client][iOffset];
 }
 
-void SetFloatCache(int client, float fVal, int iOffset=0){
-	g_fCache[client][iOffset] = fVal;
+void SetFloatCache(int client, float fVal, int iBlock=0){
+	g_fCache[client][iBlock] = fVal;
 }
 
-int GetIntCache(int client, int iOffset=0){
-	return g_iCache[client][iOffset];
+int GetIntCache(int client, int iBlock=0){
+	return g_iCache[client][iBlock];
 }
 
-bool GetIntCacheBool(int client, int iOffset=0){
-	return view_as<bool>(g_iCache[client][iOffset]);
+bool GetIntCacheBool(int client, int iBlock=0){
+	return view_as<bool>(g_iCache[client][iBlock]);
 }
 
-void SetIntCache(int client, int iVal, int iOffset=0){
-	g_iCache[client][iOffset] = iVal;
+void SetIntCache(int client, int iVal, int iBlock=0){
+	g_iCache[client][iBlock] = iVal;
 }
 
 ArrayList CreateArrayCache(int client, int iBlockSize=1){
@@ -137,7 +137,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 15:Explode_Perk			(client);
 		case 16:Snail_Perk				(client, perk, bEnable);
 		case 17:Frozen_Perk				(client, bEnable);
-		case 18:Timebomb_Perk			(client, sSettings, bEnable);
+		case 18:Timebomb_Perk			(client, perk, bEnable);
 		case 19:Ignition_Perk			(client, sSettings, bEnable);
 		case 20:LowHealth_Perk			(client, sSettings, bEnable);
 		case 21:Drugged_Perk			(client, sSettings, bEnable);

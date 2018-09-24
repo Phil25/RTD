@@ -26,244 +26,192 @@
 #define TICK_SLOW			0.75
 #define TICK_FAST			0.35
 
-int		iTimebombTicks		= 10;
-float	fTimebombRadius		= 512.0;
-float	g_fTimebombDamage	= 270.0;
+// ent cache
+#define HEAD 0
+#define FLAME 1
 
-bool	g_bHasTimebomb[MAXPLAYERS+1]			= {false, ...};
-int		g_iTimebombClientTicks[MAXPLAYERS+1]	= {0, ...};
-float	g_fTimebombClientBeeps[MAXPLAYERS+1]	= {TICK_SLOW, ...};
-int		g_iTimebombHead[MAXPLAYERS+1]			= {0, ...};
-int		g_iTimebombState[MAXPLAYERS+1]			= {0, ...};
-int		g_iTimebombFlame[MAXPLAYERS+1]			= {0, ...};
+// int cache
+#define MAX_TICKS 0
+#define CLIENT_TICKS 1
+#define STATE 3
+
+// float cache
+#define RADIUS 0
+#define DAMAGE 1
+#define CLIENT_BEEPS 2
+
+
+int g_iTimebombId = 18;
 
 void Timebomb_Start(){
-
 	PrecacheModel(MODEL_BOMB);
-	
 	PrecacheSound(SOUND_EXPLODE);
 	PrecacheSound(SOUND_TIMEBOMB_TICK);
 	PrecacheSound(SOUND_TIMEBOMB_GOFF);
-
 }
 
-void Timebomb_Perk(int client, const char[] sPref, bool apply){
+void Timebomb_Perk(int client, Perk perk, bool apply){
+	if(!apply) return;
 
-	if(!apply)
-		return;
-	
-	g_bHasTimebomb[client] = true;
-	
-	Timebomb_ProcessSettings(sPref);
-	
-	if(g_iTimebombHead[client] <= MaxClients)
-		g_iTimebombHead[client] = Timebomb_SpawnBombHead(client);
-	
-	int iSerial = GetClientSerial(client);
-	
-	CreateTimer(1.0, Timer_Timebomb_Tick, iSerial, TIMER_REPEAT);
-	
+	g_iTimebombId = perk.Id;
+	SetClientPerkCache(client, g_iTimebombId);
+
+	SetIntCache(client, perk.GetPrefCell("ticks"), MAX_TICKS);
+	SetFloatCache(client, perk.GetPrefFloat("radius"), RADIUS);
+	SetFloatCache(client, perk.GetPrefFloat("damage"), DAMAGE);
+
+	SetEntCache(client, Timebomb_SpawnBombHead(client), HEAD);
+
+	SetIntCache(client, 0, CLIENT_TICKS);
+	SetFloatCache(client, TICK_SLOW, CLIENT_BEEPS);
+	SetIntCache(client, 0, STATE);
+
 	SetVariantInt(1);
 	AcceptEntityInput(client, "SetForcedTauntCam");
-
+	CreateTimer(1.0, Timer_Timebomb_Tick, GetClientUserId(client), TIMER_REPEAT);
 }
 
-public Action Timer_Timebomb_Tick(Handle hTimer, int iSerial){
+public Action Timer_Timebomb_Tick(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(!client) return Plugin_Stop;
 
-	int client = GetClientFromSerial(iSerial);
-	if(client == 0) return Plugin_Stop;
-	
-	if(!g_bHasTimebomb[client])
+	if(!CheckClientPerkCache(client, g_iTimebombId))
 		return Plugin_Stop;
-	
-	g_iTimebombClientTicks[client]++;
-	
-	if(g_iTimebombHead[client] > MaxClients && IsValidEntity(g_iTimebombHead[client]))
-		if(g_iTimebombClientTicks[client] >= RoundToFloor(iTimebombTicks*0.3))
-			if(g_iTimebombClientTicks[client] < RoundToFloor(iTimebombTicks*0.7))
+
+	int iClientTicks = GetIntCache(client, CLIENT_TICKS) +1;
+	int iMaxTicks = GetIntCache(client, MAX_TICKS);
+
+	SetIntCache(client, iClientTicks, CLIENT_TICKS);
+	if(GetEntCache(client, HEAD) > MaxClients)
+		if(iClientTicks >= RoundToFloor(iMaxTicks*0.3))
+			if(iClientTicks < RoundToFloor(iMaxTicks*0.7))
 				Timebomb_BombState(client, 1);
 			else Timebomb_BombState(client, 2);
-	
-	
-	if(g_iTimebombClientTicks[client] == iTimebombTicks-1)
+
+	if(iClientTicks == iMaxTicks-1)
 		EmitSoundToAll(SOUND_TIMEBOMB_GOFF, client);
-	else if(g_iTimebombClientTicks[client] >= iTimebombTicks){
-	
+
+	else if(iClientTicks >= iMaxTicks){
 		Timebomb_Explode(client);
 		return Plugin_Stop;
-	
 	}
-	
-	return Plugin_Continue;
 
+	return Plugin_Continue;
 }
 
-public Action Timer_Timebomb_Beep(Handle hTimer, int iSerial){
-
-	int client = GetClientFromSerial(iSerial);
+public Action Timer_Timebomb_Beep(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
 	if(client == 0) return Plugin_Stop;
-	
-	if(!g_bHasTimebomb[client])
-		return Plugin_Stop;
-	
-	EmitSoundToAll(SOUND_TIMEBOMB_TICK, client);
-	
-	CreateTimer(g_fTimebombClientBeeps[client], Timer_Timebomb_Beep, GetClientSerial(client));
-	
-	return Plugin_Stop;
 
+	if(!CheckClientPerkCache(client, g_iTimebombId))
+		return Plugin_Stop;
+
+	EmitSoundToAll(SOUND_TIMEBOMB_TICK, client);
+	CreateTimer(GetFloatCache(client, CLIENT_BEEPS), Timer_Timebomb_Beep, GetClientUserId(client));
+	return Plugin_Stop;
 }
 
 void Timebomb_BombState(int client, int iState){
-
-	if(iState == g_iTimebombState[client])
+	int iCurState = GetIntCache(client, STATE);
+	if(iState == iCurState)
 		return;
 
 	switch(iState){
-	
 		case 1:{
-		
 			EmitSoundToAll(SOUND_TIMEBOMB_TICK, client);
-			g_fTimebombClientBeeps[client] = TICK_SLOW;
-			CreateTimer(g_fTimebombClientBeeps[client], Timer_Timebomb_Beep, GetClientSerial(client));
-		
+			SetFloatCache(client, TICK_SLOW, CLIENT_BEEPS);
+			CreateTimer(TICK_SLOW, Timer_Timebomb_Beep, GetClientUserId(client));
 		}
-		
 		case 2:{
-		
-			g_fTimebombClientBeeps[client] = TICK_FAST;
-		
+			SetFloatCache(client, TICK_FAST, CLIENT_BEEPS);
 		}
-	
 	}
-	
-	SetEntProp(g_iTimebombHead[client], Prop_Send, "m_nSkin", g_iTimebombState[client]+1);
-	
-	g_iTimebombState[client] = iState;
 
+	SetEntProp(GetEntCache(client, HEAD), Prop_Send, "m_nSkin", iCurState+1);
+	SetIntCache(client, iState, STATE);
 }
 
 void Timebomb_OnRemovePerk(int client){
-
-	if(g_bHasTimebomb[client])
+	if(CheckClientPerkCache(client, g_iTimebombId))
 		Timebomb_Explode(client, true);
-
 }
 
 void Timebomb_Explode(int client, bool bSilent=false){
-
 	SetVariantInt(0);
 	AcceptEntityInput(client, "SetForcedTauntCam");
 
-	g_iTimebombClientTicks[client]	= 0;
-	g_bHasTimebomb[client]			= false;
-	g_fTimebombClientBeeps[client]	= TICK_SLOW;
-	g_iTimebombState[client]		= 0;
+	UnsetClientPerkCache(client, g_iTimebombId);
+	KillEntCache(client, HEAD);
+	KillEntCache(client, FLAME);
 
-	if(g_iTimebombHead[client] > MaxClients && IsValidEntity(g_iTimebombHead[client]))
-		AcceptEntityInput(g_iTimebombHead[client], "Kill");
+	if(bSilent) return;
 
-	if(g_iTimebombFlame[client] > MaxClients && IsValidEntity(g_iTimebombFlame[client]))
-		AcceptEntityInput(g_iTimebombFlame[client], "Kill");
-	
-	g_iTimebombHead[client] = 0;
-	g_iTimebombFlame[client] = 0;
-	
-	if(bSilent)
-		return;
+	float fDamage = GetFloatCache(client, DAMAGE);
+	float fPos[3];
+	GetClientAbsOrigin(client, fPos);
+	float fRadius = GetFloatCache(client, RADIUS);
+	fRadius *= fRadius;
 
-	float fDamage, fPos[3]; GetClientAbsOrigin(client, fPos);
 	int iPlayerDamage;
 	for(int i = 1; i <= MaxClients; i++){
-	
 		if(i == client || !IsClientInGame(i) || !IsPlayerAlive(i))
 			continue;
-		
+
 		if(!CanPlayerBeHurt(i, client))
 			continue;
-		
+
 		if(!CanEntitySeeTarget(client, i))
 			continue;
-		
+
 		float fPosTarget[3];
 		GetClientAbsOrigin(i, fPosTarget);
-		
-		if(GetVectorDistance(fPos, fPosTarget) <= fTimebombRadius){
-		
-			fDamage = g_fTimebombDamage;
+
+		if(GetVectorDistance(fPos, fPosTarget, true) <= fRadius){
 			iPlayerDamage += RoundToFloor(fDamage);
-			
 			SDKHooks_TakeDamage(i, 0, client, fDamage, DMG_PREVENT_PHYSICS_FORCE|DMG_CRUSH|DMG_ALWAYSGIB|DMG_BLAST);
-		
 		}
-	
 	}
-	
+
 	int iShockwave = CreateParticle(client, "rd_robot_explosion_shockwave");
-	CreateTimer(1.0, Timer_TimebombRemoveTempParticle, EntIndexToEntRef(iShockwave));
-	
+	KILL_ENT_IN(iShockwave,1.0)
+
 	int iExplosion = CreateParticle(client, "rd_robot_explosion");
-	CreateTimer(1.0, Timer_TimebombRemoveTempParticle, EntIndexToEntRef(iExplosion));
-	
+	KILL_ENT_IN(iExplosion,1.0)
+
 	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Timebomb_Damage", LANG_SERVER, 0x03, iPlayerDamage, 0x01);
 	EmitSoundToAll(SOUND_EXPLODE, client);
 	FakeClientCommandEx(client, "explode");
-
-}
-
-public Action Timer_TimebombRemoveTempParticle(Handle hTimer, int iRef){
-
-	int iEnt = EntRefToEntIndex(iRef);
-	
-	if(iEnt <= MaxClients)
-		return Plugin_Stop;
-	
-	if(!IsValidEntity(iEnt))
-		return Plugin_Stop;
-	
-	AcceptEntityInput(iEnt, "Kill");
-	
-	return Plugin_Stop;
-
 }
 
 int Timebomb_SpawnBombHead(int client){
-
 	int iBomb = CreateEntityByName("prop_dynamic");
-	
+	if(!iBomb) return 0;
+
 	DispatchKeyValue(iBomb, "model", MODEL_BOMB);
-	
 	DispatchSpawn(iBomb);
-	
+
 	SetVariantString("!activator");
 	AcceptEntityInput(iBomb, "SetParent", client, -1, 0);
-	
+
 	TFClassType clsPlayer = TF2_GetPlayerClass(client);
-	
 	if(clsPlayer == TFClass_Pyro || clsPlayer == TFClass_Engineer)
 		SetVariantString("OnUser1 !self,SetParentAttachment,head,0.0,-1");
-	else
-		SetVariantString("OnUser1 !self,SetParentAttachment,eyes,0.0,-1");
-	
+	else SetVariantString("OnUser1 !self,SetParentAttachment,eyes,0.0,-1");
+
 	AcceptEntityInput(iBomb, "AddOutput");
 	AcceptEntityInput(iBomb, "FireUser1");
-	
+
 	float fOffs[3];
 	fOffs[2] = 64.0;
-	
-	g_iTimebombFlame[client] = CreateParticle(client, "burningplayer_corpse", true, "", fOffs);
-	
+	SetEntCache(client, CreateParticle(client, "burningplayer_corpse", true, "", fOffs), FLAME);
 	return iBomb;
-
 }
 
-void Timebomb_ProcessSettings(const char[] sSettings){
-	
-	char[][] sPieces = new char[3][8];
-	ExplodeString(sSettings, ",", sPieces, 3, 8);
-
-	iTimebombTicks		= StringToInt(sPieces[0]);
-	fTimebombRadius		= StringToFloat(sPieces[1]);
-	g_fTimebombDamage	= StringToFloat(sPieces[2]);
-
-}
+#undef HEAD
+#undef FLAME
+#undef MAX_TICKS
+#undef CLIENT_TICKS
+#undef STATE
+#undef RADIUS
+#undef DAMAGE
+#undef CLIENT_BEEPS
