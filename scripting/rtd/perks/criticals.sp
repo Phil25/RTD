@@ -17,30 +17,23 @@
 */
 
 
-#define MINICRIT TFCond_Buffed
 #define FULLCRIT TFCond_CritOnFirstBlood
+#define MINICRIT TFCond_Buffed
 
-bool g_bMiniCrits[MAXPLAYERS+1] = {false, ...};
-
-void Criticals_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		Criticals_ApplyPerk(client, StringToInt(sPref));
-	else
-		Criticals_RemovePerk(client);
-
+void Criticals_Perk(int client, Perk perk, bool apply){
+	if(apply) Criticals_ApplyPerk(client, perk);
+	else Criticals_RemovePerk(client);
 }
 
-void Criticals_ApplyPerk(int client, int iValue){
-
-	g_bMiniCrits[client] = (iValue > 0) ? false : true;
-	
-	TF2_AddCondition(client, g_bMiniCrits[client] ? MINICRIT : FULLCRIT);
-
+void Criticals_ApplyPerk(int client, Perk perk){
+	TFCond iFull = perk.GetPrefCell("full") > 0 ? FULLCRIT : MINICRIT;
+	SetIntCache(client, view_as<int>(iFull));
+	TF2_AddCondition(client, iFull);
 }
 
 void Criticals_RemovePerk(int client){
-	
-	TF2_RemoveCondition(client, g_bMiniCrits[client] ? MINICRIT : FULLCRIT);
-
+	TF2_RemoveCondition(client, view_as<TFCond>(GetIntCache(client)));
 }
+
+#undef FULLCRIT
+#undef MINICRIT
