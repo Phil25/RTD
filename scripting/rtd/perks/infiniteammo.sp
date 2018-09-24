@@ -16,152 +16,117 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define NO_RELOAD 0
+#define WEAPON 1
+#define CLIP 2
+#define AMMO 3
 
-bool	g_bResupplyAmmo[MAXPLAYERS+1]	= {false, ...};
-bool	g_bNoReload						= true;
-int		g_iWeaponCache[MAXPLAYERS+1][3];
-
-int		g_iOffsetClip, g_iOffsetAmmo, g_iOffsetAmmoType;
+int g_iInfiniteAmmoId = 10;
+int g_iOffsetClip, g_iOffsetAmmo, g_iOffsetAmmoType;
 
 void InfiniteAmmo_Start(){
-
 	g_iOffsetClip		= FindSendPropInfo("CTFWeaponBase", "m_iClip1");
 	g_iOffsetAmmo		= FindSendPropInfo("CTFPlayer", "m_iAmmo");
 	g_iOffsetAmmoType	= FindSendPropInfo("CBaseCombatWeapon", "m_iPrimaryAmmoType");
-
 }
 
-void InfiniteAmmo_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		InfiniteAmmo_ApplyPerk(client, StringToInt(sPref));
-	
-	else
-		g_bResupplyAmmo[client] = false;
-
+void InfiniteAmmo_Perk(int client, Perk perk, bool apply){
+	if(apply) InfiniteAmmo_ApplyPerk(client, perk);
+	else UnsetClientPerkCache(client, g_iInfiniteAmmoId);
 }
 
-void InfiniteAmmo_ApplyPerk(int client, int iNoReload){
+void InfiniteAmmo_ApplyPerk(int client, Perk perk){
+	g_iInfiniteAmmoId = perk.Id;
+	SetClientPerkCache(client, g_iInfiniteAmmoId);
+	SetIntCache(client, perk.GetPrefCell("reload") < 1, NO_RELOAD);
 
-	g_bNoReload					= (iNoReload < 1) ? true : false;
-	g_bResupplyAmmo[client]		= true;
-	
-	CreateTimer(0.25, Timer_ResupplyAmmo, GetClientSerial(client), TIMER_REPEAT);
-
+	CreateTimer(0.25, Timer_ResupplyAmmo, GetClientUserId(client), TIMER_REPEAT);
 }
 
-public Action Timer_ResupplyAmmo(Handle hTimer, int iSerial){
+public Action Timer_ResupplyAmmo(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(!client) return Plugin_Stop;
 
-	int client = GetClientFromSerial(iSerial);
-	if(client == 0) return Plugin_Stop;
-
-	if(!g_bResupplyAmmo[client])
+	if(!CheckClientPerkCache(client, g_iInfiniteAmmoId))
 		return Plugin_Stop;
-	
-	InfiniteAmmo_Resupply(client);
-	
-	return Plugin_Continue;
 
+	InfiniteAmmo_Resupply(client);
+	return Plugin_Continue;
 }
 
 void InfiniteAmmo_Resupply(int client){
-
 	switch(TF2_GetPlayerClass(client)){
-
-		case TFClass_Engineer:{
+		case TFClass_Engineer:
 			SetEntProp(client, Prop_Data, "m_iAmmo", 200, 4, 3);
-		}
-		
-		case TFClass_Spy:{
-			SetEntPropFloat(client, Prop_Send, "m_flCloakMeter", 100.0);
-		}
 
+		case TFClass_Spy:
+			SetEntPropFloat(client, Prop_Send, "m_flCloakMeter", 105.0);
 	}
-	
+
 	int iWeapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
-	
 	if(iWeapon <= MaxClients || !IsValidEntity(iWeapon))
 		return;
-	
+
 	switch(GetEntProp(iWeapon, Prop_Send, "m_iItemDefinitionIndex")){
-	
 		case 441,442,588:{
-		
 			SetEntPropFloat(iWeapon, Prop_Send, "m_flEnergy", 20.0);
-		
 		}
-		
+
 		case 307:{
-		
 			SetEntProp(iWeapon, Prop_Send, "m_bBroken", 0);
 			SetEntProp(iWeapon, Prop_Send, "m_iDetonated", 0);
-		
 		}
-		
+
 		default:{
-		
-			if(g_iWeaponCache[client][0] != iWeapon){
-			
-				g_iWeaponCache[client][0] = iWeapon;
-				g_iWeaponCache[client][1] = GetClip(iWeapon);
-				g_iWeaponCache[client][2] = GetAmmo(client, iWeapon);
-			
+			if(GetIntCache(client, WEAPON) != iWeapon){
+				SetIntCache(client, iWeapon, WEAPON);
+				SetIntCache(client, GetClip(iWeapon), CLIP);
+				SetIntCache(client, GetAmmo(client, iWeapon), AMMO);
 			}else{
-			
-				int iClip = g_bNoReload ? GetClip(iWeapon) : -1;
+				int iClip = GetIntCache(client, NO_RELOAD) ? GetClip(iWeapon) : -1;
 				if(iClip > -1){
-				
-					if(iClip > g_iWeaponCache[client][1])
-						g_iWeaponCache[client][1] = iClip;
-					else if(iClip < g_iWeaponCache[client][1])
-						SetClip(iWeapon, g_iWeaponCache[client][1]);
-				
+					if(iClip > GetIntCache(client, CLIP))
+						SetIntCache(client, iClip, CLIP);
+
+					else if(iClip < GetIntCache(client, CLIP))
+						SetClip(iWeapon, GetIntCache(client, CLIP));
 				}
-			
+
 				int iAmmo = GetAmmo(client, iWeapon);
 				if(iAmmo > -1){
-				
-					if(iAmmo > g_iWeaponCache[client][2])
-						g_iWeaponCache[client][2] = iAmmo;
-					else if(iAmmo < g_iWeaponCache[client][2])
-						SetAmmo(client, iWeapon, g_iWeaponCache[client][2]);
-				
-				}
-			
-			}
-		
-		}
-	
-	}
+					if(iAmmo > GetIntCache(client, AMMO))
+						SetIntCache(client, iAmmo, AMMO);
 
+					else if(iAmmo < GetIntCache(client, AMMO))
+						SetAmmo(client, iWeapon, GetIntCache(client, AMMO));
+				}
+			}
+		}
+	}
 }
 
 //The bellow are ripped straight from the original RTD
 
 void SetAmmo(int client, int iWeapon, int iAmount){
-
 	int iOffset = g_iOffsetAmmo + GetEntData(iWeapon, g_iOffsetAmmoType, 1) * 4;
 	SetEntData(client, iOffset, iAmount);
-
 }
 
 int GetAmmo(int client, int iWeapon){
-
 	int iAmmoType = GetEntData(iWeapon, g_iOffsetAmmoType, 1);
 	if(iAmmoType == 4) return -1;
-	
 	return GetEntData(client, g_iOffsetAmmo + iAmmoType * 4);
-
 }
 
 void SetClip(int iWeapon, int iAmount){
-
 	SetEntData(iWeapon, g_iOffsetClip, iAmount, _, true);
-
 }
 
 int GetClip(int iWeapon){
-
 	return GetEntData(iWeapon, g_iOffsetClip);
-
 }
+
+#undef NO_RELOAD
+#undef WEAPON
+#undef CLIP
+#undef AMMO
