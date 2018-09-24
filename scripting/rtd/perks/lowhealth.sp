@@ -17,11 +17,6 @@
 */
 
 
-void LowHealth_Perk(int client, const char[] sPref, bool apply){
-
-	if(!apply)
-		return;
-
-	SetEntityHealth(client, StringToInt(sPref));
-
+void LowHealth_Perk(int client, Perk perk, bool apply){
+	if(apply) SetEntityHealth(client, perk.GetPrefCell("health"));
 }

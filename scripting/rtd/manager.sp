@@ -139,7 +139,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 17:Frozen_Perk				(client, bEnable);
 		case 18:Timebomb_Perk			(client, perk, bEnable);
 		case 19:Ignition_Perk			(client);
-		case 20:LowHealth_Perk			(client, sSettings, bEnable);
+		case 20:LowHealth_Perk			(client, perk, bEnable);
 		case 21:Drugged_Perk			(client, sSettings, bEnable);
 		case 22:Blind_Perk				(client, sSettings, bEnable);
 		case 23:StripToMelee_Perk		(client, sSettings, bEnable);
