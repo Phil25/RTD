@@ -16,46 +16,37 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define DESIRED 0
+#define BASE 1
 
-int		g_iBaseFunnyFov[MAXPLAYERS+1]		= {75, ...};
-bool	g_bHasFunnyFeeling[MAXPLAYERS+1]	= {false, ...};
-int		g_iDesiredFunnyFov = 160;
+int g_iFunnyFeelingId = 28;
 
-void FunnyFeeling_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		FunnyFeeling_ApplyPerk(client, StringToInt(sPref));
-	
-	else
-		FunnyFeeling_RemovePerk(client);
-
+void FunnyFeeling_Perk(int client, Perk perk, bool apply){
+	if(apply) FunnyFeeling_ApplyPerk(client, perk);
+	else FunnyFeeling_RemovePerk(client);
 }
 
-void FunnyFeeling_ApplyPerk(int client, int iValue){
+void FunnyFeeling_ApplyPerk(int client, Perk perk){
+	g_iFunnyFeelingId = perk.Id;
+	SetClientPerkCache(client, g_iFunnyFeelingId);
+	int iDesired = perk.GetPrefCell("fov");
 
-	g_iDesiredFunnyFov = iValue;
-
-	g_iBaseFunnyFov[client] = GetEntProp(client, Prop_Send, "m_iFOV");
-	SetEntProp(client, Prop_Send, "m_iFOV", g_iDesiredFunnyFov);
-	
-	g_bHasFunnyFeeling[client] = true;
-
+	SetIntCache(client, iDesired, DESIRED);
+	SetIntCache(client, GetEntProp(client, Prop_Send, "m_iFOV"), BASE);
+	SetEntProp(client, Prop_Send, "m_iFOV", iDesired);
 }
 
 void FunnyFeeling_RemovePerk(int client){
-
-	SetEntProp(client, Prop_Send, "m_iFOV", g_iBaseFunnyFov[client]);
-	
-	g_bHasFunnyFeeling[client] = false;
-
+	SetEntProp(client, Prop_Send, "m_iFOV", GetIntCache(client, BASE));
+	UnsetClientPerkCache(client, g_iFunnyFeelingId);
 }
 
 void FunnyFeeling_OnConditionRemoved(int client, TFCond condition){
+	if(condition != TFCond_Zoomed) return;
 
-	if(!IsClientInGame(client))		return;
-	if(!g_bHasFunnyFeeling[client])	return;
-	if(condition != TFCond_Zoomed)	return;
-	
-	SetEntProp(client, Prop_Send, "m_iFOV", g_iDesiredFunnyFov);
-
+	if(CheckClientPerkCache(client, g_iFunnyFeelingId))
+		SetEntProp(client, Prop_Send, "m_iFOV", GetIntCache(client, DESIRED));
 }
+
+#undef DESIRED
+#undef BASE
