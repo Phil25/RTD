@@ -19,60 +19,37 @@
 
 #define SCARYBULLETS_PARTICLE "ghost_glow"
 
-int		g_bHasScaryBullets[MAXPLAYERS+1]	= {false, ...};
-int		g_bScaryParticle[MAXPLAYERS+1]		= {-1, ...};
-float	g_fScaryStunDuration				= 4.0;
+int g_iScaryBulletsId = 11;
 
-void ScaryBullets_Start(){
-
-	HookEvent("player_hurt", Event_ScaryBullets_PlayerHurt);
-
+void ScaryBullets_Perk(int client, Perk perk, bool apply){
+	if(apply) ScaryBullets_ApplyPerk(client, perk);
+	else ScaryBullets_RemovePerk(client);
 }
 
-void ScaryBullets_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		ScaryBullets_ApplyPerk(client, StringToFloat(sPref));
-	
-	else
-		ScaryBullets_RemovePerk(client);
-
-}
-
-void ScaryBullets_ApplyPerk(int client, float fDuration){
-
-	g_fScaryStunDuration		= fDuration;
-	g_bHasScaryBullets[client]	= true;
-	
-	if(g_bScaryParticle[client] < 0)
-		g_bScaryParticle[client] = CreateParticle(client, SCARYBULLETS_PARTICLE);
-
+void ScaryBullets_ApplyPerk(int client, Perk perk){
+	g_iScaryBulletsId = perk.Id;
+	SetClientPerkCache(client, g_iScaryBulletsId);
+	SetFloatCache(client, perk.GetPrefFloat("duration"));
+	SetEntCache(client, CreateParticle(client, SCARYBULLETS_PARTICLE));
 }
 
 void ScaryBullets_RemovePerk(int client){
-
-	if(g_bScaryParticle[client] > MaxClients && IsValidEntity(g_bScaryParticle[client])){
-		AcceptEntityInput(g_bScaryParticle[client], "Kill");
-		g_bScaryParticle[client] = -1;
-	}
-
-	g_bHasScaryBullets[client] = false;
-
+	UnsetClientPerkCache(client, g_iScaryBulletsId);
+	KillEntCache(client);
 }
 
-public void Event_ScaryBullets_PlayerHurt(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
-	
-	int attacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
-	if(attacker == 0) return;
+void ScaryBullets_PlayerHurt(int client, Handle hEvent){
+	int iAttacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
+	if(!iAttacker) return;
 
-	if(!g_bHasScaryBullets[attacker])		return;
+	if(!CheckClientPerkCache(iAttacker, g_iScaryBulletsId))
+		return;
 
-	int victim = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if(attacker == victim)					return;
-	if(!IsClientInGame(victim))				return;
-	if(victim < 1 || victim > MaxClients)	return;
-	
-	if(IsPlayerAlive(victim) && GetEventInt(hEvent, "health") > 0 && !TF2_IsPlayerInCondition(victim, TFCond_Dazed))
-		TF2_StunPlayer(victim, g_fScaryStunDuration, _, TF_STUNFLAGS_GHOSTSCARE, attacker);
+	if(client == iAttacker)
+		return;
+
+	int iHealth = GetEventInt(hEvent, "health");
+	if(IsPlayerAlive(client) && iHealth > 0 && !TF2_IsPlayerInCondition(client, TFCond_Dazed))
+		TF2_StunPlayer(client, GetFloatCache(iAttacker), _, TF_STUNFLAGS_GHOSTSCARE, iAttacker);
 
 }

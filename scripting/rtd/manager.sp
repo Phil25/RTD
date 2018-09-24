@@ -112,7 +112,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 8:	InfiniteCloak_Perk		(client, perk, bEnable);
 		case 9:	Criticals_Perk			(client, perk, bEnable);
 		case 10:InfiniteAmmo_Perk		(client, perk, bEnable);
-		case 11:ScaryBullets_Perk		(client, sSettings, bEnable);
+		case 11:ScaryBullets_Perk		(client, perk, bEnable);
 		case 12:SpawnSentry_Perk		(client, sSettings, bEnable);
 		case 13:HomingProjectiles_Perk	(client, sSettings, bEnable);
 		case 14:FullRifleCharge_Perk	(client, sSettings, bEnable);
@@ -186,7 +186,6 @@ void Forward_OnMapStart(){
 	Beacon_Start();
 	ForcedTaunt_Start();
 	Earthquake_Start();
-	ScaryBullets_Start();
 	Firework_Start();
 	DeadlyVoice_Start();
 	EyeForAnEye_Start();
@@ -250,6 +249,15 @@ void Forward_OnEntityCreated(int iEntity, const char[] sClassname){
 */
 void Forward_Resupply(int client){
 	Invisibility_Resupply(client);
+}
+
+
+/*
+	• Editing Forward_PlayerHurt() is OPTIONAL
+	• Client is guaranteed to be valid
+*/
+void Forward_PlayerHurt(int client, Handle hEvent){
+	ScaryBullets_PlayerHurt(client, hEvent);
 }
 
 

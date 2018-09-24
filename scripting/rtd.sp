@@ -345,6 +345,7 @@ public void OnMapStart(){
 	HookEvent("player_changeclass",			Event_ClassChange);
 	HookEvent("teamplay_round_active",		Event_RoundActive);
 	HookEvent("post_inventory_application",	Event_Resupply, EventHookMode_Post);
+	HookEvent("player_hurt",				Event_PlayerHurt);
 
 	PrecacheModel(LASERBEAM);
 
@@ -359,6 +360,7 @@ public void OnMapEnd(){
 	UnhookEvent("player_changeclass",		Event_ClassChange);
 	UnhookEvent("teamplay_round_active",	Event_RoundActive);
 	UnhookEvent("post_inventory_application",Event_Resupply, EventHookMode_Post);
+	UnhookEvent("player_hurt",				Event_PlayerHurt);
 }
 
 public void OnClientPutInServer(int client){
@@ -744,6 +746,12 @@ public Action Event_RoundActive(Handle hEvent, const char[] sEventName, bool don
 public Action Event_Resupply(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
 	if(client) Forward_Resupply(client);
+	return Plugin_Continue;
+}
+
+public Action Event_PlayerHurt(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
+	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+	if(client) Forward_PlayerHurt(client, hEvent);
 	return Plugin_Continue;
 }
 
