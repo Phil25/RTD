@@ -20,34 +20,24 @@
 UserMsg g_EarthquakeMsgId;
 
 void Earthquake_Start(){
-
 	g_EarthquakeMsgId = GetUserMessageId("Shake");
-
 }
 
-void Earthquake_Perk(int client, const char[] sPref, bool apply){
+void Earthquake_Perk(int client, Perk perk, bool apply){
+	if(!apply) return;
 
-	if(!apply)
-		return;
-	
-	char[][] sPieces = new char[3][8];
-	ExplodeString(sPref, ",", sPieces, 2, 8);
+	float fAmplitude = perk.GetPrefFloat("amplitude");
+	float fFrequency = perk.GetPrefFloat("frequency");
 
-	float fAmplitude = StringToFloat(sPieces[0]);
-	float fFrequency = StringToFloat(sPieces[1]);
-	
 	int iClients[2];
 	iClients[0] = client;
-	
+
 	Handle hMsg = StartMessageEx(g_EarthquakeMsgId, iClients, 1);
 	if(hMsg != INVALID_HANDLE){
-	
 		BfWriteByte(hMsg, 0);
 		BfWriteFloat(hMsg, fAmplitude);
 		BfWriteFloat(hMsg, fFrequency);
-		BfWriteFloat(hMsg, float(GetPerkTime(27)));
+		BfWriteFloat(hMsg, float(GetPerkTimeEx(perk)));
 		EndMessage();
-	
 	}
-
 }
