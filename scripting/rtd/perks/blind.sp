@@ -20,16 +20,13 @@
 UserMsg g_BlindMsgId;
 
 void Blind_Start(){
-
 	g_BlindMsgId = GetUserMessageId("Fade");
-
 }
 
-void Blind_Perk(int client, const char[] sPref, bool apply){
-
+void Blind_Perk(int client, Perk perk, bool apply){
 	int iTargets[2];
 	iTargets[0] = client;
-	
+
 	Handle hMsg = StartMessageEx(g_BlindMsgId, iTargets, 1);
 	BfWriteShort(hMsg, 1536);
 	BfWriteShort(hMsg, 1536);
@@ -37,8 +34,7 @@ void Blind_Perk(int client, const char[] sPref, bool apply){
 	BfWriteByte(hMsg, 0);
 	BfWriteByte(hMsg, 0);
 	BfWriteByte(hMsg, 0);
-	BfWriteByte(hMsg, apply ? StringToInt(sPref) : 0);
-	
-	EndMessage();
+	BfWriteByte(hMsg, apply ? perk.GetPrefCell("alpha") : 0);
 
+	EndMessage();
 }
