@@ -17,69 +17,52 @@
 */
 
 
-int		g_iMediGunCond[MAXPLAYERS+1]	= {-1, ...};
-int		g_iMediGun[MAXPLAYERS+1]		= {0, ...};
-bool	g_bRefreshUber[MAXPLAYERS+1]	= {false, ...};
-bool	g_bUberComplete[MAXPLAYERS+1]	= {true, ...};
+int g_iFullUberchargeIndex = 6;
 
-public void FullUbercharge_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		FullUbercharge_ApplyPerk(client);
-	
-	else
-		FullUbercharge_RemovePerk(client);
-
+public void FullUbercharge_Perk(int client, Perk perk, bool apply){
+	if(apply) FullUbercharge_ApplyPerk(client, perk);
+	else FullUbercharge_RemovePerk(client);
 }
 
-void FullUbercharge_ApplyPerk(int client){
-
+void FullUbercharge_ApplyPerk(int client, Perk perk){
+	g_iFullUberchargeIndex = perk.Id;
 	int iWeapon = GetPlayerWeaponSlot(client, 1);
 	if(iWeapon > MaxClients && IsValidEntity(iWeapon)){
-	
-		char sClass[20];GetEdictClassname(iWeapon, sClass, sizeof(sClass));
+		char sClass[20];
+		GetEdictClassname(iWeapon, sClass, sizeof(sClass));
+
 		if(strcmp(sClass, "tf_weapon_medigun") == 0){
-		
-			g_iMediGun[client]		= EntIndexToEntRef(iWeapon);
-			g_bRefreshUber[client]	= true;
-			g_bUberComplete[client]	= false;
-			
-			CreateTimer(0.2, Timer_RefreshUber, GetClientSerial(client), TIMER_REPEAT);
-			
+			SetEntCache(client, iWeapon);
+			SetClientPerkCache(client, g_iFullUberchargeIndex);
+			SetIntCache(client, 0);
+
+			CreateTimer(0.2, Timer_RefreshUber, GetClientUserId(client), TIMER_REPEAT);
+
 			int iWeapIndex = GetEntProp(iWeapon, Prop_Send, "m_iItemDefinitionIndex");
 			switch(iWeapIndex){
-			
-				case 35:	g_iMediGunCond[client] = view_as<int>(TFCond_Kritzkrieged);	//Kritzkrieg
-				case 411:	g_iMediGunCond[client] = view_as<int>(TFCond_MegaHeal);		//Quick-Fix
-				case 998:	g_iMediGunCond[client] = -1;								//Screw you, Vaccinator
-				default:	g_iMediGunCond[client] = view_as<int>(TFCond_Ubercharged);	//Default
-			
+				case 35:	SetIntCache(client, view_as<int>(TFCond_Kritzkrieged), 1);
+				case 411:	SetIntCache(client, view_as<int>(TFCond_MegaHeal), 1);
+				case 998:	SetIntCache(client, -1, 1);
+				default:	SetIntCache(client, view_as<int>(TFCond_Ubercharged), 1);
 			}
-		
 		}
-	
 	}
-
 }
 
 void FullUbercharge_RemovePerk(int client){
-
-	g_bRefreshUber[client] = false;
-
-	if(g_iMediGunCond[client] > -1)
-		CreateTimer(0.2, Timer_UberchargeEnd, GetClientSerial(client), TIMER_REPEAT);
-
+	UnsetClientPerkCache(client, g_iFullUberchargeIndex);
+	if(GetIntCache(client, 1) > -1)
+		CreateTimer(0.2, Timer_UberchargeEnd, GetClientUserId(client), TIMER_REPEAT);
 }
 
-public Action Timer_RefreshUber(Handle hTimer, int iSerial){
-
-	int client = GetClientFromSerial(iSerial);
+public Action Timer_RefreshUber(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
 	if(client == 0) return Plugin_Stop;
-	
-	if(!g_bRefreshUber[client])
+
+	if(!CheckClientPerkCache(client, g_iFullUberchargeIndex))
 		return Plugin_Stop;
-	
-	int iMediGun = EntRefToEntIndex(g_iMediGun[client]);
+
+	int iMediGun = GetEntCache(client);
 	if(iMediGun <= MaxClients)
 		return Plugin_Stop;
 
@@ -88,34 +71,30 @@ public Action Timer_RefreshUber(Handle hTimer, int iSerial){
 
 }
 
-public Action Timer_UberchargeEnd(Handle hTimer, int iSerial){
-
-	int client = GetClientFromSerial(iSerial);
+public Action Timer_UberchargeEnd(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
 	if(client == 0) return Plugin_Stop;
 
-	int iMediGun = EntRefToEntIndex(g_iMediGun[client]);
+	int iMediGun = GetEntCache(client);
 	if(iMediGun <= MaxClients){
-		g_bUberComplete[client] = true;
+		SetIntCache(client, 1);
 		return Plugin_Stop;
 	}
-	
+
 	if(GetEntPropFloat(iMediGun, Prop_Send, "m_flChargeLevel") > 0.05)
 		return Plugin_Continue;
-	
-	g_bUberComplete[client] = true;
-	return Plugin_Stop;
 
+	SetIntCache(client, 1);
+	return Plugin_Stop;
 }
 
 void FullUbercharge_OnConditionRemoved(int client, TFCond cond){
-
-	if(g_bUberComplete[client])
-		return;
-	
-	if(view_as<int>(cond) != g_iMediGunCond[client])
+	if(GetIntCache(client))
 		return;
 
-	if(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == EntRefToEntIndex(g_iMediGun[client]))
+	if(view_as<int>(cond) != GetIntCache(client, 1))
+		return;
+
+	if(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == GetEntCache(client))
 		TF2_AddCondition(client, cond, 2.0);
-
 }

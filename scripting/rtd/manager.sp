@@ -28,21 +28,28 @@
 \**********************************************************************************/
 
 int g_iClientPerkCache[MAXPLAYERS+1] = {-1, ...}; // Used to check if client has the current perk
-int g_iEntCache[MAXPLAYERS+1] = {0, ...}; // Used throughout perks to store temporary entities they can create
+int g_iEntCache[MAXPLAYERS+1] = {INVALID_ENT_REFERENCE, ...}; // Used throughout perks to store their entities
 
-float g_fFloatCache[MAXPLAYERS+1][4];
+float g_fCache[MAXPLAYERS+1][4];
+int g_iCache[MAXPLAYERS+1][4];
 
 // TODO: move these functions down
 void SetEntCache(int client, int iEnt){
-	if(g_iEntCache[client])
-		AcceptEntityInput(g_iEntCache[client], "Kill");
-	g_iEntCache[client] = iEnt;
+	g_iEntCache[client] = EntIndexToEntRef(iEnt);
+}
+
+int GetEntCache(int client){
+	return EntRefToEntIndex(g_iEntCache[client]);
 }
 
 void KillEntCache(int client){
-	if(g_iEntCache[client])
-		AcceptEntityInput(g_iEntCache[client], "Kill");
-	g_iEntCache[client] = 0;
+	if(g_iEntCache[client] == INVALID_ENT_REFERENCE)
+		return;
+
+	int iEnt = EntRefToEntIndex(g_iEntCache[client]);
+	if(iEnt > MaxClients) AcceptEntityInput(iEnt, "Kill");
+
+	g_iEntCache[client] = INVALID_ENT_REFERENCE;
 }
 
 void SetClientPerkCache(int client, int iPerkId){
@@ -59,11 +66,19 @@ bool CheckClientPerkCache(int client, int iPerkId){
 }
 
 float GetFloatCache(client, int iOffset=0){
-	return g_fFloatCache[client][iOffset];
+	return g_fCache[client][iOffset];
 }
 
-float SetFloatCache(client, float fVal, int iOffset=0){
-	g_fFloatCache[client][iOffset] = fVal;
+void SetFloatCache(client, float fVal, int iOffset=0){
+	g_fCache[client][iOffset] = fVal;
+}
+
+int GetIntCache(client, int iOffset=0){
+	return g_iCache[client][iOffset];
+}
+
+void SetIntCache(client, int iVal, int iOffset=0){
+	g_iCache[client][iOffset] = iVal;
 }
 
 void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
@@ -88,7 +103,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 3:	IncreasedSpeed_Perk		(client, perk, bEnable);
 		case 4:	Noclip_Perk				(client, perk, bEnable);
 		case 5:	LowGravity_Perk			(client, perk, bEnable);
-		case 6:	FullUbercharge_Perk		(client, sSettings, bEnable);
+		case 6:	FullUbercharge_Perk		(client, perk, bEnable);
 		case 7:	Invisibility_Perk		(client, sSettings, bEnable);
 		case 8:	InfiniteCloak_Perk		(client, sSettings, bEnable);
 		case 9:	Criticals_Perk			(client, sSettings, bEnable);
