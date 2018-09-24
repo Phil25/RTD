@@ -19,81 +19,57 @@
 
 #define SOUND_BEEP "buttons/blip1.wav"
 
-bool	g_bIsBeaconed[MAXPLAYERS+1]		= {false, ...};
-float	g_fBeaconInterval				= 1.0;
-float	g_fBeaconRadius					= 375.0;
-int		g_iSpriteBeam, g_iSpriteHalo;
+int g_iSpriteBeam, g_iSpriteHalo;
+int g_iBeaconId = 24;
 
 void Beacon_Start(){
-
 	PrecacheSound(SOUND_BEEP);
-	g_iSpriteBeam		= PrecacheModel("materials/sprites/laser.vmt");
-	g_iSpriteHalo		= PrecacheModel("materials/sprites/halo01.vmt");
-
+	g_iSpriteBeam = PrecacheModel("materials/sprites/laser.vmt");
+	g_iSpriteHalo = PrecacheModel("materials/sprites/halo01.vmt");
 }
 
-void Beacon_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		Beacon_ApplyPerk(client, sPref);
-	
-	else
-		g_bIsBeaconed[client] = false;
-
+void Beacon_Perk(int client, Perk perk, bool apply){
+	if(apply) Beacon_ApplyPerk(client, perk);
+	else UnsetClientPerkCache(client, g_iBeaconId);
 }
 
-void Beacon_ApplyPerk(int client, const char[] sSettings){
-
-	Beacon_ProcessSettings(sSettings);
-
-	CreateTimer(g_fBeaconInterval, Timer_BeaconBeep, GetClientSerial(client), TIMER_REPEAT);
-	g_bIsBeaconed[client] = true;
-
+void Beacon_ApplyPerk(int client, Perk perk){
+	g_iBeaconId = perk.Id;
+	SetClientPerkCache(client, g_iBeaconId);
+	CreateTimer(perk.GetPrefFloat("interval"), Timer_BeaconBeep, GetClientUserId(client), TIMER_REPEAT);
+	SetFloatCache(client, perk.GetPrefFloat("radius"));
 }
 
-public Action Timer_BeaconBeep(Handle hTimer, int iSerial){
+public Action Timer_BeaconBeep(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(!client) return Plugin_Stop;
 
-	int client = GetClientFromSerial(iSerial);
-	if(client == 0) return Plugin_Stop;
-
-	if(!g_bIsBeaconed[client])
+	if(!CheckClientPerkCache(client, g_iBeaconId))
 		return Plugin_Stop;
-	
-	Beacon_Beep(client);
-	
-	return Plugin_Continue;
 
+	Beacon_Beep(client);
+	return Plugin_Continue;
 }
 
 void Beacon_Beep(int client){
-	
-	float fPos[3]; GetClientAbsOrigin(client, fPos);
+	float fPos[3];
+	GetClientAbsOrigin(client, fPos);
 	fPos[2] += 10.0;
-	
+
 	int iColorGra[4] = {128,128,128,255};
 	int iColorRed[4] = {255,75,75,255};
 	int iColorBlu[4] = {75,75,255,255};
-	
-	TE_SetupBeamRingPoint(fPos, 10.0, g_fBeaconRadius, g_iSpriteBeam, g_iSpriteHalo, 0, 15, 0.5, 5.0, 0.0, iColorGra, 10, 0);
+
+	float fRadius = GetFloatCache(client);
+
+	TE_SetupBeamRingPoint(fPos, 10.0, fRadius, g_iSpriteBeam, g_iSpriteHalo, 0, 15, 0.5, 5.0, 0.0, iColorGra, 10, 0);
 	TE_SendToAll();
-	
-	if(GetClientTeam(client) == _:TFTeam_Red)
-		TE_SetupBeamRingPoint(fPos, 10.0, g_fBeaconRadius, g_iSpriteBeam, g_iSpriteHalo, 0, 10, 0.6, 10.0, 0.5, iColorRed, 10, 0);
+
+	if(TF2_GetClientTeam(client) == TFTeam_Red)
+		TE_SetupBeamRingPoint(fPos, 10.0, fRadius, g_iSpriteBeam, g_iSpriteHalo, 0, 10, 0.6, 10.0, 0.5, iColorRed, 10, 0);
 	else
-		TE_SetupBeamRingPoint(fPos, 10.0, g_fBeaconRadius, g_iSpriteBeam, g_iSpriteHalo, 0, 10, 0.6, 10.0, 0.5, iColorBlu, 10, 0);
-	
+		TE_SetupBeamRingPoint(fPos, 10.0, fRadius, g_iSpriteBeam, g_iSpriteHalo, 0, 10, 0.6, 10.0, 0.5, iColorBlu, 10, 0);
+
 	TE_SendToAll();
-	
 	EmitSoundToAll(SOUND_BEEP, client);
-
-}
-
-void Beacon_ProcessSettings(const char[] sSettings){
-	
-	char[][] sPieces = new char[2][4];
-	ExplodeString(sSettings, ",", sPieces, 2, 4);
-
-	g_fBeaconInterval	= StringToFloat(sPieces[0]);
-	g_fBeaconRadius		= StringToFloat(sPieces[1]);
-
 }

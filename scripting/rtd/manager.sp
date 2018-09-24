@@ -143,7 +143,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 21:Drugged_Perk			(client, perk, bEnable);
 		case 22:Blind_Perk				(client, perk, bEnable);
 		case 23:StripToMelee_Perk		(client, perk, bEnable);
-		case 24:Beacon_Perk				(client, sSettings, bEnable);
+		case 24:Beacon_Perk				(client, perk, bEnable);
 		case 25:ForcedTaunt_Perk		(client, sSettings, bEnable);
 		case 26:Monochromia_Perk		(client, sSettings, bEnable);
 		case 27:Earthquake_Perk			(client, sSettings, bEnable);
