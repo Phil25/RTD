@@ -17,11 +17,8 @@
 */
 
 
-public void Monochromia_Perk(int client, const char[] sPref, bool apply){
-
+void Monochromia_Perk(int client, bool apply){
 	int iFlags = GetCommandFlags("r_screenoverlay") & (~FCVAR_CHEAT);
 	SetCommandFlags("r_screenoverlay", iFlags);
-	
 	ClientCommand(client, "r_screenoverlay \"%s\"", apply ? "debug/yuv" : "");
-
 }
