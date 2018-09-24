@@ -19,39 +19,30 @@
 
 #define ATTRIB_SPEED 107 //the player speed attribute
 
-float g_fBaseSpeed_Snail[MAXPLAYERS+1] = {0.0, ...};
-
-void Snail_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		Snail_ApplyPerk(client, StringToFloat(sPref));
-	
-	else
-		Snail_RemovePerk(client);
-
+void Snail_Perk(int client, Perk perk, bool apply){
+	if(apply) Snail_ApplyPerk(client, perk);
+	else Snail_RemovePerk(client);
 }
 
-void Snail_ApplyPerk(int client, float fMultp){
+void Snail_ApplyPerk(int client, Perk perk){
+	float fMultp = perk.GetPrefFloat("multiplier");
+	float fBaseSpeed = 300.0;
+	TFClassType class = TF2_GetPlayerClass(client);
 
-	switch(TF2_GetPlayerClass(client)){
-	
-		case TFClass_Scout:		{g_fBaseSpeed_Snail[client] = 400.0;}
-		case TFClass_Soldier:	{g_fBaseSpeed_Snail[client] = 240.0;}
-		case TFClass_DemoMan:	{g_fBaseSpeed_Snail[client] = 280.0;}
-		case TFClass_Heavy:		{g_fBaseSpeed_Snail[client] = 230.0;}
-		case TFClass_Medic:		{g_fBaseSpeed_Snail[client] = 320.0;}
-		default:				{g_fBaseSpeed_Snail[client] = 300.0;}
-	
+	switch(class){
+		case TFClass_Scout:		fBaseSpeed = 400.0;
+		case TFClass_Soldier:	fBaseSpeed = 240.0;
+		case TFClass_DemoMan:	fBaseSpeed = 280.0;
+		case TFClass_Heavy:		fBaseSpeed = 230.0;
+		case TFClass_Medic:		fBaseSpeed = 320.0;
 	}
 
 	TF2Attrib_SetByDefIndex(client, ATTRIB_SPEED, fMultp);
-	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", g_fBaseSpeed_Snail[client]*fMultp);
-
+	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBaseSpeed*fMultp);
+	SetFloatCache(client, fBaseSpeed);
 }
 
 void Snail_RemovePerk(int client){
-
 	TF2Attrib_RemoveByDefIndex(client, ATTRIB_SPEED);
-	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", g_fBaseSpeed_Snail[client]);
-
+	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", GetFloatCache(client));
 }
