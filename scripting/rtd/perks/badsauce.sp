@@ -17,21 +17,15 @@
 */
 
 
-void BadSauce_Perk(int client, const char[] sPref, bool apply){
+void BadSauce_Perk(int client, Perk perk, bool apply){
+	if(!apply) return;
 
-	if(!apply)
-		return;
-
-	char[][] sPieces = new char[3][4];
-	ExplodeString(sPref, ",", sPieces, 3, 4);
-
-	float fMilkDuration		= StringToFloat(sPieces[0]);
-	float fJarateDuration	= StringToFloat(sPieces[1]);
-	float fBleedDuration	= StringToFloat(sPieces[2]);
-	float fPerkDuration		= float(GetPerkTime(29));
+	float fMilkDuration		= perk.GetPrefFloat("milk");
+	float fJarateDuration	= perk.GetPrefFloat("jarate");
+	float fBleedDuration	= perk.GetPrefFloat("bleed");
+	float fPerkDuration		= float(GetPerkTimeEx(perk));
 
 	if(fMilkDuration >= 0.0)	TF2_AddCondition(client, TFCond_Milked,		fMilkDuration	> 0.0	? fMilkDuration		: fPerkDuration);
 	if(fJarateDuration >= 0.0)	TF2_AddCondition(client, TFCond_Jarated,	fJarateDuration	> 0.0	? fJarateDuration	: fPerkDuration);
 	if(fBleedDuration >= 0.0)	TF2_MakeBleed	(client, client,			fBleedDuration	> 0.0	? fBleedDuration	: fPerkDuration);
-
 }
