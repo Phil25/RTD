@@ -133,7 +133,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 11:ScaryBullets_Perk		(client, perk, bEnable);
 		case 12:SpawnSentry_Perk		(client, perk, bEnable);
 		case 13:HomingProjectiles_Perk	(client, perk, bEnable);
-		case 14:FullRifleCharge_Perk	(client, sSettings, bEnable);
+		case 14:FullRifleCharge_Perk	(client, perk, bEnable);
 		case 15:Explode_Perk			(client, sSettings, bEnable);
 		case 16:Snail_Perk				(client, sSettings, bEnable);
 		case 17:Frozen_Perk				(client, sSettings, bEnable);
@@ -197,7 +197,6 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 void Forward_OnMapStart(){
 	InfiniteAmmo_Start();
 	HomingProjectiles_Start();
-	FullRifleCharge_Start();
 	Timebomb_Start();
 	Drugged_Start();
 	Blind_Start();
