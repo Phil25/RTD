@@ -17,22 +17,19 @@
 */
 
 
-void StripToMelee_Perk(int client, const char[] sPref, bool apply){
-
-	if(!apply)
-		return;
+void StripToMelee_Perk(int client, Perk perk, bool apply){
+	if(!apply) return;
 
 	TF2_RemoveWeaponSlot(client, 0);
 	TF2_RemoveWeaponSlot(client, 1);
-	
+
 	int iWeapon = GetPlayerWeaponSlot(client, 2);
 	if(iWeapon > MaxClients && IsValidEntity(iWeapon))
 		SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", iWeapon);
-	
+
 	TF2_RemoveWeaponSlot(client, 3);
 	TF2_RemoveWeaponSlot(client, 4);
 
-	if(StringToInt(sPref) > 0)
+	if(perk.GetPrefCell("fullhealth") > 0)
 		SetEntityHealth(client, GetEntProp(client, Prop_Data, "m_iMaxHealth"));
-
 }
