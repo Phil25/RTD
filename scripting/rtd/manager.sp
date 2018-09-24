@@ -85,10 +85,17 @@ void SetIntCache(int client, int iVal, int iOffset=0){
 	g_iCache[client][iOffset] = iVal;
 }
 
-ArrayList PrepareArrayCache(int client){
-	if(g_aCache[client] == null)
-		g_aCache[client] = new ArrayList();
-	else g_aCache[client].Clear();
+ArrayList CreateArrayCache(int client, int iBlockSize=1){
+	delete g_aCache[client];
+	g_aCache[client] = new ArrayList(iBlockSize);
+	return g_aCache[client];
+}
+
+ArrayList PrepareArrayCache(int client, int iBlockSize=1){
+	if(g_aCache[client] == null || g_aCache[client].BlockSize != iBlockSize)
+		return CreateArrayCache(client, iBlockSize);
+
+	g_aCache[client].Clear();
 	return g_aCache[client];
 }
 
@@ -125,7 +132,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 10:InfiniteAmmo_Perk		(client, perk, bEnable);
 		case 11:ScaryBullets_Perk		(client, perk, bEnable);
 		case 12:SpawnSentry_Perk		(client, perk, bEnable);
-		case 13:HomingProjectiles_Perk	(client, sSettings, bEnable);
+		case 13:HomingProjectiles_Perk	(client, perk, bEnable);
 		case 14:FullRifleCharge_Perk	(client, sSettings, bEnable);
 		case 15:Explode_Perk			(client, sSettings, bEnable);
 		case 16:Snail_Perk				(client, sSettings, bEnable);
