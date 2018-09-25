@@ -153,7 +153,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 31:InfiniteJump_Perk		(client, perk, bEnable);
 		case 32:PowerfulHits_Perk		(client, perk, bEnable);
 		case 33:BigHead_Perk			(client, perk, bEnable);
-		case 34:TinyMann_Perk			(client, sSettings, bEnable);
+		case 34:TinyMann_Perk			(client, perk, bEnable);
 		case 35:Firework_Perk			(client, sSettings, bEnable);
 		case 36:DeadlyVoice_Perk		(client, sSettings, bEnable);
 		case 37:StrongGravity_Perk		(client, sSettings, bEnable);

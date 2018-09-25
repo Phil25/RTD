@@ -16,39 +16,31 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define SCALE 0
+#define BASE 1
 
-float	g_fBaseTinyMann[MAXPLAYERS+1]	= {1.0, ...};
-bool	g_bIsTinyMann[MAXPLAYERS+1]		= {false, ...};
-float	g_fTinyMannScale				= 0.15;
-
-void TinyMann_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		TinyMann_ApplyPerk(client, StringToFloat(sPref));
-
-	else
-		TinyMann_RemovePerk(client);
-
+void TinyMann_Perk(int client, Perk perk, bool apply){
+	if(apply) TinyMann_ApplyPerk(client, perk);
+	else TinyMann_RemovePerk(client);
 }
 
-void TinyMann_ApplyPerk(int client, float fMultiplayer){
+void TinyMann_ApplyPerk(int client, Perk perk){
+	float fScale = perk.GetPrefFloat("scale");
+	float fBase = GetEntPropFloat(client, Prop_Send, "m_flModelScale");
 
-	g_bIsTinyMann[client]	= true;
-	g_fTinyMannScale		= fMultiplayer;
-	
-	TF2Attrib_SetByDefIndex(client, 2048, 1/g_fTinyMannScale/2);
-	g_fBaseTinyMann[client] = GetEntPropFloat(client, Prop_Send, "m_flModelScale");
-	SetEntPropFloat(client, Prop_Send, "m_flModelScale", fMultiplayer);
+	SetFloatCache(client, fScale, SCALE);
+	SetFloatCache(client, fBase, BASE);
 
+	TF2Attrib_SetByDefIndex(client, 2048, 1/fScale/2);
+	SetEntPropFloat(client, Prop_Send, "m_flModelScale", fScale);
 }
 
 void TinyMann_RemovePerk(int client){
-
-	g_bIsTinyMann[client] = false;
-	
 	TF2Attrib_RemoveByDefIndex(client, 2048);
-	SetEntPropFloat(client, Prop_Send, "m_flModelScale", g_fBaseTinyMann[client]);
-	
-	FixPotentialStuck(client);
+	SetEntPropFloat(client, Prop_Send, "m_flModelScale", GetFloatCache(client, BASE));
 
+	FixPotentialStuck(client);
 }
+
+#undef SCALE
+#undef BASE
