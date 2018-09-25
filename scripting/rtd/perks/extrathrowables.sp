@@ -17,46 +17,34 @@
 */
 
 
-void ExtraThrowables_Perk(int client, const char[] sPref, bool apply){
+void ExtraThrowables_Perk(int client, Perk perk, bool apply){
+	if(!apply) return;
 
-	if(!apply)
-		return;
-
-	int iAmount = StringToInt(sPref);
+	int iAmount = perk.GetPrefCell("amount");
 	int iWeapon = 0;
-	
+
 	if(TF2_GetPlayerClass(client) == TFClass_Scout){
-	
 		iWeapon = GetPlayerWeaponSlot(client, 2);
-		
 		if(IsValidEntity(iWeapon)){
-		
 			int iIndex = GetEntProp(iWeapon, Prop_Send, "m_iItemDefinitionIndex");
 			if(iIndex == 44 || iIndex == 648)
 				ExtraThrowables_Set(client, iWeapon, iAmount);
-		
 		}
-	
 	}
-	
+
 	iWeapon = GetPlayerWeaponSlot(client, 1);
 	if(!IsValidEntity(iWeapon))
 		return;
-	
+
 	int iIndex = GetEntProp(iWeapon, Prop_Send, "m_iItemDefinitionIndex");
 	switch(iIndex){
-	
 		case 222, 812, 833, 1121, 42, 159, 311, 433, 863, 1002, 58, 1083, 1105:
 			ExtraThrowables_Set(client, iWeapon, iAmount);
-	
 	}
-
 }
 
 stock void ExtraThrowables_Set(int client, int iWeapon, int iAmount){
-
 	int iOffset		= GetEntProp(iWeapon, Prop_Send, "m_iPrimaryAmmoType", 1)*4;
 	int iAmmoTable	= FindSendPropInfo("CTFPlayer", "m_iAmmo");
 	SetEntData(client, iAmmoTable+iOffset, iAmount, 4, true);
-
 }
