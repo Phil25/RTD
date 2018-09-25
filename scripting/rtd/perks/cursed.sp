@@ -17,46 +17,36 @@
 */
 
 
-bool g_bIsCursed[MAXPLAYERS+1] = {false, ...};
+int g_iCursedId = 51;
 
-public void Cursed_Perk(int client, const char[] sPref, bool apply){
-
-	g_bIsCursed[client] = apply;
-
+public void Cursed_Perk(int client, Perk perk, bool apply){
+	if(apply){
+		g_iCursedId = perk.Id;
+		SetClientPerkCache(client, g_iCursedId);
+	}else UnsetClientPerkCache(client, g_iCursedId);
 }
 
 bool Cursed_OnPlayerRunCmd(int client, int &iButtons, float fVel[3]){
-
-	if(!g_bIsCursed[client])
+	if(!CheckClientPerkCache(client, g_iCursedId))
 		return false;
-	
+
 	fVel[0] = -fVel[0];
 	fVel[1] = -fVel[1];
-	
 	if(iButtons & IN_MOVELEFT){
-	
 		iButtons &= ~IN_MOVELEFT;
 		iButtons |= IN_MOVERIGHT;
-		
 	}else if(iButtons & IN_MOVERIGHT){
-	
 		iButtons &= ~IN_MOVERIGHT;
 		iButtons |= IN_MOVELEFT;
-	
 	}
-	
+
 	if(iButtons & IN_FORWARD){
-	
 		iButtons &= ~IN_FORWARD;
 		iButtons |= IN_BACK;
-	
 	}else if(iButtons & IN_BACK){
-	
 		iButtons &= ~IN_BACK;
 		iButtons |= IN_FORWARD;
-	
 	}
-	
-	return true;
 
+	return true;
 }

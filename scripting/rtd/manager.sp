@@ -170,7 +170,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 48:FireTimebomb_Perk		(client, perk, bEnable);
 		case 49:FireBreath_Perk			(client, perk, bEnable);
 		case 50:StrongRecoil_Perk		(client, perk, bEnable);
-		case 51:Cursed_Perk				(client, sSettings, bEnable);
+		case 51:Cursed_Perk				(client, perk, bEnable);
 		case 52:ExtraThrowables_Perk	(client, sSettings, bEnable);
 		case 53:PowerPlay_Perk			(client, sSettings, bEnable);
 		case 54:ExplosiveArrows_Perk	(client, sSettings, bEnable);
