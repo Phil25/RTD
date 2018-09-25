@@ -17,26 +17,17 @@
 */
 
 
-bool g_bHasEyeForAnEye[MAXPLAYERS+1] = {false, ...};
+int g_iEyeForAnEyeId = 38;
 
-void EyeForAnEye_Start(){
-
-	HookEvent("player_hurt", EyeForAnEye_PlayerHurt);
-
+void EyeForAnEye_Perk(int client, Perk perk, bool apply){
+	if(apply){
+		g_iEyeForAnEyeId = perk.Id;
+		SetClientPerkCache(client, g_iEyeForAnEyeId);
+	}else UnsetClientPerkCache(client, g_iEyeForAnEyeId);
 }
 
-public void EyeForAnEye_Perk(int client, const char[] sPref, bool apply){
-
-	g_bHasEyeForAnEye[client] = apply;
-
-}
-
-public EyeForAnEye_PlayerHurt(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
-
-	int attacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
-	if(!g_bHasEyeForAnEye[attacker])
-		return;
-	
-	SDKHooks_TakeDamage(attacker, 0, 0, float(GetEventInt(hEvent, "damageamount")));
-
+void EyeForAnEye_PlayerHurt(Handle hEvent){
+	int iAttacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
+	if(CheckClientPerkCache(iAttacker, g_iEyeForAnEyeId))
+		SDKHooks_TakeDamage(iAttacker, 0, 0, float(GetEventInt(hEvent, "damageamount")));
 }

@@ -157,7 +157,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 35:Firework_Perk			(client, perk, bEnable);
 		case 36:DeadlyVoice_Perk		(client, perk, bEnable);
 		case 37:StrongGravity_Perk		(client, perk, bEnable);
-		case 38:EyeForAnEye_Perk		(client, sSettings, bEnable);
+		case 38:EyeForAnEye_Perk		(client, perk, bEnable);
 		case 39:Weakened_Perk			(client, sSettings, bEnable);
 		case 40:NecroMash_Perk			(client, sSettings, bEnable);
 		case 41:ExtraAmmo_Perk			(client, sSettings, bEnable);
@@ -205,7 +205,6 @@ void Forward_OnMapStart(){
 	Earthquake_Start();
 	Firework_Start();
 	DeadlyVoice_Start();
-	EyeForAnEye_Start();
 	NecroMash_Start();
 	ExtraAmmo_Start();
 	FastHands_Start();
@@ -275,6 +274,7 @@ void Forward_Resupply(int client){
 */
 void Forward_PlayerHurt(int client, Handle hEvent){
 	ScaryBullets_PlayerHurt(client, hEvent);
+	EyeForAnEye_PlayerHurt(hEvent);
 }
 
 
