@@ -175,7 +175,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 53:PowerPlay_Perk			(client, bEnable);
 		case 54:ExplosiveArrows_Perk	(client, perk, bEnable);
 		case 55:InclineProblem_Perk		(client, bEnable);
-		case 56:SpringShoes_Perk		(client, sSettings, bEnable);
+		case 56:SpringShoes_Perk		(client, perk, bEnable);
 		case 57:Lag_Perk				(client, sSettings, bEnable);
 		case 58:DrugBullets_Perk		(client, sSettings, bEnable);
 		case 59:LongMelee_Perk			(client, sSettings, bEnable);

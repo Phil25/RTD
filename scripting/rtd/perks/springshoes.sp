@@ -20,24 +20,36 @@
 #define SPRING_JUMP "misc/halloween/duck_pickup_neg_01.wav"
 #define ATTRIB_JUMP_BLOCK 819
 
-bool g_bIsSpringJumping[MAXPLAYERS+1] = {false, ...};
+int g_iSpringShoesId = 56;
 
 void SpringShoes_Start(){
 	PrecacheSound(SPRING_JUMP);
 }
 
-public void SpringShoes_Perk(int client, const char[] sPref, bool apply){
-	g_bIsSpringJumping[client] = apply;
-	if(apply){
-		CreateTimer(0.25, Timer_ForceSpringJump, GetClientUserId(client), TIMER_REPEAT);
-		TF2Attrib_SetByDefIndex(client, ATTRIB_JUMP_BLOCK, 1.0);
-	}else TF2Attrib_RemoveByDefIndex(client, ATTRIB_JUMP_BLOCK);
+void SpringShoes_Perk(int client, Perk perk, bool apply){
+	if(apply) SpringShoes_Apply(client, perk);
+	else SpringShoes_Remove(client);
+}
+
+void SpringShoes_Apply(int client, Perk perk){
+	g_iSpringShoesId = perk.Id;
+	SetClientPerkCache(client, g_iSpringShoesId);
+	TF2Attrib_SetByDefIndex(client, ATTRIB_JUMP_BLOCK, 1.0);
+	CreateTimer(0.25, Timer_ForceSpringJump, GetClientUserId(client), TIMER_REPEAT);
+}
+
+void SpringShoes_Remove(int client){
+	UnsetClientPerkCache(client, g_iSpringShoesId);
+	TF2Attrib_RemoveByDefIndex(client, ATTRIB_JUMP_BLOCK);
 }
 
 public Action Timer_ForceSpringJump(Handle hTimer, int iUserId){
 	int client = GetClientOfUserId(iUserId);
-	if(!client || !g_bIsSpringJumping[client])
+	if(!client) return Plugin_Stop;
+
+	if(!CheckClientPerkCache(client, g_iSpringShoesId))
 		return Plugin_Stop;
+
 	SpringJump(client);
 	return Plugin_Continue;
 }
