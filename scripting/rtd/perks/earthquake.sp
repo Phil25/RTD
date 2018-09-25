@@ -23,7 +23,7 @@ void Earthquake_Start(){
 	g_EarthquakeMsgId = GetUserMessageId("Shake");
 }
 
-void Earthquake_Perk(int client, Perk perk, bool apply){
+public void Earthquake_Call(int client, Perk perk, bool apply){
 	if(!apply) return;
 
 	float fAmplitude = perk.GetPrefFloat("amplitude");

@@ -19,7 +19,7 @@
 
 int g_iFullUberchargeIndex = 6;
 
-public void FullUbercharge_Perk(int client, Perk perk, bool apply){
+public void FullUbercharge_Call(int client, Perk perk, bool apply){
 	if(apply) FullUbercharge_ApplyPerk(client, perk);
 	else FullUbercharge_RemovePerk(client);
 }

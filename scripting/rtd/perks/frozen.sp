@@ -17,7 +17,7 @@
 */
 
 
-void Frozen_Perk(int client, bool apply){
+public void Frozen_Call(int client, Perk perk, bool apply){
 	if(apply) Frozen_ApplyPerk(client);
 	else Frozen_RemovePerk(client);
 }

@@ -50,7 +50,7 @@ void Timebomb_Start(){
 	PrecacheSound(SOUND_TIMEBOMB_GOFF);
 }
 
-void Timebomb_Perk(int client, Perk perk, bool apply){
+public void Timebomb_Call(int client, Perk perk, bool apply){
 	if(!apply) return;
 
 	g_iTimebombId = perk.Id;

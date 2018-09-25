@@ -45,7 +45,7 @@ void MadarasWhistle_Start(){
 		PrecacheSound(g_sGatorRumble[i]);
 }
 
-void MadarasWhistle_Perk(int client, Perk perk, bool apply){
+public void MadarasWhistle_Call(int client, Perk perk, bool apply){
 	if(apply) MadarasWhistle_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iMadarasWhistleId);
 }

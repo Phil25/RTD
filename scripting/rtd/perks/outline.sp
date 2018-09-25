@@ -17,7 +17,7 @@
 */
 
 
-void Outline_Perk(int client, bool apply){
+public void Outline_Call(int client, Perk perk, bool apply){
 	if(apply) Outline_ApplyPerk(client);
 	else Outline_RemovePerk(client);
 }

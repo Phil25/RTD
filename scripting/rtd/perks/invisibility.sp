@@ -27,7 +27,7 @@
 
 int g_iInvisibilityId = 7;
 
-void Invisibility_Perk(int client, Perk perk, bool apply){
+public void Invisibility_Call(int client, Perk perk, bool apply){
 	if(apply) Invisibility_ApplyPerk(client, perk);
 	else Invisibility_RemovePerk(client);
 }

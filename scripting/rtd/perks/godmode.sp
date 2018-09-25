@@ -19,7 +19,7 @@
 
 #define GODMODE_PARTICLE "powerup_supernova_ready"
 
-void Godmode_Perk(int client, Perk perk, bool bApply){
+public void Godmode_Call(int client, Perk perk, bool bApply){
 	if(bApply) Godmode_ApplyPerk(client, perk);
 	else Godmode_RemovePerk(client);
 }

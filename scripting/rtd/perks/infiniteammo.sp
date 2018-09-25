@@ -30,7 +30,7 @@ void InfiniteAmmo_Start(){
 	g_iOffsetAmmoType	= FindSendPropInfo("CBaseCombatWeapon", "m_iPrimaryAmmoType");
 }
 
-void InfiniteAmmo_Perk(int client, Perk perk, bool apply){
+public void InfiniteAmmo_Call(int client, Perk perk, bool apply){
 	if(apply) InfiniteAmmo_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iInfiniteAmmoId);
 }

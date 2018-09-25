@@ -22,7 +22,7 @@ void PowerfulHits_OnClientPutInServer(int client){
 	SDKHook(client, SDKHook_OnTakeDamage, PowerfulHits_OnTakeDamage);
 }
 
-void PowerfulHits_Perk(int client, Perk perk, bool apply){
+public void PowerfulHits_Call(int client, Perk perk, bool apply){
 	if(apply) PowerfulHits_Apply(client, perk);
 	else UnsetClientPerkCache(client, g_iPowerfulHitsId);
 }

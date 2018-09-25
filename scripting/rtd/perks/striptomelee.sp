@@ -17,7 +17,7 @@
 */
 
 
-void StripToMelee_Perk(int client, Perk perk, bool apply){
+public void StripToMelee_Call(int client, Perk perk, bool apply){
 	if(!apply) return;
 
 	TF2_RemoveWeaponSlot(client, 0);

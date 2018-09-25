@@ -124,8 +124,6 @@ methodmap Perk < StringMap{
 		this.SetValue("m_WeaponClass", hWeapClass);
 	}
 
-	//GET_STRING(Pref) // preference string
-	//SET_STRING(Pref) // TODO: clean me up
 	public bool GetPrefString(const char[] sKey, char[] sBuffer, int iLen){
 		return this.GetString(sKey, sBuffer, iLen);
 	}
@@ -176,6 +174,28 @@ methodmap Perk < StringMap{
 	property Handle Parent{
 		GET_PROP(Handle,Parent)
 		SET_PROP(Handle,Parent)
+	}
+
+	GET_STRING(InternalCall)
+	SET_STRING(InternalCall)
+
+	public void CallInternal(int client, bool bEnable){
+		char sFuncName[64];
+		this.GetInternalCall(sFuncName, 64);
+		Function func = GetFunctionByName(INVALID_HANDLE, sFuncName);
+
+		if(func == INVALID_FUNCTION){
+			char sToken[32];
+			this.GetToken(sToken, 32);
+			LogError("Invalid function name: \"%s\", for perk %s.", sFuncName, sToken);
+			return;
+		}
+
+		Call_StartFunction(INVALID_HANDLE, func);
+		Call_PushCell(client);
+		Call_PushCell(this);
+		Call_PushCell(bEnable);
+		Call_Finish();
 	}
 
 	public Handle GetCall(){

@@ -30,7 +30,7 @@ void ForcedTaunt_Start(){
 		PrecacheSound(g_sSoundScoutBB[i]);
 }
 
-void ForcedTaunt_Perk(int client, Perk perk, bool apply){
+public void ForcedTaunt_Call(int client, Perk perk, bool apply){
 	if(apply) ForcedTaunt_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iForcedTauntId);
 }

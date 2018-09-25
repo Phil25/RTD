@@ -19,7 +19,7 @@
 
 int g_iLagId = 57;
 
-public void Lag_Perk(int client, Perk perk, bool apply){
+public void Lag_Call(int client, Perk perk, bool apply){
 	if(!apply){
 		UnsetClientPerkCache(client, g_iLagId);
 		return;

@@ -17,7 +17,7 @@
 */
 
 
-void BadSauce_Perk(int client, Perk perk, bool apply){
+public void BadSauce_Call(int client, Perk perk, bool apply){
 	if(!apply) return;
 
 	float fMilkDuration		= perk.GetPrefFloat("milk");

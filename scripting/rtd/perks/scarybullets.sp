@@ -21,7 +21,7 @@
 
 int g_iScaryBulletsId = 11;
 
-void ScaryBullets_Perk(int client, Perk perk, bool apply){
+public void ScaryBullets_Call(int client, Perk perk, bool apply){
 	if(apply) ScaryBullets_ApplyPerk(client, perk);
 	else ScaryBullets_RemovePerk(client);
 }

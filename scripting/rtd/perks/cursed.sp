@@ -19,7 +19,7 @@
 
 int g_iCursedId = 51;
 
-public void Cursed_Perk(int client, Perk perk, bool apply){
+public void Cursed_Call(int client, Perk perk, bool apply){
 	if(apply){
 		g_iCursedId = perk.Id;
 		SetClientPerkCache(client, g_iCursedId);

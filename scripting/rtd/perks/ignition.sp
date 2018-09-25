@@ -17,6 +17,6 @@
 */
 
 
-void Ignition_Perk(int client){
+public void Ignition_Call(int client, Perk perk, bool apply){
 	TF2_IgnitePlayer(client, client);
 }

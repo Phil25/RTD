@@ -17,7 +17,7 @@
 */
 
 
-void ExtraThrowables_Perk(int client, Perk perk, bool apply){
+public void ExtraThrowables_Call(int client, Perk perk, bool apply){
 	if(!apply) return;
 
 	int iAmount = perk.GetPrefCell("amount");

@@ -35,7 +35,7 @@ void NecroMash_Start(){
 	PrecacheSound("doors/vent_open2.wav");
 }
 
-void NecroMash_Perk(int client, bool apply){
+public void NecroMash_Call(int client, Perk perk, bool apply){
 	if(!apply) return;
 
 	if(GetEntPropEnt(client, Prop_Send, "m_hGroundEntity") > -1)

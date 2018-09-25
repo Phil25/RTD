@@ -19,7 +19,7 @@
 
 #define ATTRIB_SPEED 107 //the player speed attribute
 
-void Snail_Perk(int client, Perk perk, bool apply){
+public void Snail_Call(int client, Perk perk, bool apply){
 	if(apply) Snail_ApplyPerk(client, perk);
 	else Snail_RemovePerk(client);
 }

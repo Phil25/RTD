@@ -23,7 +23,7 @@
 
 int g_iSpawnSentryId = 12;
 
-void SpawnSentry_Perk(int client, Perk perk, bool apply){
+public void SpawnSentry_Call(int client, Perk perk, bool apply){
 	if(apply) SpawnSentry_ApplyPerk(client, perk);
 	else SpawnSentry_RemovePerk(client);
 }

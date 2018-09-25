@@ -17,6 +17,6 @@
 */
 
 
-void LowHealth_Perk(int client, Perk perk, bool apply){
+public void LowHealth_Call(int client, Perk perk, bool apply){
 	if(apply) SetEntityHealth(client, perk.GetPrefCell("health"));
 }

@@ -17,6 +17,6 @@
 */
 
 
-void Explode_Perk(int client){
+public void Explode_Call(int client, Perk perk, bool apply){
 	FakeClientCommand(client, "explode");
 }

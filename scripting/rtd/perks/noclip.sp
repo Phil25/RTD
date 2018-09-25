@@ -17,7 +17,7 @@
 */
 
 
-void Noclip_Perk(int client, Perk perk, bool apply){
+public void Noclip_Call(int client, Perk perk, bool apply){
 	if(apply)
 		SetEntityMoveType(client, !perk.GetPrefCell("mode") ? MOVETYPE_FLY : MOVETYPE_NOCLIP);
 	else{

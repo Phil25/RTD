@@ -28,7 +28,7 @@ void Beacon_Start(){
 	g_iSpriteHalo = PrecacheModel("materials/sprites/halo01.vmt");
 }
 
-void Beacon_Perk(int client, Perk perk, bool apply){
+public void Beacon_Call(int client, Perk perk, bool apply){
 	if(apply) Beacon_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iBeaconId);
 }

@@ -17,7 +17,7 @@
 */
 
 
-void LowGravity_Perk(int client, Perk perk, bool apply){
+public void LowGravity_Call(int client, Perk perk, bool apply){
 	if(apply) LowGravity_ApplyPerk(client, perk);
 	else SetEntityGravity(client, GetFloatCache(client));
 }

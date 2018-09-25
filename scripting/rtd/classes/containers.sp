@@ -148,7 +148,6 @@ methodmap PerkContainer < StringMap{
 		perk.Time = hKv.GetNum("time");
 		READ_STRING("class",Class)
 		READ_STRING("weapons",WeaponClass)
-		//READ_STRING("settings",Pref)
 
 		if(hKv.JumpToKey("settings")){
 			this.ParseSettings(hKv, perk);
@@ -156,6 +155,7 @@ methodmap PerkContainer < StringMap{
 		}
 
 		READ_STRING("tags",Tags)
+		READ_STRING("call",InternalCall)
 		iStats[perk.Good]++;
 
 		this.Add(perk);

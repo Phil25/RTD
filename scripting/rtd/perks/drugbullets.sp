@@ -19,7 +19,7 @@
 
 int g_iDrugBulletsId = 58;
 
-public void DrugBullets_Perk(int client, Perk perk, bool apply){
+public void DrugBullets_Call(int client, Perk perk, bool apply){
 	if(apply){
 		g_iDrugBulletsId = perk.Id;
 		SetClientPerkCache(client, g_iDrugBulletsId);

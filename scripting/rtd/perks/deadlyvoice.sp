@@ -35,7 +35,7 @@ void DeadlyVoice_Start(){
 	PrecacheSound(DEADLYVOICE_SOUND_ATTACK);
 }
 
-void DeadlyVoice_Perk(int client, Perk perk, bool apply){
+public void DeadlyVoice_Call(int client, Perk perk, bool apply){
 	if(apply) DeadlyVoice_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iDeadlyVoiceId);
 }

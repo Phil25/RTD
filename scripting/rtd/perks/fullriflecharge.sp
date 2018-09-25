@@ -19,7 +19,7 @@
 
 int g_iFullRifleChargeId = 14;
 
-public void FullRifleCharge_Perk(int client, Perk perk, bool apply){
+public void FullRifleCharge_Call(int client, Perk perk, bool apply){
 	if(apply) FullRifleCharge_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iFullRifleChargeId);
 }

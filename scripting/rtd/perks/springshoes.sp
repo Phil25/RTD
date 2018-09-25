@@ -26,7 +26,7 @@ void SpringShoes_Start(){
 	PrecacheSound(SPRING_JUMP);
 }
 
-void SpringShoes_Perk(int client, Perk perk, bool apply){
+public void SpringShoes_Call(int client, Perk perk, bool apply){
 	if(apply) SpringShoes_Apply(client, perk);
 	else SpringShoes_Remove(client);
 }

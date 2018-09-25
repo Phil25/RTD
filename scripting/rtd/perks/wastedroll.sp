@@ -17,4 +17,6 @@
 */
 
 
-// jermaDafoe
+public void WastedRoll_Call(int client, Perk perk, bool bEnable){
+	// jermaDafoe
+}

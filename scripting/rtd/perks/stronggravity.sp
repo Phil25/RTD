@@ -17,7 +17,7 @@
 */
 
 
-void  StrongGravity_Perk(int client, Perk perk, bool apply){
+public void StrongGravity_Call(int client, Perk perk, bool apply){
 	if(apply) StrongGravity_ApplyPerk(client, perk);
 	else SetEntityGravity(client, GetFloatCache(client));
 }

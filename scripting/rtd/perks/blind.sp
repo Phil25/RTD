@@ -23,7 +23,7 @@ void Blind_Start(){
 	g_BlindMsgId = GetUserMessageId("Fade");
 }
 
-void Blind_Perk(int client, Perk perk, bool apply){
+public void Blind_Call(int client, Perk perk, bool apply){
 	int iTargets[2];
 	iTargets[0] = client;
 

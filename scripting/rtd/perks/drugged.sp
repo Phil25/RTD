@@ -24,7 +24,7 @@ void Drugged_Start(){
 	g_DruggedMsgId = GetUserMessageId("Fade");
 }
 
-void Drugged_Perk(int client, Perk perk, bool apply){
+public void Drugged_Call(int client, Perk perk, bool apply){
 	if(apply) Drugged_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iDruggedId);
 }

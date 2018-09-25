@@ -48,7 +48,7 @@ void HatThrow_Start(){
 	PrecacheModel(MODEL_HAT);
 }
 
-void HatThrow_Perk(int client, Perk perk, bool apply){
+public void HatThrow_Call(int client, Perk perk, bool apply){
 	if(apply) HatThrow_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iHatThrowId);
 }

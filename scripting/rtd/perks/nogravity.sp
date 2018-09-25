@@ -17,7 +17,7 @@
 */
 
 
-void NoGravity_Perk(int client, bool apply){
+public void NoGravity_Call(int client, Perk perk, bool apply){
 	if(apply) NoGravity_ApplyPerk(client);
 	else SetEntityGravity(client, GetFloatCache(client));
 }

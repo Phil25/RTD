@@ -33,7 +33,7 @@ public void FastHands_OnDroppedWeaponSpawn(int iEnt){
 		AcceptEntityInput(iEnt, "Kill");
 }
 
-void FastHands_Perk(int client, Perk perk, bool apply){
+public void FastHands_Call(int client, Perk perk, bool apply){
 	if(apply) FastHands_ApplyPerk(client, perk);
 	else FastHands_RemovePerk(client);
 }

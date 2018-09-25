@@ -23,7 +23,7 @@
 
 int g_iExplosiveArrowsId = 54;
 
-void ExplosiveArrows_Perk(int client, Perk perk, bool apply){
+public void ExplosiveArrows_Call(int client, Perk perk, bool apply){
 	if(apply) ExplosiveArrows_Apply(client, perk);
 	else UnsetClientPerkCache(client, g_iExplosiveArrowsId);
 }

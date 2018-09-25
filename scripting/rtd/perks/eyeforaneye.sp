@@ -19,7 +19,7 @@
 
 int g_iEyeForAnEyeId = 38;
 
-void EyeForAnEye_Perk(int client, Perk perk, bool apply){
+public void EyeForAnEye_Call(int client, Perk perk, bool apply){
 	if(apply){
 		g_iEyeForAnEyeId = perk.Id;
 		SetClientPerkCache(client, g_iEyeForAnEyeId);

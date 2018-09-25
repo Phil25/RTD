@@ -17,7 +17,7 @@
 */
 
 
-void Weakened_Perk(int client, Perk perk, bool apply){
+public void Weakened_Call(int client, Perk perk, bool apply){
 	if(apply) Weakened_ApplyPerk(client, perk);
 	else SDKUnhook(client, SDKHook_OnTakeDamage, Weakened_OnTakeDamage);
 }

@@ -30,83 +30,9 @@
 #include "rtd/cache.sp"
 
 void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
-	//If the perk effect is NOT in this plugin, execute the function and stop, check if it's not being disabled and just stop right there.
-	if(perk.External){
+	if(perk.External)
 		perk.Call(client, bEnable);
-
-		if(!bEnable) //Check if anything is needing to be printed.
-			RemovedPerk(client, reason, sReason);
-		return;	//Stop further exectuion of ManagePerk()
-	}
-
-	//template: case <your_perk_id>:{YourPerk_Function(client, perk, bEnable);}
-	int iId = perk.Id;
-	switch(iId){
-		case 0:	Godmode_Perk			(client, perk, bEnable);
-		case 1:	Toxic_Perk				(client, perk, bEnable);
-		case 2:	LuckySandvich_Perk		(client, perk, bEnable);
-		case 3:	IncreasedSpeed_Perk		(client, perk, bEnable);
-		case 4:	Noclip_Perk				(client, perk, bEnable);
-		case 5:	LowGravity_Perk			(client, perk, bEnable);
-		case 6:	FullUbercharge_Perk		(client, perk, bEnable);
-		case 7:	Invisibility_Perk		(client, perk, bEnable);
-		case 8:	InfiniteCloak_Perk		(client, perk, bEnable);
-		case 9:	Criticals_Perk			(client, perk, bEnable);
-		case 10:InfiniteAmmo_Perk		(client, perk, bEnable);
-		case 11:ScaryBullets_Perk		(client, perk, bEnable);
-		case 12:SpawnSentry_Perk		(client, perk, bEnable);
-		case 13:HomingProjectiles_Perk	(client, perk, bEnable);
-		case 14:FullRifleCharge_Perk	(client, perk, bEnable);
-		case 15:Explode_Perk			(client);
-		case 16:Snail_Perk				(client, perk, bEnable);
-		case 17:Frozen_Perk				(client, bEnable);
-		case 18:Timebomb_Perk			(client, perk, bEnable);
-		case 19:Ignition_Perk			(client);
-		case 20:LowHealth_Perk			(client, perk, bEnable);
-		case 21:Drugged_Perk			(client, perk, bEnable);
-		case 22:Blind_Perk				(client, perk, bEnable);
-		case 23:StripToMelee_Perk		(client, perk, bEnable);
-		case 24:Beacon_Perk				(client, perk, bEnable);
-		case 25:ForcedTaunt_Perk		(client, perk, bEnable);
-		case 26:Monochromia_Perk		(client, bEnable);
-		case 27:Earthquake_Perk			(client, perk, bEnable);
-		case 28:FunnyFeeling_Perk		(client, perk, bEnable);
-		case 29:BadSauce_Perk			(client, perk, bEnable);
-		case 30:SpawnDispenser_Perk		(client, perk, bEnable);
-		case 31:InfiniteJump_Perk		(client, perk, bEnable);
-		case 32:PowerfulHits_Perk		(client, perk, bEnable);
-		case 33:BigHead_Perk			(client, perk, bEnable);
-		case 34:TinyMann_Perk			(client, perk, bEnable);
-		case 35:Firework_Perk			(client, perk, bEnable);
-		case 36:DeadlyVoice_Perk		(client, perk, bEnable);
-		case 37:StrongGravity_Perk		(client, perk, bEnable);
-		case 38:EyeForAnEye_Perk		(client, perk, bEnable);
-		case 39:Weakened_Perk			(client, perk, bEnable);
-		case 40:NecroMash_Perk			(client, bEnable);
-		case 41:ExtraAmmo_Perk			(client, perk, bEnable);
-		case 42:Suffocation_Perk		(client, perk, bEnable);
-		case 43:FastHands_Perk			(client, perk, bEnable);
-		case 44:Outline_Perk			(client, bEnable);
-		case 45:Vital_Perk				(client, perk, bEnable);
-		case 46:NoGravity_Perk			(client, bEnable);
-		case 47:TeamCriticals_Perk		(client, perk, bEnable);
-		case 48:FireTimebomb_Perk		(client, perk, bEnable);
-		case 49:FireBreath_Perk			(client, perk, bEnable);
-		case 50:StrongRecoil_Perk		(client, perk, bEnable);
-		case 51:Cursed_Perk				(client, perk, bEnable);
-		case 52:ExtraThrowables_Perk	(client, perk, bEnable);
-		case 53:PowerPlay_Perk			(client, bEnable);
-		case 54:ExplosiveArrows_Perk	(client, perk, bEnable);
-		case 55:InclineProblem_Perk		(client, bEnable);
-		case 56:SpringShoes_Perk		(client, perk, bEnable);
-		case 57:Lag_Perk				(client, perk, bEnable);
-		case 58:DrugBullets_Perk		(client, perk, bEnable);
-		case 59:LongMelee_Perk			(client, perk, bEnable);
-		case 60:HatThrow_Perk			(client, perk, bEnable);
-		case 61:MadarasWhistle_Perk		(client, perk, bEnable);
-		case 62:Sickness_Perk			(client, perk, bEnable);
-		case 63:{} // Wasted Roll
-	}
+	else perk.CallInternal(client, bEnable);
 
 	if(!bEnable)
 		RemovedPerk(client, reason, sReason);

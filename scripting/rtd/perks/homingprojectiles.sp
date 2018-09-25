@@ -32,7 +32,7 @@ void HomingProjectiles_Start(){
 	HookEvent("teamplay_round_start", Event_HomingProjectiles_RoundStart);
 }
 
-void HomingProjectiles_Perk(int client, Perk perk, bool apply){
+public void HomingProjectiles_Call(int client, Perk perk, bool apply){
 	if(apply) HomingProjectiles_ApplyPerk(client, perk);
 	else HomingProjectiles_RemovePerk(client);
 }

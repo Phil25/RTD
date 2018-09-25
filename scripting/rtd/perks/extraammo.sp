@@ -27,7 +27,7 @@ void ExtraAmmo_Start(){
 	g_iExtraAmmoOffsetAmmoType	= FindSendPropInfo("CBaseCombatWeapon", "m_iPrimaryAmmoType");
 }
 
-void ExtraAmmo_Perk(int client, Perk perk, bool apply){
+public void ExtraAmmo_Call(int client, Perk perk, bool apply){
 	if(!apply) return;
 
 	float fMultiplier = perk.GetPrefFloat("multiplier");

@@ -20,7 +20,7 @@
 #define FULLCRIT TFCond_CritOnFirstBlood
 #define MINICRIT TFCond_Buffed
 
-void Criticals_Perk(int client, Perk perk, bool apply){
+public void Criticals_Call(int client, Perk perk, bool apply){
 	if(apply) Criticals_ApplyPerk(client, perk);
 	else Criticals_RemovePerk(client);
 }

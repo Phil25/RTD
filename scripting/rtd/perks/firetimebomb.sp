@@ -48,7 +48,7 @@ void FireTimebomb_Start(){
 	PrecacheSound(SOUND_FTIMEBOMB_GOFF);
 }
 
-void FireTimebomb_Perk(int client, Perk perk, bool apply){
+public void FireTimebomb_Call(int client, Perk perk, bool apply){
 	if(!apply) return;
 
 	g_iFireTimebombId = perk.Id;

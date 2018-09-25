@@ -19,7 +19,7 @@
 
 bool g_bLuckySandvich_HasCrit[MAXPLAYERS+1] = {false, ...};
 
-void LuckySandvich_Perk(int client, Perk perk, bool apply){
+public void LuckySandvich_Call(int client, Perk perk, bool apply){
 	if(!apply) return;
 
 	int iHealth = perk.GetPrefCell("amount");

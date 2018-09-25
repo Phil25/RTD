@@ -24,7 +24,7 @@ int g_iCritBoostsGetting[33] = {0, ...};
 int g_iCritBoostEnt[33][33];
 int g_iTeamCriticalsId = 47;
 
-void TeamCriticals_Perk(int client, Perk perk, bool apply){
+public void TeamCriticals_Call(int client, Perk perk, bool apply){
 	if(apply) TeamCriticals_ApplyPerk(client, perk);
 	else TeamCriticals_RemovePerk(client);
 }

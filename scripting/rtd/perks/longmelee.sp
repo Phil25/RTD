@@ -32,7 +32,7 @@ public void LongMelee_OnDroppedWeaponSpawn(int iEnt){
 		AcceptEntityInput(iEnt, "Kill");
 } 
 
-void LongMelee_Perk(int client, Perk perk, bool apply){
+public void LongMelee_Call(int client, Perk perk, bool apply){
 	if(apply) LongMelee_ApplyPerk(client, perk);
 	else LongMelee_RemovePerk(client);
 }

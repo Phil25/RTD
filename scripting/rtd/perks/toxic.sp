@@ -20,7 +20,7 @@
 #define TOXIC_PARTICLE "eb_aura_angry01"
 int g_iToxicId = 1;
 
-void Toxic_Perk(int client, Perk perk, bool apply){
+public void Toxic_Call(int client, Perk perk, bool apply){
 	if(apply) Toxic_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iToxicId);
 }

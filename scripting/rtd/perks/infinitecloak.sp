@@ -19,7 +19,7 @@
 
 int g_iInfiniteCloakId = 8;
 
-public void InfiniteCloak_Perk(int client, Perk perk, bool apply){
+public void InfiniteCloak_Call(int client, Perk perk, bool apply){
 	if(apply) InfiniteCloak_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iInfiniteCloakId);
 }

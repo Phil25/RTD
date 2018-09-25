@@ -21,7 +21,7 @@
 
 int g_iBigHeadId = 33;
 
-void BigHead_Perk(int client, Perk perk, bool apply){
+public void BigHead_Call(int client, Perk perk, bool apply){
 	if(apply) BigHead_Apply(client, perk);
 	else BigHead_Remove(client);
 }

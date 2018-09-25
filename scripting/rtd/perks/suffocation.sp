@@ -21,7 +21,7 @@
 
 int g_iSuffocationId = 42;
 
-void Suffocation_Perk(int client, Perk perk, bool apply){
+public void Suffocation_Call(int client, Perk perk, bool apply){
 	if(apply) Suffocation_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iSuffocationId);
 }

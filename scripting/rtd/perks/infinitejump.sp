@@ -19,7 +19,7 @@
 
 int g_iInfiniteJumpId = 31;
 
-public void InfiniteJump_Perk(int client, Perk perk, bool apply){
+public void InfiniteJump_Call(int client, Perk perk, bool apply){
 	if(apply){
 		g_iInfiniteJumpId = perk.Id;
 		SetClientPerkCache(client, g_iInfiniteJumpId);

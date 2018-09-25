@@ -24,7 +24,7 @@ void Firework_Start(){
 	PrecacheSound(FIREWORK_EXPLOSION);
 }
 
-void Firework_Perk(int client, Perk perk, bool apply){
+public void Firework_Call(int client, Perk perk, bool apply){
 	if(!apply) return;
 
 	float fPush[3];

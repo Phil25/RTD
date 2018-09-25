@@ -19,7 +19,7 @@
 
 #define ATTRIB_SPEED 107 //the player speed attribute
 
-void IncreasedSpeed_Perk(int client, Perk perk, bool apply){
+public void IncreasedSpeed_Call(int client, Perk perk, bool apply){
 	if(apply) IncreasedSpeed_ApplyPerk(client, perk);
 	else IncreasedSpeed_RemovePerk(client);
 }

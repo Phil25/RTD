@@ -19,7 +19,7 @@
 
 #define MAX_HEALTH_ATTRIB 26
 
-public void Vital_Perk(int client, Perk perk, bool apply){
+public void Vital_Call(int client, Perk perk, bool apply){
 	if(apply) Vital_ApplyPerk(client, perk);
 	else TF2Attrib_RemoveByDefIndex(client, MAX_HEALTH_ATTRIB);
 }

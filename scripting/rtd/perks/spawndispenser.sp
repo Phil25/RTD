@@ -22,7 +22,7 @@
 
 int g_iSpawnDispenserId = 30;
 
-public SpawnDispenser_Perk(int client, Perk perk, bool apply){
+public SpawnDispenser_Call(int client, Perk perk, bool apply){
 	if(apply) SpawnDispenser_ApplyPerk(client, perk);
 	else SpawnDispenser_RemovePerk(client);
 }
@@ -58,11 +58,11 @@ void SpawnDispenser_RemovePerk(int client){
 void SpawnDispenser_Voice(int client){
 	if(!CheckClientPerkCache(client, g_iSpawnDispenserId))
 		return;
-	
+
 	float fPos[3];
 	if(!GetClientLookPosition(client, fPos))
 		return;
-	
+
 	if(!CanBuildAtPos(fPos, false))
 		return;
 
@@ -105,7 +105,7 @@ stock int SpawnDispenser(int builder, float Position[3], float Angle[3], int lev
 	SetEntProp(dispenser, Prop_Send, "m_iHighestUpgradeLevel", level);
 	SetEntProp(dispenser, Prop_Data, "m_spawnflags", flags);
 	SetEntProp(dispenser, Prop_Send, "m_bBuilding", 1);
-	DispatchSpawn(dispenser); 
+	DispatchSpawn(dispenser);
 
 	SetVariantInt(iTeam);
 	AcceptEntityInput(dispenser, "SetTeam");
@@ -115,7 +115,7 @@ stock int SpawnDispenser(int builder, float Position[3], float Angle[3], int lev
 	SetEntPropEnt(dispenser, Prop_Send, "m_hBuilder", builder);
 
 	return dispenser;
-} 
+}
 
 #define LEVEL 0
 #define KEEP 1

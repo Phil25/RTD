@@ -29,7 +29,7 @@ void FireBreath_Start(){
 	PrecacheSound(FIREBREATH_SOUND_ATTACK);
 }
 
-void FireBreath_Perk(int client, Perk perk, bool apply){
+public void FireBreath_Call(int client, Perk perk, bool apply){
 	if(apply) FireBreath_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iFireBreathId);
 }

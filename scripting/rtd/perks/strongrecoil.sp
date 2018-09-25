@@ -19,7 +19,7 @@
 
 int g_iStrongRecoilId = 50;
 
-public void StrongRecoil_Perk(int client, Perk perk, bool apply){
+public void StrongRecoil_Call(int client, Perk perk, bool apply){
 	if(apply){
 		g_iStrongRecoilId = perk.Id;
 		SetClientPerkCache(client, g_iStrongRecoilId);

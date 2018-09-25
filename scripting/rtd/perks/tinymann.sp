@@ -19,7 +19,7 @@
 #define SCALE 0
 #define BASE 1
 
-void TinyMann_Perk(int client, Perk perk, bool apply){
+public void TinyMann_Call(int client, Perk perk, bool apply){
 	if(apply) TinyMann_ApplyPerk(client, perk);
 	else TinyMann_RemovePerk(client);
 }

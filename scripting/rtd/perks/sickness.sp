@@ -34,7 +34,7 @@ void Sickness_Start(){
 		PrecacheSound(g_sSoundCough[i]);
 }
 
-void Sickness_Perk(int client, Perk perk, bool apply){
+public void Sickness_Call(int client, Perk perk, bool apply){
 	if(apply) Sickness_ApplyPerk(client, perk);
 	else UnsetClientPerkCache(client, g_iSicknessId);
 }

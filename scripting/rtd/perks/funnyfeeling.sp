@@ -21,7 +21,7 @@
 
 int g_iFunnyFeelingId = 28;
 
-void FunnyFeeling_Perk(int client, Perk perk, bool apply){
+public void FunnyFeeling_Call(int client, Perk perk, bool apply){
 	if(apply) FunnyFeeling_ApplyPerk(client, perk);
 	else FunnyFeeling_RemovePerk(client);
 }
