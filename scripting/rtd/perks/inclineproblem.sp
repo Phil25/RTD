@@ -17,16 +17,9 @@
 */
 
 
-float g_fDefaultStepSize[MAXPLAYERS+1] = {0.0, ...};
-
-public void InclineProblem_Perk(int client, const char[] sPref, bool apply){
-
+public void InclineProblem_Perk(int client, bool apply){
 	if(apply){
-	
-		g_fDefaultStepSize[client] = GetEntPropFloat(client, Prop_Send, "m_flStepSize");
+		SetFloatCache(client, GetEntPropFloat(client, Prop_Send, "m_flStepSize"));
 		SetEntPropFloat(client, Prop_Send, "m_flStepSize", 1.0);
-	
-	}else
-		SetEntPropFloat(client, Prop_Send, "m_flStepSize", g_fDefaultStepSize[client]);
-
+	}else SetEntPropFloat(client, Prop_Send, "m_flStepSize", GetFloatCache(client));
 }
