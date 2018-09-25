@@ -20,47 +20,29 @@
 #define FIREWORK_EXPLOSION	"weapons/flare_detonator_explode.wav"
 #define FIREWORK_PARTICLE	"burningplayer_rainbow_flame"
 
-int g_iFireworkParticle[MAXPLAYERS+1] = {-1, ...};
-
 void Firework_Start(){
-
 	PrecacheSound(FIREWORK_EXPLOSION);
-
 }
 
-void Firework_Perk(int client, const char[] sPref, bool apply){
-
-	if(!apply)
-		if(g_iFireworkParticle[client] > MaxClients && IsValidEntity(g_iFireworkParticle[client])){
-			AcceptEntityInput(g_iFireworkParticle[client], "Kill");
-			g_iFireworkParticle[client] = -1;
-		}
+void Firework_Perk(int client, Perk perk, bool apply){
+	if(!apply) return;
 
 	float fPush[3];
-	fPush[2] = StringToFloat(sPref);
-
+	fPush[2] = perk.GetPrefFloat("force");
 	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fPush);
-	
-	if(g_iFireworkParticle[client] < 0)
-		g_iFireworkParticle[client] = CreateParticle(client, FIREWORK_PARTICLE);
-	
-	CreateTimer(0.5, Timer_Firework_Explode, GetClientSerial(client));
 
+	int iParticle = CreateParticle(client, FIREWORK_PARTICLE);
+	SetEntCache(client, iParticle);
+	KILL_ENT_IN(iParticle,0.5)
+
+	CreateTimer(0.5, Timer_Firework_Explode, GetClientUserId(client));
 }
 
-public Action Timer_Firework_Explode(Handle hTimer, int iSerial){
-
-	int client = GetClientFromSerial(iSerial);
+public Action Timer_Firework_Explode(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(!client) return Plugin_Stop;
 
 	EmitSoundToAll(FIREWORK_EXPLOSION, client);
-	
-	int iParticle = g_iFireworkParticle[client];
-	if(iParticle > MaxClients && IsValidEntity(iParticle))
-		AcceptEntityInput(iParticle, "Kill");
-	g_iFireworkParticle[client] = -1;
-
 	FakeClientCommandEx(client, "explode");
-	
 	return Plugin_Stop;
-
 }
