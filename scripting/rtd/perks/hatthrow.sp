@@ -20,10 +20,12 @@
 #define MODEL_HAT "models/player/items/all_class/all_domination_Scout.mdl"
 #define SOUND_HAT_IMPACT "weapons/loose_cannon_ball_impact.wav"
 
-bool g_bHasHatThrow[MAXPLAYERS+1] = {false, ...};
-float g_fHatThrowLastAttack[MAXPLAYERS+1] = {0.0, ...};
-float g_fHatThrowDamage = 150.0;
-float g_fHatThrowRate = 2.0;
+#define LAST_ATTACK 0
+#define RATE 1
+#define SPEED 2
+#define DAMAGE 3
+
+int g_iHatThrowId = 60;
 
 char g_sSoundSwoosh[][] = {
 	"passtime/projectile_swoosh3.wav",
@@ -46,23 +48,32 @@ void HatThrow_Start(){
 	PrecacheModel(MODEL_HAT);
 }
 
-void HatThrow_Perk(int client, const char[] sPref, bool apply){
-	g_bHasHatThrow[client] = apply;
-	if(apply){
-		HatThrow_ProcessString(sPref);
-		PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
-	}
+void HatThrow_Perk(int client, Perk perk, bool apply){
+	if(apply) HatThrow_ApplyPerk(client, perk);
+	else UnsetClientPerkCache(client, g_iHatThrowId);
+}
+
+void HatThrow_ApplyPerk(int client, Perk perk){
+	g_iHatThrowId = perk.Id;
+	SetClientPerkCache(client, g_iHatThrowId);
+
+	SetFloatCache(client, 0.0, LAST_ATTACK);
+	SetFloatCache(client, perk.GetPrefFloat("rate"), RATE);
+	SetFloatCache(client, perk.GetPrefFloat("speed"), SPEED);
+	SetFloatCache(client, perk.GetPrefFloat("damage"), DAMAGE);
+
+	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
 }
 
 void HatThrow_Voice(int client){
-	if(!g_bHasHatThrow[client])
+	if(!CheckClientPerkCache(client, g_iHatThrowId))
 		return;
 
 	float fEngineTime = GetEngineTime();
-	if(fEngineTime < g_fHatThrowLastAttack[client] +g_fHatThrowRate)
+	if(fEngineTime < GetFloatCache(client, LAST_ATTACK) +GetFloatCache(client, RATE))
 		return;
 
-	g_fHatThrowLastAttack[client] = fEngineTime;
+	SetFloatCache(client, fEngineTime, LAST_ATTACK);
 	HatThrow_Spawn(client);
 }
 
@@ -83,7 +94,7 @@ void HatThrow_Spawn(int client){
 	DispatchKeyValue(iHat, "model", MODEL_HAT);
 	DispatchKeyValue(iHat, "modelscale", "3");
 	DispatchKeyValue(iRot, "distance", "99999");
-	DispatchKeyValue(iRot, "speed", "2000");
+	DispatchKeyValue(iRot, "speed", "2000"); // TODO: is this necessary?
 	DispatchKeyValue(iRot, "spawnflags", "4104"); // passable|silent
 	DispatchSpawn(iHat);
 	DispatchSpawn(iRot);
@@ -118,9 +129,10 @@ void HatThrow_Launch(int client, int iHat){
 
 	float fVel[3], fBuf[3];
 	GetAngleVectors(fAng, fBuf, NULL_VECTOR, NULL_VECTOR);
-	fVel[0] = fBuf[0]*1100.0; // rocket speed TODO: read from config
-	fVel[1] = fBuf[1]*1100.0;
-	fVel[2] = fBuf[2]*1100.0;
+	float fSpeed = GetFloatCache(client, SPEED);
+	fVel[0] = fBuf[0]*fSpeed;
+	fVel[1] = fBuf[1]*fSpeed;
+	fVel[2] = fBuf[2]*fSpeed;
 
 	SetEntPropEnt(iCarrier, Prop_Send, "m_hOwnerEntity", client);
 	DispatchKeyValue(iCarrier, "model", MODEL_HAT);
@@ -139,7 +151,7 @@ public Action Event_HatThrow_OnHatTouch(int iHat, int client){
 	if(1 <= client <= MaxClients){
 		int attacker = GetEntPropEnt(iHat, Prop_Send, "m_hOwnerEntity");
 		if(CanPlayerBeHurt(client, attacker))
-			SDKHooks_TakeDamage(client, iHat, attacker, g_fHatThrowDamage, DMG_CLUB);
+			SDKHooks_TakeDamage(client, iHat, attacker, GetFloatCache(attacker, DAMAGE), DMG_CLUB);
 
 		EmitSoundToAll(g_sSoundHatHit[GetRandomInt(0, 2)], iHat);
 	}
@@ -174,9 +186,7 @@ void HatThrow_SpawnCorpse(float fPos[3]){
 	KILL_ENT_IN(iHat,1.0)
 }
 
-void HatThrow_ProcessString(const char[] sSettings){
-	char[][] sPieces = new char[2][8];
-	ExplodeString(sSettings, ",", sPieces, 3, 8);
-	g_fHatThrowRate		= StringToFloat(sPieces[0]);
-	g_fHatThrowDamage	= StringToFloat(sPieces[1]);
-}
+#undef LAST_ATTACK
+#undef RATE
+#undef SPEED
+#undef DAMAGE
