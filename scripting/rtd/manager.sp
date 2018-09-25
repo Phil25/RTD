@@ -160,7 +160,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 38:EyeForAnEye_Perk		(client, perk, bEnable);
 		case 39:Weakened_Perk			(client, perk, bEnable);
 		case 40:NecroMash_Perk			(client, bEnable);
-		case 41:ExtraAmmo_Perk			(client, sSettings, bEnable);
+		case 41:ExtraAmmo_Perk			(client, perk, bEnable);
 		case 42:Suffocation_Perk		(client, sSettings, bEnable);
 		case 43:FastHands_Perk			(client, sSettings, bEnable);
 		case 44:Outline_Perk			(client, sSettings, bEnable);
