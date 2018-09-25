@@ -17,18 +17,12 @@
 */
 
 
-public void PowerPlay_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		PowerPlay_ApplyPerk(client);
-	
-	else
-		PowerPlay_RemovePerk(client);
-
+public void PowerPlay_Perk(int client, bool apply){
+	if(apply) PowerPlay_ApplyPerk(client);
+	else PowerPlay_RemovePerk(client);
 }
 
 void PowerPlay_ApplyPerk(int client){
-
 	TF2_AddCondition(client, TFCond_UberchargedCanteen);
 	TF2_AddCondition(client, TFCond_CritOnFirstBlood);
 	TF2_AddCondition(client, TFCond_UberBulletResist);
@@ -36,11 +30,9 @@ void PowerPlay_ApplyPerk(int client){
 	TF2_AddCondition(client, TFCond_UberFireResist);
 	TF2_AddCondition(client, TFCond_MegaHeal);
 	TF2_SetPlayerPowerPlay(client, true);
-
 }
 
 void PowerPlay_RemovePerk(int client){
-
 	TF2_RemoveCondition(client, TFCond_UberchargedCanteen);
 	TF2_RemoveCondition(client, TFCond_CritOnFirstBlood);
 	TF2_RemoveCondition(client, TFCond_UberBulletResist);
@@ -48,5 +40,4 @@ void PowerPlay_RemovePerk(int client){
 	TF2_RemoveCondition(client, TFCond_UberFireResist);
 	TF2_RemoveCondition(client, TFCond_MegaHeal);
 	TF2_SetPlayerPowerPlay(client, false);
-
 }
