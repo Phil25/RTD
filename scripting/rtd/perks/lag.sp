@@ -17,14 +17,21 @@
 */
 
 
-bool g_bHasLag[MAXPLAYERS+1] = {false, ...};
-float g_fLagLastPos[MAXPLAYERS+1][3];
+int g_iLagId = 57;
 
-public void Lag_Perk(int client, const char[] sPref, bool apply){
-	g_bHasLag[client] = apply;
-	if(!apply) return;
+public void Lag_Perk(int client, Perk perk, bool apply){
+	if(!apply){
+		UnsetClientPerkCache(client, g_iLagId);
+		return;
+	}
 
-	GetClientAbsOrigin(client, g_fLagLastPos[client]);
+	g_iLagId = perk.Id;
+	SetClientPerkCache(client, g_iLagId);
+
+	float fPos[3];
+	GetClientAbsOrigin(client, fPos);
+	SetVectorCache(client, fPos);
+
 	int iUserId = GetClientUserId(client);
 	CreateTimer(1.0, Timer_Lag_Teleport, iUserId, TIMER_REPEAT);
 	CreateTimer(0.5, Timer_Lag_SetPos, iUserId, TIMER_REPEAT);
@@ -32,18 +39,26 @@ public void Lag_Perk(int client, const char[] sPref, bool apply){
 
 public Action Timer_Lag_Teleport(Handle hTimer, int iUserId){
 	int client = GetClientOfUserId(iUserId);
-	if(!client || !g_bHasLag[client])
+	if(!client) return Plugin_Stop;
+
+	if(!CheckClientPerkCache(client, g_iLagId))
 		return Plugin_Stop;
 
-	TeleportEntity(client, g_fLagLastPos[client], NULL_VECTOR, NULL_VECTOR);
+	float fPos[3];
+	GetVectorCache(client, fPos);
+	TeleportEntity(client, fPos, NULL_VECTOR, NULL_VECTOR);
 	return Plugin_Continue;
 }
 
 public Action Timer_Lag_SetPos(Handle hTimer, int iUserId){
 	int client = GetClientOfUserId(iUserId);
-	if(!client || !g_bHasLag[client])
+	if(!client) return Plugin_Stop;
+
+	if(!CheckClientPerkCache(client, g_iLagId))
 		return Plugin_Stop;
 
-	GetClientAbsOrigin(client, g_fLagLastPos[client]);
+	float fPos[3];
+	GetClientAbsOrigin(client, fPos);
+	SetVectorCache(client, fPos);
 	return Plugin_Continue;
 }

@@ -73,6 +73,18 @@ void SetFloatCache(int client, float fVal, int iBlock=0){
 	g_fCache[client][iBlock] = fVal;
 }
 
+float GetVectorCache(int client, float fVec[3]){
+	fVec[0] = GetFloatCache(client, 1);
+	fVec[1] = GetFloatCache(client, 2);
+	fVec[2] = GetFloatCache(client, 3);
+}
+
+float SetVectorCache(int client, float fVec[3]){
+	SetFloatCache(client, fVec[0], 1);
+	SetFloatCache(client, fVec[1], 2);
+	SetFloatCache(client, fVec[2], 3);
+}
+
 int GetIntCache(int client, int iBlock=0){
 	return g_iCache[client][iBlock];
 }
@@ -176,7 +188,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 54:ExplosiveArrows_Perk	(client, perk, bEnable);
 		case 55:InclineProblem_Perk		(client, bEnable);
 		case 56:SpringShoes_Perk		(client, perk, bEnable);
-		case 57:Lag_Perk				(client, sSettings, bEnable);
+		case 57:Lag_Perk				(client, perk, bEnable);
 		case 58:DrugBullets_Perk		(client, sSettings, bEnable);
 		case 59:LongMelee_Perk			(client, sSettings, bEnable);
 		case 60:HatThrow_Perk			(client, sSettings, bEnable);
