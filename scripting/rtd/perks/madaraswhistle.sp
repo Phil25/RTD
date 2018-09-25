@@ -23,11 +23,12 @@
 #define MODEL_GATOR "models/props_island/crocodile/crocodile.mdl"
 #define ANIM_GATOR "attack"
 
-bool g_bHasMadarasWhistle[MAXPLAYERS+1] = {false, ...};
-float g_fMadarasWhistleLastAttack[MAXPLAYERS+1] = {0.0, ...};
-float g_fMadarasWhistleRate = 2.0;
-float g_fMadarasWhistleRange = 100.0;
-float g_fMadarasWhistleDamage = 150.0;
+#define LAST_ATTACK 0
+#define RATE 1
+#define DELAY 2
+#define RANGE 3
+
+int g_iMadarasWhistleId = 61;
 
 char g_sGatorRumble[][] = {
 	"ambient_mp3/lair/crocs_growl1.mp3",
@@ -44,29 +45,33 @@ void MadarasWhistle_Start(){
 		PrecacheSound(g_sGatorRumble[i]);
 }
 
-void MadarasWhistle_Perk(int client, const char[] sPref, bool apply){
-	if(apply) MadarasWhistle_ApplyPerk(client, sPref);
-	else MadarasWhistle_RemovePerk(client);
+void MadarasWhistle_Perk(int client, Perk perk, bool apply){
+	if(apply) MadarasWhistle_ApplyPerk(client, perk);
+	else UnsetClientPerkCache(client, g_iMadarasWhistleId);
 }
 
-void MadarasWhistle_ApplyPerk(int client, const char[] sPref){
-	MadarasWhistle_ProcessSettings(sPref);
-	g_bHasMadarasWhistle[client] = true;
+void MadarasWhistle_ApplyPerk(int client, Perk perk){
+	g_iMadarasWhistleId = perk.Id;
+	SetClientPerkCache(client, g_iMadarasWhistleId);
+
+	SetFloatCache(client, 0.0, LAST_ATTACK);
+	SetFloatCache(client, perk.GetPrefFloat("rate"), RATE);
+	SetFloatCache(client, perk.GetPrefFloat("delay"), DELAY);
+	SetFloatCache(client, perk.GetPrefFloat("range"), RANGE);
+	SetIntCache(client, perk.GetPrefCell("damage"));
+
 	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
 }
 
-void MadarasWhistle_RemovePerk(int client){
-	g_bHasMadarasWhistle[client] = false;
-}
-
 void MadarasWhistle_Voice(int client){
-	if(!g_bHasMadarasWhistle[client]) return;
-
-	float fEngineTime = GetEngineTime();
-	if(fEngineTime < g_fMadarasWhistleLastAttack[client] +g_fMadarasWhistleRate)
+	if(!CheckClientPerkCache(client, g_iMadarasWhistleId))
 		return;
 
-	g_fMadarasWhistleLastAttack[client] = fEngineTime;
+	float fEngineTime = GetEngineTime();
+	if(fEngineTime < GetFloatCache(client, LAST_ATTACK) +GetFloatCache(client, RATE))
+		return;
+
+	SetFloatCache(client, fEngineTime, LAST_ATTACK);
 	MadarasWhistle_Whistle(client);
 }
 
@@ -77,7 +82,8 @@ void MadarasWhistle_Whistle(int client){
 	EmitSoundToAll(SOUND_WHISTLE, client, _, _, _, _, 180);
 	DataPack hPack = new DataPack();
 
-	CreateTimer(1.0, Timer_MadarasWhistle_Whistle, hPack); // TODO: read delay from config
+	float fDelay = GetFloatCache(client, DELAY);
+	CreateTimer(fDelay, Timer_MadarasWhistle_Whistle, hPack);
 	hPack.WriteCell(GetClientUserId(client));
 	hPack.WriteFloat(fPos[0]);
 	hPack.WriteFloat(fPos[1]);
@@ -85,7 +91,7 @@ void MadarasWhistle_Whistle(int client){
 
 	int iParticle = CreateParticle(client, "waterfall_bottomsplash", false, "", view_as<float>({0.0, 0.0, 0.0}));
 	EmitSoundToAll(g_sGatorRumble[GetRandomInt(0, 4)], iParticle);
-	KillEntIn(iParticle, 1.0); // TODO: read delay from config
+	KillEntIn(iParticle, fDelay); 
 }
 
 public Action Timer_MadarasWhistle_Whistle(Handle hTimer, DataPack hPack){
@@ -105,9 +111,11 @@ public Action Timer_MadarasWhistle_Whistle(Handle hTimer, DataPack hPack){
 
 void MadarasWhistle_Summon(int client, float fPos[3]){
 	int iGator = MadarasWhistle_SpawnGator(fPos);
-	if(iGator == 0) return;
+	if(!iGator) return;
 
-	DamageRadius(fPos, iGator, client, g_fMadarasWhistleRange, g_fMadarasWhistleDamage, DMG_BLAST|DMG_ALWAYSGIB, true);
+	float fRange = GetFloatCache(client, RANGE);
+	float fDamage = float(GetIntCache(client));
+	DamageRadius(fPos, iGator, client, fRange, fDamage, DMG_BLAST|DMG_ALWAYSGIB, true);
 	KILL_ENT_IN(iGator,1.0)
 }
 
@@ -124,15 +132,10 @@ int MadarasWhistle_SpawnGator(float fPos[3]){
 
 	SetVariantString(ANIM_GATOR);
 	AcceptEntityInput(iGator, "SetAnimation");
-
 	return iGator;
 }
 
-void MadarasWhistle_ProcessSettings(const char[] sSettings){
-	char[][] sPieces = new char[3][8];
-	ExplodeString(sSettings, ",", sPieces, 3, 8);
-
-	g_fMadarasWhistleRate = StringToFloat(sPieces[0]);
-	g_fMadarasWhistleRange = StringToFloat(sPieces[1]);
-	g_fMadarasWhistleDamage = StringToFloat(sPieces[2]);
-}
+#undef LAST_ATTACK
+#undef RATE
+#undef DELAY
+#undef RANGE

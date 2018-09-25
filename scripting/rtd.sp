@@ -1658,9 +1658,9 @@ void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRa
 	}
 }
 
-void TakeDamage(int client, int iInflictor, int iAttacker, float fDamage, int iFlags, Function call=INVALID_FUNCTION){
+void TakeDamage(int client, int iInflictor, int iAttacker, float fDamage, int iFlags, Function call){
 	SDKHooks_TakeDamage(client, iInflictor, iAttacker, fDamage, iFlags);
-	if(!call) return;
+	if(call == INVALID_FUNCTION) return;
 	Call_StartFunction(INVALID_HANDLE, call);
 	Call_PushCell(client);
 	Call_PushCell(iAttacker);
