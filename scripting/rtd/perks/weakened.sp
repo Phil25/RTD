@@ -17,32 +17,20 @@
 */
 
 
-float g_fWeakenedMultiplayer = 2.5;
-
-void Weakened_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		Weakened_ApplyPerk(client, StringToFloat(sPref));
-	
-	else
-		SDKUnhook(client, SDKHook_OnTakeDamage, Weakened_OnTakeDamage);
-
+void Weakened_Perk(int client, Perk perk, bool apply){
+	if(apply) Weakened_ApplyPerk(client, perk);
+	else SDKUnhook(client, SDKHook_OnTakeDamage, Weakened_OnTakeDamage);
 }
 
-void Weakened_ApplyPerk(int client, float fMultiplayer){
-
-	g_fWeakenedMultiplayer = fMultiplayer;
+void Weakened_ApplyPerk(int client, Perk perk){
+	SetFloatCache(client, perk.GetPrefFloat("multiplier"));
 	SDKHook(client, SDKHook_OnTakeDamage, Weakened_OnTakeDamage);
-
 }
 
-public Action Weakened_OnTakeDamage(int iVic, int &iAttacker, int &iInflictor, float &fDamage, int &iDamageType){//, int &weapon, float damageForce[3], float damagePosition[3]){
-
-	if(iVic == iAttacker)	
+public Action Weakened_OnTakeDamage(int client, int &iAtk, int &iInflictor, float &fDmg, int &iType){
+	if(client == iAtk)
 		return Plugin_Continue;
-	
-	fDamage *= g_fWeakenedMultiplayer;
-	
-	return Plugin_Changed;
 
+	fDmg *= GetFloatCache(client);
+	return Plugin_Changed;
 }
