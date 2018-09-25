@@ -1643,7 +1643,7 @@ bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
 	return true;
 }
 
-void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRadius, float fDamage, int iFlags=0, bool bCanHurtSelf=false, bool bCheckSight=true){
+void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRadius, float fDamage, int iFlags=0, bool bCanHurtSelf=false, bool bCheckSight=true, Function call=INVALID_FUNCTION){
 	fRadius *= fRadius;
 	float fOtherPos[3];
 	for(int i = 1; i <= MaxClients; ++i){
@@ -1654,8 +1654,18 @@ void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRa
 		if(GetVectorDistance(fOrigin, fOtherPos, true) <= fRadius)
 			if(CanPlayerBeHurt(i, iAttacker, bCanHurtSelf))
 				if(!bCheckSight || (bCheckSight && CanEntitySeeTarget(iAttacker, i)))
-					SDKHooks_TakeDamage(i, iInflictor, iAttacker, fDamage, iFlags);
+					TakeDamage(i, iInflictor, iAttacker, fDamage, iFlags, call);
 	}
+}
+
+void TakeDamage(int client, int iInflictor, int iAttacker, float fDamage, int iFlags, Function call=INVALID_FUNCTION){
+	SDKHooks_TakeDamage(client, iInflictor, iAttacker, fDamage, iFlags);
+	if(!call) return;
+	Call_StartFunction(INVALID_HANDLE, call);
+	Call_PushCell(client);
+	Call_PushCell(iAttacker);
+	Call_PushFloat(fDamage);
+	Call_Finish();
 }
 
 bool IsPlayerFriendly(int client){
