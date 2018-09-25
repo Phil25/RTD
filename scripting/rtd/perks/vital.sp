@@ -19,20 +19,13 @@
 
 #define MAX_HEALTH_ATTRIB 26
 
-public void Vital_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		Vital_ApplyPerk(client, StringToInt(sPref));
-	
-	else
-		TF2Attrib_RemoveByDefIndex(client, MAX_HEALTH_ATTRIB);
-
+public void Vital_Perk(int client, Perk perk, bool apply){
+	if(apply) Vital_ApplyPerk(client, perk);
+	else TF2Attrib_RemoveByDefIndex(client, MAX_HEALTH_ATTRIB);
 }
 
-void Vital_ApplyPerk(int client, int iValue){
-
+void Vital_ApplyPerk(int client, Perk perk){
+	int iValue = perk.GetPrefCell("health");
 	TF2Attrib_SetByDefIndex(client, MAX_HEALTH_ATTRIB, float(iValue));
-
 	SetEntityHealth(client, GetEntProp(client, Prop_Data, "m_iHealth") +iValue);
-
 }
