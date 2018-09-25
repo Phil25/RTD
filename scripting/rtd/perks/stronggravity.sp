@@ -17,21 +17,12 @@
 */
 
 
-float g_fBaseStrongGravity[MAXPLAYERS+1] = {0.0, ...};
-
-void  StrongGravity_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		StrongGravity_ApplyPerk(client, StringToFloat(sPref));
-	
-	else
-		SetEntityGravity(client, g_fBaseStrongGravity[client]);
-
+void  StrongGravity_Perk(int client, Perk perk, bool apply){
+	if(apply) StrongGravity_ApplyPerk(client, perk);
+	else SetEntityGravity(client, GetFloatCache(client));
 }
 
-void StrongGravity_ApplyPerk(int client, float fMultp){
-
-	g_fBaseStrongGravity[client] = GetEntityGravity(client);
-	SetEntityGravity(client, fMultp);
-
+void StrongGravity_ApplyPerk(int client, Perk perk){
+	SetFloatCache(client, GetEntityGravity(client));
+	SetEntityGravity(client, perk.GetPrefFloat("multiplier"));
 }
