@@ -189,7 +189,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 55:InclineProblem_Perk		(client, bEnable);
 		case 56:SpringShoes_Perk		(client, perk, bEnable);
 		case 57:Lag_Perk				(client, perk, bEnable);
-		case 58:DrugBullets_Perk		(client, sSettings, bEnable);
+		case 58:DrugBullets_Perk		(client, perk, bEnable);
 		case 59:LongMelee_Perk			(client, sSettings, bEnable);
 		case 60:HatThrow_Perk			(client, sSettings, bEnable);
 		case 61:MadarasWhistle_Perk		(client, sSettings, bEnable);
@@ -222,7 +222,6 @@ void Forward_OnMapStart(){
 	FireTimebomb_Start();
 	FireBreath_Start();
 	SpringShoes_Start();
-	DrugBullets_Start();
 	LongMelee_Start();
 	HatThrow_Start();
 	MadarasWhistle_Start();
@@ -286,6 +285,7 @@ void Forward_Resupply(int client){
 void Forward_PlayerHurt(int client, Handle hEvent){
 	ScaryBullets_PlayerHurt(client, hEvent);
 	EyeForAnEye_PlayerHurt(hEvent);
+	DrugBullets_PlayerHurt(client, hEvent);
 }
 
 
