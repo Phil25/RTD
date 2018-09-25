@@ -190,7 +190,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 56:SpringShoes_Perk		(client, perk, bEnable);
 		case 57:Lag_Perk				(client, perk, bEnable);
 		case 58:DrugBullets_Perk		(client, perk, bEnable);
-		case 59:LongMelee_Perk			(client, sSettings, bEnable);
+		case 59:LongMelee_Perk			(client, perk, bEnable);
 		case 60:HatThrow_Perk			(client, sSettings, bEnable);
 		case 61:MadarasWhistle_Perk		(client, sSettings, bEnable);
 		case 62:Sickness_Perk			(client, sSettings, bEnable);
@@ -222,7 +222,6 @@ void Forward_OnMapStart(){
 	FireTimebomb_Start();
 	FireBreath_Start();
 	SpringShoes_Start();
-	LongMelee_Start();
 	HatThrow_Start();
 	MadarasWhistle_Start();
 	Sickness_Start();
@@ -275,6 +274,7 @@ void Forward_OnEntityCreated(int iEntity, const char[] sClassname){
 void Forward_Resupply(int client){
 	Invisibility_Resupply(client);
 	FastHands_Resupply(client);
+	LongMelee_Resupply(client);
 }
 
 
