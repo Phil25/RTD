@@ -17,32 +17,17 @@
 */
 
 
-bool g_bOutlined_Outline[MAXPLAYERS+1] = {false, ...};
-
-public void Outline_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		Outline_ApplyPerk(client);
-	
-	else
-		Outline_RemovePerk(client);
-
+void Outline_Perk(int client, bool apply){
+	if(apply) Outline_ApplyPerk(client);
+	else Outline_RemovePerk(client);
 }
 
 void Outline_ApplyPerk(int client){
-
-	g_bOutlined_Outline[client] = view_as<bool>(GetEntProp(client, Prop_Send, "m_bGlowEnabled"));
-
-	if(g_bOutlined_Outline[client])
-		return;
-
+	SetIntCache(client, GetEntProp(client, Prop_Send, "m_bGlowEnabled"));
 	SetEntProp(client, Prop_Send, "m_bGlowEnabled", 1);
-
 }
 
 void Outline_RemovePerk(int client){
-
-	if(!g_bOutlined_Outline[client])
+	if(!GetIntCacheBool(client))
 		SetEntProp(client, Prop_Send, "m_bGlowEnabled", 0);
-
 }
