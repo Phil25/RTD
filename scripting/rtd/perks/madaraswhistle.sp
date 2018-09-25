@@ -91,7 +91,7 @@ void MadarasWhistle_Whistle(int client){
 
 	int iParticle = CreateParticle(client, "waterfall_bottomsplash", false, "", view_as<float>({0.0, 0.0, 0.0}));
 	EmitSoundToAll(g_sGatorRumble[GetRandomInt(0, 4)], iParticle);
-	KillEntIn(iParticle, fDelay); 
+	KillEntIn(iParticle, fDelay);
 }
 
 public Action Timer_MadarasWhistle_Whistle(Handle hTimer, DataPack hPack){

@@ -20,9 +20,7 @@
 #define SICKNESS_NEXT_TICK GetURandomFloat()*2.0+2.0
 #define SICKNESS_PARTICLE "spell_skeleton_goop_green"
 
-bool g_bHasSickness[MAXPLAYERS+1] = {false, ...};
-float g_fSicknessDamageMin = 5.0;
-float g_fSicknessDamageMax = 10.0;
+int g_iSicknessId = 62;
 
 char g_sSoundCough[][] = {
 	"ambient/voices/cough1.wav",
@@ -36,20 +34,26 @@ void Sickness_Start(){
 		PrecacheSound(g_sSoundCough[i]);
 }
 
-void Sickness_Perk(int client, const char[] sPref, bool apply){
-	if(apply) Sickness_ApplyPerk(client, sPref);
-	else g_bHasSickness[client] = false;
+void Sickness_Perk(int client, Perk perk, bool apply){
+	if(apply) Sickness_ApplyPerk(client, perk);
+	else UnsetClientPerkCache(client, g_iSicknessId);
 }
 
-void Sickness_ApplyPerk(client, const char[] sPref){
-	Sickness_ProcessSettings(sPref);
-	g_bHasSickness[client] = true;
+void Sickness_ApplyPerk(client, Perk perk){
+	g_iSicknessId = perk.Id;
+	SetClientPerkCache(client, g_iSicknessId);
+
+	SetFloatCache(client, perk.GetPrefFloat("mindamage"), 0);
+	SetFloatCache(client, perk.GetPrefFloat("maxdamage"), 1);
+
 	CreateTimer(SICKNESS_NEXT_TICK, Timer_Sickness_Tick, GetClientUserId(client));
 }
 
 public Action Timer_Sickness_Tick(Handle hTimer, int iUserId){
 	int client = GetClientOfUserId(iUserId);
-	if(!client || !g_bHasSickness[client])
+	if(!client) return Plugin_Stop;
+
+	if(!CheckClientPerkCache(client, g_iSicknessId))
 		return Plugin_Stop;
 
 	EmitSoundToAll(g_sSoundCough[GetRandomInt(0, 3)], client);
@@ -70,17 +74,10 @@ void Sickness_Cough(int client){
 	int iParticle = CreateParticle(client, SICKNESS_PARTICLE);
 	KILL_ENT_IN(iParticle,0.1)
 
-	float fDamage = GetRandomFloat(g_fSicknessDamageMin, g_fSicknessDamageMax);
+	float fDamage = GetRandomFloat(GetFloatCache(client), GetFloatCache(client, 1));
 	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_PREVENT_PHYSICS_FORCE);
 
 	float fShake[3];
 	fShake[0] = GetRandomFloat(10.0, 15.0);
 	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fShake);
-}
-
-void Sickness_ProcessSettings(const char[] sSettings){
-	char[][] sPieces = new char[2][8];
-	ExplodeString(sSettings, ",", sPieces, 2, 8);
-	g_fSicknessDamageMin = StringToFloat(sPieces[0]);
-	g_fSicknessDamageMax = StringToFloat(sPieces[1]);
 }

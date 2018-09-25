@@ -125,10 +125,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		return;	//Stop further exectuion of ManagePerk()
 	}
 
-	//This is the optional value for perks, found under "settings" in rtd2_perks.cfg
-	char sSettings[127];
-
-	//template: case <your_perk_id>:{YourPerk_Function(client, sSettings, bEnable);}
+	//template: case <your_perk_id>:{YourPerk_Function(client, perk, bEnable);}
 	int iId = perk.Id;
 	switch(iId){
 		case 0:	Godmode_Perk			(client, perk, bEnable);
@@ -193,7 +190,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 59:LongMelee_Perk			(client, perk, bEnable);
 		case 60:HatThrow_Perk			(client, perk, bEnable);
 		case 61:MadarasWhistle_Perk		(client, perk, bEnable);
-		case 62:Sickness_Perk			(client, sSettings, bEnable);
+		case 62:Sickness_Perk			(client, perk, bEnable);
 		case 63:{} // Wasted Roll
 	}
 
