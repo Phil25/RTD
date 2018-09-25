@@ -20,118 +20,67 @@
 #define ATTRIB_RATE 6
 #define ATTRIB_RELOAD 97
 
-bool	g_bHasFastHands[MAXPLAYERS+1]	= {false, ...};
-bool	g_bHasFastHands2[MAXPLAYERS+1]	= {false, ...};
-float	g_fFastHandsRateMultiplier		= 2.0;
-float	g_fFastHandsReloadMultiplier	= 2.0;
+int g_iFastHandsId = 43;
 
-void FastHands_Start(){
-
-	HookEvent("post_inventory_application", FastHands_Resupply, EventHookMode_Post);
-
-}
-
-public void FastHands_OnEntityCreated(int iEnt, const char[] sClassname){
-
+void FastHands_OnEntityCreated(int iEnt, const char[] sClassname){
 	if(StrEqual(sClassname, "tf_dropped_weapon"))
 		SDKHook(iEnt, SDKHook_SpawnPost, FastHands_OnDroppedWeaponSpawn);
-
 }
 
 public void FastHands_OnDroppedWeaponSpawn(int iEnt){
-
 	int client = AccountIDToClient(GetEntProp(iEnt, Prop_Send, "m_iAccountID"));
-	if(client && g_bHasFastHands2[client])
+	if(client && GetIntCacheBool(client, 3))
 		AcceptEntityInput(iEnt, "Kill");
-
-} 
-
-void FastHands_Perk(int client, const char[] sPref, bool apply){
-
-	if(apply)
-		FastHands_ApplyPerk(client, sPref);
-	
-	else
-		FastHands_RemovePerk(client);
-
 }
 
-void FastHands_ApplyPerk(int client, const char[] sSettings){
+void FastHands_Perk(int client, Perk perk, bool apply){
+	if(apply) FastHands_ApplyPerk(client, perk);
+	else FastHands_RemovePerk(client);
+}
 
-	FastHands_ProcessSettings(sSettings);
+void FastHands_ApplyPerk(int client, Perk perk){
+	g_iFastHandsId = perk.Id;
+	SetClientPerkCache(client, g_iFastHandsId);
 
-	FastHands_EditClientWeapons(client, true);
-	g_bHasFastHands[client]	= true;
-	g_bHasFastHands2[client]= true;
+	float fRate = 1/perk.GetPrefFloat("attack");
+	float fReload = 1/perk.GetPrefFloat("reload");
 
+	FastHands_EditClientWeapons(client, true, fRate, fReload);
+	SetIntCache(client, true, 3);
 }
 
 void FastHands_RemovePerk(int client){
-
 	FastHands_EditClientWeapons(client, false);
-	g_bHasFastHands[client] = false;
-	CreateTimer(0.5, Timer_FastHands_FullUnset, GetClientSerial(client));
-
+	UnsetClientPerkCache(client, g_iFastHandsId);
+	CreateTimer(0.25, Timer_FastHands_FullUnset, GetClientUserId(client));
 }
 
-public Action Timer_FastHands_FullUnset(Handle hTimer, int iSerial){
-
-	int client = GetClientFromSerial(iSerial);
-	
-	if(client < 1)
-		return Plugin_Stop;
-	
-	g_bHasFastHands2[client] = false;
-	
+public Action Timer_FastHands_FullUnset(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(client) SetIntCache(client, false, 3);
 	return Plugin_Stop;
-
 }
 
-void FastHands_EditClientWeapons(int client, bool apply){
-
+void FastHands_EditClientWeapons(int client, bool apply, float fRate=0.0, float fReload=0.0){
 	int iWeapon = 0;
-	for(int i = 0; i < 3; i++){
-	
+	if(apply) for(int i = 0; i < 3; i++){
 		iWeapon = GetPlayerWeaponSlot(client, i);
-		
 		if(iWeapon <= MaxClients || !IsValidEntity(iWeapon))
 			continue;
-		
-		if(apply){
-		
-			if(g_fFastHandsRateMultiplier != 0.0)
-				TF2Attrib_SetByDefIndex(iWeapon, ATTRIB_RATE, g_fFastHandsRateMultiplier);
-			
-			if(g_fFastHandsReloadMultiplier != 0.0)
-				TF2Attrib_SetByDefIndex(iWeapon, ATTRIB_RELOAD, g_fFastHandsReloadMultiplier);
-		
-		}else{
-		
-			TF2Attrib_RemoveByDefIndex(iWeapon, ATTRIB_RATE);
-			TF2Attrib_RemoveByDefIndex(iWeapon, ATTRIB_RELOAD);
-		
-		}
-	
+
+		if(fRate != 0.0) TF2Attrib_SetByDefIndex(iWeapon, ATTRIB_RATE, fRate);
+		if(fReload != 0.0) TF2Attrib_SetByDefIndex(iWeapon, ATTRIB_RELOAD, fReload);
+	}else for(int i = 0; i < 3; i++){
+		iWeapon = GetPlayerWeaponSlot(client, i);
+		if(iWeapon <= MaxClients || !IsValidEntity(iWeapon))
+			continue;
+
+		TF2Attrib_RemoveByDefIndex(iWeapon, ATTRIB_RATE);
+		TF2Attrib_RemoveByDefIndex(iWeapon, ATTRIB_RELOAD);
 	}
-
 }
 
-public void FastHands_Resupply(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
-
-	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if(client == 0) return;
-
-	if(g_bHasFastHands[client])
+void FastHands_Resupply(int client){
+	if(CheckClientPerkCache(client, g_iFastHandsId))
 		FastHands_EditClientWeapons(client, true);
-
-}
-
-void FastHands_ProcessSettings(const char[] sSettings){
-
-	char[][] sPieces = new char[2][8];
-	ExplodeString(sSettings, ",", sPieces, 2, 8);
-	
-	g_fFastHandsRateMultiplier		= Pow(StringToFloat(sPieces[0]), -1.0);
-	g_fFastHandsReloadMultiplier	= Pow(StringToFloat(sPieces[1]), -1.0);
-
 }
