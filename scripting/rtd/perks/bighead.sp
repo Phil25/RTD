@@ -19,25 +19,28 @@
 
 #define ATTRIB_VOICEPITCH 2048
 
-bool	g_bHasBigHead[MAXPLAYERS+1]	= {false, ...};
-float	g_fBigHeadMultiplayer		= 2.0;
+int g_iBigHeadId = 33;
 
-void BigHead_Perk(int client, const char[] sPref, bool apply){
-
-	g_fBigHeadMultiplayer = StringToFloat(sPref);
-	g_bHasBigHead[client] = apply;
-	
-	if(apply)
-		TF2Attrib_SetByDefIndex(client, ATTRIB_VOICEPITCH, 1/g_fBigHeadMultiplayer);
-	else
-		TF2Attrib_RemoveByDefIndex(client, ATTRIB_VOICEPITCH);
-
+void BigHead_Perk(int client, Perk perk, bool apply){
+	if(apply) BigHead_Apply(client, perk);
+	else BigHead_Remove(client);
 }
 
-void BigHead_OnPlayerRunCmd(client){
+void BigHead_Apply(int client, Perk perk){
+	g_iBigHeadId = perk.Id;
+	SetClientPerkCache(client, g_iBigHeadId);
 
-	if(!g_bHasBigHead[client]) return;
-	
-	SetEntPropFloat(client, Prop_Send, "m_flHeadScale", g_fBigHeadMultiplayer);
+	float fScale = perk.GetPrefFloat("scale");
+	SetFloatCache(client, fScale);
+	TF2Attrib_SetByDefIndex(client, ATTRIB_VOICEPITCH, 1/(fScale > 3.0 ? 3.0 : fScale));
+}
 
+void BigHead_Remove(int client){
+	UnsetClientPerkCache(client, g_iBigHeadId);
+	TF2Attrib_RemoveByDefIndex(client, ATTRIB_VOICEPITCH);
+}
+
+void BigHead_OnPlayerRunCmd(int client){
+	if(CheckClientPerkCache(client, g_iBigHeadId))
+		SetEntPropFloat(client, Prop_Send, "m_flHeadScale", GetFloatCache(client));
 }
