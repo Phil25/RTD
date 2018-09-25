@@ -166,7 +166,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 		case 44:Outline_Perk			(client, bEnable);
 		case 45:Vital_Perk				(client, perk, bEnable);
 		case 46:NoGravity_Perk			(client, bEnable);
-		case 47:TeamCriticals_Perk		(client, sSettings, bEnable);
+		case 47:TeamCriticals_Perk		(client, perk, bEnable);
 		case 48:FireTimebomb_Perk		(client, sSettings, bEnable);
 		case 49:FireBreath_Perk			(client, sSettings, bEnable);
 		case 50:StrongRecoil_Perk		(client, sSettings, bEnable);
