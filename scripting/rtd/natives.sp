@@ -27,6 +27,12 @@ void CreateNatives(){
 	CreateNative("RTD2_GetPerkString",		Native_GetPerkString);
 	CreateNative("RTD2_SetPerkString",		Native_SetPerkString);
 	CreateNative("RTD2_SetPerkCall",		Native_SetPerkCall);
+
+	CreateNative("RTD2_GetPerkPrefCell",	Native_GetPerkPrefCell);
+	CreateNative("RTD2_GetPerkPrefFloat",	Native_GetPerkPrefFloat);
+	CreateNative("RTD2_GetPerkPrefString",	Native_GetPerkPrefString);
+	CreateNative("RTD2_SetPerkPref",		Native_SetPerkPref);
+
 	CreateNative("RTD2_Format",				Native_Format);
 
 	CreateNative("RTD2_GetClientPerkId",	Native_GetClientPerkId); // deprecated
@@ -106,7 +112,7 @@ public int Native_GetPerkString(Handle hPlugin, int iParams){
 		case RTDPerk_Name: perk.GetName(sBuffer, iLen);
 		case RTDPerk_Sound: perk.GetSound(sBuffer, iLen);
 		case RTDPerk_Token: perk.GetToken(sBuffer, iLen);
-		//case RTDPerk_Pref: perk.GetPref(sBuffer, iLen); // TODO: create new natives
+		case RTDPerk_InternalCall: perk.GetInternalCall(sBuffer, iLen);
 		default: ThrowNativeError(0, "Property %d is not of type char[].", prop);
 	}
 
@@ -126,7 +132,7 @@ public int Native_SetPerkString(Handle hPlugin, int iParams){
 		case RTDPerk_Token: ThrowNativeError(0, "Tokens cannot be changed.");
 		case RTDPerk_Classes: perk.SetClass(sVal);
 		case RTDPerk_WeaponClasses: perk.SetWeaponClass(sVal);
-		//case RTDPerk_Pref: perk.SetPref(sVal); // TODO: create new natives
+		case RTDPerk_InternalCall: perk.SetInternalCall(sVal);
 		case RTDPerk_Tags: perk.SetTags(sVal);
 		default: ThrowNativeError(0, "Property %d is not of type char[].", prop);
 	}
@@ -137,6 +143,45 @@ public int Native_SetPerkString(Handle hPlugin, int iParams){
 public int Native_SetPerkCall(Handle hPlugin, int iParams){
 	GET_PERK
 	perk.SetCall(GetNativeCell(2), hPlugin);
+	return iId;
+}
+
+public int Native_GetPerkPrefCell(Handle hPlugin, int iParams){
+	GET_PERK
+	char sKey[16];
+	GetNativeString(2, sKey, 16);
+	return perk.GetPrefCell(sKey);
+}
+
+public int Native_GetPerkPrefFloat(Handle hPlugin, int iParams){
+	GET_PERK
+	char sKey[16];
+	GetNativeString(2, sKey, 16);
+	return view_as<int>(perk.GetPrefFloat(sKey));
+}
+
+public int Native_GetPerkPrefString(Handle hPlugin, int iParams){
+	GET_PERK
+
+	char sKey[16];
+	GetNativeString(2, sKey, 16);
+	int iLen = GetNativeCell(4);
+
+	char[] sBuffer = new char[iLen];
+	perk.GetPrefString(sKey, sBuffer, iLen);
+
+	SetNativeString(3, sBuffer, iLen);
+	return 0;
+}
+
+public int Native_SetPerkPref(Handle hPlugin, int iParams){
+	GET_PERK
+
+	char sKey[16], sVal[32];
+	GetNativeString(2, sKey, 16);
+	GetNativeString(3, sVal, 32);
+
+	perk.SetPref(sKey, sVal);
 	return iId;
 }
 

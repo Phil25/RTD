@@ -20,6 +20,12 @@ public __pl_rtd2_SetNTVOptional(){
 	MarkNativeAsOptional("RTD2_GetPerkString");
 	MarkNativeAsOptional("RTD2_SetPerkString");
 	MarkNativeAsOptional("RTD2_SetPerkCall");
+
+	MarkNativeAsOptional("RTD2_GetPerkPrefString");
+	MarkNativeAsOptional("RTD2_GetPerkPrefCell");
+	MarkNativeAsOptional("RTD2_GetPerkPrefFloat");
+	MarkNativeAsOptional("RTD2_SetPerkPref");
+
 	MarkNativeAsOptional("RTD2_Format");
 
 	MarkNativeAsOptional("RTD2_GetClientPerkId"); // deprecated
@@ -84,8 +90,8 @@ enum RTDPerkProp{
 	RTDPerk_Time,
 	RTDPerk_Classes,
 	RTDPerk_WeaponClasses,
-	RTDPerk_Pref,
 	RTDPerk_Tags,
+	RTDPerk_InternalCall,
 	RTDPerk_Enabled,
 	RTDPerk_External
 }
@@ -197,6 +203,63 @@ typedef RTDCall = function void(int client, RTDPerk perk, bool bEnable);
  * @return			Same RTDPerk object
  */
 native RTDPerk RTD2_SetPerkCall(RTDPerk perk, RTDCall func);
+
+
+/**
+ * Gets perk setting of type cell.
+ *
+ * @note Prefer to use RTDPerk methodmap over this.
+ * @note This is just a wrapper for rounding the float type setting.
+ *
+ * @param perk			RTDPerk object
+ * @param sKey			Setting's key
+ *
+ * @return				Setting's value
+ */
+native int RTD2_GetPerkPrefCell(RTDPerk perk, const char[] sKey);
+
+
+/**
+ * Gets perk setting of type float.
+ *
+ * @note Prefer to use RTDPerk methodmap over this.
+ *
+ * @param perk			RTDPerk object
+ * @param sKey			Setting's key
+ *
+ * @return				Setting's value
+ */
+native float RTD2_GetPerkPrefFloat(RTDPerk perk, const char[] sKey);
+
+
+/**
+ * Gets perk setting of type char[].
+ *
+ * @note Prefer to use RTDPerk methodmap over this.
+ *
+ * @param perk			RTDPerk object
+ * @param sKey			Setting's key
+ * @param sBuffer		char[] buffer to store the result in
+ * @param iBufferLen	Length of the buffer
+ *
+ * @noreturn
+ */
+native void RTD2_GetPerkPrefString(RTDPerk perk, const char[] sKey, char[] sBuffer, int iBufferLen);
+
+
+/**
+ * Sets perk property of type char[].
+ *
+ * @note Prefer to use RTDPerk methodmap over this.
+ * @note It will be determined internally whether to save the value as char[] or float.
+ *
+ * @param perk		RTDPerk object
+ * @param sKey		Setting's key
+ * @param sValue	Value to set the setting to
+ *
+ * @return			Same RTDPerk object
+ */
+native RTDPerk RTD2_SetPerkPref(RTDPerk perk, const char[] sKey, const char[] sValue);
 
 
 /**
@@ -361,23 +424,6 @@ methodmap RTDPerk{
 	public RTDPerk SetWeaponClasses(const char[] sWeapClasses){
 		return RTD2_SetPerkString(this, RTDPerk_WeaponClasses, sWeapClasses);}
 
-	// Get settings string of the perk.
-	//
-	// @param sBuffer		Buffer to store the result in
-	// @param iBufferLen	Length of the buffer
-	//
-	// @noreturn
-	public void GetPref(char[] sBuffer, int iBufferLen){
-		RTD2_GetPerkString(this, RTDPerk_Pref, sBuffer, iBufferLen);}
-
-	// Set settings string of the perk.
-	//
-	// @param sVal		Value to set the settings to
-	//
-	// @return			Same RTDPerk object
-	public RTDPerk SetPref(const char[] sVal){
-		return RTD2_SetPerkString(this, RTDPerk_Pref, sVal);}
-
 	// Retrieves ArrayList of perk's tags. This is never null and is not cloned.
 	property ArrayList Tags{
 		public get(){
@@ -395,6 +441,62 @@ methodmap RTDPerk{
 	// @return			Same RTDPerk object
 	public RTDPerk SetTags(const char[] sTags){
 		return RTD2_SetPerkString(this, RTDPerk_Tags, sTags);}
+
+	// Gets perk setting of type cell.
+	//
+	// @note This is just a wrapper for rounding the float type setting.
+	//
+	// @param sKey			Setting's key
+	//
+	// @return				Setting's value
+	public int GetPrefCell(const char[] sKey){
+		return RTD2_GetPerkPrefCell(this, sKey);}
+
+	// Gets perk setting of type float.
+	//
+	// @param sKey			Setting's key
+	//
+	// @return				Setting's value
+	public float GetPrefFloat(const char[] sKey){
+		return RTD2_GetPerkPrefFloat(this, sKey);}
+
+	// Gets perk setting of type char[].
+	//
+	// @param sKey			Setting's key
+	// @param sBuffer		char[] buffer to store the result in
+	// @param iBufferLen	Length of the buffer
+	//
+	// @noreturn
+	public void GetPrefString(const char[] sKey, char[] sBuffer, int iBufferLen){
+		RTD2_GetPerkPrefString(this, sKey, sBuffer, iBufferLen);}
+
+	// Set settings of the perk.
+	//
+	// @note This will silently fail if sKey is prefixed with "m_".
+	//
+	// @param sKey		Setting's key
+	// @param sValue	Value to set the setting to
+	//
+	// @return			Same RTDPerk object
+	public RTDPerk SetPref(const char[] sKey, const char[] sValue){
+		return RTD2_SetPerkPref(this, sKey, sValue);}
+
+	// Get internal call function name assigned to the perk.
+	//
+	// @param sBuffer		Buffer to store the result in
+	// @param iBufferLen	Length of the buffer
+	//
+	// @noreturn
+	public void GetInternalCall(char[] sBuffer, int iBufferLen){
+		RTD2_GetPerkString(this, RTDPerk_InternalCall, sBuffer, iBufferLen);}
+
+	// Set internal call of the perk.
+	//
+	// @param sName		Name of the function to call during perk's execution.
+	//
+	// @return			Same RTDPerk object
+	public RTDPerk SetInternalCall(const char[] sName){
+		return RTD2_SetPerkString(this, RTDPerk_InternalCall, sName);}
 
 	// Retrieves or sets whether the perk is enabled.
 	property bool Enabled{
