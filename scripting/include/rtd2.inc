@@ -203,7 +203,7 @@ native RTDPerk RTD2_SetPerkCall(RTDPerk perk, RTDCall func);
  * Format specific perk properties into a buffer.
  * Available specifiers: $Id$, $Name, $Good$,
  * $Sound$, $Token$, $Time$, $Tags$, $Class$,
- * $WeaponClass$, $Pref$
+ * $WeaponClass$, $Settings$, $InternalCall$
  *
  * @note Format example: "Perk: $Id$ - $Name$"
  * @note Mind the capitalization.

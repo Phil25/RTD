@@ -94,7 +94,7 @@ void HatThrow_Spawn(int client){
 	DispatchKeyValue(iHat, "model", MODEL_HAT);
 	DispatchKeyValue(iHat, "modelscale", "3");
 	DispatchKeyValue(iRot, "distance", "99999");
-	DispatchKeyValue(iRot, "speed", "2000"); // TODO: is this necessary?
+	DispatchKeyValue(iRot, "speed", "2000");
 	DispatchKeyValue(iRot, "spawnflags", "4104"); // passable|silent
 	DispatchSpawn(iHat);
 	DispatchSpawn(iRot);

@@ -61,7 +61,8 @@ enum PerkPropType{
 	Type_Bool,
 	Type_Int,
 	Type_String,
-	Type_Array
+	Type_Array,
+	Type_Map
 }
 
 /* TF2 class enum offsets numbered accoring to their appearance in-game */
@@ -229,10 +230,16 @@ methodmap Perk < StringMap{
 		if(strlen(sProp) < 4)
 			return Type_Invalid;
 		switch(sProp[2]){
-			case 'I': return Type_Int; // m_Id
+			case 'I': switch(sProp[3]){
+				case 'd': return Type_Int; // m_Id
+				case 'n': return Type_String; // m_InternalCall
+			}
 			case 'N': return Type_String; // m_Name
 			case 'G': return Type_Bool; // m_Good
-			case 'S': return Type_String; // m_Sound
+			case 'S': switch(sProp[3]){
+				case 'o': return Type_String; // m_Sound
+				case 'e': return Type_Map; // m_Settings
+			}
 			case 'T': switch(sProp[3]){
 				case 'o': return Type_String; // m_Token
 				case 'i': return Type_Int; // m_Time
@@ -240,7 +247,6 @@ methodmap Perk < StringMap{
 			}
 			case 'C': return Type_Int; // m_Class
 			case 'W': return Type_Array; // m_Array
-			case 'P': return Type_String; // m_Pref
 		}
 		return Type_Invalid;
 	}
@@ -281,6 +287,32 @@ methodmap Perk < StringMap{
 		FormatEx(sBuffer, iLen, "%s]", sBuffer);
 	}
 
+	public void GetMapAsString(const char[] sProp, char[] sBuffer, int iLen){
+		StringMapSnapshot snap = this.Snapshot();
+		int i = snap.Length;
+		char sKey[16], sVal[32];
+		sBuffer[0] = '{';
+		bool bFirstPrint = true;
+
+		while(--i >= 0){
+			snap.GetKey(i, sKey, 16);
+			if(strlen(sKey) < 2 || (sKey[1] == '_' && sKey[0] == 'm'))
+				continue;
+
+			if(this.GetString(sKey, sVal, 32)){
+				FormatEx(sBuffer, iLen, "%s%s%s: %s", sBuffer, bFirstPrint ? "" : ", ", sKey, sVal);
+				bFirstPrint = false;
+			}else{
+				float fVal;
+				this.GetValue(sKey, fVal);
+				FormatEx(sBuffer, iLen, "%s%s%s: %.2f", sBuffer, bFirstPrint ? "" : ", ", sKey, fVal);
+				bFirstPrint = false;
+			}
+		}
+		FormatEx(sBuffer, iLen, "%s}", sBuffer);
+		delete snap;
+	}
+
 	public int GetPropAsString(const char[] sProp, char[] sBuffer, int iLen){
 		PerkPropType iPropType = this.GetPropType(sProp);
 		switch(iPropType){
@@ -289,6 +321,7 @@ methodmap Perk < StringMap{
 			case Type_Int:		this.GetIntAsString(sProp, sBuffer, iLen);
 			case Type_String:	this.GetStringAsString(sProp, sBuffer, iLen);
 			case Type_Array:	this.GetArrayAsString(sProp, sBuffer, iLen);
+			case Type_Map:		this.GetMapAsString(sProp, sBuffer, iLen);
 		}
 		return strlen(sBuffer);
 	}
@@ -317,7 +350,7 @@ methodmap Perk < StringMap{
 		return i;
 	}
 
-	public void Format(char[] sBuffer, int iLen, const char[] sFormat){ // TODO: remove $Pref$
+	public void Format(char[] sBuffer, int iLen, const char[] sFormat){
 		int iFormatLen = strlen(sFormat);
 		char sProp[32] = "m_";
 		int i = 0, j = 0;
