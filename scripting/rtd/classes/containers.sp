@@ -176,8 +176,14 @@ methodmap PerkContainer < StringMap{
 		READ_IF_EXISTS_NUM("time",Time)
 		READ_IF_EXISTS_STRING("class",Class)
 		READ_IF_EXISTS_STRING("weapons",WeaponClass)
-		//READ_IF_EXISTS_STRING("settings",Pref) // TODO: parse custom settings
+
+		if(hKv.JumpToKey("settings")){
+			this.ParseSettings(hKv, perk);
+			hKv.GoBack();
+		}
+
 		READ_IF_EXISTS_STRING("tags",Tags)
+		READ_IF_EXISTS_STRING("call",InternalCall)
 
 		return true;
 	}
