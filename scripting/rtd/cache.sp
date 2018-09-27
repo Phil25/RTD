@@ -23,12 +23,14 @@ float g_fCache[MAXPLAYERS+1][4];
 int g_iCache[MAXPLAYERS+1][4];
 ArrayList g_aCache[MAXPLAYERS+1] = {null, ...};
 
-void SetEntCache(int client, int iEnt, int iBlock=0){
-	g_iEntCache[client][iBlock] = EntIndexToEntRef(iEnt);
-}
-
 int GetEntCache(int client, int iBlock=0){
 	return EntRefToEntIndex(g_iEntCache[client][iBlock]);
+}
+
+void SetEntCache(int client, int iEnt, int iBlock=0){
+	int iCurEnt = EntRefToEntIndex(g_iEntCache[client][iBlock]);
+	if(iCurEnt > MaxClients) AcceptEntityInput(iCurEnt, "Kill");
+	g_iEntCache[client][iBlock] = EntIndexToEntRef(iEnt);
 }
 
 void KillEntCache(int client, int iBlock=0){
