@@ -94,6 +94,7 @@ ArrayList g_hPerkHistory		= null;
 int		g_iCorePerks			= 0;
 
 bool	g_bIsGameArena			= false;
+int		g_iLastPerkTime			= -1;
 
 
 
@@ -1052,7 +1053,10 @@ RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, int 
 			return RTDForce_Blocked;
 	}
 
+	g_iLastPerkTime = iPerkTime;
 	ApplyPerk(client, perk, iPerkTime);
+	g_iLastPerkTime = -1; // Set back to default
+
 	if(g_bCvarLog){
 		char sBuffer[64];
 		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
@@ -1440,7 +1444,9 @@ void DisplayPerkTimeFrame(client){
 }
 
 //-----[ Perks ]-----//
-int GetPerkTimeEx(Perk perk){
+int GetPerkTimeEx(Perk perk){ // TODO: rename me
+	if(g_iLastPerkTime != -1)
+		return g_iLastPerkTime;
 	int iTime = perk.Time;
 	return (iTime > 0) ? iTime : g_iCvarPerkDuration;
 }
