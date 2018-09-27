@@ -17,7 +17,7 @@
 */
 
 
-public void PowerPlay_Call(int client, bool apply){
+public void PowerPlay_Call(int client, Perk perk, bool apply){
 	if(apply) PowerPlay_ApplyPerk(client);
 	else PowerPlay_RemovePerk(client);
 }
