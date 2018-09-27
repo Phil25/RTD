@@ -33,7 +33,8 @@
 // int cache
 #define MAX_TICKS 0
 #define CLIENT_TICKS 1
-#define STATE 3
+#define STATE 2
+#define CAN_STOP 3
 
 // float cache
 #define RADIUS 0
@@ -49,19 +50,24 @@ void FireTimebomb_Start(){
 }
 
 public void FireTimebomb_Call(int client, Perk perk, bool apply){
-	if(!apply) return;
+	if(!apply){
+		if(GetIntCacheBool(client, CAN_STOP))
+			FireTimebomb_Explode(client, true);
+		return;
+	}
 
 	g_iFireTimebombId = perk.Id;
 	SetClientPerkCache(client, g_iFireTimebombId);
 
-	SetIntCache(client, perk.GetPrefCell("ticks"), MAX_TICKS);
 	SetFloatCache(client, perk.GetPrefFloat("radius"), RADIUS);
+	SetFloatCache(client, TICK_SLOW, CLIENT_BEEPS);
 
 	SetEntCache(client, FireTimebomb_SpawnBombHead(client), HEAD);
 
+	SetIntCache(client, GetPerkTimeEx(perk), MAX_TICKS);
 	SetIntCache(client, 0, CLIENT_TICKS);
-	SetFloatCache(client, TICK_SLOW, CLIENT_BEEPS);
 	SetIntCache(client, 0, STATE);
+	SetIntCache(client, true, CAN_STOP);
 
 	SetVariantInt(1);
 	AcceptEntityInput(client, "SetForcedTauntCam");
@@ -85,8 +91,10 @@ public Action Timer_FireTimebomb_Tick(Handle hTimer, int iUserId){
 				FireTimebomb_BombState(client, 1);
 			else FireTimebomb_BombState(client, 2);
 
-	if(iClientTicks == iMaxTicks-1)
+	if(iClientTicks == iMaxTicks-1){
 		EmitSoundToAll(SOUND_TIMEBOMB_GOFF, client);
+		SetIntCache(client, false, CAN_STOP);
+	}
 
 	else if(iClientTicks >= iMaxTicks){
 		FireTimebomb_Explode(client);
@@ -124,17 +132,8 @@ void FireTimebomb_BombState(int client, int iState){
 		}
 	}
 
-	int iHead = GetEntCache(client, HEAD);
-	char sClass[18];
-	GetEntityClassname(iHead, sClass, 18);
-	if(strcmp(sClass, "prop_dynamic") == 0)
-		SetEntProp(iHead, Prop_Send, "m_nSkin", iCurState+1);
+	SetEntProp(GetEntCache(client, HEAD), Prop_Send, "m_nSkin", iCurState+1);
 	SetIntCache(client, iState, STATE);
-}
-
-void FireTimebomb_OnRemovePerk(int client){
-	if(CheckClientPerkCache(client, g_iFireTimebombId))
-		FireTimebomb_Explode(client, true);
 }
 
 void FireTimebomb_Explode(int client, bool bSilent=false){
@@ -209,5 +208,6 @@ int FireTimebomb_SpawnBombHead(int client){
 #undef MAX_TICKS
 #undef CLIENT_TICKS
 #undef STATE
+#undef CAN_STOP
 #undef RADIUS
 #undef CLIENT_BEEPS

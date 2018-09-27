@@ -173,19 +173,6 @@ public bool Forward_OnPlayerRunCmd(int client, int &iButtons, int &iImpulse, flo
 
 
 /*
-	• Editing Forward_OnRemovePerkPre() is OPTIONAL
-	• It fires before a perk is about to be removed.
-	• REGARDLESS whether the client is in roll or not.
-	• Client is guaranteed to be valid.
-	• You cannot block it from this forward.
-*/
-void Forward_OnRemovePerkPre(int client){
-	Timebomb_OnRemovePerk(client);
-	FireTimebomb_OnRemovePerk(client);
-}
-
-
-/*
 	• Editing Forward_AttackIsCritical() is OPTIONAL
 	• Returning true from here means that the next attack is crit.
 	• REGARDLESS whether the client is in roll or not.

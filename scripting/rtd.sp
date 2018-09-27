@@ -332,8 +332,6 @@ public void OnPluginEnd(){
 
 void ReloadPluginState(){
 	for(int i = 1; i <= MaxClients; i++){
-		Forward_OnRemovePerkPre(i);
-
 		if(g_hRollers.GetInRoll(i))
 			ForceRemovePerk(i, RTDRemove_PluginUnload);
 
@@ -374,8 +372,6 @@ public void OnClientPutInServer(int client){
 }
 
 public void OnClientDisconnect(int client){
-	Forward_OnRemovePerkPre(client);
-
 	if(g_hRollers.GetInRoll(client))
 		ForceRemovePerk(client, RTDRemove_Disconnect);
 
@@ -523,7 +519,6 @@ public Action Command_RemoveRTD(int client, int args){
 				continue;
 		}
 
-		Forward_OnRemovePerkPre(aTrgList[i]);
 		if(g_hRollers.GetInRoll(aTrgList[i]))
 			ForceRemovePerk(aTrgList[i], args > 1 ? RTDRemove_Custom : RTDRemove_WearOff, sReason);
 	}
@@ -715,8 +710,6 @@ public Action Event_PlayerDeath(Handle hEvent, const char[] sEventName, bool don
 	if(flags & FLAG_FEIGNDEATH)
 		return Plugin_Continue;
 
-	Forward_OnRemovePerkPre(client);
-
 	if(!g_hRollers.GetInRoll(client))
 		return Plugin_Continue;
 
@@ -729,7 +722,6 @@ public Action Event_ClassChange(Handle hEvent, const char[] sEventName, bool don
 	if(client == 0)
 		return Plugin_Continue;
 
-	Forward_OnRemovePerkPre(client);
 	if(!g_hRollers.GetInRoll(client))
 		return Plugin_Continue;
 

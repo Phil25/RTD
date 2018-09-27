@@ -263,7 +263,6 @@ public int Native_Remove(Handle hPlugin, int iParams){
 	if(iReason == RTDRemove_Custom)
 		GetNativeString(3, sReason, sizeof(sReason));
 
-	Forward_OnRemovePerkPre(client);
 	Perk perk = ForceRemovePerk(client, iReason, sReason);
 	return perk ? perk.Id : -1;
 }
