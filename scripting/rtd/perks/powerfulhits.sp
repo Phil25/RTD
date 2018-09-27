@@ -35,7 +35,7 @@ void PowerfulHits_Apply(int client, Perk perk){
 
 public Action PowerfulHits_OnTakeDamage(int client, int &iAtk, int &iInflictor, float &fDmg, int &iType){
 	if(client == iAtk) return Plugin_Continue;
-	if(!IsValidClient(client)) return Plugin_Continue;
+	if(!IsValidClient(iAtk)) return Plugin_Continue;
 	if(!CheckClientPerkCache(iAtk, g_iPowerfulHitsId))
 		return Plugin_Continue;
 
