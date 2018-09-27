@@ -131,7 +131,7 @@ void TeamCriticals_SetCritBoost(int client, int iTrg, bool bSet, int iTeam){
 			AcceptEntityInput(g_iCritBoostEnt[client][iTrg], "Kill");
 
 		g_iCritBoostEnt[client][iTrg] = 0;
-		if(g_iCritBoostsGetting[iTrg] < 1)
+		if(g_iCritBoostsGetting[iTrg] < 1 && IsValidClient(iTrg))
 			TF2_RemoveCondition(iTrg, view_as<TFCond>(GetIntCache(client)));
 	}
 }

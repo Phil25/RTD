@@ -66,6 +66,11 @@ public Action Timer_RefreshUber(Handle hTimer, int iUserId){
 	if(iMediGun <= MaxClients)
 		return Plugin_Stop;
 
+	char sClass[18];
+	GetEntityClassname(iMediGun, sClass, 18);
+	if(strcmp(sClass, "tf_weapon_medigun") != 0)
+		return Plugin_Stop;
+
 	SetEntPropFloat(iMediGun, Prop_Send, "m_flChargeLevel", 1.0);
 	return Plugin_Continue;
 
@@ -80,6 +85,11 @@ public Action Timer_UberchargeEnd(Handle hTimer, int iUserId){
 		SetIntCache(client, 1);
 		return Plugin_Stop;
 	}
+
+	char sClass[18];
+	GetEntityClassname(iMediGun, sClass, 18);
+	if(strcmp(sClass, "tf_weapon_medigun") != 0)
+		return Plugin_Stop;
 
 	if(GetEntPropFloat(iMediGun, Prop_Send, "m_flChargeLevel") > 0.05)
 		return Plugin_Continue;

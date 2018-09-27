@@ -127,7 +127,11 @@ void Timebomb_BombState(int client, int iState){
 		}
 	}
 
-	SetEntProp(GetEntCache(client, HEAD), Prop_Send, "m_nSkin", iCurState+1);
+	int iHead = GetEntCache(client, HEAD);
+	char sClass[18];
+	GetEntityClassname(iHead, sClass, 18);
+	if(strcmp(sClass, "prop_dynamic") == 0)
+		SetEntProp(iHead, Prop_Send, "m_nSkin", iCurState+1);
 	SetIntCache(client, iState, STATE);
 }
 
