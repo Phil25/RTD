@@ -44,6 +44,11 @@ These are important changes related to custom RTD configuration.
 * Removed cvars: sm\_rtd2\_repeat & sm\_rtd2\_repeatgreat
 * Added cvars: sm\_rtd2\_repeat\_player & sm\_rtd2\_repeat\_perk
 
+* Made Timebomb and Fire Timebomb timed perks (were a bit hacked instant-type perks)
+	* Ticks setting is specified as their time.
+	* Time defaults to 10.
+	* Cannot be forcefully removed when the pre-explosion sound is going off.
+
 * (For devs) deprecated the following natives:
 	* RTD2\_GetClientPerkId, use RTD2\_GetClientPerk
 	* RTD2\_ForcePerk, use RTD2\_Force
@@ -51,6 +56,6 @@ These are important changes related to custom RTD configuration.
 	* RTD2\_RemovePerk, use RTD2\_Remove
 	* RTD2\_GetPerkOfString, use RTD2\_FindPerk or RTD2\_FindPerks
 	* RTD2\_RegisterPerk, use RTD2\_MakePerk
-	* RTD2\_SetPerkByToken, RTD2\_SetPerkById and RTD2\_DefaultCorePerk, use RTD2\_SetPerk*
+	* RTD2\_SetPerkByToken, RTD2\_SetPerkById and RTD2\_DefaultCorePerk, use RTD2\_SetPerk\*
 
-** If you have any questions, don't hesitate to ask on the AlliedModder's thread. **
+**If you have any questions, don't hesitate to ask on the AlliedModder's thread.**
