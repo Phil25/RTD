@@ -64,7 +64,7 @@ public void FireTimebomb_Call(int client, Perk perk, bool apply){
 
 	SetEntCache(client, FireTimebomb_SpawnBombHead(client), HEAD);
 
-	SetIntCache(client, GetPerkTimeEx(perk), MAX_TICKS);
+	SetIntCache(client, GetPerkTime(perk), MAX_TICKS);
 	SetIntCache(client, 0, CLIENT_TICKS);
 	SetIntCache(client, 0, STATE);
 	SetIntCache(client, true, CAN_STOP);

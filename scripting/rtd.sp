@@ -1436,7 +1436,7 @@ void DisplayPerkTimeFrame(client){
 }
 
 //-----[ Perks ]-----//
-int GetPerkTimeEx(Perk perk){ // TODO: rename me
+int GetPerkTime(Perk perk){
 	if(g_iLastPerkTime != -1)
 		return g_iLastPerkTime;
 	int iTime = perk.Time;

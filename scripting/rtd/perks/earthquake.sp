@@ -37,7 +37,7 @@ public void Earthquake_Call(int client, Perk perk, bool apply){
 		BfWriteByte(hMsg, 0);
 		BfWriteFloat(hMsg, fAmplitude);
 		BfWriteFloat(hMsg, fFrequency);
-		BfWriteFloat(hMsg, float(GetPerkTimeEx(perk)));
+		BfWriteFloat(hMsg, float(GetPerkTime(perk)));
 		EndMessage();
 	}
 }
