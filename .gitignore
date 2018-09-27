@@ -5,3 +5,5 @@ scripting/compiled/
 !scripting/include
 scripting/include/*
 !scripting/include/rtd2.inc
+
+*.zip
