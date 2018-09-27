@@ -20,10 +20,17 @@
 #include <sdkhooks>
 #include <rtd2>
 
+#define INTERVAL 120.0
+
 bool g_bStress = false;
+int g_iFile = 0;
+bool g_bPause = false;
+Handle g_hTimer = null
 
 public void OnPluginStart(){
 	RegAdminCmd("sm_rtdstress", Command_Stress, 0);
+	ServerCommand("tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add");
+
 	for(int i = 1; i <= MaxClients; ++i)
 		if(IsClientInGame(i))
 			OnClientPutInServer(i);
@@ -31,7 +38,13 @@ public void OnPluginStart(){
 
 public Action Command_Stress(int client, int args){
 	g_bStress = !g_bStress;
-	PrintToChatAll("Stress test %d", g_bStress);
+	PrintToServer("Stress test %d", g_bStress);
+	if(g_bStress){
+		ServerCommand("sm_cvar sm_rtd2_interval 2");
+		ServerCommand("sm_cvar sm_rtd2_duration 2");
+		ServerCommand("sm_cvar tf_bot_join_after_player 0");
+		g_hTimer = CreateTimer(INTERVAL, Timer_DumpHandles, _, TIMER_REPEAT);
+	}else delete g_hTimer;
 	return Plugin_Handled;
 }
 
@@ -45,7 +58,15 @@ public Action Timer_Roll(Handle hTimer, int iUserId){
 	if(!client || !IsFakeClient(client))
 		return Plugin_Stop;
 
-	if(g_bStress) FakeClientCommand(client, "sm_rtd");
+	if(g_bStress){
+		g_bPause = g_iFile %10 == 0;
+		if(!g_bPause) FakeClientCommand(client, "sm_rtd");
+	}
+
 	CreateTimer(GetRandomFloat(1.0, 2.0), Timer_Roll, iUserId);
 	return Plugin_Stop;
+}
+
+public Action Timer_DumpHandles(Handle hTimer, any aData){
+	ServerCommand("sm_dump_handles handles/%d.dump", ++g_iFile);
 }
