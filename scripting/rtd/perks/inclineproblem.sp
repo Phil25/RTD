@@ -17,7 +17,7 @@
 */
 
 
-public void InclineProblem_Call(int client, bool apply){
+public void InclineProblem_Call(int client, Perk perk, bool apply){
 	if(apply){
 		SetFloatCache(client, GetEntPropFloat(client, Prop_Send, "m_flStepSize"));
 		SetEntPropFloat(client, Prop_Send, "m_flStepSize", 1.0);
