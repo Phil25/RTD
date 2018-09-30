@@ -416,7 +416,7 @@ methodmap RTDPerk{
 	//
 	// @note Prefer the property if not chaining methods. Manually pushing classes is faster.
 	// @note This string is parsed the same way its config equivalent is.
-	// @note This will destroy and create the tags Handle.
+	// @note This will destroy and create the weapon classes Handle.
 	//
 	// @param sWeapClasses	String representing weapon classes or parts of them, separated by comma.
 	//
