@@ -87,5 +87,13 @@
 		"Source"	"Path_SM/scripting/rtd/perks/toxic.sp"
 		"Source"	"Path_SM/scripting/rtd/perks/vital.sp"
 		"Source"	"Path_SM/scripting/rtd/perks/weakened.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/springshoes.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/lag.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/drugbullets.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/longmelee.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/hatthrow.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/madaraswhistle.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/sickness.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/wastedroll.sp"
 	}
 }
