@@ -22,7 +22,20 @@ public void PowerPlay_Call(int client, Perk perk, bool apply){
 	else PowerPlay_RemovePerk(client);
 }
 
-void PowerPlay_ApplyPerk(int client){
+public void PowerPlay_ApplyPerk(int client){
+	if(TF2_IsPlayerInCondition(client, TFCond_Taunting)){ // Fix for issue #9
+		TF2_RemoveCondition(client, TFCond_Taunting);
+		CreateTimer(0.0, Timer_PowerPlay_ApplyConditions, GetClientUserId(client));
+	}else PowerPlay_ApplyConditions(client);
+}
+
+public Action Timer_PowerPlay_ApplyConditions(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(client) PowerPlay_ApplyConditions(client);
+	return Plugin_Stop;
+}
+
+void PowerPlay_ApplyConditions(int client){
 	TF2_AddCondition(client, TFCond_UberchargedCanteen);
 	TF2_AddCondition(client, TFCond_CritOnFirstBlood);
 	TF2_AddCondition(client, TFCond_UberBulletResist);
