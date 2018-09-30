@@ -1,9 +1,9 @@
 > # [DOWNLOAD [⤓]](https://github.com/Phil25/RTD/releases/latest)
-> * [[Updating from before v2.0.0|Updating-from-before-v2.0.0]]
+> * [Updating from before v2.0.0](https://github.com/Phil25/RTD/wiki/updating-from-before-v2.0.0)
 > * [Thread](https://forums.alliedmods.net/showthread.php?t=278579)
-> * [[Perk List|Perk-List]]
-> * [[Changelog|Changelog]]
-> * [[API Documentation|api-documentation]]
+> * [Perk List](https://github.com/Phil25/RTD/wiki/perk-list)
+> * [Changelog](https://github.com/Phil25/RTD/wiki/changelog)
+> * [API Documentation](https://github.com/Phil25/RTD/wiki/api-documentation)
 
 # Roll The Dice Revamped
 
