@@ -1641,7 +1641,7 @@ bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
 	return true;
 }
 
-void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRadius, float fDamage, int iFlags=0, bool bCanHurtSelf=false, bool bCheckSight=true, Function call=INVALID_FUNCTION){
+void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRadius, float fDamage, int iFlags=0, float fSelfDamage=0.0, bool bCheckSight=true, Function call=INVALID_FUNCTION){
 	fRadius *= fRadius;
 	float fOtherPos[3];
 	for(int i = 1; i <= MaxClients; ++i){
@@ -1650,9 +1650,9 @@ void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRa
 
 		GetClientAbsOrigin(i, fOtherPos);
 		if(GetVectorDistance(fOrigin, fOtherPos, true) <= fRadius)
-			if(CanPlayerBeHurt(i, iAttacker, bCanHurtSelf))
+			if(CanPlayerBeHurt(i, iAttacker, fSelfDamage > 0.0))
 				if(!bCheckSight || (bCheckSight && CanEntitySeeTarget(iAttacker, i)))
-					TakeDamage(i, iInflictor, iAttacker, fDamage, iFlags, call);
+					TakeDamage(i, iInflictor, iAttacker, i == iAttacker ? fSelfDamage : fDamage, iFlags, call);
 	}
 }
 

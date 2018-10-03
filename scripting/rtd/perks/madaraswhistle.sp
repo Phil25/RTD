@@ -23,10 +23,15 @@
 #define MODEL_GATOR "models/props_island/crocodile/crocodile.mdl"
 #define ANIM_GATOR "attack"
 
+// float cache
 #define LAST_ATTACK 0
 #define RATE 1
 #define DELAY 2
 #define RANGE 3
+
+// int cache
+#define DAMAGE_OTHERS 0
+#define DAMAGE_SELF 1
 
 int g_iMadarasWhistleId = 61;
 
@@ -58,7 +63,8 @@ void MadarasWhistle_ApplyPerk(int client, Perk perk){
 	SetFloatCache(client, perk.GetPrefFloat("rate"), RATE);
 	SetFloatCache(client, perk.GetPrefFloat("delay"), DELAY);
 	SetFloatCache(client, perk.GetPrefFloat("range"), RANGE);
-	SetIntCache(client, perk.GetPrefCell("damage"));
+	SetIntCache(client, perk.GetPrefCell("damage"), DAMAGE_OTHERS);
+	SetIntCache(client, perk.GetPrefCell("selfdamage"), DAMAGE_SELF);
 
 	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
 }
@@ -114,8 +120,9 @@ void MadarasWhistle_Summon(int client, float fPos[3]){
 	if(!iGator) return;
 
 	float fRange = GetFloatCache(client, RANGE);
-	float fDamage = float(GetIntCache(client));
-	DamageRadius(fPos, iGator, client, fRange, fDamage, DMG_BLAST|DMG_ALWAYSGIB, true);
+	float fDamage = float(GetIntCache(client, DAMAGE_OTHERS));
+	float fSelfDamage = float(GetIntCache(client, DAMAGE_SELF));
+	DamageRadius(fPos, iGator, client, fRange, fDamage, DMG_BLAST|DMG_ALWAYSGIB, fSelfDamage);
 	KILL_ENT_IN(iGator,1.0)
 }
 
@@ -139,3 +146,5 @@ int MadarasWhistle_SpawnGator(float fPos[3]){
 #undef RATE
 #undef DELAY
 #undef RANGE
+#undef DAMAGE_OTHERS
+#undef DAMAGE_SELF
