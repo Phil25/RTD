@@ -1775,3 +1775,57 @@ void KillEntIn(int iEnt, float fTime){
 	AcceptEntityInput(iEnt, "AddOutput");
 	AcceptEntityInput(iEnt, "FireUser1");
 }
+
+int GetEntityAlpha(int iEnt){
+	return GetEntData(iEnt, GetEntSendPropOffs(iEnt, "m_clrRender") + 3, 1);
+}
+
+void SetEntityAlpha(int iEnt, int iVal){
+	SetEntData(iEnt, GetEntSendPropOffs(iEnt, "m_clrRender") + 3, iVal, 1, true);
+}
+
+void DisarmWeapons(int client, bool bDisarm){
+	int iWeapon = 0;
+	float fNextAttack = bDisarm ? GetGameTime() +86400.0 : 0.1;
+	for(int i = 0; i < 3; i++){
+		iWeapon = GetPlayerWeaponSlot(client, i);
+		if(iWeapon <= MaxClients || !IsValidEntity(iWeapon))
+			continue;
+
+		SetEntPropFloat(iWeapon, Prop_Data, "m_flNextPrimaryAttack", fNextAttack);
+		SetEntPropFloat(iWeapon, Prop_Data, "m_flNextSecondaryAttack", fNextAttack);
+	}
+}
+
+int CreateRagdoll(int client, bool bFrozen=false){
+	int iRag = CreateEntityByName("tf_ragdoll");
+	if(iRag <= MaxClients || !IsValidEntity(iRag))
+		return 0;
+
+	float fPos[3], fAng[3], fVel[3];
+	GetClientAbsOrigin(client, fPos);
+	GetClientAbsAngles(client, fAng);
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
+
+	TeleportEntity(iRag, fPos, fAng, fVel);
+
+	SetEntProp(iRag, Prop_Send, "m_iPlayerIndex", client);
+	SetEntProp(iRag, Prop_Send, "m_bIceRagdoll", bFrozen);
+	SetEntProp(iRag, Prop_Send, "m_iTeam", GetClientTeam(client));
+	SetEntProp(iRag, Prop_Send, "m_iClass", view_as<int>(TF2_GetPlayerClass(client)));
+	SetEntProp(iRag, Prop_Send, "m_bOnGround", 1);
+
+	//Scale fix by either SHADoW NiNE TR3S or ddhoward (dunno who was first :p)
+	//https://forums.alliedmods.net/showpost.php?p=2383502&postcount=1491
+	//https://forums.alliedmods.net/showpost.php?p=2366104&postcount=1487
+	SetEntPropFloat(iRag, Prop_Send, "m_flHeadScale", GetEntPropFloat(client, Prop_Send, "m_flHeadScale"));
+	SetEntPropFloat(iRag, Prop_Send, "m_flTorsoScale", GetEntPropFloat(client, Prop_Send, "m_flTorsoScale"));
+	SetEntPropFloat(iRag, Prop_Send, "m_flHandScale", GetEntPropFloat(client, Prop_Send, "m_flHandScale"));
+
+	SetEntityMoveType(iRag, MOVETYPE_NONE);
+
+	DispatchSpawn(iRag);
+	ActivateEntity(iRag);
+
+	return iRag;
+}
