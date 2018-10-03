@@ -4,14 +4,25 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.0.0"
+			"Latest"	"2.0.1"
+			"Previous"	"2.0.0"
 		}
 
-		"Notes"	"• Major rework of RTD"
+		"Notes"	"View changelog at https://github.com/Phil25/RTD/wiki/changelog"
 	}
 
 	"Files"
 	{
+		"Patch"
+		{
+			"Plugin"	"Path_SM/plugins/rtd.smx"
+			"Plugin"	"Path_SM/configs/rtd2_perks.default.cfg"
+
+			"Source"	"Path_SM/scripting/rtd.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/godmode.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/madaraswhistle.sp"
+		}
+
 		"Plugin"	"Path_SM/plugins/rtd.smx"
 		"Plugin"	"Path_SM/translations/rtd2.phrases.txt"
 		"Plugin"	"Path_SM/translations/rtd2_perks.phrases.txt"
