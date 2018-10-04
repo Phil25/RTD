@@ -5,5 +5,11 @@ cd "$(dirname "$0")"
 
 test -e compiled || mkdir compiled
 
-smxfile="`echo "$1" | sed -e 's/\.sp$/\.smx/'`";
-./spcomp $1 -ocompiled/$smxfile
+if [ $1 = "rtdtest.sp" ]; then
+	sfile="rtdtest.sp"
+else
+	sfile="rtd.sp"
+fi
+
+smxfile="`echo "$sfile" | sed -e 's/\.sp$/\.smx/'`";
+./spcomp $sfile -ocompiled/$smxfile
