@@ -94,3 +94,4 @@
 #include "rtd/perks/madaraswhistle.sp"		//	61
 #include "rtd/perks/sickness.sp"			//	62
 #include "rtd/perks/wastedroll.sp"			//	63
+#include "rtd/perks/mercsdietwice.sp"		//	64

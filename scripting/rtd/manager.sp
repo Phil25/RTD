@@ -88,6 +88,7 @@ void Forward_Voice(int client){
 	FireBreath_Voice(client);
 	HatThrow_Voice(client);
 	MadarasWhistle_Voice(client);
+	MercsDieTwice_Voice(client);
 }
 
 

@@ -43,7 +43,7 @@
 
 /******* D E F I N E S ******/
 
-#define PLUGIN_VERSION	"2.0.0"
+#define PLUGIN_VERSION	"2.1.0"
 
 #define CHAT_PREFIX 	"\x07FFD700[RTD]\x01"
 #define CONS_PREFIX 	"[RTD]"

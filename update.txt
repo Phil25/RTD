@@ -4,7 +4,7 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.0.1"
+			"Latest"	"2.1.0"
 			"Previous"	"2.0.0"
 		}
 
@@ -21,6 +21,7 @@
 			"Source"	"Path_SM/scripting/rtd.sp"
 			"Source"	"Path_SM/scripting/rtd/perks/godmode.sp"
 			"Source"	"Path_SM/scripting/rtd/perks/madaraswhistle.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/mercsdietwice.sp"
 		}
 
 		"Plugin"	"Path_SM/plugins/rtd.smx"
@@ -106,5 +107,6 @@
 		"Source"	"Path_SM/scripting/rtd/perks/madaraswhistle.sp"
 		"Source"	"Path_SM/scripting/rtd/perks/sickness.sp"
 		"Source"	"Path_SM/scripting/rtd/perks/wastedroll.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/mercsdietwice.sp"
 	}
 }
