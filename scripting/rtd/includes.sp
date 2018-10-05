@@ -95,3 +95,4 @@
 #include "rtd/perks/sickness.sp"			//	62
 #include "rtd/perks/wastedroll.sp"			//	63
 #include "rtd/perks/mercsdietwice.sp"		//	64
+#include "rtd/perks/drunkwalk.sp"			//	65

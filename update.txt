@@ -17,11 +17,13 @@
 		{
 			"Plugin"	"Path_SM/plugins/rtd.smx"
 			"Plugin"	"Path_SM/configs/rtd2_perks.default.cfg"
+			"Plugin"	"Path_SM/translations/rtd2_perks.phrases.txt"
 
 			"Source"	"Path_SM/scripting/rtd.sp"
 			"Source"	"Path_SM/scripting/rtd/perks/godmode.sp"
 			"Source"	"Path_SM/scripting/rtd/perks/madaraswhistle.sp"
 			"Source"	"Path_SM/scripting/rtd/perks/mercsdietwice.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/drunkwalk.sp"
 		}
 
 		"Plugin"	"Path_SM/plugins/rtd.smx"
@@ -108,5 +110,6 @@
 		"Source"	"Path_SM/scripting/rtd/perks/sickness.sp"
 		"Source"	"Path_SM/scripting/rtd/perks/wastedroll.sp"
 		"Source"	"Path_SM/scripting/rtd/perks/mercsdietwice.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/drunkwalk.sp"
 	}
 }

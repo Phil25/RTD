@@ -527,4 +527,12 @@
 		"sv"	""
 		"de"	""
 	}
+
+	"RTD2_Desc_drunkwalk" // TODO: description
+	{
+		"en"	"You're pretty bad at rolling."
+		"pl"	"Coś ci nie wychodzi losowanie."
+		"sv"	""
+		"de"	""
+	}
 }

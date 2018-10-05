@@ -97,7 +97,6 @@ bool	g_bIsGameArena			= false;
 int		g_iLastPerkTime			= -1;
 
 
-
 /***** C O N V A R S ****/
 
 Handle g_hCvarPluginEnabled;		bool g_bCvarPluginEnabled = true;
@@ -309,6 +308,8 @@ public void OnPluginStart(){
 	AddCommandListener(Listener_Say,	"say");
 	AddCommandListener(Listener_Say,	"say_team");
 	AddCommandListener(Listener_Voice,	"voicemenu");
+	AddNormalSoundHook(Listener_Sound);
+
 
 	g_hRollers = new Rollers();
 	g_hPerkHistory = new PerkList();
@@ -595,6 +596,12 @@ public Action Listener_Voice(int client, const char[] sCommand, int args){
 	if(IsValidClient(client))
 		Forward_Voice(client);
 
+	return Plugin_Continue;
+}
+
+public Action Listener_Sound(int clients[MAXPLAYERS], int& iLen, char sSample[PLATFORM_MAX_PATH], int& iEnt, int& iChannel, float& fVol, int& iLevel, int& iPitch, int& iFlags, char sEntry[PLATFORM_MAX_PATH], int& iSeed){
+	if(IsValidClient(iEnt) && !Forward_Sound(iEnt, sSample))
+		return Plugin_Stop;
 	return Plugin_Continue;
 }
 
@@ -1828,4 +1835,44 @@ int CreateRagdoll(int client, bool bFrozen=false){
 	ActivateEntity(iRag);
 
 	return iRag;
+}
+
+float GetBaseSpeed(int client){
+	float fBaseSpeed = 300.0;
+	TFClassType class = TF2_GetPlayerClass(client);
+	switch(class){
+		case TFClass_Scout:		fBaseSpeed = 400.0;
+		case TFClass_Soldier:	fBaseSpeed = 240.0;
+		case TFClass_DemoMan:	fBaseSpeed = 280.0;
+		case TFClass_Heavy:		fBaseSpeed = 230.0;
+		case TFClass_Medic:		fBaseSpeed = 320.0;
+		case TFClass_Spy:		fBaseSpeed = 320.0;
+	}
+	return fBaseSpeed;
+}
+
+void SetSpeed(int client, float fBase, float fMul=1.0){
+	if(fMul == 1.0){ // reset to base
+		TF2Attrib_RemoveByDefIndex(client, 107);
+		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase);
+	}else{
+		TF2Attrib_SetByDefIndex(client, 107, fMul);
+		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase *fMul);
+	}
+}
+
+void ViewPunch(int client, float fPunch[3]){
+	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fPunch);
+}
+
+void ViewPunchRand(int client, float fThreshold){
+	float fPunch[3];
+	fPunch[0] = GetRandomFloat(-fThreshold, fThreshold);
+	fPunch[1] = GetRandomFloat(-fThreshold, fThreshold);
+	fPunch[2] = GetRandomFloat(-fThreshold, fThreshold);
+	ViewPunch(client, fPunch);
+}
+
+bool IsFootstepSound(const char[] sSound){
+	return sSound[0] == 'f'; // TODO: finish me
 }
