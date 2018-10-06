@@ -520,10 +520,10 @@
 		"de"	""
 	}
 
-	"RTD2_Desc_mercsdietwice" // TODO: description
+	"RTD2_Desc_mercsdietwice"
 	{
-		"en"	"You're pretty bad at rolling."
-		"pl"	"Coś ci nie wychodzi losowanie."
+		"en"	"Resurrect yourself on death."
+		"pl"	"Wskrześ się po śmierci."
 		"sv"	""
 		"de"	""
 	}

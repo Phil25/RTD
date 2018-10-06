@@ -295,6 +295,15 @@
 		"de"			"Rufe nach einen {1}Medic{2} um zu attackieren."
 	}
 
+	"RTD2_Perk_Resurrect"
+	{
+		"#format"		"{1:c},{2:c}"
+		"en"			"Shout {1}\"MEDIC!\"{2} to resurrect."
+		"pl"			"Krzyknij {1}\"MEDYK!\"{2} aby się wskrzesić."
+		"sv"			""
+		"de"			""
+	}
+
 	"RTD2_Perk_Dispenser_Initialization"
 	{
 		"#format"		"{1:c},{2:c}"

@@ -308,7 +308,7 @@ public void OnPluginStart(){
 	AddCommandListener(Listener_Say,	"say");
 	AddCommandListener(Listener_Say,	"say_team");
 	AddCommandListener(Listener_Voice,	"voicemenu");
-	AddNormalSoundHook(Listener_Sound);
+	//AddNormalSoundHook(Listener_Sound);
 
 
 	g_hRollers = new Rollers();
@@ -1639,7 +1639,8 @@ bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
 	if(IsPlayerFriendly(client))
 		return false;
 
-	if(TF2_IsPlayerInCondition(client, TFCond_Ubercharged))
+	if(TF2_IsPlayerInCondition(client, TFCond_Ubercharged)
+	|| TF2_IsPlayerInCondition(client, TFCond_UberchargedCanteen))
 		return false;
 
 	if(GetEntProp(client, Prop_Data, "m_takedamage") != 2)
@@ -1788,7 +1789,45 @@ int GetEntityAlpha(int iEnt){
 }
 
 void SetEntityAlpha(int iEnt, int iVal){
+	SetEntityRenderMode(iEnt, RENDER_TRANSCOLOR);
 	SetEntData(iEnt, GetEntSendPropOffs(iEnt, "m_clrRender") + 3, iVal, 1, true);
+}
+
+void SetClientAlpha(int client, int iVal){
+	SetEntityAlpha(client, iVal);
+
+	int iWeapon = 0;
+	for(int i = 0; i < 5; i++){
+		iWeapon = GetPlayerWeaponSlot(client, i);
+		if(iWeapon > MaxClients && IsValidEntity(iWeapon))
+			SetEntityAlpha(iWeapon, iVal);
+	}
+
+	for(int i = MaxClients+1; i < GetMaxEntities(); i++)
+		if(IsWearable(i, client))
+			SetEntityAlpha(i, iVal);
+}
+
+bool IsWearable(int iEnt, int iOwner){
+	if(!IsValidEntity(iEnt))
+		return false;
+
+	char sClass[24];
+	GetEntityClassname(iEnt, sClass, 24);
+	if(strlen(sClass) < 7)
+		return false;
+
+	if(strncmp(sClass, "tf_", 3) != 0)
+		return false;
+
+	if(strncmp(sClass[3], "wear", 4) != 0
+	&& strncmp(sClass[3], "powe", 4) != 0)
+		return false;
+
+	if(GetEntPropEnt(iEnt, Prop_Send, "m_hOwnerEntity") != iOwner)
+		return false;
+
+	return true;
 }
 
 void DisarmWeapons(int client, bool bDisarm){

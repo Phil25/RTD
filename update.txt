@@ -17,6 +17,7 @@
 		{
 			"Plugin"	"Path_SM/plugins/rtd.smx"
 			"Plugin"	"Path_SM/configs/rtd2_perks.default.cfg"
+			"Plugin"	"Path_SM/translations/rtd2.phrases.txt"
 			"Plugin"	"Path_SM/translations/rtd2_perks.phrases.txt"
 
 			"Source"	"Path_SM/scripting/rtd.sp"

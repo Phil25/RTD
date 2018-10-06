@@ -62,6 +62,7 @@ void Forward_OnMapStart(){
 	HatThrow_Start();
 	MadarasWhistle_Start();
 	Sickness_Start();
+	MercsDieTwice_Start();
 }
 
 

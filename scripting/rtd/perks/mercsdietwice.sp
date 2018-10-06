@@ -16,6 +16,17 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define SOUND_RESURRECT "mvm/mvm_revive.wav"
+
+#define FAKE_DEATH 0
+#define ALPHA 1
+#define FULL_HEALTH 2
+#define CUR_HEALTH 3
+
+void MercsDieTwice_Start(){
+	PrecacheSound(SOUND_RESURRECT);
+}
+
 public void MercsDieTwice_Call(int client, Perk perk, bool bApply){
 	if(bApply) MercsDieTwice_ApplyPerk(client, perk);
 	else MercsDieTwice_RemovePerk(client);
@@ -24,37 +35,44 @@ public void MercsDieTwice_Call(int client, Perk perk, bool bApply){
 void MercsDieTwice_ApplyPerk(int client, Perk perk){
 	SDKHook(client, SDKHook_OnTakeDamage, MercsDieTwice_OnTakeDamage);
 	SetFloatCache(client, perk.GetPrefFloat("protection"));
-	SetIntCache(client, false);
+	SetIntCache(client, false, FAKE_DEATH);
+	SetIntCache(client, perk.GetPrefCell("fullhealth"), FULL_HEALTH);
 }
 
 void MercsDieTwice_RemovePerk(int client){
 	SDKUnhook(client, SDKHook_OnTakeDamage, MercsDieTwice_OnTakeDamage);
-	KillEntCache(client);
-	SetIntCache(client, false);
-	if(GetIntCacheBool(client))
-		SDKHooks_TakeDamage(client, 0, 0, view_as<float>(GetClientHealth(client)) +1.0);
+
+	if(GetIntCacheBool(client, FAKE_DEATH))
+		MercsDieTwice_Resurrect(client);
+
+	SetIntCache(client, false, FAKE_DEATH);
 }
 
 void MercsDieTwice_Voice(int client){
-	if(GetIntCacheBool(client))
-		MercsDieTwice_Revive(client);
+	if(GetIntCacheBool(client, FAKE_DEATH))
+		MercsDieTwice_Resurrect(client);
 }
 
 public Action MercsDieTwice_OnTakeDamage(int client, int& iAttacker, int& iInflictor, float& fDamage, int& iType){
+	if(!CanPlayerBeHurt(client))
+		return Plugin_Continue;
+
 	int iHealth = GetClientHealth(client);
 	if(iHealth > fDamage)
 		return Plugin_Continue;
 
-	if(!GetIntCacheBool(client))
+	if(!GetIntCacheBool(client, FAKE_DEATH))
 		MercsDieTwice_FakeDeath(client);
 	return Plugin_Handled;
 }
 
 void MercsDieTwice_FakeDeath(int client){
-	SetIntCache(client, true);
+	SetIntCache(client, true, FAKE_DEATH);
 	float fVel[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
 	SetVectorCache(client, fVel);
+	SetIntCache(client, GetEntityAlpha(client), ALPHA);
+	SetClientAlpha(client, 0);
 
 	int iRag = CreateRagdoll(client);
 	if(iRag){
@@ -66,19 +84,40 @@ void MercsDieTwice_FakeDeath(int client){
 	SetEntityMoveType(client, MOVETYPE_NONE);
 	SetVariantInt(1);
 	AcceptEntityInput(client, "SetForcedTauntCam");
+	TF2_AddCondition(client, TFCond_UberchargedCanteen);
+
+	int iCurHealth = GetEntProp(client, Prop_Send, "m_iHealth");
+	SetIntCache(client, iCurHealth, CUR_HEALTH);
+	SetEntityHealth(client, 0); // Changes health HUD to death symbol
+
+	PrintCenterText(client, "%T", "RTD2_Perk_Resurrect", LANG_SERVER, 0x03, 0x01);
 }
 
-void MercsDieTwice_Revive(int client){
-	SetIntCache(client, false);
+void MercsDieTwice_Resurrect(int client){
+	SetIntCache(client, false, FAKE_DEATH);
 
 	float fVec[3];
 	GetVectorCache(client, fVec);
 	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVec);
+	SetClientAlpha(client, GetIntCache(client, ALPHA));
 
 	DisarmWeapons(client, false);
 	SetEntityMoveType(client, MOVETYPE_WALK);
 	SetVariantInt(0);
 	AcceptEntityInput(client, "SetForcedTauntCam");
+	SetClientViewEntity(client, client);
+	KillEntCache(client);
 
+	TF2_RemoveCondition(client, TFCond_UberchargedCanteen);
 	TF2_AddCondition(client, TFCond_UberchargedCanteen, GetFloatCache(client));
+	EmitSoundToAll(SOUND_RESURRECT, client);
+
+	if(GetIntCacheBool(client, FULL_HEALTH))
+		SetEntityHealth(client, GetEntProp(client, Prop_Data, "m_iMaxHealth"));
+	else SetEntityHealth(client, GetIntCache(client, CUR_HEALTH));
 }
+
+#undef FAKE_DEATH
+#undef ALPHA
+#undef FULL_HEALTH
+#undef CUR_HEALTH
