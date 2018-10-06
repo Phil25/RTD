@@ -138,6 +138,7 @@ void Forward_PlayerHurt(int client, Handle hEvent){
 	ScaryBullets_PlayerHurt(client, hEvent);
 	EyeForAnEye_PlayerHurt(hEvent);
 	DrugBullets_PlayerHurt(client, hEvent);
+	MercsDieTwice_PlayerHurt(client, hEvent);
 }
 
 

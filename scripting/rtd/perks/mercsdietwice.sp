@@ -20,8 +20,7 @@
 
 #define FAKE_DEATH 0
 #define ALPHA 1
-#define FULL_HEALTH 2
-#define CUR_HEALTH 3
+#define HEALTH 2
 
 int g_iMercsDieTwiceId = 64;
 
@@ -37,16 +36,14 @@ public void MercsDieTwice_Call(int client, Perk perk, bool bApply){
 void MercsDieTwice_ApplyPerk(int client, Perk perk){
 	g_iMercsDieTwiceId = perk.Id;
 	SetClientPerkCache(client, g_iMercsDieTwiceId);
-	SDKHook(client, SDKHook_OnTakeDamage, MercsDieTwice_OnTakeDamage);
 
 	SetFloatCache(client, perk.GetPrefFloat("protection"));
 	SetIntCache(client, false, FAKE_DEATH);
-	SetIntCache(client, perk.GetPrefCell("fullhealth"), FULL_HEALTH);
+	SetIntCache(client, perk.GetPrefCell("health"), HEALTH);
 }
 
 void MercsDieTwice_RemovePerk(int client){
 	UnsetClientPerkCache(client, g_iMercsDieTwiceId);
-	SDKUnhook(client, SDKHook_OnTakeDamage, MercsDieTwice_OnTakeDamage);
 
 	if(GetIntCacheBool(client, FAKE_DEATH))
 		MercsDieTwice_Resurrect(client);
@@ -60,24 +57,25 @@ void MercsDieTwice_Voice(int client){
 			MercsDieTwice_Resurrect(client);
 }
 
-public Action MercsDieTwice_OnTakeDamage(int client, int& iAttacker, int& iInflictor, float& fDamage, int& iType){
+void MercsDieTwice_PlayerHurt(int client, Handle hEvent){
+	if(!CheckClientPerkCache(client, g_iMercsDieTwiceId))
+		return;
+
 	if(!CanPlayerBeHurt(client))
-		return Plugin_Continue;
+		return;
 
-	int iHealth = GetClientHealth(client);
-	if(iHealth > fDamage)
-		return Plugin_Continue;
-
-	if(!GetIntCacheBool(client, FAKE_DEATH))
+	if(GetEventInt(hEvent, "health") < 1)
 		MercsDieTwice_FakeDeath(client);
-	return Plugin_Handled;
 }
 
 void MercsDieTwice_FakeDeath(int client){
+	SetEntityHealth(client, 1);
 	SetIntCache(client, true, FAKE_DEATH);
+
 	float fVel[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
 	SetVectorCache(client, fVel);
+
 	SetIntCache(client, GetEntityAlpha(client), ALPHA);
 	SetClientAlpha(client, 0);
 
@@ -93,10 +91,6 @@ void MercsDieTwice_FakeDeath(int client){
 	AcceptEntityInput(client, "SetForcedTauntCam");
 	TF2_AddCondition(client, TFCond_UberchargedCanteen);
 
-	int iCurHealth = GetEntProp(client, Prop_Send, "m_iHealth");
-	SetIntCache(client, iCurHealth, CUR_HEALTH);
-	SetEntityHealth(client, 0); // Changes health HUD to death symbol
-
 	PrintCenterText(client, "%T", "RTD2_Perk_Resurrect", LANG_SERVER, 0x03, 0x01);
 }
 
@@ -110,8 +104,10 @@ void MercsDieTwice_Resurrect(int client){
 
 	DisarmWeapons(client, false);
 	SetEntityMoveType(client, MOVETYPE_WALK);
+
 	SetVariantInt(0);
 	AcceptEntityInput(client, "SetForcedTauntCam");
+
 	SetClientViewEntity(client, client);
 	KillEntCache(client);
 
@@ -119,12 +115,11 @@ void MercsDieTwice_Resurrect(int client){
 	TF2_AddCondition(client, TFCond_UberchargedCanteen, GetFloatCache(client));
 	EmitSoundToAll(SOUND_RESURRECT, client);
 
-	if(GetIntCacheBool(client, FULL_HEALTH))
-		SetEntityHealth(client, GetEntProp(client, Prop_Data, "m_iMaxHealth"));
-	else SetEntityHealth(client, GetIntCache(client, CUR_HEALTH));
+	float fMulti = float(GetIntCache(client, HEALTH)) /100.0;
+	float fMaxHealth = float(GetEntProp(client, Prop_Data, "m_iMaxHealth"));
+	SetEntityHealth(client, RoundFloat(fMaxHealth *fMulti));
 }
 
 #undef FAKE_DEATH
 #undef ALPHA
-#undef FULL_HEALTH
-#undef CUR_HEALTH
+#undef HEALTH
