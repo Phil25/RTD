@@ -21,6 +21,7 @@ echo "Moving \"$smxfile\" to the testing server...";
 
 destroot=`cat ./compiled/destination`;
 sshpass -f "./compiled/passfile" scp -r "../configs/rtd2_perks.default.cfg" "$destroot:/home/steam/test/tf/addons/sourcemod/configs/"
+sshpass -f "./compiled/passfile" scp -r "../translations/rtd2.phrases.txt" "$destroot:/home/steam/test/tf/addons/sourcemod/translations/"
 sshpass -f "./compiled/passfile" scp -r "../translations/rtd2_perks.phrases.txt" "$destroot:/home/steam/test/tf/addons/sourcemod/translations/"
 sshpass -f "./compiled/passfile" scp -r "./compiled/$smxfile" "$destroot:/home/steam/test/tf/addons/sourcemod/plugins/"
 
