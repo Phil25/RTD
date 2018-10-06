@@ -19,6 +19,7 @@
 #define BASE_WALK_SPEED 0
 #define MIN_WALK_SPEED 1
 #define MAX_WALK_SPEED 2
+#define TURN_ANGLE 3
 
 int g_iDrunkWalkId = 65;
 
@@ -34,6 +35,7 @@ void DrunkWalk_ApplyPerk(int client, Perk perk){
 	SetFloatCache(client, GetBaseSpeed(client), BASE_WALK_SPEED);
 	SetFloatCache(client, perk.GetPrefFloat("minspeed"), MIN_WALK_SPEED);
 	SetFloatCache(client, perk.GetPrefFloat("maxspeed"), MAX_WALK_SPEED);
+	SetFloatCache(client, perk.GetPrefFloat("turnangle"), TURN_ANGLE);
 }
 
 void DrunkWalk_RemovePerk(int client){
@@ -49,13 +51,13 @@ bool DrunkWalk_Sound(int client, const char[] sSound){
 }
 
 void DrunkWalk_Tick(int client){
-	ViewPunchRand(client, 25.0);
-	Drugged_Tick(client);
+	bool bLeft = GetURandomFloat() > 0.5;
+	float fAngle = GetFloatCache(client, TURN_ANGLE);
+	RotateClientSmooth(client, bLeft ? -fAngle : fAngle);
 
 	float fBase = GetFloatCache(client, BASE_WALK_SPEED);
-	float fMin = GetFloatCache(client, MIN_WALK_SPEED);
-	float fMax = GetFloatCache(client, MAX_WALK_SPEED);
-	SetSpeed(client, fBase, GetRandomFloat(fMin, fMax));
+	float fSpeed = GetRandomFloat(GetFloatCache(client, MIN_WALK_SPEED), GetFloatCache(client, MAX_WALK_SPEED));
+	SetSpeed(client, fBase, fSpeed);
 }
 
 #undef BASE_WALK_SPEED

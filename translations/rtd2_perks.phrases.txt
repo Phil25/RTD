@@ -528,10 +528,10 @@
 		"de"	""
 	}
 
-	"RTD2_Desc_drunkwalk" // TODO: description
+	"RTD2_Desc_drunkwalk"
 	{
-		"en"	"You're pretty bad at rolling."
-		"pl"	"Coś ci nie wychodzi losowanie."
+		"en"	"Don't drink and fight."
+		"pl"	"Nigdy nie pij i walcz."
 		"sv"	""
 		"de"	""
 	}

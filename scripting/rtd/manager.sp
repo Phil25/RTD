@@ -99,10 +99,10 @@ void Forward_Voice(int client){
 	• Listener_Sound() fires when a client emits a sound
 	• Client is guaranteed to be valid.
 */
-bool Forward_Sound(int& client, const char[] sSound){
-	if(DrunkWalk_Sound(client, sSound))
-		return false;
-	return true;
+bool Forward_Sound(int client, const char[] sSound){
+	bool bAllow = true;
+	bAllow &= DrunkWalk_Sound(client, sSound);
+	return bAllow;
 }
 
 

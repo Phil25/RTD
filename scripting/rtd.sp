@@ -308,7 +308,7 @@ public void OnPluginStart(){
 	AddCommandListener(Listener_Say,	"say");
 	AddCommandListener(Listener_Say,	"say_team");
 	AddCommandListener(Listener_Voice,	"voicemenu");
-	//AddNormalSoundHook(Listener_Sound);
+	AddNormalSoundHook(Listener_Sound);
 
 
 	g_hRollers = new Rollers();
@@ -600,9 +600,9 @@ public Action Listener_Voice(int client, const char[] sCommand, int args){
 }
 
 public Action Listener_Sound(int clients[MAXPLAYERS], int& iLen, char sSample[PLATFORM_MAX_PATH], int& iEnt, int& iChannel, float& fVol, int& iLevel, int& iPitch, int& iFlags, char sEntry[PLATFORM_MAX_PATH], int& iSeed){
-	if(IsValidClient(iEnt) && !Forward_Sound(iEnt, sSample))
-		return Plugin_Stop;
-	return Plugin_Continue;
+	if(!IsValidClient(iEnt))
+		return Plugin_Continue;
+	return Forward_Sound(iEnt, sSample) ? Plugin_Continue : Plugin_Stop;
 }
 
 
@@ -1900,18 +1900,17 @@ void SetSpeed(int client, float fBase, float fMul=1.0){
 	}
 }
 
-void ViewPunch(int client, float fPunch[3]){
-	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fPunch);
-}
-
-void ViewPunchRand(int client, float fThreshold){
-	float fPunch[3];
-	fPunch[0] = GetRandomFloat(-fThreshold, fThreshold);
-	fPunch[1] = GetRandomFloat(-fThreshold, fThreshold);
-	fPunch[2] = GetRandomFloat(-fThreshold, fThreshold);
-	ViewPunch(client, fPunch);
-}
-
 bool IsFootstepSound(const char[] sSound){
-	return sSound[0] == 'f'; // TODO: finish me
+	return !strncmp(sSound[7], "footstep", 8);
+}
+
+void RotateClientSmooth(int client, float fAngle){
+	float fPunch[3], fEyeAng[3];
+	GetClientEyeAngles(client, fEyeAng);
+
+	fPunch[1] += fAngle;
+	fEyeAng[1] -= fAngle;
+
+	TeleportEntity(client, NULL_VECTOR, fEyeAng, NULL_VECTOR);
+	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fPunch);
 }
