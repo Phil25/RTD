@@ -23,6 +23,8 @@
 #define FULL_HEALTH 2
 #define CUR_HEALTH 3
 
+int g_iMercsDieTwiceId = 64;
+
 void MercsDieTwice_Start(){
 	PrecacheSound(SOUND_RESURRECT);
 }
@@ -33,13 +35,17 @@ public void MercsDieTwice_Call(int client, Perk perk, bool bApply){
 }
 
 void MercsDieTwice_ApplyPerk(int client, Perk perk){
+	g_iMercsDieTwiceId = perk.Id;
+	SetClientPerkCache(client, g_iMercsDieTwiceId);
 	SDKHook(client, SDKHook_OnTakeDamage, MercsDieTwice_OnTakeDamage);
+
 	SetFloatCache(client, perk.GetPrefFloat("protection"));
 	SetIntCache(client, false, FAKE_DEATH);
 	SetIntCache(client, perk.GetPrefCell("fullhealth"), FULL_HEALTH);
 }
 
 void MercsDieTwice_RemovePerk(int client){
+	UnsetClientPerkCache(client, g_iMercsDieTwiceId);
 	SDKUnhook(client, SDKHook_OnTakeDamage, MercsDieTwice_OnTakeDamage);
 
 	if(GetIntCacheBool(client, FAKE_DEATH))
@@ -49,8 +55,9 @@ void MercsDieTwice_RemovePerk(int client){
 }
 
 void MercsDieTwice_Voice(int client){
-	if(GetIntCacheBool(client, FAKE_DEATH))
-		MercsDieTwice_Resurrect(client);
+	if(CheckClientPerkCache(client, g_iMercsDieTwiceId))
+		if(GetIntCacheBool(client, FAKE_DEATH))
+			MercsDieTwice_Resurrect(client);
 }
 
 public Action MercsDieTwice_OnTakeDamage(int client, int& iAttacker, int& iInflictor, float& fDamage, int& iType){
