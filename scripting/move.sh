@@ -2,7 +2,13 @@
 
 cd "$(dirname "$0")"
 
-smxfile="`echo "$1" | sed -e 's/\.sp$/\.smx/'`";
+if [ $1 = "rtdtest.sp" ]; then
+	sfile="rtdtest.sp"
+else
+	sfile="rtd.sp"
+fi
+
+smxfile="`echo "$sfile" | sed -e 's/\.sp$/\.smx/'`";
 
 if [ ! -f "./compiled/$smxfile" ]; then
 	echo "Plugin \"$smxfile\" not compiled.";
@@ -20,9 +26,10 @@ destination=`cat ./compiled/destination`;
 for server in $servers; do
 	echo "Moving \"$smxfile\" to $server...";
 
-	sshpass -f "./compiled/passfile" scp -r "./compiled/$smxfile" "$destination:/home/steam/$server/tf/addons/sourcemod/plugins/";
 	sshpass -f "./compiled/passfile" scp -r "../configs/rtd2_perks.default.cfg" "$destination:/home/steam/$server/tf/addons/sourcemod/configs/";
+	sshpass -f "./compiled/passfile" scp -r "../translations/rtd2.phrases.txt" "$destination:/home/steam/$server/tf/addons/sourcemod/translations/";
 	sshpass -f "./compiled/passfile" scp -r "../translations/rtd2_perks.phrases.txt" "$destination:/home/steam/$server/tf/addons/sourcemod/translations/";
+	sshpass -f "./compiled/passfile" scp -r "./compiled/$smxfile" "$destination:/home/steam/$server/tf/addons/sourcemod/plugins/";
 
 	if [ $? -eq 0 ]; then
 		shithappened=1;

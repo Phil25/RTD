@@ -1,7 +1,10 @@
-> # [DOWNLOAD [⤓]](https://github.com/Phil25/RTD/releases/latest)
+> # [DOWNLOAD](https://github.com/Phil25/RTD/releases/latest)
 > * [Updating from before v2.0.0](https://github.com/Phil25/RTD/wiki/updating-from-before-v2.0.0)
-> * [Thread](https://forums.alliedmods.net/showthread.php?t=278579)
+> * [AlliedModders Thread](https://forums.alliedmods.net/showthread.php?t=278579)
 > * [Perk List](https://github.com/Phil25/RTD/wiki/perk-list)
+> * [Commands](https://github.com/Phil25/RTD/wiki/commands)
+> * [ConVars](https://github.com/Phil25/RTD/wiki/convars)
+> * [Customizing Perks](https://github.com/Phil25/RTD/wiki/customizing-perks)
 > * [Changelog](https://github.com/Phil25/RTD/wiki/changelog)
 > * [API Documentation](https://github.com/Phil25/RTD/wiki/api-documentation)
 

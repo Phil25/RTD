@@ -25,9 +25,9 @@ public void Frozen_Call(int client, Perk perk, bool apply){
 void Frozen_ApplyPerk(int client){
 	SetIntCache(client, Frozen_GetEntityAlpha(client));
 	Frozen_Set(client, 0);
-	Frozen_DisarmWeapons(client, true);
+	DisarmWeapons(client, true);
 
-	int iStatue = CreateDummy(client);
+	int iStatue = CreateRagdoll(client, true);
 	SetEntCache(client, iStatue);
 	if(iStatue)
 		SetClientViewEntity(client, iStatue);
@@ -42,44 +42,11 @@ void Frozen_RemovePerk(int client){
 	KillEntCache(client);
 
 	Frozen_Set(client, GetIntCache(client));
-	Frozen_DisarmWeapons(client, false);
+	DisarmWeapons(client, false);
 
 	SetEntityMoveType(client, MOVETYPE_WALK);
 	SetVariantInt(0);
 	AcceptEntityInput(client, "SetForcedTauntCam");
-}
-
-int CreateDummy(client){
-	int iRag = CreateEntityByName("tf_ragdoll");
-	if(iRag < 1 || iRag <= MaxClients || !IsValidEntity(iRag))
-		return 0;
-
-	float fPos[3], fAng[3], fVel[3];
-	GetClientAbsOrigin(client, fPos);
-	GetClientAbsAngles(client, fAng);
-	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
-
-	TeleportEntity(iRag, fPos, fAng, fVel);
-
-	SetEntProp(iRag, Prop_Send, "m_iPlayerIndex", client);
-	SetEntProp(iRag, Prop_Send, "m_bIceRagdoll", 1);
-	SetEntProp(iRag, Prop_Send, "m_iTeam", GetClientTeam(client));
-	SetEntProp(iRag, Prop_Send, "m_iClass", _:TF2_GetPlayerClass(client));
-	SetEntProp(iRag, Prop_Send, "m_bOnGround", 1);
-
-	//Scale fix by either SHADoW NiNE TR3S or ddhoward (dunno who was first :p)
-	//https://forums.alliedmods.net/showpost.php?p=2383502&postcount=1491
-	//https://forums.alliedmods.net/showpost.php?p=2366104&postcount=1487
-	SetEntPropFloat(iRag, Prop_Send, "m_flHeadScale", GetEntPropFloat(client, Prop_Send, "m_flHeadScale"));
-	SetEntPropFloat(iRag, Prop_Send, "m_flTorsoScale", GetEntPropFloat(client, Prop_Send, "m_flTorsoScale"));
-	SetEntPropFloat(iRag, Prop_Send, "m_flHandScale", GetEntPropFloat(client, Prop_Send, "m_flHandScale"));
-
-	SetEntityMoveType(iRag, MOVETYPE_NONE);
-
-	DispatchSpawn(iRag);
-	ActivateEntity(iRag);
-
-	return iRag;
 }
 
 void Frozen_Set(int client, int iValue){
@@ -118,16 +85,4 @@ stock int Frozen_GetEntityAlpha(int entity){
 
 stock void Frozen_SetEntityAlpha(int entity, int value){
 	SetEntData(entity, GetEntSendPropOffs(entity, "m_clrRender") + 3, value, 1, true);
-}
-
-void Frozen_DisarmWeapons(int client, bool bDisarm){
-	int iWeapon = 0;
-	for(int i = 0; i < 3; i++){
-		iWeapon = GetPlayerWeaponSlot(client, i);
-		if(iWeapon <= MaxClients || !IsValidEntity(iWeapon))
-			continue;
-
-		SetEntPropFloat(iWeapon, Prop_Data, "m_flNextPrimaryAttack",	bDisarm ? GetGameTime() + 86400.0 : 0.1);
-		SetEntPropFloat(iWeapon, Prop_Data, "m_flNextSecondaryAttack",	bDisarm ? GetGameTime() + 86400.0 : 0.1);
-	}
 }

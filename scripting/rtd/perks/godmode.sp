@@ -38,6 +38,10 @@ void Godmode_ApplyPerk(int client, Perk perk){
 		case 1: // deal self damage
 			SDKHook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Self);
 	}
+
+	int iUber = perk.GetPrefCell("uber");
+	SetIntCache(client, iUber);
+	if(iUber) TF2_AddCondition(client, TFCond_UberchargedCanteen);
 }
 
 void Godmode_RemovePerk(int client){
@@ -45,6 +49,8 @@ void Godmode_RemovePerk(int client){
 	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_NoSelf);
 	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Pushback);
 	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Self);
+	if(GetIntCacheBool(client))
+		TF2_RemoveCondition(client, TFCond_UberchargedCanteen);
 }
 
 public Action Godmode_OnTakeDamage_NoSelf(int client, int &iAttacker){

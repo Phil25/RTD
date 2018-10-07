@@ -1,20 +1,15 @@
 #!/bin/bash -e
 cd "$(dirname "$0")"
 
+[[ $# -eq 0 ]] && exit 0
+
 test -e compiled || mkdir compiled
 
-if [[ $# -ne 0 ]]; then
-	for sourcefile in "$@"
-	do
-		smxfile="`echo $sourcefile | sed -e 's/\.sp$/\.smx/'`"
-		echo -e "\nCompiling $sourcefile..."
-		./spcomp $sourcefile -ocompiled/$smxfile
-	done
+if [ $1 = "rtdtest.sp" ]; then
+	sfile="rtdtest.sp"
 else
-	for sourcefile in *.sp
-	do
-		smxfile="`echo $sourcefile | sed -e 's/\.sp$/\.smx/'`"
-		echo -e "\nCompiling $sourcefile ..."
-		./spcomp $sourcefile -ocompiled/$smxfile
-	done
+	sfile="rtd.sp"
 fi
+
+smxfile="`echo "$sfile" | sed -e 's/\.sp$/\.smx/'`";
+./spcomp $sfile -ocompiled/$smxfile

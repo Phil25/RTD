@@ -25,8 +25,8 @@
 
 char g_sDeadlyVoiceParticles[][] = {
 	"default", "default",
-	"powerup_supernova_explode_red",
-	"powerup_supernova_explode_blue"
+	"bombinomicon_burningdebris",
+	"bombinomicon_burningdebris_halloween"
 };
 
 int g_iDeadlyVoiceId = 36;

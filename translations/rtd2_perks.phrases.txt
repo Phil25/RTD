@@ -519,4 +519,20 @@
 		"sv"	""
 		"de"	""
 	}
+
+	"RTD2_Desc_mercsdietwice"
+	{
+		"en"	"Resurrect yourself on death."
+		"pl"	"Wskrześ się po śmierci."
+		"sv"	""
+		"de"	""
+	}
+
+	"RTD2_Desc_drunkwalk"
+	{
+		"en"	"Don't drink and fight."
+		"pl"	"Nigdy nie pij i walcz."
+		"sv"	""
+		"de"	""
+	}
 }

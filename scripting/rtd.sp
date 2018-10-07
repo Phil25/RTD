@@ -43,7 +43,7 @@
 
 /******* D E F I N E S ******/
 
-#define PLUGIN_VERSION	"2.0.0"
+#define PLUGIN_VERSION	"2.1.0"
 
 #define CHAT_PREFIX 	"\x07FFD700[RTD]\x01"
 #define CONS_PREFIX 	"[RTD]"
@@ -95,7 +95,6 @@ int		g_iCorePerks			= 0;
 
 bool	g_bIsGameArena			= false;
 int		g_iLastPerkTime			= -1;
-
 
 
 /***** C O N V A R S ****/
@@ -309,6 +308,8 @@ public void OnPluginStart(){
 	AddCommandListener(Listener_Say,	"say");
 	AddCommandListener(Listener_Say,	"say_team");
 	AddCommandListener(Listener_Voice,	"voicemenu");
+	AddNormalSoundHook(Listener_Sound);
+
 
 	g_hRollers = new Rollers();
 	g_hPerkHistory = new PerkList();
@@ -596,6 +597,12 @@ public Action Listener_Voice(int client, const char[] sCommand, int args){
 		Forward_Voice(client);
 
 	return Plugin_Continue;
+}
+
+public Action Listener_Sound(int clients[MAXPLAYERS], int& iLen, char sSample[PLATFORM_MAX_PATH], int& iEnt, int& iChannel, float& fVol, int& iLevel, int& iPitch, int& iFlags, char sEntry[PLATFORM_MAX_PATH], int& iSeed){
+	if(!IsValidClient(iEnt))
+		return Plugin_Continue;
+	return Forward_Sound(iEnt, sSample) ? Plugin_Continue : Plugin_Stop;
 }
 
 
@@ -1632,7 +1639,8 @@ bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
 	if(IsPlayerFriendly(client))
 		return false;
 
-	if(TF2_IsPlayerInCondition(client, TFCond_Ubercharged))
+	if(TF2_IsPlayerInCondition(client, TFCond_Ubercharged)
+	|| TF2_IsPlayerInCondition(client, TFCond_UberchargedCanteen))
 		return false;
 
 	if(GetEntProp(client, Prop_Data, "m_takedamage") != 2)
@@ -1641,7 +1649,7 @@ bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
 	return true;
 }
 
-void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRadius, float fDamage, int iFlags=0, bool bCanHurtSelf=false, bool bCheckSight=true, Function call=INVALID_FUNCTION){
+void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRadius, float fDamage, int iFlags=0, float fSelfDamage=0.0, bool bCheckSight=true, Function call=INVALID_FUNCTION){
 	fRadius *= fRadius;
 	float fOtherPos[3];
 	for(int i = 1; i <= MaxClients; ++i){
@@ -1650,9 +1658,9 @@ void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRa
 
 		GetClientAbsOrigin(i, fOtherPos);
 		if(GetVectorDistance(fOrigin, fOtherPos, true) <= fRadius)
-			if(CanPlayerBeHurt(i, iAttacker, bCanHurtSelf))
+			if(CanPlayerBeHurt(i, iAttacker, fSelfDamage > 0.0))
 				if(!bCheckSight || (bCheckSight && CanEntitySeeTarget(iAttacker, i)))
-					TakeDamage(i, iInflictor, iAttacker, fDamage, iFlags, call);
+					TakeDamage(i, iInflictor, iAttacker, i == iAttacker ? fSelfDamage : fDamage, iFlags, call);
 	}
 }
 
@@ -1774,4 +1782,135 @@ void KillEntIn(int iEnt, float fTime){
 	SetVariantString(sStr);
 	AcceptEntityInput(iEnt, "AddOutput");
 	AcceptEntityInput(iEnt, "FireUser1");
+}
+
+int GetEntityAlpha(int iEnt){
+	return GetEntData(iEnt, GetEntSendPropOffs(iEnt, "m_clrRender") + 3, 1);
+}
+
+void SetEntityAlpha(int iEnt, int iVal){
+	SetEntityRenderMode(iEnt, RENDER_TRANSCOLOR);
+	SetEntData(iEnt, GetEntSendPropOffs(iEnt, "m_clrRender") + 3, iVal, 1, true);
+}
+
+void SetClientAlpha(int client, int iVal){
+	SetEntityAlpha(client, iVal);
+
+	int iWeapon = 0;
+	for(int i = 0; i < 5; i++){
+		iWeapon = GetPlayerWeaponSlot(client, i);
+		if(iWeapon > MaxClients && IsValidEntity(iWeapon))
+			SetEntityAlpha(iWeapon, iVal);
+	}
+
+	for(int i = MaxClients+1; i < GetMaxEntities(); i++)
+		if(IsWearable(i, client))
+			SetEntityAlpha(i, iVal);
+}
+
+bool IsWearable(int iEnt, int iOwner){
+	if(!IsValidEntity(iEnt))
+		return false;
+
+	char sClass[24];
+	GetEntityClassname(iEnt, sClass, 24);
+	if(strlen(sClass) < 7)
+		return false;
+
+	if(strncmp(sClass, "tf_", 3) != 0)
+		return false;
+
+	if(strncmp(sClass[3], "wear", 4) != 0
+	&& strncmp(sClass[3], "powe", 4) != 0)
+		return false;
+
+	if(GetEntPropEnt(iEnt, Prop_Send, "m_hOwnerEntity") != iOwner)
+		return false;
+
+	return true;
+}
+
+void DisarmWeapons(int client, bool bDisarm){
+	int iWeapon = 0;
+	float fNextAttack = bDisarm ? GetGameTime() +86400.0 : 0.1;
+	for(int i = 0; i < 3; i++){
+		iWeapon = GetPlayerWeaponSlot(client, i);
+		if(iWeapon <= MaxClients || !IsValidEntity(iWeapon))
+			continue;
+
+		SetEntPropFloat(iWeapon, Prop_Data, "m_flNextPrimaryAttack", fNextAttack);
+		SetEntPropFloat(iWeapon, Prop_Data, "m_flNextSecondaryAttack", fNextAttack);
+	}
+}
+
+int CreateRagdoll(int client, bool bFrozen=false){
+	int iRag = CreateEntityByName("tf_ragdoll");
+	if(iRag <= MaxClients || !IsValidEntity(iRag))
+		return 0;
+
+	float fPos[3], fAng[3], fVel[3];
+	GetClientAbsOrigin(client, fPos);
+	GetClientAbsAngles(client, fAng);
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
+
+	TeleportEntity(iRag, fPos, fAng, fVel);
+
+	SetEntProp(iRag, Prop_Send, "m_iPlayerIndex", client);
+	SetEntProp(iRag, Prop_Send, "m_bIceRagdoll", bFrozen);
+	SetEntProp(iRag, Prop_Send, "m_iTeam", GetClientTeam(client));
+	SetEntProp(iRag, Prop_Send, "m_iClass", view_as<int>(TF2_GetPlayerClass(client)));
+	SetEntProp(iRag, Prop_Send, "m_bOnGround", 1);
+
+	//Scale fix by either SHADoW NiNE TR3S or ddhoward (dunno who was first :p)
+	//https://forums.alliedmods.net/showpost.php?p=2383502&postcount=1491
+	//https://forums.alliedmods.net/showpost.php?p=2366104&postcount=1487
+	SetEntPropFloat(iRag, Prop_Send, "m_flHeadScale", GetEntPropFloat(client, Prop_Send, "m_flHeadScale"));
+	SetEntPropFloat(iRag, Prop_Send, "m_flTorsoScale", GetEntPropFloat(client, Prop_Send, "m_flTorsoScale"));
+	SetEntPropFloat(iRag, Prop_Send, "m_flHandScale", GetEntPropFloat(client, Prop_Send, "m_flHandScale"));
+
+	SetEntityMoveType(iRag, MOVETYPE_NONE);
+
+	DispatchSpawn(iRag);
+	ActivateEntity(iRag);
+
+	return iRag;
+}
+
+float GetBaseSpeed(int client){
+	float fBaseSpeed = 300.0;
+	TFClassType class = TF2_GetPlayerClass(client);
+	switch(class){
+		case TFClass_Scout:		fBaseSpeed = 400.0;
+		case TFClass_Soldier:	fBaseSpeed = 240.0;
+		case TFClass_DemoMan:	fBaseSpeed = 280.0;
+		case TFClass_Heavy:		fBaseSpeed = 230.0;
+		case TFClass_Medic:		fBaseSpeed = 320.0;
+		case TFClass_Spy:		fBaseSpeed = 320.0;
+	}
+	return fBaseSpeed;
+}
+
+void SetSpeed(int client, float fBase, float fMul=1.0){
+	if(fMul == 1.0){ // reset to base
+		TF2Attrib_RemoveByDefIndex(client, 107);
+		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase);
+	}else{
+		TF2Attrib_SetByDefIndex(client, 107, fMul);
+		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase *fMul);
+	}
+}
+
+bool IsFootstepSound(const char[] sSound){
+	return !strncmp(sSound[7], "footstep", 8);
+}
+
+void RotateClientSmooth(int client, float fAngle){
+	float fPunch[3], fEyeAng[3];
+	GetClientEyeAngles(client, fEyeAng);
+
+	fPunch[1] += fAngle;
+	fEyeAng[1] -= fAngle;
+
+	TeleportEntity(client, NULL_VECTOR, fEyeAng, NULL_VECTOR);
+	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fPunch);
 }

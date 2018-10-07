@@ -86,14 +86,6 @@ void Invisibility_Resupply(int client){
 		Invisibility_Set(client, GetIntCache(client, INVIS_VALUE));
 }
 
-stock int GetEntityAlpha(int iEntity){
-	return GetEntData(iEntity, GetEntSendPropOffs(iEntity, "m_clrRender") + 3, 1);
-}
-
-stock void SetEntityAlpha(int iEntity, int iValue){
-	SetEntData(iEntity, GetEntSendPropOffs(iEntity, "m_clrRender") + 3, iValue, 1, true);
-}
-
 bool IsCorrectWearable(int client, int i, char[] sClass, int iBufferSize){
 	if(!IsValidEntity(i))
 		return false;

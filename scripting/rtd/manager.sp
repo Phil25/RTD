@@ -21,7 +21,7 @@
 	Welcome to the perk manager!
 
 	This script is responsible for actually applying and removing perks,
-	so after all the logic goes off in the core rtd2.sp first.
+	so after all the logic goes off in the core rtd.sp first.
 
 	If you have a custom perk you want to add: WRITE A MODULE.
 	(editing this plugin is bad)
@@ -41,7 +41,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 
 /*
 	• Editing Forward_OnMapStart() is OPTIONAL
-	• This is a forward of OnMapStart() from rtd2.sp
+	• This is a forward of OnMapStart() from rtd.sp
 */
 void Forward_OnMapStart(){
 	InfiniteAmmo_Start();
@@ -62,12 +62,13 @@ void Forward_OnMapStart(){
 	HatThrow_Start();
 	MadarasWhistle_Start();
 	Sickness_Start();
+	MercsDieTwice_Start();
 }
 
 
 /*
 	• Editing Forward_OnClientPutInServer() is OPTIONAL
-	• This is a forward of OnClientPutInServer() from rtd2.sp
+	• This is a forward of OnClientPutInServer() from rtd.sp
 	• ATTENTION: Also occures to every valid client on OnPluginStart()
 */
 void Forward_OnClientPutInServer(int client){
@@ -77,7 +78,7 @@ void Forward_OnClientPutInServer(int client){
 
 /*
 	• Editing Forward_Voice() is OPTIONAL
-	• This is a forward of Listener_Voice() from rtd2.sp
+	• This is a forward of Listener_Voice() from rtd.sp
 	• Listener_Voice() fires when a client says something via Voicemenu
 	• Client is guaranteed to be valid and alive.
 */
@@ -88,12 +89,26 @@ void Forward_Voice(int client){
 	FireBreath_Voice(client);
 	HatThrow_Voice(client);
 	MadarasWhistle_Voice(client);
+	MercsDieTwice_Voice(client);
+}
+
+
+/*
+	• Editing Forward_Sound() is OPTIONAL
+	• This is a forward of Listener_Sound() from rtd.sp
+	• Listener_Sound() fires when a client emits a sound
+	• Client is guaranteed to be valid.
+*/
+bool Forward_Sound(int client, const char[] sSound){
+	bool bAllow = true;
+	bAllow &= DrunkWalk_Sound(client, sSound);
+	return bAllow;
 }
 
 
 /*
 	• Editing Forward_OnEntityCreated() is OPTIONAL
-	• This is a forward of OnEntityCreated() from rtd2.sp
+	• This is a forward of OnEntityCreated() from rtd.sp
 	• Entity is NOT guaranteed to be valid.
 */
 void Forward_OnEntityCreated(int iEntity, const char[] sClassname){
@@ -123,12 +138,13 @@ void Forward_PlayerHurt(int client, Handle hEvent){
 	ScaryBullets_PlayerHurt(client, hEvent);
 	EyeForAnEye_PlayerHurt(hEvent);
 	DrugBullets_PlayerHurt(client, hEvent);
+	MercsDieTwice_PlayerHurt(client, hEvent);
 }
 
 
 /*
 	• Editing Forward_OnGameFrame() is OPTIONAL
-	• It's a forward of OnGameFrame() from rtd2.sp
+	• It's a forward of OnGameFrame() from rtd.sp
 */
 void Forward_OnGameFrame(){
 	HomingProjectiles_OnGameFrame();
@@ -137,7 +153,7 @@ void Forward_OnGameFrame(){
 
 /*
 	• Editing Forward_OnConditionAdded() is OPTIONAL
-	• It's a forward of TF2_OnConditionAdded() from rtd2.sp
+	• It's a forward of TF2_OnConditionAdded() from rtd.sp
 */
 void Forward_OnConditionAdded(int client, TFCond condition){
 	FullRifleCharge_OnConditionAdded(client, condition);
@@ -147,7 +163,7 @@ void Forward_OnConditionAdded(int client, TFCond condition){
 
 /*
 	• Editing Forward_OnConditionRemoved() is OPTIONAL
-	• It's a forward of TF2_OnConditionRemoved() from rtd2.sp
+	• It's a forward of TF2_OnConditionRemoved() from rtd.sp
 */
 void Forward_OnConditionRemoved(int client, TFCond condition){
 	FullUbercharge_OnConditionRemoved(client, condition);
@@ -158,7 +174,7 @@ void Forward_OnConditionRemoved(int client, TFCond condition){
 
 /*
 	• Editing Forward_OnPlayerRunCmd() is OPTIONAL
-	• It's a forward of OnPlayerRunCmd() from rtd2.sp
+	• It's a forward of OnPlayerRunCmd() from rtd.sp
 	• Client is guaranteed to be valid.
 	• Return TRUE if anything changed.
 	• You cannot block it from this forward.
