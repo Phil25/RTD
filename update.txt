@@ -21,7 +21,13 @@
 			"Plugin"	"Path_SM/translations/rtd2_perks.phrases.txt"
 
 			"Source"	"Path_SM/scripting/rtd.sp"
+			"Source"	"Path_SM/scripting/rtd/includes.sp"
+			"Source"	"Path_SM/scripting/rtd/manager.sp"
 			"Source"	"Path_SM/scripting/rtd/perks/godmode.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/deadlyvoice.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/frozen.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/invisibility.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/longmelee.sp"
 			"Source"	"Path_SM/scripting/rtd/perks/madaraswhistle.sp"
 			"Source"	"Path_SM/scripting/rtd/perks/mercsdietwice.sp"
 			"Source"	"Path_SM/scripting/rtd/perks/drunkwalk.sp"
