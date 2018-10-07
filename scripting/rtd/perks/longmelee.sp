@@ -30,7 +30,7 @@ public void LongMelee_OnDroppedWeaponSpawn(int iEnt){
 	int client = AccountIDToClient(GetEntProp(iEnt, Prop_Send, "m_iAccountID"));
 	if(client && GetIntCacheBool(client, 3))
 		AcceptEntityInput(iEnt, "Kill");
-} 
+}
 
 public void LongMelee_Call(int client, Perk perk, bool apply){
 	if(apply) LongMelee_ApplyPerk(client, perk);
@@ -41,8 +41,10 @@ void LongMelee_ApplyPerk(int client, Perk perk){
 	g_iLongMeleeId = perk.Id;
 	SetClientPerkCache(client, g_iLongMeleeId);
 
-	LongMelee_EditClientWeapons(client, true, perk.GetPrefFloat("multiplier"));
+	SetFloatCache(client, perk.GetPrefFloat("multiplier"));
 	SetIntCache(client, true, 3);
+
+	LongMelee_EditClientWeapons(client, true);
 }
 
 void LongMelee_RemovePerk(int client){
@@ -57,13 +59,12 @@ public Action Timer_LongMelee_FullUnset(Handle hTimer, int iUserId){
 	return Plugin_Stop;
 }
 
-void LongMelee_EditClientWeapons(int client, bool apply, float fMulti=0.0){
-
+void LongMelee_EditClientWeapons(int client, bool apply){
 	int iWeapon = GetPlayerWeaponSlot(client, 2);
 	if(iWeapon <= MaxClients || !IsValidEntity(iWeapon))
 		return;
 
-	if(apply) TF2Attrib_SetByDefIndex(iWeapon, ATTRIB_MELEE_RANGE, fMulti);
+	if(apply) TF2Attrib_SetByDefIndex(iWeapon, ATTRIB_MELEE_RANGE, GetFloatCache(client));
 	else TF2Attrib_RemoveByDefIndex(iWeapon, ATTRIB_MELEE_RANGE);
 }
 
