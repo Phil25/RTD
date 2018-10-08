@@ -1904,6 +1904,18 @@ bool IsFootstepSound(const char[] sSound){
 	return !strncmp(sSound[7], "footstep", 8);
 }
 
+void ViewPunch(int client, float fPunch[3]){
+	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fPunch);
+}
+
+void ViewPunchRand(int client, float fThreshold=25.0){
+	float fPunch[3];
+	fPunch[0] = GetRandomFloat(-fThreshold, fThreshold);
+	fPunch[1] = GetRandomFloat(-fThreshold, fThreshold);
+	fPunch[2] = GetRandomFloat(-fThreshold, fThreshold);
+	ViewPunch(client, fPunch);
+}
+
 void RotateClientSmooth(int client, float fAngle){
 	float fPunch[3], fEyeAng[3];
 	GetClientEyeAngles(client, fEyeAng);
@@ -1912,5 +1924,5 @@ void RotateClientSmooth(int client, float fAngle){
 	fEyeAng[1] -= fAngle;
 
 	TeleportEntity(client, NULL_VECTOR, fEyeAng, NULL_VECTOR);
-	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fPunch);
+	ViewPunch(client, fPunch);
 }

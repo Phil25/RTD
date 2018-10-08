@@ -96,3 +96,4 @@
 #include "rtd/perks/wastedroll.sp"			//	63
 #include "rtd/perks/mercsdietwice.sp"		//	64
 #include "rtd/perks/drunkwalk.sp"			//	65
+#include "rtd/perks/hellsreach.sp"			//	66

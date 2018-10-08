@@ -535,4 +535,12 @@
 		"sv"	""
 		"de"	""
 	}
+
+	"RTD2_Desc_hellsreach"
+	{
+		"en"	"Hell is something you can't escape."
+		"pl"	"Nie uciekniesz przed piekłem."
+		"sv"	""
+		"de"	""
+	}
 }

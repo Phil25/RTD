@@ -63,6 +63,7 @@ void Forward_OnMapStart(){
 	MadarasWhistle_Start();
 	Sickness_Start();
 	MercsDieTwice_Start();
+	HellsReach_Start();
 }
 
 
