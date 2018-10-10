@@ -45,7 +45,6 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 */
 void Forward_OnMapStart(){
 	InfiniteAmmo_Start();
-	HomingProjectiles_Start();
 	Timebomb_Start();
 	Drugged_Start();
 	Blind_Start();
@@ -148,7 +147,6 @@ void Forward_PlayerHurt(int client, Handle hEvent){
 	• It's a forward of OnGameFrame() from rtd.sp
 */
 void Forward_OnGameFrame(){
-	HomingProjectiles_OnGameFrame();
 }
 
 

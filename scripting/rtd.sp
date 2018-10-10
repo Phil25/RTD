@@ -758,6 +758,7 @@ public void OnEntityCreated(int iEnt, const char[] sClassname){
 }
 
 public void OnGameFrame(){
+	Homing_OnGameFrame();
 	Forward_OnGameFrame();
 }
 

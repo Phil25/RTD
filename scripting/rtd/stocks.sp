@@ -65,12 +65,47 @@
 *
 * SOUNDS
 * - IsFootstepSound
+*
+* HOMING
+* - Homing_Push
+* - Homing_OnGameFrame
+* - Homing_Think
+* - Homing_IsValidTarget
+* - Homing_FindTarget
+* - Homing_TurnToTarget
+* - Homing_AptClass
 */
 
 #define LASERBEAM "sprites/laserbeam.vmt"
 
+// Homing target flags
+#define HOMING_NONE 0
+#define HOMING_SELF (1 << 0)
+#define HOMING_ENEMIES (1 << 1)
+#define HOMING_FRIENDLIES (1 << 2)
+
+#define HOMING_SPEED_MULTIPLIER 0.5
+#define HOMING_AIRBLAST_MULTIPLIER 1.1
+
+/*
+* g_hHoming ArrayList is multidimensional:
+* - [0] -> Projectile index
+* - [1] -> last target index
+* - [2] -> homing target flags
+*
+*/
+ArrayList g_hHoming = null;
+
 void Stocks_OnMapStart(){
 	PrecacheModel(LASERBEAM);
+
+	g_hHoming = new ArrayList(3);
+	HookEvent("teamplay_round_start", Event_Homing_RoundStart);
+}
+
+public Action Event_Homing_RoundStart(Handle hEvent, const char[] sName, bool bDontBroadcast){
+	g_hHoming.Clear();
+	return Plugin_Continue;
 }
 
 /*
@@ -490,4 +525,132 @@ stock void RotateClientSmooth(int client, float fAngle){
 
 stock bool IsFootstepSound(const char[] sSound){
 	return !strncmp(sSound[7], "footstep", 8);
+}
+
+
+/*
+* HOMING
+*/
+
+stock void Homing_Push(int iProjectile, int iFlags=HOMING_ENEMIES){
+	int iData[3];
+	iData[0] = EntIndexToEntRef(iProjectile);
+	iData[2] = iFlags;
+	g_hHoming.PushArray(iData);
+}
+
+stock void Homing_OnGameFrame(){
+	int iData[3];
+	int iProjectile, i = g_hHoming.Length;
+
+	while(--i >= 0){
+		g_hHoming.GetArray(i, iData);
+		if(iData[0] == 0){
+			g_hHoming.Erase(i);
+			continue;
+		}
+
+		iProjectile = EntRefToEntIndex(iData[0]);
+		if(iProjectile > MaxClients)
+			Homing_Think(iProjectile, iData[0], i, iData[1], iData[2]);
+		else g_hHoming.Erase(i);
+	}
+}
+
+stock void Homing_Think(int iProjectile, int iRefProjectile, int iArrayIndex, int iCurrentTarget, int iFlags){
+	if(!Homing_IsValidTarget(iCurrentTarget, iProjectile, iFlags))
+		Homing_FindTarget(iProjectile, iRefProjectile, iArrayIndex, iFlags);
+	else Homing_TurnToTarget(iCurrentTarget, iProjectile);
+}
+
+stock bool Homing_IsValidTarget(int client, int iProjectile, int iFlags){
+	if(!IsValidClient(client) || !IsPlayerAlive(client))
+		return false;
+
+	int iOwner = GetEntPropEnt(iProjectile, Prop_Send, "m_hOwnerEntity"),
+		iTeam = GetEntProp(iProjectile, Prop_Send, "m_iTeamNum");
+
+	if(iOwner == client){
+		if(!(iFlags & HOMING_SELF)) return false;
+	}else{
+		if(GetClientTeam(client) == iTeam){
+			if(!(iFlags & HOMING_FRIENDLIES)) return false;
+		}else{
+			if(!(iFlags & HOMING_ENEMIES)) return false;
+		}
+	}
+
+	if(TF2_IsPlayerInCondition(client, TFCond_Cloaked))
+		return false;
+
+	if(TF2_IsPlayerInCondition(client, TFCond_Disguised) && GetEntProp(client, Prop_Send, "m_nDisguiseTeam") == iTeam)
+		return false;
+
+	if(IsPlayerFriendly(client))
+		return false;
+
+	return CanEntitySeeTarget(iProjectile, client);
+}
+
+stock void Homing_FindTarget(int iProjectile, int iRefProjectile, int iArrayIndex, int iFlags){
+	float fPos[3], fPosOther[3];
+	GetEntPropVector(iProjectile, Prop_Send, "m_vecOrigin", fPos);
+
+	int iBestTarget = 0;
+	float fBestDist = 9999999999.0;
+
+	for(int i = 1; i <= MaxClients; ++i){
+		if(!Homing_IsValidTarget(i, iProjectile, iFlags))
+			continue;
+
+		GetClientEyePosition(i, fPosOther);
+		float fDistance = GetVectorDistance(fPos, fPosOther, true);
+		if(fDistance > fBestDist)
+			continue;
+
+		iBestTarget = i;
+		fBestDist = fDistance;
+	}
+
+	int iData[3];
+	iData[0] = iRefProjectile;
+	iData[1] = iBestTarget;
+	iData[2] = iFlags;
+	g_hHoming.SetArray(iArrayIndex, iData);
+
+	if(iBestTarget)
+		Homing_TurnToTarget(iBestTarget, iProjectile);
+}
+
+stock void Homing_TurnToTarget(int client, int iProjectile){
+	float fTargetPos[3], fRocketPos[3], fInitialVelocity[3];
+	GetClientAbsOrigin(client, fTargetPos);
+	GetEntPropVector(iProjectile, Prop_Send, "m_vecOrigin", fRocketPos);
+	GetEntPropVector(iProjectile, Prop_Send, "m_vInitialVelocity", fInitialVelocity);
+
+	float fSpeedInit = GetVectorLength(fInitialVelocity);
+	float fSpeedBase = fSpeedInit *HOMING_SPEED_MULTIPLIER;
+
+	fTargetPos[2] += 30 +Pow(GetVectorDistance(fTargetPos, fRocketPos), 2.0) /10000;
+
+	float fNewVec[3], fAng[3];
+	SubtractVectors(fTargetPos, fRocketPos, fNewVec);
+	NormalizeVector(fNewVec, fNewVec);
+	GetVectorAngles(fNewVec, fAng);
+
+	float fSpeedNew = fSpeedBase +GetEntProp(iProjectile, Prop_Send, "m_iDeflected") *fSpeedBase *HOMING_AIRBLAST_MULTIPLIER;
+
+	ScaleVector(fNewVec, fSpeedNew);
+	TeleportEntity(iProjectile, NULL_VECTOR, fAng, fNewVec);
+}
+
+stock bool Homing_AptClass(const char[] sClass){
+	if(strncmp(sClass, "tf_projectile_", 14))
+		return false;
+
+	return !strcmp(sClass[14], "rocket")
+		|| !strcmp(sClass[14], "arrow")
+		|| !strcmp(sClass[14], "flare")
+		|| !strcmp(sClass[14], "energy_ball")
+		|| !strcmp(sClass[14], "healing_bolt");
 }
