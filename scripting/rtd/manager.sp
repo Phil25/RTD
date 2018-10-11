@@ -63,6 +63,7 @@ void Forward_OnMapStart(){
 	Sickness_Start();
 	MercsDieTwice_Start();
 	HellsReach_Start();
+	Vampire_Start();
 }
 
 
@@ -140,6 +141,7 @@ void Forward_PlayerHurt(int client, Handle hEvent){
 	EyeForAnEye_PlayerHurt(hEvent);
 	DrugBullets_PlayerHurt(client, hEvent);
 	MercsDieTwice_PlayerHurt(client, hEvent);
+	Vampire_PlayerHurt(hEvent);
 }
 
 

@@ -552,4 +552,12 @@
 		"de"	""
 	}
 
+	"RTD2_Desc_vampire"
+	{
+		"en"	"Loose health when not damaging enemies."
+		"pl"	"Tracisz zdrowie nie zadając obrażeń przeciwnikom."
+		"sv"	""
+		"de"	""
+	}
+
 }
