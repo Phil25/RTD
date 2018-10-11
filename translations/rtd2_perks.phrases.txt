@@ -543,4 +543,13 @@
 		"sv"	""
 		"de"	""
 	}
+
+	"RTD2_Desc_cursedprojectiles"
+	{
+		"en"	"Cannot trust your own weapons."
+		"pl"	"Nie zaufasz swoim broniom."
+		"sv"	""
+		"de"	""
+	}
+
 }

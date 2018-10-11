@@ -116,6 +116,7 @@ void Forward_OnEntityCreated(int iEntity, const char[] sClassname){
 	FastHands_OnEntityCreated(iEntity, sClassname);
 	ExplosiveArrows_OnEntityCreated(iEntity, sClassname);
 	LongMelee_OnEntityCreated(iEntity, sClassname);
+	CursedProjectiles_OnEntityCreated(iEntity, sClassname);
 }
 
 

@@ -24,6 +24,9 @@
 * - KillTimerSafe
 * - IsValidClient
 * - KillEntIn
+* - GetOppositeTeam
+* - GetOppositeTeamOf
+* - GetLauncher
 *
 * DAMAGE
 * - DamageRadius
@@ -50,8 +53,10 @@
 * - DisarmWeapons
 *
 * ENTITY CREATION
+* - CreateEffect
 * - CreateParticle
 * - CreateRagdoll
+* - CreateExplosion
 * - ConnectWithBeam
 *
 * SPEED MANIPULATION
@@ -80,9 +85,10 @@
 
 // Homing target flags
 #define HOMING_NONE 0
-#define HOMING_SELF (1 << 0)
-#define HOMING_ENEMIES (1 << 1)
-#define HOMING_FRIENDLIES (1 << 2)
+#define HOMING_SELF (1 << 0) // rocket's owner
+#define HOMING_SELF_ORIG (1 << 1) // original launcher's owner
+#define HOMING_ENEMIES (1 << 2) // enemies of owner
+#define HOMING_FRIENDLIES (1 << 3) // friendlies of owner
 
 #define HOMING_SPEED_MULTIPLIER 0.5
 #define HOMING_AIRBLAST_MULTIPLIER 1.1
@@ -156,6 +162,22 @@ stock void KillEntIn(int iEnt, float fTime){
 	SetVariantString(sStr);
 	AcceptEntityInput(iEnt, "AddOutput");
 	AcceptEntityInput(iEnt, "FireUser1");
+}
+
+stock int GetOppositeTeam(int iTeam){
+	return iTeam == 2 ? 3 : 2;
+}
+
+stock int GetOppositeTeamOf(int client){
+	int iTeam = GetClientTeam(client);
+	return GetOppositeTeam(iTeam);
+}
+
+stock int GetLauncher(int iProjectile){
+	int iWeapon = GetEntPropEnt(iProjectile, Prop_Send, "m_hOriginalLauncher");
+	if(iWeapon > MaxClients)
+		return GetEntPropEnt(iWeapon, Prop_Send, "m_hOwnerEntity");
+	else return 0;
 }
 
 
@@ -360,6 +382,20 @@ stock void DisarmWeapons(int client, bool bDisarm){
 * ENTITY CREATION
 */
 
+stock void CreateEffect(float fPos[3], const char[] sEffect, float fTime=1.0){
+	int iEffect = CreateEntityByName("info_particle_system");
+	if(!IsValidEdict(iEffect)) return;
+
+	TeleportEntity(iEffect, fPos, NULL_VECTOR, NULL_VECTOR);
+	DispatchKeyValue(iEffect, "effect_name", sEffect);
+
+	DispatchSpawn(iEffect);
+	ActivateEntity(iEffect);
+	AcceptEntityInput(iEffect, "Start");
+
+	KillEntIn(iEffect, fTime);
+}
+
 stock int CreateParticle(int iClient, char[] strParticle, bool bAttach=true, char[] strAttachmentPoint="", float fOffset[3]={0.0, 0.0, 36.0}){
 	//Thanks J-Factor for CreateParticle()
 	int iParticle = CreateEntityByName("info_particle_system");
@@ -425,6 +461,24 @@ stock int CreateRagdoll(int client, bool bFrozen=false){
 	ActivateEntity(iRag);
 
 	return iRag;
+}
+
+stock void CreateExplosion(float fPos[3], float fDamage=100.0, float fRadius=80.0, float fForce=100.0, int iOwner=0){
+	int iExplosion = CreateEntityByName("env_explosion");
+	if(!iExplosion) return;
+
+	DispatchKeyValueFloat(iExplosion, "iMagnitude", fDamage);
+	DispatchKeyValueFloat(iExplosion, "iRadiusOverride", fRadius);
+	DispatchKeyValueFloat(iExplosion, "DamageForce", fForce);
+
+	DispatchSpawn(iExplosion);
+	ActivateEntity(iExplosion);
+
+	SetEntPropEnt(iExplosion, Prop_Data, "m_hOwnerEntity", iOwner);
+
+	TeleportEntity(iExplosion, fPos, NULL_VECTOR, NULL_VECTOR);
+	AcceptEntityInput(iExplosion, "Explode");
+	AcceptEntityInput(iExplosion, "Kill");
 }
 
 stock int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int iBlue=255, float fStartWidth=1.0, float fEndWidth=1.0, float fAmp=1.35){
@@ -567,11 +621,16 @@ stock bool Homing_IsValidTarget(int client, int iProjectile, int iFlags){
 	if(!IsValidClient(client) || !IsPlayerAlive(client))
 		return false;
 
-	int iOwner = GetEntPropEnt(iProjectile, Prop_Send, "m_hOwnerEntity"),
-		iTeam = GetEntProp(iProjectile, Prop_Send, "m_iTeamNum");
+	int iTeam = GetEntProp(iProjectile, Prop_Send, "m_iTeamNum"),
+		iOwner = 0;
+
+	iOwner = 0;
+	if(iFlags & HOMING_SELF_ORIG)
+		iOwner = GetLauncher(iProjectile);
+	else iOwner = GetEntPropEnt(iProjectile, Prop_Send, "m_hOwnerEntity");
 
 	if(iOwner == client){
-		if(!(iFlags & HOMING_SELF)) return false;
+		if(!(iFlags & HOMING_SELF) && !(iFlags & HOMING_SELF_ORIG)) return false;
 	}else{
 		if(GetClientTeam(client) == iTeam){
 			if(!(iFlags & HOMING_FRIENDLIES)) return false;
