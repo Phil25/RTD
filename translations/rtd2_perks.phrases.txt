@@ -560,4 +560,12 @@
 		"de"	""
 	}
 
+	"RTD2_Desc_batswarm"
+	{
+		"en"	"Swarmed with bats defending you."
+		"pl"	"Nietoperze cię obraniają."
+		"sv"	""
+		"de"	""
+	}
+
 }
