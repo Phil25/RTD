@@ -27,6 +27,7 @@
 * - GetOppositeTeam
 * - GetOppositeTeamOf
 * - GetLauncher
+* - Parent
 *
 * DAMAGE
 * - DamageRadius
@@ -58,6 +59,7 @@
 * - CreateRagdoll
 * - CreateExplosion
 * - ConnectWithBeam
+* - AttachRotating
 *
 * SPEED MANIPULATION
 * - GetBaseSpeed
@@ -178,6 +180,11 @@ stock int GetLauncher(int iProjectile){
 	if(iWeapon > MaxClients)
 		return GetEntPropEnt(iWeapon, Prop_Send, "m_hOwnerEntity");
 	else return 0;
+}
+
+stock void Parent(int iEnt, int iTo){
+	SetVariantString("!activator");
+	AcceptEntityInput(iEnt, "SetParent", iTo, iEnt, 0);
 }
 
 
@@ -382,9 +389,9 @@ stock void DisarmWeapons(int client, bool bDisarm){
 * ENTITY CREATION
 */
 
-stock void CreateEffect(float fPos[3], const char[] sEffect, float fTime=1.0){
+stock int CreateEffect(float fPos[3], const char[] sEffect, float fTime=1.0){
 	int iEffect = CreateEntityByName("info_particle_system");
-	if(!IsValidEdict(iEffect)) return;
+	if(!IsValidEdict(iEffect)) return 0;
 
 	TeleportEntity(iEffect, fPos, NULL_VECTOR, NULL_VECTOR);
 	DispatchKeyValue(iEffect, "effect_name", sEffect);
@@ -394,6 +401,7 @@ stock void CreateEffect(float fPos[3], const char[] sEffect, float fTime=1.0){
 	AcceptEntityInput(iEffect, "Start");
 
 	KillEntIn(iEffect, fTime);
+	return iEffect;
 }
 
 stock int CreateParticle(int iClient, char[] strParticle, bool bAttach=true, char[] strAttachmentPoint="", float fOffset[3]={0.0, 0.0, 36.0}){
@@ -513,6 +521,29 @@ stock int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int
 	AcceptEntityInput(iBeam, "Amplitude");
 	AcceptEntityInput(iBeam, "TurnOn");
 	return iBeam;
+}
+
+stock int AttachRotating(int client, int iEnt, float fDist=128.0, float fSpeed=100.0){
+	int iRot = CreateEntityByName("func_door_rotating");
+	if(iRot <= MaxClients) return 0;
+
+	float fPos[3];
+	GetClientAbsOrigin(client, fPos);
+	DispatchKeyValueVector(iRot, "origin", fPos);
+
+	fPos[0] += fDist;
+	DispatchKeyValueVector(iEnt, "origin", fPos);
+
+	DispatchKeyValue(iRot, "distance", "99999");
+	DispatchKeyValueFloat(iRot, "speed", fSpeed);
+	DispatchKeyValue(iRot, "spawnflags", "4104"); // passable|silent
+	DispatchSpawn(iRot);
+
+	Parent(iEnt, iRot);
+	Parent(iRot, client);
+	AcceptEntityInput(iRot, "Open");
+
+	return iRot;
 }
 
 
