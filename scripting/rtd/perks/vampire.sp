@@ -17,8 +17,11 @@
 */
 
 
-#define HEARTBEAT_NEXT_TICK 0.5 // TODO: adjust this to heartbeat
-#define SOUND_HEARTBEAT "ambient/voices/cough1.wav" // TODO: change this
+#define HEARTBEAT_NEXT_TICK 0.5
+#define HEARTBEAT_NEXT_STEP 0.12
+
+#define SOUND_HEARTBEAT_1 "player/taunt_yeti_chest_hit1.wav"
+#define SOUND_HEARTBEAT_2 "player/taunt_yeti_chest_hit7.wav"
 
 #define MIN_DAMAGE 0
 #define MAX_DAMAGE 1
@@ -28,7 +31,8 @@
 int g_iVampireId = 68;
 
 void Vampire_Start(){
-	PrecacheSound(SOUND_HEARTBEAT);
+	PrecacheSound(SOUND_HEARTBEAT_1);
+	PrecacheSound(SOUND_HEARTBEAT_2);
 }
 
 public void Vampire_Call(int client, Perk perk, bool apply){
@@ -57,11 +61,10 @@ public Action Timer_Vampire_Tick(Handle hTimer, int iUserId){
 	if(!CheckClientPerkCache(client, g_iVampireId))
 		return Plugin_Stop;
 
-	EmitSoundToAll(SOUND_HEARTBEAT, client);
-
 	if(GetFloatCache(client, NEXT_HURT) < GetGameTime()){
+		EmitSoundToAll(SOUND_HEARTBEAT_1, client);
 		Vampire_Hurt(client);
-		CreateTimer(0.25, Timer_Vampire_Tick2, iUserId);
+		CreateTimer(HEARTBEAT_NEXT_STEP, Timer_Vampire_Tick2, iUserId);
 	}
 
 	CreateTimer(HEARTBEAT_NEXT_TICK, Timer_Vampire_Tick, iUserId);
@@ -70,19 +73,22 @@ public Action Timer_Vampire_Tick(Handle hTimer, int iUserId){
 
 public Action Timer_Vampire_Tick2(Handle hTimer, int iUserId){
 	int client = GetClientOfUserId(iUserId);
-	if(client) Vampire_Hurt(client);
-	return Plugin_Handled;
+	if(!client) return Plugin_Stop;
+
+	EmitSoundToAll(SOUND_HEARTBEAT_2, client);
+	Vampire_Hurt(client);
+	return Plugin_Stop;
 }
 
 void Vampire_Hurt(int client){
 	float fDamage = GetRandomFloat(GetFloatCache(client), GetFloatCache(client, 1));
 	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_PREVENT_PHYSICS_FORCE);
-	ViewPunchRand(client, 15.0);
+	ViewPunchRand(client, 5.0);
 }
 
-void Vampire_PlayerHurt(Handle hEvent){
+void Vampire_PlayerHurt(int client, Handle hEvent){
 	int iAttacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
-	if(iAttacker && CheckClientPerkCache(iAttacker, g_iVampireId))
+	if(iAttacker && client != iAttacker && CheckClientPerkCache(iAttacker, g_iVampireId))
 		SetFloatCache(iAttacker, GetGameTime() +GetFloatCache(iAttacker, RESISTANCE), NEXT_HURT);
 }
 

@@ -141,7 +141,7 @@ void Forward_PlayerHurt(int client, Handle hEvent){
 	EyeForAnEye_PlayerHurt(hEvent);
 	DrugBullets_PlayerHurt(client, hEvent);
 	MercsDieTwice_PlayerHurt(client, hEvent);
-	Vampire_PlayerHurt(hEvent);
+	Vampire_PlayerHurt(client, hEvent);
 }
 
 
