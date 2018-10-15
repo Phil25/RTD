@@ -18,8 +18,10 @@
 
 #define HELL_HURT "ghost_appearation"
 #define HELL_GHOSTS "utaunt_hellpit_parent"
+
 #define SOUND_SLOWDOWN "ambient/halloween/windgust_12.wav"
 #define SOUND_LAUNCH "vo/halloween_boss/knight_attack01.mp3"
+#define SOUND_HELL_DAMAGE "player/fall_damage_dealt.wav"
 
 #define BASE_SPEED 0
 #define CUR_SPEED 1
@@ -31,6 +33,7 @@ int g_iHellsReachId = 66;
 void HellsReach_Start(){
 	PrecacheSound(SOUND_SLOWDOWN);
 	PrecacheSound(SOUND_LAUNCH);
+	PrecacheSound(SOUND_HELL_DAMAGE);
 }
 
 public void HellsReach_Call(int client, Perk perk, bool apply){
@@ -95,8 +98,10 @@ void HellsReach_Hurt(int client){
 	KILL_ENT_IN(iEnt,1.0)
 
 	float fDamage = GetRandomFloat(GetFloatCache(client, MIN_DAMAGE), GetFloatCache(client, MAX_DAMAGE));
-	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_ACID|DMG_PREVENT_PHYSICS_FORCE);
+	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_PREVENT_PHYSICS_FORCE);
+
 	ViewPunchRand(client, 100.0);
+	EmitSoundToAll(SOUND_HELL_DAMAGE, client);
 }
 
 void HellsReach_Launch(int client){
@@ -106,8 +111,9 @@ void HellsReach_Launch(int client){
 	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVel);
 
 	EmitSoundToAll(SOUND_LAUNCH, client, _, _, _, _, 50);
+	EmitSoundToAll(SOUND_HELL_DAMAGE, client);
+
 	TF2_IgnitePlayer(client, client);
-	HellsReach_Hurt(client);
 }
 
 #undef BASE_SPEED
