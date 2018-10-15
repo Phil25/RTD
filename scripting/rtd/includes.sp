@@ -100,3 +100,4 @@
 #include "rtd/perks/cursedprojectiles.sp"	//	67
 #include "rtd/perks/vampire.sp"				//	68
 #include "rtd/perks/batswarm.sp"			//	69
+#include "rtd/perks/pumpkintrail.sp"		//	70

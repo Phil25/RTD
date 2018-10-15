@@ -92,6 +92,7 @@ void Forward_Voice(int client){
 	HatThrow_Voice(client);
 	MadarasWhistle_Voice(client);
 	MercsDieTwice_Voice(client);
+	PumpkinTrail_Voice(client);
 }
 
 
