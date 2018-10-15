@@ -63,6 +63,7 @@ void Forward_OnMapStart(){
 	Sickness_Start();
 	MercsDieTwice_Start();
 	HellsReach_Start();
+	CursedProjectiles_Start();
 	Vampire_Start();
 }
 

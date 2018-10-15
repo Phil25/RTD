@@ -16,8 +16,14 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define CURSED_PROJECTILES_TRANSFORM "halloween_ghost_flash"
+#define SOUND_COURSE_PROJECTILE "misc/halloween/merasmus_disappear.wav"
 
 int g_iCursedProjectilesId = 67;
+
+void CursedProjectiles_Start(){
+	PrecacheSound(SOUND_COURSE_PROJECTILE);
+}
 
 public void CursedProjectiles_Call(int client, Perk perk, bool apply){
 	if(apply) CursedProjectiles_ApplyPerk(client, perk);
@@ -70,7 +76,10 @@ void CursedProjectiles_Turn(int iProjectile, int client){
 
 	KILL_ENT_IN(iProjectile,3.0)
 	Homing_Push(iProjectile, HOMING_SELF_ORIG);
-	CreateEffect(fPos, "explosion_trailSmoke_mvm");
+
+	CreateEffect(fPos, CURSED_PROJECTILES_TRANSFORM);
+	EmitSoundToAll(SOUND_COURSE_PROJECTILE, iProjectile);
+
 	SDKHook(iProjectile, SDKHook_StartTouchPost, CursedProjectiles_ProjectileTouch);
 }
 
