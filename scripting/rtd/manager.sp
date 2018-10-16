@@ -65,6 +65,7 @@ void Forward_OnMapStart(){
 	HellsReach_Start();
 	CursedProjectiles_Start();
 	Vampire_Start();
+	PumpkinTrail_Start();
 }
 
 

@@ -16,6 +16,11 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define SOUND_PUMPKIN_EXPLODE "weapons/cow_mangler_explode.wav"
+#define SOUND_PUMPKIN_SPAWN "misc/halloween/merasmus_appear.wav"
+#define MODEL_PUMPKIN "models/props_halloween/pumpkin_explode.mdl"
+#define PUMPKIN_DISTANCE 100.0
+
 // int cache
 #define SPAWN_INDEX 0
 #define SPAWN_LIMIT 1
@@ -27,6 +32,12 @@
 #define LAST_ATTACK 3
 
 int g_iPumpkinTrail = 70;
+
+void PumpkinTrail_Start(){
+	PrecacheModel(MODEL_PUMPKIN);
+	PrecacheSound(SOUND_PUMPKIN_EXPLODE);
+	PrecacheSound(SOUND_PUMPKIN_SPAWN);
+}
 
 public void PumpkinTrail_Call(int client, Perk perk, bool apply){
 	if(apply) PumpkinTrail_ApplyPerk(client, perk);
@@ -82,25 +93,57 @@ void PumpkinTrail_SpawnOffset(int client, int iSpawnIndex){
 	GetClientAbsAngles(client, fAng);
 	GetAngleVectors(fAng, fFwd, NULL_VECTOR, NULL_VECTOR);
 
-	float fRange = GetFloatCache(client, RANGE);
-	fPos[0] += fRange *fFwd[0] *iSpawnIndex;
-	fPos[1] += fRange *fFwd[1] *iSpawnIndex;
+	fPos[0] += PUMPKIN_DISTANCE *fFwd[0] *iSpawnIndex;
+	fPos[1] += PUMPKIN_DISTANCE *fFwd[1] *iSpawnIndex;
 
 	PumpkinTrail_Spawn(client, fPos);
 }
 
 void PumpkinTrail_Spawn(int client, float fPos[3]){
-	int iPumpkin = CreateEntityByName("tf_pumpkin_bomb");
+	int iPumpkin = CreateEntityByName("prop_dynamic");
 	if(iPumpkin <= MaxClients)
 		return;
 
-	DispatchSpawn(iPumpkin);
+	SetEntityModel(iPumpkin, MODEL_PUMPKIN);
 	TeleportEntity(iPumpkin, fPos, NULL_VECTOR, NULL_VECTOR);
+	DispatchSpawn(iPumpkin);
+
 	SetEntPropEnt(iPumpkin, Prop_Send, "m_hOwnerEntity", client);
 
-	SetVariantString("OnUser1 !self:Ignite::3:1"); \
-	AcceptEntityInput(iPumpkin, "AddOutput"); \
-	AcceptEntityInput(iPumpkin, "FireUser1");
+	if(!CanEntitySeeTarget(iPumpkin, client)){
+		AcceptEntityInput(iPumpkin, "Kill");
+		return;
+	}
+
+	EmitSoundToAll(SOUND_PUMPKIN_SPAWN, iPumpkin, _, _, _, _, 200);
+	CreateEffect(fPos, "ghost_appearation");
+
+	CreateTimer(1.0, Timer_PumpkinTrail_Detonate, EntIndexToEntRef(iPumpkin));
+	KILL_ENT_IN(iPumpkin,1.1)
+}
+
+public Action Timer_PumpkinTrail_Detonate(Handle hTimer, int iRef){
+	int iPumpkin = EntRefToEntIndex(iRef);
+	if(iPumpkin <= MaxClients)
+		return Plugin_Stop;
+
+	float fPos[3];
+	GetEntPropVector(iPumpkin, Prop_Send, "m_vecOrigin", fPos);
+	int client = GetEntPropEnt(iPumpkin, Prop_Send, "m_hOwnerEntity");
+
+	PumpkinTrail_Detonate(client, iPumpkin, fPos);
+	AcceptEntityInput(iPumpkin, "Kill");
+
+	return Plugin_Stop;
+}
+
+void PumpkinTrail_Detonate(int client, int iPumpkin, float fPos[3]){
+	CreateEffect(fPos, "ExplosionCore_MidAir");
+	EmitSoundToAll(SOUND_PUMPKIN_EXPLODE, iPumpkin, _, _, _, _, 200);
+
+	float fRange = GetFloatCache(client, RANGE);
+	float fDamage = GetFloatCache(client, DAMAGE);
+	DamageRadius(fPos, iPumpkin, client, fRange, fDamage);
 }
 
 #undef SPAWN_INDEX
