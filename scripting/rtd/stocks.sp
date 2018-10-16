@@ -91,6 +91,7 @@
 #define HOMING_SELF_ORIG (1 << 1) // original launcher's owner
 #define HOMING_ENEMIES (1 << 2) // enemies of owner
 #define HOMING_FRIENDLIES (1 << 3) // friendlies of owner
+#define HOMING_SMOOTH (1 << 4) // smooths the turning
 
 #define HOMING_SPEED_MULTIPLIER 0.5
 #define HOMING_AIRBLAST_MULTIPLIER 1.1
@@ -645,7 +646,7 @@ stock void Homing_OnGameFrame(){
 stock void Homing_Think(int iProjectile, int iRefProjectile, int iArrayIndex, int iCurrentTarget, int iFlags){
 	if(!Homing_IsValidTarget(iCurrentTarget, iProjectile, iFlags))
 		Homing_FindTarget(iProjectile, iRefProjectile, iArrayIndex, iFlags);
-	else Homing_TurnToTarget(iCurrentTarget, iProjectile);
+	else Homing_TurnToTarget(iCurrentTarget, iProjectile, view_as<bool>(iFlags & HOMING_SMOOTH));
 }
 
 stock bool Homing_IsValidTarget(int client, int iProjectile, int iFlags){
@@ -709,10 +710,10 @@ stock void Homing_FindTarget(int iProjectile, int iRefProjectile, int iArrayInde
 	g_hHoming.SetArray(iArrayIndex, iData);
 
 	if(iBestTarget)
-		Homing_TurnToTarget(iBestTarget, iProjectile);
+		Homing_TurnToTarget(iBestTarget, iProjectile, view_as<bool>(iFlags & HOMING_SMOOTH));
 }
 
-stock void Homing_TurnToTarget(int client, int iProjectile){
+stock void Homing_TurnToTarget(int client, int iProjectile, bool bSmooth=false){
 	float fTargetPos[3], fRocketPos[3], fInitialVelocity[3];
 	GetClientAbsOrigin(client, fTargetPos);
 	GetEntPropVector(iProjectile, Prop_Send, "m_vecOrigin", fRocketPos);
@@ -722,6 +723,7 @@ stock void Homing_TurnToTarget(int client, int iProjectile){
 	float fSpeedBase = fSpeedInit *HOMING_SPEED_MULTIPLIER;
 
 	fTargetPos[2] += 30 +Pow(GetVectorDistance(fTargetPos, fRocketPos), 2.0) /10000;
+	if(bSmooth) Homing_SmoothTurn(fTargetPos, fRocketPos, iProjectile);
 
 	float fNewVec[3], fAng[3];
 	SubtractVectors(fTargetPos, fRocketPos, fNewVec);
@@ -732,6 +734,20 @@ stock void Homing_TurnToTarget(int client, int iProjectile){
 
 	ScaleVector(fNewVec, fSpeedNew);
 	TeleportEntity(iProjectile, NULL_VECTOR, fAng, fNewVec);
+}
+
+stock void Homing_SmoothTurn(float fTargetPos[3], float fRocketPos[3], int iProjectile){
+	float fDist = GetVectorDistance(fRocketPos, fTargetPos);
+
+	float fAng[3], fFwd[3];
+	GetEntPropVector(iProjectile, Prop_Data, "m_angRotation", fAng);
+	GetAngleVectors(fAng, fFwd, NULL_VECTOR, NULL_VECTOR);
+
+	float fNewTargetPos[3];
+	for(int i = 0; i < 3; ++i){
+		fNewTargetPos[i] = fRocketPos[i] + fDist *fFwd[i];
+		fTargetPos[i] += (fNewTargetPos[i] -fTargetPos[i]) *0.925;
+	}
 }
 
 stock bool Homing_AptClass(const char[] sClass){
