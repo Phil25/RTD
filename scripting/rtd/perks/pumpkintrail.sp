@@ -31,7 +31,7 @@
 #define DAMAGE 2
 #define LAST_ATTACK 3
 
-int g_iPumpkinTrail = 70;
+int g_iPumpkinTrailId = 70;
 
 void PumpkinTrail_Start(){
 	PrecacheModel(MODEL_PUMPKIN);
@@ -41,12 +41,12 @@ void PumpkinTrail_Start(){
 
 public void PumpkinTrail_Call(int client, Perk perk, bool apply){
 	if(apply) PumpkinTrail_ApplyPerk(client, perk);
-	else UnsetClientPerkCache(client, g_iPumpkinTrail);
+	else UnsetClientPerkCache(client, g_iPumpkinTrailId);
 }
 
 public void PumpkinTrail_ApplyPerk(int client, Perk perk){
-	g_iPumpkinTrail = perk.Id;
-	SetClientPerkCache(client, g_iPumpkinTrail);
+	g_iPumpkinTrailId = perk.Id;
+	SetClientPerkCache(client, g_iPumpkinTrailId);
 
 	SetFloatCache(client, perk.GetPrefFloat("rate"), RATE);
 	SetFloatCache(client, perk.GetPrefFloat("range"), RANGE);
@@ -58,7 +58,7 @@ public void PumpkinTrail_ApplyPerk(int client, Perk perk){
 }
 
 void PumpkinTrail_Voice(int client){
-	if(!CheckClientPerkCache(client, g_iPumpkinTrail))
+	if(!CheckClientPerkCache(client, g_iPumpkinTrailId))
 		return;
 
 	float fTime = GetEngineTime();
@@ -75,7 +75,7 @@ public Action Timer_PumpkinTrail_Spawn(Handle hTimer, int iUserId){
 	int client = GetClientOfUserId(iUserId);
 	if(!client) return Plugin_Stop;
 
-	if(!CheckClientPerkCache(client, g_iPumpkinTrail))
+	if(!CheckClientPerkCache(client, g_iPumpkinTrailId))
 		return Plugin_Stop;
 
 	int iSpawnIndex = GetIntCache(client, SPAWN_INDEX);
