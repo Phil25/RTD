@@ -66,6 +66,7 @@ void Forward_OnMapStart(){
 	CursedProjectiles_Start();
 	Vampire_Start();
 	PumpkinTrail_Start();
+	ACallBeyond_Start();
 }
 
 
@@ -94,6 +95,7 @@ void Forward_Voice(int client){
 	MadarasWhistle_Voice(client);
 	MercsDieTwice_Voice(client);
 	PumpkinTrail_Voice(client);
+	ACallBeyond_Voice(client);
 }
 
 
