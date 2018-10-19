@@ -105,11 +105,15 @@
 */
 ArrayList g_hHoming = null;
 
+int g_iEnergyBallDamageOffset = -1;
+
 void Stocks_OnMapStart(){
 	PrecacheModel(LASERBEAM);
 
 	g_hHoming = new ArrayList(3);
 	HookEvent("teamplay_round_start", Event_Homing_RoundStart);
+
+	g_iEnergyBallDamageOffset = FindSendPropInfo("CTFProjectile_EnergyBall", "m_iDeflected") +4;
 }
 
 public Action Event_Homing_RoundStart(Handle hEvent, const char[] sName, bool bDontBroadcast){
@@ -746,7 +750,7 @@ stock void Homing_SmoothTurn(float fTargetPos[3], float fRocketPos[3], int iProj
 	float fNewTargetPos[3];
 	for(int i = 0; i < 3; ++i){
 		fNewTargetPos[i] = fRocketPos[i] + fDist *fFwd[i];
-		fTargetPos[i] += (fNewTargetPos[i] -fTargetPos[i]) *0.925;
+		fTargetPos[i] += (fNewTargetPos[i] -fTargetPos[i]) *0.96;
 	}
 }
 

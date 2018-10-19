@@ -16,16 +16,30 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define SOUND_CONJURE "misc/flame_engulf.wav"
+#define SOUND_ACALLBEYOND_CONJURE "misc/flame_engulf.wav"
+#define ACALLBEYOND_SIZE 70.0
 
+// float cache
 #define RATE 0
 #define DAMAGE 1
 #define LAST_ATTACK 2
 
+// int cache
+#define PROJECTILE_AMOUNT 0
+
+char g_sSoundAirStrikeFire[][] = {
+	"weapons/airstrike_fire_01.wav",
+	"weapons/airstrike_fire_02.wav",
+	"weapons/airstrike_fire_03.wav"
+};
+
 int g_iACallBeyondId = 71;
 
 void ACallBeyond_Start(){
-	PrecacheSound(SOUND_CONJURE);
+	PrecacheSound(SOUND_ACALLBEYOND_CONJURE);
+	PrecacheSound(g_sSoundAirStrikeFire[0]);
+	PrecacheSound(g_sSoundAirStrikeFire[1]);
+	PrecacheSound(g_sSoundAirStrikeFire[2]);
 }
 
 public void ACallBeyond_Call(int client, Perk perk, bool apply){
@@ -40,6 +54,7 @@ public void ACallBeyond_ApplyPerk(int client, Perk perk){
 	SetFloatCache(client, perk.GetPrefFloat("rate"), RATE);
 	SetFloatCache(client, perk.GetPrefFloat("damage"), DAMAGE);
 	SetFloatCache(client, 0.0, LAST_ATTACK);
+	SetIntCache(client, perk.GetPrefCell("amount"), PROJECTILE_AMOUNT);
 
 	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
 }
@@ -59,40 +74,56 @@ void ACallBeyond_Voice(int client){
 void ACallBeyond_SpawnMultiple(int client){
 	float fPos[3];
 	GetClientEyePosition(client, fPos);
-	fPos[2] += 100.0;
+	fPos[2] += 80.0;
 
-	CreateEffect(fPos, "ghost_smoke", 2.0);
-	EmitSoundToAll(SOUND_CONJURE, client, _, _, _, _, 50);
+	CreateEffect(fPos, "eyeboss_tp_vortex", 2.0);
+	EmitSoundToAll(SOUND_ACALLBEYOND_CONJURE, client, _, _, _, _, 50);
 
 	int iTeam = GetClientTeam(client);
-	ACallBeyond_Spawn(fPos, -1.0, -1.0, client, iTeam);
-	ACallBeyond_Spawn(fPos, 1.0, -1.0, client, iTeam);
-	ACallBeyond_Spawn(fPos, -1.0, 1.0, client, iTeam);
-	ACallBeyond_Spawn(fPos, 1.0, 1.0, client, iTeam);
+	float fDamage = GetFloatCache(client, DAMAGE);
+
+	int iAmount = GetIntCache(client, PROJECTILE_AMOUNT);
+	for(int i = 0; i < iAmount; ++i)
+		ACallBeyond_Spawn(fPos, client, iTeam, fDamage);
 }
 
-void ACallBeyond_Spawn(float fPos[3], float fX, float fY, int client, int iTeam){
-	int iSpell = CreateEntityByName("tf_projectile_spellfireball");
+void ACallBeyond_Spawn(float fOrigPos[3], int client, int iTeam, float fDamage){
+	int iSpell = CreateEntityByName("tf_projectile_energy_ball");
 	if(iSpell <= MaxClients)
 		return;
 
 	SetEntPropEnt(iSpell, Prop_Send, "m_hOwnerEntity", client);
 	SetEntProp(iSpell, Prop_Send, "m_iTeamNum", iTeam, 1);
 	SetEntProp(iSpell, Prop_Send, "m_nSkin", iTeam -2);
-	SetEntPropVector(iSpell, Prop_Send, "m_vInitialVelocity", view_as<float>({1100.0, 1100.0, 1100.0}));
+	SetEntPropVector(iSpell, Prop_Send, "m_vInitialVelocity", view_as<float>({600.0, 600.0, 600.0}));
+	SetEntDataFloat(iSpell, g_iEnergyBallDamageOffset, fDamage, true);
 
 	DispatchSpawn(iSpell);
 
-	fPos[0] += fX *100.0;
-	fPos[1] += fY *100.0;
-	TeleportEntity(iSpell, fPos, NULL_VECTOR, NULL_VECTOR);
-	fPos[0] -= fX *100.0;
-	fPos[1] -= fY *100.0;
+	float fPos[3], fAng[3];
+	fAng[0] = 270.0;
+	for(int i = 0; i < 3; ++i){
+		fPos[i] = fOrigPos[i] +GetRandomFloat(-ACALLBEYOND_SIZE, ACALLBEYOND_SIZE);
+		fAng[i] += GetRandomFloat(-60.0, 60.0);
+	}
 
-	Homing_Push(iSpell);
-	KILL_ENT_IN(iSpell,5.0)
+	TeleportEntity(iSpell, fPos, fAng, NULL_VECTOR);
+	CreateTimer(2.0, Timer_ACallBeyond_PushToHoming, EntIndexToEntRef(iSpell));
+	KILL_ENT_IN(iSpell,10.0)
+}
+
+public Action Timer_ACallBeyond_PushToHoming(Handle hTimer, int iRef){
+	int iSpell = EntRefToEntIndex(iRef);
+	if(iSpell <= MaxClients)
+		return Plugin_Stop;
+
+	EmitSoundToAll(g_sSoundAirStrikeFire[GetRandomInt(0, 2)], iSpell, _, _, _, _, 250);
+	TeleportEntity(iSpell, NULL_VECTOR, NULL_VECTOR, view_as<float>({0.0, 0.0, 100.0}));
+	Homing_Push(iSpell, HOMING_ENEMIES|HOMING_SMOOTH);
+	return Plugin_Stop;
 }
 
 #undef RATE
 #undef DAMAGE
 #undef LAST_ATTACK
+#undef PROJECTILE_AMOUNT
