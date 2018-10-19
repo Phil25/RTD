@@ -568,4 +568,20 @@
 		"de"	""
 	}
 
+	"RTD2_Desc_pumpkintrail"
+	{
+		"en"	"Spawn pumpkins in front of you."
+		"pl"	"Bądź władcą dyń."
+		"sv"	""
+		"de"	""
+	}
+
+	"RTD2_Desc_acallbeyond"
+	{
+		"en"	"Unleash hell from the nightmares."
+		"pl"	"Rozpętaj piekło z koszmarów."
+		"sv"	""
+		"de"	""
+	}
+
 }
