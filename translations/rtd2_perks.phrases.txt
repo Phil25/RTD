@@ -535,4 +535,53 @@
 		"sv"	""
 		"de"	""
 	}
+
+	"RTD2_Desc_hellsreach"
+	{
+		"en"	"Hell is something you can't escape."
+		"pl"	"Nie uciekniesz przed piekłem."
+		"sv"	""
+		"de"	""
+	}
+
+	"RTD2_Desc_cursedprojectiles"
+	{
+		"en"	"Cannot trust your own weapons."
+		"pl"	"Nie zaufasz swoim broniom."
+		"sv"	""
+		"de"	""
+	}
+
+	"RTD2_Desc_vampire"
+	{
+		"en"	"Loose health when not damaging enemies."
+		"pl"	"Tracisz zdrowie nie zadając obrażeń przeciwnikom."
+		"sv"	""
+		"de"	""
+	}
+
+	"RTD2_Desc_batswarm"
+	{
+		"en"	"Swarmed with bats defending you."
+		"pl"	"Nietoperze cię obraniają."
+		"sv"	""
+		"de"	""
+	}
+
+	"RTD2_Desc_pumpkintrail"
+	{
+		"en"	"Spawn pumpkins in front of you."
+		"pl"	"Bądź władcą dyń."
+		"sv"	""
+		"de"	""
+	}
+
+	"RTD2_Desc_acallbeyond"
+	{
+		"en"	"Unleash hell from the nightmares."
+		"pl"	"Rozpętaj piekło z koszmarów."
+		"sv"	""
+		"de"	""
+	}
+
 }

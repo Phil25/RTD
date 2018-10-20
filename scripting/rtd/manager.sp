@@ -45,7 +45,6 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 */
 void Forward_OnMapStart(){
 	InfiniteAmmo_Start();
-	HomingProjectiles_Start();
 	Timebomb_Start();
 	Drugged_Start();
 	Blind_Start();
@@ -63,6 +62,11 @@ void Forward_OnMapStart(){
 	MadarasWhistle_Start();
 	Sickness_Start();
 	MercsDieTwice_Start();
+	HellsReach_Start();
+	CursedProjectiles_Start();
+	Vampire_Start();
+	PumpkinTrail_Start();
+	ACallBeyond_Start();
 }
 
 
@@ -90,6 +94,8 @@ void Forward_Voice(int client){
 	HatThrow_Voice(client);
 	MadarasWhistle_Voice(client);
 	MercsDieTwice_Voice(client);
+	PumpkinTrail_Voice(client);
+	ACallBeyond_Voice(client);
 }
 
 
@@ -116,6 +122,7 @@ void Forward_OnEntityCreated(int iEntity, const char[] sClassname){
 	FastHands_OnEntityCreated(iEntity, sClassname);
 	ExplosiveArrows_OnEntityCreated(iEntity, sClassname);
 	LongMelee_OnEntityCreated(iEntity, sClassname);
+	CursedProjectiles_OnEntityCreated(iEntity, sClassname);
 }
 
 
@@ -139,6 +146,7 @@ void Forward_PlayerHurt(int client, Handle hEvent){
 	EyeForAnEye_PlayerHurt(hEvent);
 	DrugBullets_PlayerHurt(client, hEvent);
 	MercsDieTwice_PlayerHurt(client, hEvent);
+	Vampire_PlayerHurt(client, hEvent);
 }
 
 
@@ -147,7 +155,6 @@ void Forward_PlayerHurt(int client, Handle hEvent){
 	• It's a forward of OnGameFrame() from rtd.sp
 */
 void Forward_OnGameFrame(){
-	HomingProjectiles_OnGameFrame();
 }
 
 

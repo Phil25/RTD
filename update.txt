@@ -4,8 +4,8 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.1.0"
-			"Previous"	"2.0.0"
+			"Latest"	"2.2.0"
+			"Previous"	"2.1.0"
 		}
 
 		"Notes"	"View changelog at https://github.com/Phil25/RTD/wiki/changelog"
@@ -23,14 +23,15 @@
 			"Source"	"Path_SM/scripting/rtd.sp"
 			"Source"	"Path_SM/scripting/rtd/includes.sp"
 			"Source"	"Path_SM/scripting/rtd/manager.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/godmode.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/deadlyvoice.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/frozen.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/invisibility.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/longmelee.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/madaraswhistle.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/mercsdietwice.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/drunkwalk.sp"
+			"Source"	"Path_SM/scripting/rtd/stocks.sp"
+
+			"Source"	"Path_SM/scripting/rtd/perks/homingprojectiles.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/hellsreach.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/cursedprojectiles.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/vampire.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/batswarm.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/pumpkintrail.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/acallbeyond.sp"
 		}
 
 		"Plugin"	"Path_SM/plugins/rtd.smx"
@@ -46,6 +47,7 @@
 		"Source"	"Path_SM/scripting/rtd/manager.sp"
 		"Source"	"Path_SM/scripting/rtd/natives.sp"
 		"Source"	"Path_SM/scripting/rtd/parsing.sp"
+		"Source"	"Path_SM/scripting/rtd/stocks.sp"
 
 		"Source"	"Path_SM/scripting/rtd/classes/containers.sp"
 		"Source"	"Path_SM/scripting/rtd/classes/iterators.sp"
@@ -118,5 +120,11 @@
 		"Source"	"Path_SM/scripting/rtd/perks/wastedroll.sp"
 		"Source"	"Path_SM/scripting/rtd/perks/mercsdietwice.sp"
 		"Source"	"Path_SM/scripting/rtd/perks/drunkwalk.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/hellsreach.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/cursedprojectiles.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/vampire.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/batswarm.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/pumpkintrail.sp"
+		"Source"	"Path_SM/scripting/rtd/perks/acallbeyond.sp"
 	}
 }
