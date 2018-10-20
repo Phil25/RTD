@@ -20,9 +20,9 @@
 /****** M A C R O S *****/
 
 #define KILL_ENT_IN(%1,%2) \
-SetVariantString("OnUser1 !self:Kill::" ... #%2 ... ":1"); \
-AcceptEntityInput(%1, "AddOutput"); \
-AcceptEntityInput(%1, "FireUser1");
+	SetVariantString("OnUser1 !self:Kill::" ... #%2 ... ":1"); \
+	AcceptEntityInput(%1, "AddOutput"); \
+	AcceptEntityInput(%1, "FireUser1");
 
 
 /****** I N C L U D E S *****/
@@ -321,9 +321,10 @@ public void OnPluginStart(){
 	g_hRollers = new Rollers();
 	g_hPerkHistory = new PerkList();
 
-	for(int i = 1; i <= MaxClients; i++)
+	for(int i = 1; i <= MaxClients; i++) {
 		if(IsClientInGame(i))
-		OnClientPutInServer(i);
+			OnClientPutInServer(i);
+	}
 }
 
 public void OnConfigsExecuted(){
@@ -1025,9 +1026,10 @@ void RollPerkForClient(int client){
 		case 2:{
 			int iCount = 0, iTeam = GetClientTeam(client);
 			for(int i = 1; i <= MaxClients; i++){
-				if(g_hRollers.GetInRoll(i))
+				if(g_hRollers.GetInRoll(i)) {
 					if(GetClientTeam(i) == iTeam)
-					iCount++;
+						iCount++;
+				}
 			}
 
 			if(iCount >= g_iCvarTeamLimit){
@@ -1115,14 +1117,16 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 	PerkIter iter = new PerkListIter(candidates, -1);
 
 	if(bFilter){
-		while((perk = (++iter).Perk()))
+		while((perk = (++iter).Perk())) {
 			if(perk.IsAptForSetupOf(client, iRollFlags))
-			list.Push(perk);
+				list.Push(perk);
+		}
 	}else{
 		bool bBeGood = GoodRoll(client);
-		while((perk = (++iter).Perk()))
+		while((perk = (++iter).Perk())) {
 			if(perk.Good == bBeGood && perk.IsAptFor(client, iRollFlags))
-			list.Push(perk);
+				list.Push(perk);
+		}
 	}
 
 	delete iter;
@@ -1435,13 +1439,15 @@ void RTDPrintAllExcept(int client, char[] sFormat, any ...){
 	VFormat(sMsg, 255, sFormat, 3);
 	int i = 0;
 
-	while(++i < client)
+	while(++i < client) {
 		if(IsClientInGame(i))
-		PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
+			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
+	}
 
-	while(++i <= MaxClients)
+	while(++i <= MaxClients) {
 		if(IsClientInGame(i))
-		PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
+			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
+	}
 }
 
 void DisplayPerkTimeFrame(client){
@@ -1464,9 +1470,10 @@ int GetPerkTime(Perk perk){
 }
 
 void RemovePerkFromClients(Perk perk){
-	for(int i = 1; i <= MaxClients; ++i)
+	for(int i = 1; i <= MaxClients; ++i) {
 		if(IsClientInGame(i) && g_hRollers.GetPerk(i) == perk)
-		ForceRemovePerk(i);
+			ForceRemovePerk(i);
+	}
 }
 
 void DisableModulePerks(Handle hPlugin){
@@ -1544,12 +1551,12 @@ bool IsPlayerFriendly(int client){
 #if defined _friendly_included
 	if(g_bPluginFriendly)
 		if(TF2Friendly_IsFriendly(client))
-			return true;
+		return true;
 #endif
 #if defined _friendlysimple_included
 	if(g_bPluginFriendlySimple)
 		if(FriendlySimple_IsFriendly(client))
-			return true;
+		return true;
 #endif
 
 	return false;
@@ -1570,17 +1577,18 @@ bool IsRTDInRound(){
 }
 
 bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
-	if(IsValidClient(by))
+	if(IsValidClient(by)) {
 		if(GetClientTeam(by) == GetClientTeam(client)){
-		if(client != by || !bCanHurtSelf)
-			return false;
+			if(client != by || !bCanHurtSelf)
+				return false;
+		}
 	}
 
 	if(IsPlayerFriendly(client))
 		return false;
 
 	if(TF2_IsPlayerInCondition(client, TFCond_Ubercharged)
-			|| TF2_IsPlayerInCondition(client, TFCond_UberchargedCanteen))
+	|| TF2_IsPlayerInCondition(client, TFCond_UberchargedCanteen))
 		return false;
 
 	if(GetEntProp(client, Prop_Data, "m_takedamage") != 2)
