@@ -20,9 +20,9 @@
 /****** M A C R O S *****/
 
 #define KILL_ENT_IN(%1,%2) \
-	SetVariantString("OnUser1 !self:Kill::" ... #%2 ... ":1"); \
-	AcceptEntityInput(%1, "AddOutput"); \
-	AcceptEntityInput(%1, "FireUser1");
+SetVariantString("OnUser1 !self:Kill::" ... #%2 ... ":1"); \
+AcceptEntityInput(%1, "AddOutput"); \
+AcceptEntityInput(%1, "FireUser1");
 
 
 /****** I N C L U D E S *****/
@@ -34,9 +34,9 @@
 #include <tf2attributes>
 
 #undef REQUIRE_PLUGIN
-#include <updater>
-#include <friendly>
-#include <friendlysimple>
+#tryinclude <updater>
+#tryinclude <friendly>
+#tryinclude <friendlysimple>
 
 #include "rtd/stocks.sp"
 #include "rtd/includes.sp"
@@ -62,7 +62,9 @@
 #define FLAG_FEIGNDEATH	(1 << 5)
 #define FLAGS_CVARS		FCVAR_NOTIFY
 
+#if defined _updater_included
 #define UPDATE_URL		"https://phil25.github.io/RTD/update.txt"
+#endif
 
 
 
@@ -81,9 +83,15 @@ Rollers g_hRollers = null;
 
 char	g_sTeamColors[][]		= {"\x07B2B2B2", "\x07B2B2B2", "\x07FF4040", "\x0799CCFF"};
 
+#if defined _updater_included
 bool	g_bPluginUpdater		= false;
+#endif
+#if defined _friendly_included
 bool	g_bPluginFriendly		= false;
+#endif
+#if defined _friendlysimple_included
 bool	g_bPluginFriendlySimple	= false;
+#endif
 
 bool	g_bIsRegisteringOpen	= false;
 bool	g_bIsUpdateForced		= false;
@@ -315,7 +323,7 @@ public void OnPluginStart(){
 
 	for(int i = 1; i <= MaxClients; i++)
 		if(IsClientInGame(i))
-			OnClientPutInServer(i);
+		OnClientPutInServer(i);
 }
 
 public void OnConfigsExecuted(){
@@ -378,36 +386,60 @@ public void OnClientDisconnect(int client){
 }
 
 public void OnAllPluginsLoaded(){
+#if defined _updater_included
 	g_bPluginUpdater		= LibraryExists("updater");
-	g_bPluginFriendly		= LibraryExists("[TF2] Friendly Mode");
-	g_bPluginFriendlySimple	= LibraryExists("Friendly Simple");
-
 	if(g_bPluginUpdater)
 		Updater_AddPlugin(UPDATE_URL);
+#endif
+#if defined _friendly_included
+	g_bPluginFriendly		= LibraryExists("[TF2] Friendly Mode");
+#endif
+#if defined _friendlysimple_included
+	g_bPluginFriendlySimple	= LibraryExists("Friendly Simple");
+#endif
 }
 
 public void OnLibraryAdded(const char[] sLibName){
+#if defined _updater_included
 	if(StrEqual(sLibName, "updater")){
 		g_bPluginUpdater = true;
 		Updater_AddPlugin(UPDATE_URL);
+		return;
 	}
-
-	else if(StrEqual(sLibName, "[TF2] Friendly Mode"))
+#endif
+#if defined _friendly_included
+	if(StrEqual(sLibName, "[TF2] Friendly Mode")) {
 		g_bPluginFriendly = true;
-
-	else if(StrEqual(sLibName, "Friendly Simple"))
+		return;
+	}
+#endif
+#if defined _friendlysimple_included
+	if(StrEqual(sLibName, "Friendly Simple")) {
 		g_bPluginFriendlySimple = true;
+		return;
+	}
+#endif
 }
 
 public void OnLibraryRemoved(const char[] sLibName){
-	if(StrEqual(sLibName, "updater"))
+#if defined _updater_included
+	if(StrEqual(sLibName, "updater")){
 		g_bPluginUpdater = false;
-
-	else if(StrEqual(sLibName, "[TF2] Friendly Mode"))
+		return;
+	}
+#endif
+#if defined _friendly_included
+	if(StrEqual(sLibName, "[TF2] Friendly Mode")) {
 		g_bPluginFriendly = false;
-
-	else if(StrEqual(sLibName, "Friendly Simple"))
+		return;
+	}
+#endif
+#if defined _friendlysimple_included
+	if(StrEqual(sLibName, "Friendly Simple")) {
 		g_bPluginFriendlySimple = false;
+		return;
+	}
+#endif
 }
 
 
@@ -415,7 +447,7 @@ public void OnLibraryRemoved(const char[] sLibName){
 			//*************************//
 			//----  U P D A T E R  ----//
 			//*************************//
-
+#if defined _updater_included
 public Action Updater_OnPluginChecking(){
 	if(!g_bCvarAutoUpdate && !g_bIsUpdateForced)
 		return Plugin_Handled;
@@ -424,10 +456,11 @@ public Action Updater_OnPluginChecking(){
 	return Plugin_Continue;
 }
 
-public int Updater_OnPluginUpdated(){
+public void Updater_OnPluginUpdated(){
 	if(g_bCvarReloadUpdate)
 		ReloadPlugin();
 }
+#endif
 
 
 
@@ -994,7 +1027,7 @@ void RollPerkForClient(int client){
 			for(int i = 1; i <= MaxClients; i++){
 				if(g_hRollers.GetInRoll(i))
 					if(GetClientTeam(i) == iTeam)
-						iCount++;
+					iCount++;
 			}
 
 			if(iCount >= g_iCvarTeamLimit){
@@ -1084,12 +1117,12 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 	if(bFilter){
 		while((perk = (++iter).Perk()))
 			if(perk.IsAptForSetupOf(client, iRollFlags))
-				list.Push(perk);
+			list.Push(perk);
 	}else{
 		bool bBeGood = GoodRoll(client);
 		while((perk = (++iter).Perk()))
 			if(perk.Good == bBeGood && perk.IsAptFor(client, iRollFlags))
-				list.Push(perk);
+			list.Push(perk);
 	}
 
 	delete iter;
@@ -1137,13 +1170,13 @@ Menu BuildDesc(){
 	Menu hMenu = new Menu(ManagerDesc);
 	hMenu.SetTitle("%T", "RTD2_Menu_Title", LANG_SERVER);
 
-	char sPerkName[MAX_NAME_LENGTH], sPerkToken[32];
+	char sPerkName[RTD2_MAX_PERK_NAME_LENGTH], sPerkToken[32];
 	PerkIter iter = new PerkContainerIter(-1);
 	Perk perk = null;
 
 	while((perk = (++iter).Perk())){
 		perk.GetToken(sPerkToken, 32);
-		perk.GetName(sPerkName, MAX_NAME_LENGTH);
+		perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
 		hMenu.AddItem(sPerkToken, sPerkName);
 	}
 
@@ -1166,17 +1199,17 @@ public int ManagerDesc(Menu hMenu, MenuAction maState, int client, int iPos){
 		return 0;
 
 	Perk perk = null;
-	char sPerkToken[32], sPerkName[MAX_NAME_LENGTH], sTranslate[64];
+	char sPerkToken[32], sPerkName[RTD2_MAX_PERK_NAME_LENGTH], sTranslate[64];
 
 	hMenu.GetItem(iPos, sPerkToken, 32);
 	perk = g_hPerkContainer.Get(sPerkToken);
-	perk.GetName(sPerkName, MAX_NAME_LENGTH);
+	perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
 	FormatEx(sTranslate, 64, "RTD2_Desc_%s", sPerkToken);
 
 	RTDPrint(client, "%s%s%c: \x03%T\x01",
-		perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-		sPerkName, 0x01,
-		sTranslate, LANG_SERVER);
+			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			sPerkName, 0x01,
+			sTranslate, LANG_SERVER);
 
 	ShowDesc(client, iPos);
 	return 1;
@@ -1236,8 +1269,8 @@ void PrintToRoller(int client, Perk perk, int iDuration){
 	if(!(g_iCvarChat & CHAT_APPROLLER))
 		return;
 
-	char sPerkName[MAX_NAME_LENGTH];
-	perk.GetName(sPerkName, MAX_NAME_LENGTH);
+	char sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
+	perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
 
 	if(!g_bCvarShowTime || perk.Time == -1)
 		RTDPrint(client, "%T",
@@ -1248,10 +1281,10 @@ void PrintToRoller(int client, Perk perk, int iDuration){
 	else{
 		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		RTDPrint(client, "%T",
-			"RTD2_Rolled_Perk_Roller_Time", LANG_SERVER,
-			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			sPerkName,
-			0x01, 0x03, iTrueDuration, 0x01);
+				"RTD2_Rolled_Perk_Roller_Time", LANG_SERVER,
+				perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+				sPerkName,
+				0x01, 0x03, iTrueDuration, 0x01);
 	}
 }
 
@@ -1259,9 +1292,9 @@ void PrintToNonRollers(int client, Perk perk, int iDuration){
 	if(!(g_iCvarChat & CHAT_APPOTHER))
 		return;
 
-	char sRollerName[MAX_NAME_LENGTH], sPerkName[MAX_NAME_LENGTH];
+	char sRollerName[MAX_NAME_LENGTH], sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
 	GetClientName(client, sRollerName, sizeof(sRollerName));
-	perk.GetName(sPerkName, MAX_NAME_LENGTH);
+	perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
 
 	if(!g_bCvarShowTime || perk.Time == -1)
 		RTDPrintAllExcept(client, "%T",
@@ -1274,12 +1307,12 @@ void PrintToNonRollers(int client, Perk perk, int iDuration){
 	else{
 		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		RTDPrintAllExcept(client, "%T",
-			"RTD2_Rolled_Perk_Others_Time", LANG_SERVER,
-			g_sTeamColors[GetClientTeam(client)],
-			sRollerName,
-			0x01,
-			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			sPerkName, 0x01, 0x03, iTrueDuration, 0x01);
+				"RTD2_Rolled_Perk_Others_Time", LANG_SERVER,
+				g_sTeamColors[GetClientTeam(client)],
+				sRollerName,
+				0x01,
+				perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+				sPerkName, 0x01, 0x03, iTrueDuration, 0x01);
 	}
 }
 
@@ -1404,11 +1437,11 @@ void RTDPrintAllExcept(int client, char[] sFormat, any ...){
 
 	while(++i < client)
 		if(IsClientInGame(i))
-			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
+		PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
 
 	while(++i <= MaxClients)
 		if(IsClientInGame(i))
-			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
+		PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
 }
 
 void DisplayPerkTimeFrame(client){
@@ -1417,8 +1450,8 @@ void DisplayPerkTimeFrame(client){
 	int iBlue	= (iTeam == 3) ? 255 : 32;
 
 	SetHudTextParams(g_fCvarTimerPosX, g_fCvarTimerPosY, 1.0, iRed, 32, iBlue, 255);
-	char sPerkName[MAX_NAME_LENGTH];
-	g_hRollers.GetPerk(client).GetName(sPerkName, MAX_NAME_LENGTH);
+	char sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
+	g_hRollers.GetPerk(client).GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
 	ShowSyncHudText(client, g_hRollers.GetHud(client), "%s: %d", sPerkName, g_hRollers.GetEndRollTime(client) -GetTime());
 }
 
@@ -1433,7 +1466,7 @@ int GetPerkTime(Perk perk){
 void RemovePerkFromClients(Perk perk){
 	for(int i = 1; i <= MaxClients; ++i)
 		if(IsClientInGame(i) && g_hRollers.GetPerk(i) == perk)
-			ForceRemovePerk(i);
+		ForceRemovePerk(i);
 }
 
 void DisableModulePerks(Handle hPlugin){
@@ -1508,13 +1541,16 @@ bool IsRollerDonator(int client){
 }
 
 bool IsPlayerFriendly(int client){
+#if defined _friendly_included
 	if(g_bPluginFriendly)
 		if(TF2Friendly_IsFriendly(client))
 			return true;
-
+#endif
+#if defined _friendlysimple_included
 	if(g_bPluginFriendlySimple)
 		if(FriendlySimple_IsFriendly(client))
 			return true;
+#endif
 
 	return false;
 }
@@ -1536,15 +1572,15 @@ bool IsRTDInRound(){
 bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
 	if(IsValidClient(by))
 		if(GetClientTeam(by) == GetClientTeam(client)){
-			if(client != by || !bCanHurtSelf)
-				return false;
-		}
+		if(client != by || !bCanHurtSelf)
+			return false;
+	}
 
 	if(IsPlayerFriendly(client))
 		return false;
 
 	if(TF2_IsPlayerInCondition(client, TFCond_Ubercharged)
-	|| TF2_IsPlayerInCondition(client, TFCond_UberchargedCanteen))
+			|| TF2_IsPlayerInCondition(client, TFCond_UberchargedCanteen))
 		return false;
 
 	if(GetEntProp(client, Prop_Data, "m_takedamage") != 2)
