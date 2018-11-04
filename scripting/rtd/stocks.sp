@@ -58,6 +58,7 @@
 * - CreateParticle
 * - CreateRagdoll
 * - CreateExplosion
+* - CreateTesla
 * - ConnectWithBeam
 * - AttachRotating
 *
@@ -492,6 +493,33 @@ stock void CreateExplosion(float fPos[3], float fDamage=100.0, float fRadius=80.
 	TeleportEntity(iExplosion, fPos, NULL_VECTOR, NULL_VECTOR);
 	AcceptEntityInput(iExplosion, "Explode");
 	AcceptEntityInput(iExplosion, "Kill");
+}
+
+stock int CreateTesla(float fPos[3]){
+	int iTesla = CreateEntityByName("point_tesla");
+	if(iTesla <= MaxClients || !IsValidEntity(iTesla))
+		return 0;
+
+	TeleportEntity(iTesla, fPos, NULL_VECTOR, NULL_VECTOR);
+
+	DispatchKeyValue(iTesla, "m_flRadius", "150.0");
+	DispatchKeyValue(iTesla, "m_SoundName", "DoSpark");
+	DispatchKeyValue(iTesla, "beamcount_min", "2");
+	DispatchKeyValue(iTesla, "beamcount_max", "4");
+	DispatchKeyValue(iTesla, "texture", "sprites/physbeam.vmt");
+	DispatchKeyValue(iTesla, "m_Color", "255 255 255");
+	DispatchKeyValue(iTesla, "thick_min", "5.0");
+	DispatchKeyValue(iTesla, "thick_max", "11.0");
+	DispatchKeyValue(iTesla, "lifetime_min", "0.3");
+	DispatchKeyValue(iTesla, "lifetime_max", "2");
+	DispatchKeyValue(iTesla, "interval_min", "0.1");
+	DispatchKeyValue(iTesla, "interval_max", "0.2");
+
+	ActivateEntity(iTesla);
+	DispatchSpawn(iTesla);
+	AcceptEntityInput(iTesla, "TurnOn");
+
+	return iTesla;
 }
 
 stock int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int iBlue=255, float fStartWidth=1.0, float fEndWidth=1.0, float fAmp=1.35){

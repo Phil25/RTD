@@ -28,12 +28,22 @@ bool g_bPause = false;
 Handle g_hTimer = null
 
 public void OnPluginStart(){
-	RegAdminCmd("sm_rtdstress", Command_Stress, 0);
-	ServerCommand("tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add;tf_bot_add");
-
+	RegAdminCmd("sm_test", Command_TestRTD, 0, "blah");
 	for(int i = 1; i <= MaxClients; ++i)
 		if(IsClientInGame(i))
 			OnClientPutInServer(i);
+}
+
+public Action Command_TestRTD(int client, int args){
+	if(!client) return Plugin_Handled;
+	if(args < 1) return Plugin_Handled;
+
+	char sPerk[64];
+	GetCmdArg(1, sPerk, 64);
+	if(StrContains(sPerk, ";") == -1)
+		ServerCommand("sm_forcertd #%d %s", GetClientUserId(client), sPerk);
+	
+	return Plugin_Handled;
 }
 
 public Action Command_Stress(int client, int args){

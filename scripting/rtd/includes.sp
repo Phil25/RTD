@@ -102,3 +102,4 @@
 #include "rtd/perks/batswarm.sp"			//	69
 #include "rtd/perks/pumpkintrail.sp"		//	70
 #include "rtd/perks/acallbeyond.sp"			//	71
+#include "rtd/perks/smite.sp"				//	72
