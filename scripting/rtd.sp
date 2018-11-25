@@ -163,6 +163,9 @@ Handle g_hCvarTimerPosX;			float g_fCvarTimerPosX = -1.0;
 Handle g_hCvarTimerPosY;			float g_fCvarTimerPosY = 0.55;
 #define DESC_TIMER_POS_Y "0.0-1.0 - The Y position of the perk HUD timer display. -1.0 to center."
 
+ConVar g_hCvarPerkDesc;
+#define DESC_PERK_DESC "Show perk description to roller after applying effect"
+
 
 
 /***** F O R W A R D S ****/
@@ -250,6 +253,8 @@ public void OnPluginStart(){
 
 	g_hCvarTimerPosX			= CreateConVar("sm_rtd2_timerpos_x",	"-1.0",		DESC_TIMER_POS_X,			FLAGS_CVARS);
 	g_hCvarTimerPosY			= CreateConVar("sm_rtd2_timerpos_y",	"0.55",		DESC_TIMER_POS_Y,			FLAGS_CVARS);
+
+	g_hCvarPerkDesc =			= CreateConVar("sm_rtd2_perk_description", "1",		DESC_PERK_DESC,			FLAGS_CVARS, true, 0.0, true, 1.0);
 
 
 		//-----[ ConVars Hooking & Setting ]-----//
@@ -1282,13 +1287,19 @@ void PrintToRoller(int client, Perk perk, int iDuration){
 			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
 			0x01);
-	else{
+	else {
 		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		RTDPrint(client, "%T",
 				"RTD2_Rolled_Perk_Roller_Time", LANG_SERVER,
 				perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 				sPerkName,
 				0x01, 0x03, iTrueDuration, 0x01);
+	}
+	if (g_hCvarPerkDesc.BoolValue) {
+		char sPerkToken[32], sPerkDesc[64];
+		perk.GetToken(sPerkToken, sizeof(sPerkToken));
+		FormatEx(sPerkDesc, sizeof(sPerkDesc), "RTD2_Desc_%s", sPerkToken);
+		RTDPrint(client, "%T", sPerkDesc, LANG_SERVER);
 	}
 }
 
