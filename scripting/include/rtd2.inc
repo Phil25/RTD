@@ -3,18 +3,18 @@
 #endif
 #define _rtd2_included
 
-public SharedPlugin:__pl_rtd2 = {
+public SharedPlugin __pl_rtd2 = {
 	name = "RollTheDice2",
 	file = "rtd2.smx",
 #if defined REQUIRE_PLUGIN
-	required = 1,
+	required = 1
 #else
-	required = 0,
+	required = 0
 #endif
 };
 
 #if !defined REQUIRE_PLUGIN
-public __pl_rtd2_SetNTVOptional(){
+public void __pl_rtd2_SetNTVOptional(){
 	MarkNativeAsOptional("RTD2_GetPerkAny");
 	MarkNativeAsOptional("RTD2_SetPerkAny");
 	MarkNativeAsOptional("RTD2_GetPerkString");
@@ -73,6 +73,7 @@ public __pl_rtd2_SetNTVOptional(){
 #define ROLLFLAG_IGNORE_PERK_REPEATS	(1 << 3)	/* Ignore whether the perk was rolled recently */
 #define ROLLFLAG_IGNORE_PLAYER_REPEATS	(1 << 4)	/* Ignore whether the client has rolled the perk recently */
 
+#define RTD2_MAX_PERK_NAME_LENGTH		(MAX_NAME_LENGTH * 2)
 
 
 /*
