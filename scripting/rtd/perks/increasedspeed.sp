@@ -17,32 +17,17 @@
 */
 
 
-#define ATTRIB_SPEED 107 //the player speed attribute
-
 public void IncreasedSpeed_Call(int client, Perk perk, bool apply){
 	if(apply) IncreasedSpeed_ApplyPerk(client, perk);
 	else IncreasedSpeed_RemovePerk(client);
 }
 
 void IncreasedSpeed_ApplyPerk(int client, Perk perk){
-	float fValue = perk.GetPrefFloat("multiplier");
-	float fBaseSpeed = 300.0;
-
-	TFClassType class = TF2_GetPlayerClass(client);
-	switch(class){
-		case TFClass_Scout:		fBaseSpeed = 400.0;
-		case TFClass_Soldier:	fBaseSpeed = 240.0;
-		case TFClass_DemoMan:	fBaseSpeed = 280.0;
-		case TFClass_Heavy:		fBaseSpeed = 230.0;
-		case TFClass_Medic:		fBaseSpeed = 320.0;
-	}
-	SetFloatCache(client, fBaseSpeed);
-
-	TF2Attrib_SetByDefIndex(client, ATTRIB_SPEED, fValue);
-	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBaseSpeed*fValue);
+	float fBase = GetBaseSpeed(client);
+	SetFloatCache(client, fBase);
+	SetSpeed(client, fBase, perk.GetPrefFloat("multiplier"));
 }
 
 void IncreasedSpeed_RemovePerk(int client){
-	TF2Attrib_RemoveByDefIndex(client, ATTRIB_SPEED);
-	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", GetFloatCache(client));
+	SetSpeed(client, GetFloatCache(client));
 }

@@ -17,32 +17,17 @@
 */
 
 
-#define ATTRIB_SPEED 107 //the player speed attribute
-
 public void Snail_Call(int client, Perk perk, bool apply){
 	if(apply) Snail_ApplyPerk(client, perk);
 	else Snail_RemovePerk(client);
 }
 
 void Snail_ApplyPerk(int client, Perk perk){
-	float fMultp = perk.GetPrefFloat("multiplier");
-	float fBaseSpeed = 300.0;
-	TFClassType class = TF2_GetPlayerClass(client);
-
-	switch(class){
-		case TFClass_Scout:		fBaseSpeed = 400.0;
-		case TFClass_Soldier:	fBaseSpeed = 240.0;
-		case TFClass_DemoMan:	fBaseSpeed = 280.0;
-		case TFClass_Heavy:		fBaseSpeed = 230.0;
-		case TFClass_Medic:		fBaseSpeed = 320.0;
-	}
-
-	TF2Attrib_SetByDefIndex(client, ATTRIB_SPEED, fMultp);
-	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBaseSpeed*fMultp);
-	SetFloatCache(client, fBaseSpeed);
+	float fBase = GetBaseSpeed(client);
+	SetFloatCache(client, fBase);
+	SetSpeed(client, fBase, perk.GetPrefFloat("multiplier"));
 }
 
 void Snail_RemovePerk(int client){
-	TF2Attrib_RemoveByDefIndex(client, ATTRIB_SPEED);
-	SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", GetFloatCache(client));
+	SetSpeed(client, GetFloatCache(client));
 }
