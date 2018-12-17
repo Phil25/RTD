@@ -20,8 +20,8 @@
 #define MINICRIT TFCond_Buffed
 #define FULLCRIT TFCond_CritOnFirstBlood
 
-int g_iCritBoostsGetting[33] = {0, ...};
-int g_iCritBoostEnt[33][33];
+int g_iCritBoostsGetting[MAXPLAYERS+1] = {0, ...};
+int g_iCritBoostEnt[MAXPLAYERS+1][MAXPLAYERS+1];
 int g_iTeamCriticalsId = 47;
 
 public void TeamCriticals_Call(int client, Perk perk, bool apply){
