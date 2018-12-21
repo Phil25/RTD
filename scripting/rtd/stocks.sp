@@ -107,6 +107,7 @@
 ArrayList g_hHoming = null;
 
 int g_iEnergyBallDamageOffset = -1;
+int g_iWaterLevel[MAXPLAYERS +1] = {0, ...};
 
 void Stocks_OnMapStart(){
 	PrecacheModel(LASERBEAM);
@@ -599,13 +600,34 @@ stock float GetBaseSpeed(int client){
 }
 
 stock void SetSpeed(int client, float fBase, float fMul=1.0){
-	if(fMul == 1.0){ // reset to base
+	if(fMul == 1.0){
 		TF2Attrib_RemoveByDefIndex(client, 107);
 		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase);
 	}else{
 		TF2Attrib_SetByDefIndex(client, 107, fMul);
 		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase *fMul);
 	}
+}
+
+// calcualtes m_flMaxspeed itself, tad overkill for small, frequent updates (like drunkwalk)
+stock void SetSpeedEx(int client, float fMul=1.0){
+	if(fMul == 1.0)
+		TF2Attrib_RemoveByDefIndex(client, 107);
+	else TF2Attrib_SetByDefIndex(client, 107, fMul);
+	TriggerSpeedRecalc(client);
+}
+
+// forces water level update which triggers recalculation of m_flMaxspeed (#18)
+stock void TriggerSpeedRecalc(int client){
+	g_iWaterLevel[client] = GetEntProp(client, Prop_Data, "m_nWaterLevel");
+	SetEntProp(client, Prop_Data, "m_nWaterLevel", g_iWaterLevel[client] > 0 ? 0 : 1);
+	CreateTimer(0.1, TriggerSpeedRecalc_Frame, GetClientUserId(client));
+}
+
+public Action TriggerSpeedRecalc_Frame(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(client) SetEntProp(client, Prop_Data, "m_nWaterLevel", g_iWaterLevel[client]);
+	return Plugin_Stop;
 }
 
 

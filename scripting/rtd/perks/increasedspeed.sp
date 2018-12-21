@@ -23,11 +23,9 @@ public void IncreasedSpeed_Call(int client, Perk perk, bool apply){
 }
 
 void IncreasedSpeed_ApplyPerk(int client, Perk perk){
-	float fBase = GetBaseSpeed(client);
-	SetFloatCache(client, fBase);
-	SetSpeed(client, fBase, perk.GetPrefFloat("multiplier"));
+	SetSpeedEx(client, perk.GetPrefFloat("multiplier"));
 }
 
 void IncreasedSpeed_RemovePerk(int client){
-	SetSpeed(client, GetFloatCache(client));
+	SetSpeedEx(client);
 }

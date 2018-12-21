@@ -23,11 +23,9 @@ public void Snail_Call(int client, Perk perk, bool apply){
 }
 
 void Snail_ApplyPerk(int client, Perk perk){
-	float fBase = GetBaseSpeed(client);
-	SetFloatCache(client, fBase);
-	SetSpeed(client, fBase, perk.GetPrefFloat("multiplier"));
+	SetSpeedEx(client, perk.GetPrefFloat("multiplier"));
 }
 
 void Snail_RemovePerk(int client){
-	SetSpeed(client, GetFloatCache(client));
+	SetSpeedEx(client);
 }
