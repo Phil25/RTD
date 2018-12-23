@@ -123,6 +123,7 @@ void Forward_OnEntityCreated(int iEntity, const char[] sClassname){
 	ExplosiveArrows_OnEntityCreated(iEntity, sClassname);
 	LongMelee_OnEntityCreated(iEntity, sClassname);
 	CursedProjectiles_OnEntityCreated(iEntity, sClassname);
+	OverhealBonus_OnEntityCreated(iEntity, sClassname);
 }
 
 
@@ -134,6 +135,7 @@ void Forward_Resupply(int client){
 	Invisibility_Resupply(client);
 	FastHands_Resupply(client);
 	LongMelee_Resupply(client);
+	OverhealBonus_Resupply(client);
 }
 
 

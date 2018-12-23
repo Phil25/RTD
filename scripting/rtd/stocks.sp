@@ -58,6 +58,7 @@
 * - CreateParticle
 * - CreateRagdoll
 * - CreateExplosion
+* - CreateTesla
 * - ConnectWithBeam
 * - AttachRotating
 *
@@ -106,6 +107,7 @@
 ArrayList g_hHoming = null;
 
 int g_iEnergyBallDamageOffset = -1;
+int g_iWaterLevel[MAXPLAYERS +1] = {0, ...};
 
 void Stocks_OnMapStart(){
 	PrecacheModel(LASERBEAM);
@@ -494,6 +496,33 @@ stock void CreateExplosion(float fPos[3], float fDamage=100.0, float fRadius=80.
 	AcceptEntityInput(iExplosion, "Kill");
 }
 
+stock int CreateTesla(float fPos[3]){
+	int iTesla = CreateEntityByName("point_tesla");
+	if(iTesla <= MaxClients || !IsValidEntity(iTesla))
+		return 0;
+
+	TeleportEntity(iTesla, fPos, NULL_VECTOR, NULL_VECTOR);
+
+	DispatchKeyValue(iTesla, "m_flRadius", "150.0");
+	DispatchKeyValue(iTesla, "m_SoundName", "DoSpark");
+	DispatchKeyValue(iTesla, "beamcount_min", "2");
+	DispatchKeyValue(iTesla, "beamcount_max", "4");
+	DispatchKeyValue(iTesla, "texture", "sprites/physbeam.vmt");
+	DispatchKeyValue(iTesla, "m_Color", "255 255 255");
+	DispatchKeyValue(iTesla, "thick_min", "5.0");
+	DispatchKeyValue(iTesla, "thick_max", "11.0");
+	DispatchKeyValue(iTesla, "lifetime_min", "0.3");
+	DispatchKeyValue(iTesla, "lifetime_max", "2");
+	DispatchKeyValue(iTesla, "interval_min", "0.1");
+	DispatchKeyValue(iTesla, "interval_max", "0.2");
+
+	ActivateEntity(iTesla);
+	DispatchSpawn(iTesla);
+	AcceptEntityInput(iTesla, "TurnOn");
+
+	return iTesla;
+}
+
 stock int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int iBlue=255, float fStartWidth=1.0, float fEndWidth=1.0, float fAmp=1.35){
 	int iBeam = CreateEntityByName("env_beam");
 	if(iBeam <= MaxClients)
@@ -571,13 +600,34 @@ stock float GetBaseSpeed(int client){
 }
 
 stock void SetSpeed(int client, float fBase, float fMul=1.0){
-	if(fMul == 1.0){ // reset to base
+	if(fMul == 1.0){
 		TF2Attrib_RemoveByDefIndex(client, 107);
 		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase);
 	}else{
 		TF2Attrib_SetByDefIndex(client, 107, fMul);
 		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase *fMul);
 	}
+}
+
+// calcualtes m_flMaxspeed itself, tad overkill for small, frequent updates (like drunkwalk)
+stock void SetSpeedEx(int client, float fMul=1.0){
+	if(fMul == 1.0)
+		TF2Attrib_RemoveByDefIndex(client, 107);
+	else TF2Attrib_SetByDefIndex(client, 107, fMul);
+	TriggerSpeedRecalc(client);
+}
+
+// forces water level update which triggers recalculation of m_flMaxspeed (#18)
+stock void TriggerSpeedRecalc(int client){
+	g_iWaterLevel[client] = GetEntProp(client, Prop_Data, "m_nWaterLevel");
+	SetEntProp(client, Prop_Data, "m_nWaterLevel", g_iWaterLevel[client] > 0 ? 0 : 1);
+	CreateTimer(0.1, TriggerSpeedRecalc_Frame, GetClientUserId(client));
+}
+
+public Action TriggerSpeedRecalc_Frame(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(client) SetEntProp(client, Prop_Data, "m_nWaterLevel", g_iWaterLevel[client]);
+	return Plugin_Stop;
 }
 
 
