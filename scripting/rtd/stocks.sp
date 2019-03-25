@@ -294,8 +294,10 @@ stock bool GetClientLookPosition(int client, float fPosition[3]){
 	Handle hTrace = TR_TraceRayFilterEx(fPos, fAng, MASK_SHOT, RayType_Infinite, TraceFilterIgnorePlayers, client);
 	if(hTrace != INVALID_HANDLE && TR_DidHit(hTrace)){
 		TR_GetEndPosition(fPosition, hTrace);
+		delete hTrace;
 		return true;
 	}
+	delete hTrace;
 	return false;
 }
 
