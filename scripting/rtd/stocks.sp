@@ -276,14 +276,10 @@ stock bool CanEntitySeeTarget(int iEnt, int iTarget){
 	else GetEntPropVector(iTarget, Prop_Send, "m_vecOrigin", fEnd);
 
 	Handle hTrace = TR_TraceRayFilterEx(fStart, fEnd, MASK_SOLID, RayType_EndPoint, TraceFilterIgnorePlayersAndSelf, iEnt);
-	if(hTrace != INVALID_HANDLE){
-		if(TR_DidHit(hTrace)){
-			CloseHandle(hTrace);
-			return false;
-		}
-		CloseHandle(hTrace);
-	}
-	return true;
+	bool bResult = hTrace != INVALID_HANDLE && !TR_DidHit(hTrace);
+
+	delete hTrace;
+	return bResult;
 }
 
 stock bool GetClientLookPosition(int client, float fPosition[3]){
@@ -294,8 +290,10 @@ stock bool GetClientLookPosition(int client, float fPosition[3]){
 	Handle hTrace = TR_TraceRayFilterEx(fPos, fAng, MASK_SHOT, RayType_Infinite, TraceFilterIgnorePlayers, client);
 	if(hTrace != INVALID_HANDLE && TR_DidHit(hTrace)){
 		TR_GetEndPosition(fPosition, hTrace);
+		delete hTrace;
 		return true;
 	}
+	delete hTrace;
 	return false;
 }
 

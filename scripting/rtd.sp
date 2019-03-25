@@ -44,7 +44,7 @@
 
 /******* D E F I N E S ******/
 
-#define PLUGIN_VERSION	"2.3.0"
+#define PLUGIN_VERSION	"2.3.1"
 
 #define CHAT_PREFIX 	"\x07FFD700[RTD]\x01"
 #define CONS_PREFIX 	"[RTD]"
@@ -136,7 +136,7 @@ Handle g_hCvarShowTime;				bool g_bCvarShowTime = false;
 #define DESC_SHOW_TIME "0/1 - Should time the perk was applied for be displayed?"
 
 Handle g_hCvarRtdTeam;				int g_iCvarRtdTeam = 0;
-#define DESC_RTD_TEAM "0 - both teams can roll, 1 - only RED team can roll, 2 - only BLU team can roll."
+#define DESC_RTD_TEAM "0 - both teams can roll, 1 - only BLU team can roll, 2 - only RED team can roll."
 Handle g_hCvarRtdMode;				int g_iCvarRtdMode = 0;
 #define DESC_RTD_MODE "0 - No restrain except the interval, 1 - Limit by rollers, 2 - Limit by rollers in team."
 Handle g_hCvarClientLimit;			int g_iCvarClientLimit = 2;
