@@ -6,6 +6,7 @@
 		"pl"	"Efekty RTD:"
 		"sv"	"RTD Effekter:"
 		"de"	"RTD Effekte:"
+		"ru"	"Эффекты RTD:"
 	}
 
 	"RTD2_Desc_godmode"
@@ -14,6 +15,7 @@
 		"pl"	"Jesteś nieśmiertelny."
 		"sv"	"Du är osårbar mot skada."
 		"de"	"Du bist unverwundbar."
+		"ru"	"Вы неуязвимы к урону."
 	}
 
 	"RTD2_Desc_toxic"
@@ -22,6 +24,7 @@
 		"pl"	"Twój smród boli przeciwników."
 		"sv"	"Din hemska andedräkt skadar nära fiender."
 		"de"	"Dein schrecklicher Atem schädigt Feinde in einem Umkreis."
+		"ru"	"Твое ужасное дыхание ранит ближайших врагов."
 	}
 
 	"RTD2_Desc_luckysandvich"
@@ -30,6 +33,7 @@
 		"pl"	"Twoje zdrowie jest zwiekszone i następny atak jest krytyczny."
 		"sv"	"Du får ökad hälsa och nästa attack gör kritisk skada."
 		"de"	"Dein Leben ist erhöht und der nächste Schuss ist eine kritischer Schuss."
+		"ru"	"Ваше здоровье увеличено, а следующая атака становится критической."
 	}
 
 	"RTD2_Desc_increasedspeed"
@@ -38,6 +42,7 @@
 		"pl"	"Twoja postać jest przyśpieszona."
 		"sv"	"Du får ökad fart."
 		"de"	"Dein Lauftempo ist erhöht."
+		"ru"	"Ваша скорость увеличена."
 	}
 
 	"RTD2_Desc_flying"
@@ -46,6 +51,7 @@
 		"pl"	"Poleć sobie gdzie chcesz."
 		"sv"	"Du kan flyga runt i kartan."
 		"de"	"Du kannst in der Karte herumfliegen"
+		"ru"	"Вы можете летать по карте."
 	}
 
 	"RTD2_Desc_lowgravity"
@@ -54,6 +60,7 @@
 		"pl"	"Twoja grawitacja jest słaba."
 		"sv"	"Du får låg gravitation."
 		"de"	"Deine Anziehungskraft wurde zu einer niedriegen Schwerkraft gesetzt."
+		"ru"	"Ваша гравитация является нулевой."
 	}
 
 	"RTD2_Desc_fullubercharge"
@@ -62,6 +69,7 @@
 		"pl"	"Masz pełny Übercharge."
 		"sv"	"Du får full Übercharge."
 		"de"	"Dein Übercharge wurde aufgeladen."
+		"ru"	"Ваш Убер-заряд был заряжен на полную."
 	}
 
 	"RTD2_Desc_invisibility"
@@ -70,6 +78,7 @@
 		"pl"	"Jesteś niewidzialny."
 		"sv"	"Du är osynlig."
 		"de"	"Du bist unsichtbar."
+		"ru"	"Ты невидимка."
 	}
 
 	"RTD2_Desc_infinitecloak"
@@ -78,6 +87,7 @@
 		"pl"	"Masz nieskończoną niewidzialność."
 		"sv"	"Du får oändlig cloak."
 		"de"	"Du hast unendlich Tarnung."
+		"ru"	"У вас бесконечная невидимость."
 	}
 
 	"RTD2_Desc_criticals"
@@ -86,6 +96,7 @@
 		"pl"	"Twoje ataki są krytyczne."
 		"sv"	"Dina attacker gör kritisk skada."
 		"de"	"Deine Schüsse sind kritische Schüsse."
+		"ru"	"Ваши атаки криты."
 	}
 
 	"RTD2_Desc_infiniteammo"
@@ -94,6 +105,7 @@
 		"pl"	"Masz nieskończoną amunicję."
 		"sv"	"Du får aldrig slut på ammunition."
 		"de"	"Deine Munition geht niemals leer."
+		"ru"	"У тебя никогда не кончатся патроны."
 	}
 
 	"RTD2_Desc_scarybullets"
@@ -102,6 +114,7 @@
 		"pl"	"Przestrasz przeciwnika swoimi strasznymi pociskami."
 		"sv"	"Stunna fienden med dina kusliga kulor."
 		"de"	"Erschrecke ein Feind mit deinen gruseligen Kuuuuugeln."
+		"ru"	"Оглушите врага своими пугающими пууулями."
 	}
 
 	"RTD2_Desc_spawnsentry"
@@ -110,6 +123,7 @@
 		"pl"	"Możesz postawić Działko."
 		"sv"	"Du kan lägga ner en Sentry Gun."
 		"de"	"Du kannst eine Sentry spawnen."
+		"ru"	"Вы можете создать Турель."
 	}
 
 	"RTD2_Desc_homingprojectiles"
@@ -118,6 +132,7 @@
 		"pl"	"Masz samonaprowadzające pociski."
 		"sv"	"Dina projektiler följer efter närmsta fiende."
 		"de"	"Deine Projektile wissen schon bescheid."
+		"ru"	"Ваши снаряды имеют самосознание."
 	}
 
 	"RTD2_Desc_fullriflecharge"
@@ -126,6 +141,7 @@
 		"pl"	"Masz zawsze zapełniony pasek naładowania dla Snajperki czy Łowcy."
 		"sv"	"Skyttegeväret eller Pilbågen är alltid fullt utdraget."
 		"de"	"Deine Sniper Rifle oder Huntsman sind immer voll aufgeladen."
+		"ru"	"Снайперская винтовка или Охотник постоянно заряженные."
 	}
 
 	"RTD2_Desc_explode"
@@ -134,6 +150,7 @@
 		"pl"	"Nagle, wybuch."
 		"sv"	"Du exploderar."
 		"de"	"Explosion!"
+		"ru"	"Внезапно, БУМ!"
 	}
 
 	"RTD2_Desc_snail"
@@ -142,6 +159,7 @@
 		"pl"	"Jesteś bardzo wolny."
 		"sv"	"Du blir väldigt långsam."
 		"de"	"Du bist echt langsam."
+		"ru"	"Ты очень медленный."
 	}
 
 	"RTD2_Desc_frozen"
@@ -150,6 +168,7 @@
 		"pl"	"Zamieniasz się w lód."
 		"sv"	"Du är nu en isstaty."
 		"de"	"Du bist jetzt eine Eis Statue."
+		"ru"	"Вы теперь ледяная статуя."
 	}
 
 	"RTD2_Desc_timebomb"
@@ -158,6 +177,7 @@
 		"pl"	"Twoja głowa to teraz bomba, idź kogoś nią zabić."
 		"sv"	"Ditt huvud är en bomb nu, döda någon med det."
 		"de"	"Dein Kopf ist jetzt eine Bombe, jetzt töte jemanden."
+		"ru"	"Твоя голова бомба сейчас, иди убить кого-то с этим."
 	}
 
 	"RTD2_Desc_ignition"
@@ -166,6 +186,7 @@
 		"pl"	"Zgiń w ogniu."
 		"sv"	"Brinn till döds."
 		"de"	"Sterb in ein Feuer."
+		"ru"	"Иди умри в огне."
 	}
 
 	"RTD2_Desc_lowhealth"
@@ -174,6 +195,7 @@
 		"pl"	"Twoje zdrowie jest teraz małe."
 		"sv"	"Din hälsa är väldigt låg nu."
 		"de"	"Dein Leben ist nun niedrig."
+		"ru"	"Ваше здоровье сейчас низкое."
 	}
 
 	"RTD2_Desc_drugged"
@@ -182,6 +204,7 @@
 		"pl"	"Czujesz się dobrze, zbyt dobrze."
 		"sv"	"Du känner att du mår bra, för bra."
 		"de"	"Du fühlst dich gut. Zu gut."
+		"ru"	"Вы чувствуете себя хорошо, слишком хорошо."
 	}
 
 	"RTD2_Desc_blind"
@@ -190,6 +213,7 @@
 		"pl"	"Kto zgasił światło?"
 		"sv"	"Vart tog alla vägen?"
 		"de"	"Wo ist jeder hin gegangen?"
+		"ru"	"Куда все пропали?"
 	}
 
 	"RTD2_Desc_striptomelee"
@@ -198,6 +222,7 @@
 		"pl"	"Zostajesz wyłącznie z bronią ręczną. Powodzenia!"
 		"sv"	"Nu är det dags för närstrid! Lycka till!"
 		"de"	"Du hast nurnach deine Nahkampfwaffe. Viel Glück!"
+		"ru"	"Вы остались только со своим оружием ближнего боя. Удачи!"
 	}
 
 	"RTD2_Desc_beacon"
@@ -206,6 +231,7 @@
 		"pl"	"Pokaż przeciwnikom gdzie jesteś, pokaż, że się ich nie boisz."
 		"sv"	"Låt dina fiender veta vart du är, du är inte rädd för dem."
 		"de"	"Lass dein Feind wissen wo du bist, du hast keine Angst vor den."
+		"ru"	"Пусть враги знают, где ты, ты их не боишься."
 	}
 
 	"RTD2_Desc_forcedtaunt"
@@ -214,6 +240,7 @@
 		"pl"	"Nie mogę... przestać... drwić!"
 		"sv"	"Kan... inte... sluta... visa min överlägsenhet!"
 		"de"	"Kann...nicht...aufhören...meine Überlegenheit zu zeigen!"
+		"ru"	"Не могу... перестать... показывать свое превосходство!"
 	}
 
 	"RTD2_Desc_monochromia"
@@ -222,6 +249,7 @@
 		"pl"	"Twój obraz jest czarno biały."
 		"sv"	"Du ser i svart och vitt."
 		"de"	"Deine Sicht ist Schwarz und Weiß."
+		"ru"	"Ваше зрение черно-белое."
 	}
 
 	"RTD2_Desc_earthquake"
@@ -230,6 +258,7 @@
 		"pl"	"Ziemia się trzęsie!"
 		"sv"	"Marken skakar!"
 		"de"	"Der Boden wackelt!"
+		"ru"	"Земля трясется!"
 	}
 
 	"RTD2_Desc_funnyfeeling"
@@ -238,6 +267,7 @@
 		"pl"	"Co się dzieje, kiedy rozciągasz sobie oczy."
 		"sv"	"Vad som händer när du drar bak dina ögonlock."
 		"de"	"Das passiert wenn du deine Augenlieder zurück ziehst."
+		"ru"	"Что происходет, если вы оттяните веки назад."
 	}
 
 	"RTD2_Desc_badsauce"
@@ -246,6 +276,7 @@
 		"pl"	"Mleko, krew i Jarate."
 		"sv"	"Mjölk, blood och Jarate."
 		"de"	"Milch, Blut und Jarate."
+		"ru"	"Молоко, кровь и Банкате."
 	}
 
 	"RTD2_Desc_spawndispenser"
@@ -254,6 +285,7 @@
 		"pl"	"Możesz postawić Zasobnik."
 		"sv"	"Du kan lägga ner en Dispenser."
 		"de"	"Du kannst einen Dispenser spawnen."
+		"ru"	"Вы можете создать Раздатчик."
 	}
 
 	"RTD2_Desc_infinitejump"
@@ -262,6 +294,7 @@
 		"pl"	"Możesz raz odbić się od powietrza, to czemu nie wiele razy?"
 		"sv"	"Du kan hoppa i luften en gång, så varför inte fler gånger?"
 		"de"	"Du kannst in der Luft springen, warum nicht öfters?"
+		"ru"	"Вы можете отпрыгнуть от воздуха один раз, так почему бы не несколько раз?"
 	}
 
 	"RTD2_Desc_powerfulhits"
@@ -270,6 +303,7 @@
 		"pl"	"Wzmacnia zadawane obrażenia."
 		"sv"	"Din skada är ökad."
 		"de"	"Dein Schaden wurde erhöht."
+		"ru"	"Ваш урон увеличен."
 	}
 
 	"RTD2_Desc_bighead"
@@ -278,6 +312,7 @@
 		"pl"	"Inni się teraz śmieją za twoimi plecami."
 		"sv"	"Nu skrattar andra åt dig bakom ryggen."
 		"de"	"Andere Soldaten lachen dich hinter deinen Rücken aus."
+		"ru"	"Другие наемники теперь шутят за вашей спиной."
 	}
 
 	"RTD2_Desc_tinymann"
@@ -286,6 +321,7 @@
 		"pl"	"Jesteś malutki, zaczaj się na kogo chcesz!"
 		"sv"	"Du har krympt, creepa på vem du vill!"
 		"de"	"Du bist geschrumpt, schleich dich an die jede an die du willst!"
+		"ru"	"Вы уменьшились, подкрадывайтесь к кому хотите!"
 	}
 
 	"RTD2_Desc_firework"
@@ -294,6 +330,7 @@
 		"pl"	"Stałeś się fajerwerką."
 		"sv"	"Du flyger upp i luften och exploderar."
 		"de"	"Steig hoch und geh mit einen awe runter."
+		"ru"	"Поднимись высоко и опустись с восхищением."
 	}
 
 	"RTD2_Desc_deadlyvoice"
@@ -302,6 +339,7 @@
 		"pl"	"Komendy głosowe zadają obrażenia."
 		"sv"	"Röstkommandon gör skada."
 		"de"	"Sprach Commands teilen Schaden aus."
+		"ru"	"Голосовые команды наносят урон."
 	}
 
 	"RTD2_Desc_stronggravity"
@@ -310,6 +348,7 @@
 		"pl"	"Nie potknij się bo złamiesz nogę... albo dwie."
 		"sv"	"Ramla inte, annars bryter du benet... eller båda."
 		"de"	"Fall nicht hin oder du brichst dir dein Bein... oder beide."
+		"ru"	"Не споткнись, иначе сломаешь ногу... или обе."
 	}
 
 	"RTD2_Desc_eyeforaneye"
@@ -318,6 +357,7 @@
 		"pl"	"Tak właśnie czują się inni."
 		"sv"	"Det är såhär det känns."
 		"de"	"So fühlt sich das an."
+		"ru"	"Вот как это чувствуется."
 	}
 
 	"RTD2_Desc_weakened"
@@ -326,6 +366,7 @@
 		"pl"	"Jesteś teraz słabiakiem."
 		"sv"	"Du är nu en mes."
 		"de"	"Du bist jetzt ein Schwächling!"
+		"ru"	"Вы теперь слабак."
 	}
 
 	"RTD2_Desc_necromash"
@@ -334,6 +375,7 @@
 		"pl"	"Ten hełm ci nie pomoże."
 		"sv"	"That helmet ain't gonna save ya."
 		"de"	"Dieser Helm wird dich nich' beschützen."
+		"ru"	"Этот шлем не спасет тебя."
 	}
 
 	"RTD2_Desc_extraammo"
@@ -342,6 +384,7 @@
 		"pl"	"Więcej amunicji, więcej wprawy."
 		"sv"	"Mer ammo, mer skill."
 		"de"	"Mehr Munition, mehr Skill.
+		"ru"	"Больше боеприпасов, больше навыков."
 	}
 
 	"RTD2_Desc_suffocation"
@@ -350,6 +393,7 @@
 		"pl"	"Zapomniałeś jak się oddycha."
 		"sv"	"Du har glömt hur man andas."
 		"de"	"Du hast vergessen zu atmen."
+		"ru"	"Вы забыли, как дышать."
 	}
 
 	"RTD2_Desc_fasthands"
@@ -358,6 +402,7 @@
 		"pl"	"Jesteś teraz sprawnym najemnikiem."
 		"sv"	"Nu är du en skicklig soldat."
 		"de"	"Du bist jetzt ein schneller Soldat."
+		"ru"	"Вы теперь умелый наемник."
 	}
 
 	"RTD2_Desc_outline"
@@ -366,6 +411,7 @@
 		"pl"	"Twoja wspaniałość błyszczy przez ściany. I powiadamia przeciwnika."
 		"sv"	"Din awesomeness glöder genom väggar. Fienden märker dig."
 		"de"	"Dein schönes Aussehen scheint durch die Wände. Und alarmiert Feinde."
+		"ru"	"Твоя крутость светится сквозь стены. И светит врагам тоже."
 	}
 
 	"RTD2_Desc_vital"
@@ -374,6 +420,7 @@
 		"pl"	"Twoje maksymalne zdrowie zostało podwyższone."
 		"sv"	"Din maxhälsa är ökad."
 		"de"	"Dein Maximales Leben wurde erhöht."
+		"ru"	"Ваше максимальное здоровье увеличено."
 	}
 
 	"RTD2_Desc_nogravity"
@@ -382,6 +429,7 @@
 		"pl"	"Skocz na księżyc i zostań zabitym podczas lotu."
 		"sv"	"Hoppa till månen och bli dödad på vägen."
 		"de"	"Springe zum Mond und werde auf den weg dahin getötet."
+		"ru"	"Прыгни на Луну и убейся тем временем."
 	}
 
 	"RTD2_Desc_teamcriticals"
@@ -390,6 +438,7 @@
 		"pl"	"Stań obok przyjaciela aby dać mu krytyczne ataki."
 		"sv"	"Stå nära en lagkamrat för att ge dem kritisk skada."
 		"de"	"Stehe in der nähe eines Teammitglieds und gebe ihn kritische Schüsse."
+		"ru"	"Встаньте рядом с товарищами по команде, чтобы дать им криты."
 	}
 
 	"RTD2_Desc_firetimebomb"
@@ -398,6 +447,7 @@
 		"pl"	"Nie eksplodujesz ale podpalasz wszystkich wokół."
 		"sv"	"Du exploderar inte, men tänder fyr på alla andra runtomkring."
 		"de"	"Du explodierst nicht, setzt aber jeden in einem Umkreis in Flammen."
+		"ru"	"Вы не взорветесь, но зажжете всех вокруг."
 	}
 
 	"RTD2_Desc_firebreath"
@@ -406,6 +456,7 @@
 		"pl"	"To palenie w tobie. To CZYSTY OGIEŃ."
 		"sv"	"The burning you feel? It is PURE FIRE."
 		"de"	"Das brennen was du fühlst? Es ist PURES FEUER."
+		"ru"	"Вы чувствуете жжение? Это ЧИСТЫЙ ОГОНЬ."
 	}
 
 	"RTD2_Desc_strongrecoil"
@@ -414,6 +465,7 @@
 		"pl"	"Twoje doświadczenie w broniach palnych gdzieś zniknęło."
 		"sv"	"Dina vapenfärdigheter är borta."
 		"de"	"Deine Schuss Fähigkeiten sind weg."
+		"ru"	"Ваши навыки стрельбы из огнестрельного оружия пропали."
 	}
 
 	"RTD2_Desc_cursed"
@@ -422,6 +474,7 @@
 		"pl"	"Idziesz w lewo, a nie w górę czy wstecz? W prawo czy w dół...?"
 		"sv"	"Går du till vänster och upp eller  bak och höger eller neråt?"
 		"de"	"Du gehts nach links und nach oben und nach rechts oder nach unten?"
+		"ru"	"Вы идете налево и вы идете вверх или назад и вправо или вниз...?"
 	}
 
 	"RTD2_Desc_extrathrowables"
@@ -430,6 +483,7 @@
 		"pl"	"Zdajesz sobie sprawę, że możesz wziąć ich więcej."
 		"sv"	"Du inser att du faktiskt kan ta flera av dessa med dig."
 		"de"	"Du hast realisiert das du mehrere davon mitnehmen kannst."
+		"ru"	"Вы поняли, что можете взять больше с собой."
 	}
 
 	"RTD2_Desc_powerplay"
@@ -438,6 +492,7 @@
 		"pl"	"Twój ruch, Robin!"
 		"sv"	"Take that, Robin!"
 		"de"	"Nehm das, Robin!"
+		"ru"	"Получай, Робин!"
 	}
 
 	"RTD2_Desc_explosivearrows"
@@ -446,6 +501,7 @@
 		"pl"	"Twoje strzały i pociski z kusz wybuchają."
 		"sv"	"Dina pilar och armborst sprutor detoneras vid nedslag."
 		"de"	"Deine Pfeile und Armbrust Pfeile explodieren bei Berührung."
+		"ru"	"Ваши стрелы и арбалетные болты взрываются при попадании."
 	}
 
 	"RTD2_Desc_inclineproblem"
@@ -454,6 +510,7 @@
 		"pl"	"Zapomniałeś jak się używa schody."
 		"sv"	"Du har glömt hur trappor fungerar."
 		"de"	"Du hast vergessen wie man Treppen steigt."
+		"ru"	"Вы забыли, как пользоваться лестницей."
 	}
 
 	"RTD2_Desc_springshoes"
@@ -462,6 +519,7 @@
 		"pl"	"Nie możesz przestać skakać."
 		"sv"	""
 		"de"	""
+		"ru"	"Не могу перестать прыгать."
 	}
 
 	"RTD2_Desc_lag"
@@ -470,6 +528,7 @@
 		"pl"	"Musi być godzina szczytu."
 		"sv"	""
 		"de"	""
+		"ru"	"Должно быть занятой час."
 	}
 
 	"RTD2_Desc_drugbullets"
@@ -478,6 +537,7 @@
 		"pl"	"Rozprzestrzeniaj narkotyki na odległość."
 		"sv"	""
 		"de"	""
+		"ru"	"Стреляйте наркотиками на расстоянии."
 	}
 
 	"RTD2_Desc_longmelee"
@@ -486,6 +546,7 @@
 		"pl"	"Wydłuża ramiona."
 		"sv"	""
 		"de"	""
+		"ru"	"Продлевает руки."
 	}
 
 	"RTD2_Desc_hatthrow"
@@ -494,6 +555,7 @@
 		"pl"	"Nareszcie, dobry z nich pożytek."
 		"sv"	""
 		"de"	""
+		"ru"	"Наконец, правильное использование для них."
 	}
 
 	"RTD2_Desc_madaraswhistle"
@@ -502,6 +564,7 @@
 		"pl"	"Przyjaźń z aligatorem."
 		"sv"	""
 		"de"	""
+		"ru"	"Нечеловеческое сходство с аллигатором."
 	}
 
 	"RTD2_Desc_sickness"
@@ -510,6 +573,7 @@
 		"pl"	"Medyk ci nie pomoże."
 		"sv"	""
 		"de"	""
+		"ru"	"Вызов медика не поможет вам."
 	}
 
 	"RTD2_Desc_wastedroll"
@@ -518,6 +582,7 @@
 		"pl"	"Coś ci nie wychodzi losowanie."
 		"sv"	""
 		"de"	""
+		"ru"	"У вас довольно плохая удача."
 	}
 
 	"RTD2_Desc_mercsdietwice"
@@ -526,6 +591,7 @@
 		"pl"	"Wskrześ się po śmierci."
 		"sv"	""
 		"de"	""
+		"ru"	"Воскресить себя при смерти."
 	}
 
 	"RTD2_Desc_drunkwalk"
@@ -534,6 +600,7 @@
 		"pl"	"Nigdy nie pij i walcz."
 		"sv"	""
 		"de"	""
+		"ru"	"Не пей и сражайся."
 	}
 
 	"RTD2_Desc_hellsreach"
@@ -542,6 +609,7 @@
 		"pl"	"Nie uciekniesz przed piekłem."
 		"sv"	""
 		"de"	""
+		"ru"	"Ад это то, что вы не можете избежать."
 	}
 
 	"RTD2_Desc_cursedprojectiles"
@@ -550,6 +618,7 @@
 		"pl"	"Nie zaufasz swoim broniom."
 		"sv"	""
 		"de"	""
+		"ru"	"Не могу доверять собственному оружию."
 	}
 
 	"RTD2_Desc_vampire"
@@ -558,6 +627,7 @@
 		"pl"	"Tracisz zdrowie nie zadając obrażeń przeciwnikom."
 		"sv"	""
 		"de"	""
+		"ru"	"Потеря здоровья, если не наносишь вред врагу."
 	}
 
 	"RTD2_Desc_batswarm"
@@ -566,6 +636,7 @@
 		"pl"	"Nietoperze cię obraniają."
 		"sv"	""
 		"de"	""
+		"ru"	"Рой летучих мышей защищает тебя."
 	}
 
 	"RTD2_Desc_pumpkintrail"
@@ -574,6 +645,7 @@
 		"pl"	"Bądź władcą dyń."
 		"sv"	""
 		"de"	""
+		"ru"	"Создание тыквы перед вами."
 	}
 
 	"RTD2_Desc_acallbeyond"
@@ -582,6 +654,7 @@
 		"pl"	"Rozpętaj piekło z koszmarów."
 		"sv"	""
 		"de"	""
+		"ru"	"Выпусти ад из ночных кошмаров."
 	}
 
 	"RTD2_Desc_smite"
@@ -590,6 +663,7 @@
 		"pl"	"Zostań proażony z niebios."
 		"sv"	""
 		"de"	""
+		"ru"	"Повержен Богом."
 	}
 
 	"RTD2_Desc_overhealbonus"
@@ -598,6 +672,7 @@
 		"pl"	"Ulepszony overheal."
 		"sv"	""
 		"de"	""
+		"ru"	"Увеличенние сверх-лечения для вашей Лечебной пушки."
 	}
 
 }
