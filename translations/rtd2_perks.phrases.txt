@@ -78,7 +78,7 @@
 		"pl"	"Jesteś niewidzialny."
 		"sv"	"Du är osynlig."
 		"de"	"Du bist unsichtbar."
-		"ru"	"Ты невидимка."
+		"ru"	"Вы невидимка."
 	}
 
 	"RTD2_Desc_infinitecloak"
@@ -96,7 +96,7 @@
 		"pl"	"Twoje ataki są krytyczne."
 		"sv"	"Dina attacker gör kritisk skada."
 		"de"	"Deine Schüsse sind kritische Schüsse."
-		"ru"	"Ваши атаки криты."
+		"ru"	"Ваши атаки - криты."
 	}
 
 	"RTD2_Desc_infiniteammo"
@@ -159,7 +159,7 @@
 		"pl"	"Jesteś bardzo wolny."
 		"sv"	"Du blir väldigt långsam."
 		"de"	"Du bist echt langsam."
-		"ru"	"Ты очень медленный."
+		"ru"	"Вы очень медленный."
 	}
 
 	"RTD2_Desc_frozen"
@@ -231,7 +231,7 @@
 		"pl"	"Pokaż przeciwnikom gdzie jesteś, pokaż, że się ich nie boisz."
 		"sv"	"Låt dina fiender veta vart du är, du är inte rädd för dem."
 		"de"	"Lass dein Feind wissen wo du bist, du hast keine Angst vor den."
-		"ru"	"Пусть враги знают, где ты, ты их не боишься."
+		"ru"	"Пусть враги знают, где вы, вы их не боитесь."
 	}
 
 	"RTD2_Desc_forcedtaunt"
@@ -537,7 +537,7 @@
 		"pl"	"Rozprzestrzeniaj narkotyki na odległość."
 		"sv"	""
 		"de"	""
-		"ru"	"Стреляйте наркотиками на расстоянии."
+		"ru"	"Стреляйте наркотическими пулями на расстоянии."
 	}
 
 	"RTD2_Desc_longmelee"
@@ -546,7 +546,7 @@
 		"pl"	"Wydłuża ramiona."
 		"sv"	""
 		"de"	""
-		"ru"	"Продлевает руки."
+		"ru"	"Продливает руки."
 	}
 
 	"RTD2_Desc_hatthrow"
