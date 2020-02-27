@@ -24,7 +24,7 @@
 		"pl"	"Twój smród boli przeciwników."
 		"sv"	"Din hemska andedräkt skadar nära fiender."
 		"de"	"Dein schrecklicher Atem schädigt Feinde in einem Umkreis."
-		"ru"	"Твое ужасное дыхание ранит ближайших врагов."
+		"ru"	"Ваше ужасное дыхание ранит ближайших врагов."
 	}
 
 	"RTD2_Desc_luckysandvich"
@@ -105,7 +105,7 @@
 		"pl"	"Masz nieskończoną amunicję."
 		"sv"	"Du får aldrig slut på ammunition."
 		"de"	"Deine Munition geht niemals leer."
-		"ru"	"У тебя никогда не кончатся патроны."
+		"ru"	"У вас никогда не кончатся патроны."
 	}
 
 	"RTD2_Desc_scarybullets"
@@ -177,7 +177,7 @@
 		"pl"	"Twoja głowa to teraz bomba, idź kogoś nią zabić."
 		"sv"	"Ditt huvud är en bomb nu, döda någon med det."
 		"de"	"Dein Kopf ist jetzt eine Bombe, jetzt töte jemanden."
-		"ru"	"Твоя голова бомба сейчас, иди убить кого-то с этим."
+		"ru"	"Ваша голова - бомба, иди убить кого-то с этим."
 	}
 
 	"RTD2_Desc_ignition"
@@ -186,7 +186,7 @@
 		"pl"	"Zgiń w ogniu."
 		"sv"	"Brinn till döds."
 		"de"	"Sterb in ein Feuer."
-		"ru"	"Иди умри в огне."
+		"ru"	"Идите умрите в огне."
 	}
 
 	"RTD2_Desc_lowhealth"
@@ -411,7 +411,7 @@
 		"pl"	"Twoja wspaniałość błyszczy przez ściany. I powiadamia przeciwnika."
 		"sv"	"Din awesomeness glöder genom väggar. Fienden märker dig."
 		"de"	"Dein schönes Aussehen scheint durch die Wände. Und alarmiert Feinde."
-		"ru"	"Твоя крутость светится сквозь стены. И светит врагам тоже."
+		"ru"	"Ваша крутость светится сквозь стены. И светит врагам тоже."
 	}
 
 	"RTD2_Desc_vital"
@@ -537,7 +537,7 @@
 		"pl"	"Rozprzestrzeniaj narkotyki na odległość."
 		"sv"	""
 		"de"	""
-		"ru"	"Стреляйте наркотическими пулями на расстоянии."
+		"ru"	"Стреляйте опьяняющими пулями на расстоянии."
 	}
 
 	"RTD2_Desc_longmelee"
