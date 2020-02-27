@@ -537,7 +537,7 @@
 		"pl"	"Rozprzestrzeniaj narkotyki na odległość."
 		"sv"	""
 		"de"	""
-		"ru"	"Стреляйте опьяняющими пулями на расстоянии."
+		"ru"	"Стреляйте наркопулями пулями на расстоянии."
 	}
 
 	"RTD2_Desc_longmelee"
