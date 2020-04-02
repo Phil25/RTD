@@ -44,7 +44,7 @@
 
 /******* D E F I N E S ******/
 
-#define PLUGIN_VERSION	"2.2.0"
+#define PLUGIN_VERSION	"2.3.1"
 
 #define CHAT_PREFIX 	"\x07FFD700[RTD]\x01"
 #define CONS_PREFIX 	"[RTD]"
@@ -136,7 +136,7 @@ Handle g_hCvarShowTime;				bool g_bCvarShowTime = false;
 #define DESC_SHOW_TIME "0/1 - Should time the perk was applied for be displayed?"
 
 Handle g_hCvarRtdTeam;				int g_iCvarRtdTeam = 0;
-#define DESC_RTD_TEAM "0 - both teams can roll, 1 - only RED team can roll, 2 - only BLU team can roll."
+#define DESC_RTD_TEAM "0 - both teams can roll, 1 - only BLU team can roll, 2 - only RED team can roll."
 Handle g_hCvarRtdMode;				int g_iCvarRtdMode = 0;
 #define DESC_RTD_MODE "0 - No restrain except the interval, 1 - Limit by rollers, 2 - Limit by rollers in team."
 Handle g_hCvarClientLimit;			int g_iCvarClientLimit = 2;
@@ -163,8 +163,8 @@ Handle g_hCvarTimerPosX;			float g_fCvarTimerPosX = -1.0;
 Handle g_hCvarTimerPosY;			float g_fCvarTimerPosY = 0.55;
 #define DESC_TIMER_POS_Y "0.0-1.0 - The Y position of the perk HUD timer display. -1.0 to center."
 
-ConVar g_hCvarPerkDesc;
-#define DESC_PERK_DESC "Show perk description to roller after applying effect"
+ConVar g_hCvarShowDesc;
+#define DESC_SHOW_DESC "0.0-1.0 - Show perk description to roller after applying effect."
 
 
 
@@ -254,7 +254,7 @@ public void OnPluginStart(){
 	g_hCvarTimerPosX			= CreateConVar("sm_rtd2_timerpos_x",	"-1.0",		DESC_TIMER_POS_X,			FLAGS_CVARS);
 	g_hCvarTimerPosY			= CreateConVar("sm_rtd2_timerpos_y",	"0.55",		DESC_TIMER_POS_Y,			FLAGS_CVARS);
 
-	g_hCvarPerkDesc =			= CreateConVar("sm_rtd2_perk_description", "1",		DESC_PERK_DESC,			FLAGS_CVARS, true, 0.0, true, 1.0);
+	g_hCvarShowDesc 			= CreateConVar("sm_rtd2_show_description", "0",		DESC_SHOW_DESC,				FLAGS_CVARS, true, 0.0, true, 1.0);
 
 
 		//-----[ ConVars Hooking & Setting ]-----//
@@ -326,7 +326,7 @@ public void OnPluginStart(){
 	g_hRollers = new Rollers();
 	g_hPerkHistory = new PerkList();
 
-	for(int i = 1; i <= MaxClients; i++) {
+	for(int i = 1; i <= MaxClients; i++){
 		if(IsClientInGame(i))
 			OnClientPutInServer(i);
 	}
@@ -462,7 +462,7 @@ public Action Updater_OnPluginChecking(){
 	return Plugin_Continue;
 }
 
-public void Updater_OnPluginUpdated(){
+public int Updater_OnPluginUpdated(){
 	if(g_bCvarReloadUpdate)
 		ReloadPlugin();
 }
@@ -1031,7 +1031,7 @@ void RollPerkForClient(int client){
 		case 2:{
 			int iCount = 0, iTeam = GetClientTeam(client);
 			for(int i = 1; i <= MaxClients; i++){
-				if(g_hRollers.GetInRoll(i)) {
+				if(g_hRollers.GetInRoll(i)){
 					if(GetClientTeam(i) == iTeam)
 						iCount++;
 				}
@@ -1122,13 +1122,13 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 	PerkIter iter = new PerkListIter(candidates, -1);
 
 	if(bFilter){
-		while((perk = (++iter).Perk())) {
+		while((perk = (++iter).Perk())){
 			if(perk.IsAptForSetupOf(client, iRollFlags))
 				list.Push(perk);
 		}
 	}else{
 		bool bBeGood = GoodRoll(client);
-		while((perk = (++iter).Perk())) {
+		while((perk = (++iter).Perk())){
 			if(perk.Good == bBeGood && perk.IsAptFor(client, iRollFlags))
 				list.Push(perk);
 		}
@@ -1216,9 +1216,9 @@ public int ManagerDesc(Menu hMenu, MenuAction maState, int client, int iPos){
 	FormatEx(sTranslate, 64, "RTD2_Desc_%s", sPerkToken);
 
 	RTDPrint(client, "%s%s%c: \x03%T\x01",
-			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			sPerkName, 0x01,
-			sTranslate, LANG_SERVER);
+		perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+		sPerkName, 0x01,
+		sTranslate, LANG_SERVER);
 
 	ShowDesc(client, iPos);
 	return 1;
@@ -1281,25 +1281,26 @@ void PrintToRoller(int client, Perk perk, int iDuration){
 	char sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
 	perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
 
-	if(!g_bCvarShowTime || perk.Time == -1)
+	if(!g_bCvarShowTime || perk.Time == -1){
 		RTDPrint(client, "%T",
 			"RTD2_Rolled_Perk_Roller", LANG_SERVER,
 			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
 			0x01);
-	else {
+	}else{
 		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		RTDPrint(client, "%T",
-				"RTD2_Rolled_Perk_Roller_Time", LANG_SERVER,
-				perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-				sPerkName,
-				0x01, 0x03, iTrueDuration, 0x01);
+			"RTD2_Rolled_Perk_Roller_Time", LANG_SERVER,
+			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			sPerkName,
+			0x01, 0x03, iTrueDuration, 0x01);
 	}
-	if (g_hCvarPerkDesc.BoolValue) {
+
+	if(g_hCvarShowDesc.BoolValue){
 		char sPerkToken[32], sPerkDesc[64];
 		perk.GetToken(sPerkToken, sizeof(sPerkToken));
 		FormatEx(sPerkDesc, sizeof(sPerkDesc), "RTD2_Desc_%s", sPerkToken);
-		RTDPrint(client, "%T", sPerkDesc, LANG_SERVER);
+		RTDPrint(client, "\x03%T\x01", sPerkDesc, LANG_SERVER);
 	}
 }
 
@@ -1322,12 +1323,12 @@ void PrintToNonRollers(int client, Perk perk, int iDuration){
 	else{
 		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		RTDPrintAllExcept(client, "%T",
-				"RTD2_Rolled_Perk_Others_Time", LANG_SERVER,
-				g_sTeamColors[GetClientTeam(client)],
-				sRollerName,
-				0x01,
-				perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-				sPerkName, 0x01, 0x03, iTrueDuration, 0x01);
+			"RTD2_Rolled_Perk_Others_Time", LANG_SERVER,
+			g_sTeamColors[GetClientTeam(client)],
+			sRollerName,
+			0x01,
+			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
+			sPerkName, 0x01, 0x03, iTrueDuration, 0x01);
 	}
 }
 
@@ -1450,12 +1451,12 @@ void RTDPrintAllExcept(int client, char[] sFormat, any ...){
 	VFormat(sMsg, 255, sFormat, 3);
 	int i = 0;
 
-	while(++i < client) {
+	while(++i < client){
 		if(IsClientInGame(i))
 			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
 	}
 
-	while(++i <= MaxClients) {
+	while(++i <= MaxClients){
 		if(IsClientInGame(i))
 			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
 	}
@@ -1481,7 +1482,7 @@ int GetPerkTime(Perk perk){
 }
 
 void RemovePerkFromClients(Perk perk){
-	for(int i = 1; i <= MaxClients; ++i) {
+	for(int i = 1; i <= MaxClients; ++i){
 		if(IsClientInGame(i) && g_hRollers.GetPerk(i) == perk)
 			ForceRemovePerk(i);
 	}
@@ -1588,7 +1589,7 @@ bool IsRTDInRound(){
 }
 
 bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
-	if(IsValidClient(by)) {
+	if(IsValidClient(by)){
 		if(GetClientTeam(by) == GetClientTeam(client)){
 			if(client != by || !bCanHurtSelf)
 				return false;

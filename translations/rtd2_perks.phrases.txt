@@ -584,4 +584,20 @@
 		"de"	""
 	}
 
+	"RTD2_Desc_smite"
+	{
+		"en"	"Get struck down by God."
+		"pl"	"Zostań proażony z niebios."
+		"sv"	""
+		"de"	""
+	}
+
+	"RTD2_Desc_overhealbonus"
+	{
+		"en"	"Overheal boost for your MediGun."
+		"pl"	"Ulepszony overheal."
+		"sv"	""
+		"de"	""
+	}
+
 }
