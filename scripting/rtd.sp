@@ -1610,5 +1610,8 @@ bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
 	if(GetEntProp(client, Prop_Data, "m_takedamage") != 2)
 		return false;
 
+	if(g_iInGodmode & client)
+		return false;
+
 	return true;
 }
