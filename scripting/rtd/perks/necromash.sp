@@ -206,7 +206,7 @@ stock void NecroMash_CreateParticle(char[] particle, float pos[3]){
 		}
 	}
 
-	for(int i = 1; i <= GetMaxClients(); i++){
+	for(int i = 1; i <= MaxClients; i++){
 		if(!IsValidEntity(i)) continue;
 		if(!IsClientInGame(i)) continue;
 		TE_Start("TFParticleEffect");

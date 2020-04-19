@@ -845,9 +845,6 @@ see the RTD's thread on AlliedModders:
 https://forums.alliedmods.net/showthread.php?t=278579
 */
 
-#pragma deprecated Use RTDCall instead
-functag RTD2Manager public(client, iPerkId, bool:bEnable);
-
 /**
  * Registers a perk from a different plugin to the core.
  * The parameters match the fields in the KV file.
