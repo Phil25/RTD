@@ -313,7 +313,9 @@ public void OnPluginStart(){
 	RegAdminCmd("sm_rtdsearch",	Command_PerkSearchup,	ADMFLAG_SLAY,	"Displays customized perk list.");
 
 	RegAdminCmd("sm_reloadrtd",	Command_Reload,			ADMFLAG_CONFIG,	"Reloads the config files.");
+#if defined _updater_included
 	RegAdminCmd("sm_updatertd",	Command_Update,			ADMFLAG_ROOT,	"Force an update check. Does nothing if Updater is not installed.");
+#endif
 
 
 		//-----[ Listeners ]-----//
@@ -595,6 +597,7 @@ public Action Command_Reload(int client, int args){
 	return Plugin_Handled;
 }
 
+#if defined _updater_included
 public Action Command_Update(int client, int args){
 	if(!g_bPluginUpdater){
 		ReplyToCommand(client, CONS_PREFIX ... " Updater is not installed.");
@@ -609,6 +612,7 @@ public Action Command_Update(int client, int args){
 	g_bIsUpdateForced = false;
 	return Plugin_Handled;
 }
+#endif
 
 
 
