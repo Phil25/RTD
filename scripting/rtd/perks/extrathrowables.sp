@@ -38,7 +38,7 @@ public void ExtraThrowables_Call(int client, Perk perk, bool apply){
 
 	int iIndex = GetEntProp(iWeapon, Prop_Send, "m_iItemDefinitionIndex");
 	switch(iIndex){
-		case 222, 812, 833, 1121, 42, 159, 311, 433, 863, 1002, 58, 1083, 1105:
+		case 222, 812, 833, 1121, 42, 159, 311, 433, 863, 1002, 58, 1083, 1105, 1190:
 			ExtraThrowables_Set(client, iWeapon, iAmount);
 	}
 }
