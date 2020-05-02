@@ -17,8 +17,8 @@
 */
 
 
-#define ATTRIB_RATE 6
-#define ATTRIB_RELOAD 97
+#define ATTRIB_RATE 394
+#define ATTRIB_RELOAD 241
 
 int g_iFastHandsId = 43;
 
