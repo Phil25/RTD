@@ -346,10 +346,10 @@ public void OnPluginEnd(){
 	ReloadPluginState();
 }
 
-void ReloadPluginState(){
+void ReloadPluginState(RTDRemoveReason reason=RTDRemove_PluginUnload){
 	for(int i = 1; i <= MaxClients; i++){
 		if(g_hRollers.GetInRoll(i))
-			ForceRemovePerk(i, RTDRemove_PluginUnload);
+			ForceRemovePerk(i, reason);
 
 		g_hRollers.Reset(i);
 	}
@@ -361,6 +361,10 @@ public void OnMapStart(){
 	HookEvent("teamplay_round_active",		Event_RoundActive);
 	HookEvent("post_inventory_application",	Event_Resupply, EventHookMode_Post);
 	HookEvent("player_hurt",				Event_PlayerHurt);
+
+	HookEvent("teamplay_round_start",		Event_RoundStart);
+	HookEvent("arena_round_start",			Event_RoundStart);
+	HookEvent("mvm_begin_wave",				Event_RoundStart);
 
 	Stocks_OnMapStart(); // rtd/stocks.sp
 	Forward_OnMapStart(); // rtd/manager.sp
@@ -375,6 +379,10 @@ public void OnMapEnd(){
 	UnhookEvent("teamplay_round_active",	Event_RoundActive);
 	UnhookEvent("post_inventory_application",Event_Resupply, EventHookMode_Post);
 	UnhookEvent("player_hurt",				Event_PlayerHurt);
+
+	UnhookEvent("teamplay_round_start",		Event_RoundStart);
+	UnhookEvent("arena_round_start",		Event_RoundStart);
+	UnhookEvent("mvm_begin_wave",			Event_RoundStart);
 }
 
 public void OnClientPutInServer(int client){
@@ -793,6 +801,11 @@ public Action Event_Resupply(Handle hEvent, const char[] sEventName, bool bDontB
 public Action Event_PlayerHurt(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
 	if(client) Forward_PlayerHurt(client, hEvent);
+	return Plugin_Continue;
+}
+
+public Action Event_RoundStart(Handle hEvent, const char[] sEventName, bool dontBroadcast){
+	ReloadPluginState(RTDRemove_NoPrint);
 	return Plugin_Continue;
 }
 
@@ -1271,7 +1284,9 @@ void RemovedPerk(int client, RTDRemoveReason reason, const char[] sReason=""){
 
 	Forward_PerkRemoved(client, g_hRollers.GetPerk(client), reason);
 	g_hRollers.SetPerk(client, null);
-	PrintPerkEndReason(client, reason, sReason);
+
+	if(reason != RTDRemove_NoPrint)
+		PrintPerkEndReason(client, reason, sReason);
 
 	Handle hTimer = g_hRollers.GetTimer(client);
 	KillTimerSafe(hTimer);

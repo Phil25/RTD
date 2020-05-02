@@ -103,7 +103,8 @@ enum RTDRemoveReason{
 	RTDRemove_ClassChange,
 	RTDRemove_WearOff,
 	RTDRemove_Disconnect,
-	RTDRemove_Custom
+	RTDRemove_Custom,
+	RTDRemove_NoPrint
 }
 
 enum RTDForceResult{
