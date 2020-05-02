@@ -17,7 +17,7 @@
 */
 
 
-int g_iMediGuns[33] = {INVALID_ENT_REFERENCE, ...};
+int g_iMediGuns[MAXPLAYERS+1] = {INVALID_ENT_REFERENCE, ...};
 int g_iFullUberchargeIndex = 6;
 
 public void FullUbercharge_Call(int client, Perk perk, bool apply){
