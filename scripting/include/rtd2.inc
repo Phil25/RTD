@@ -73,7 +73,7 @@ public void __pl_rtd2_SetNTVOptional(){
 #define ROLLFLAG_IGNORE_PERK_REPEATS	(1 << 3)	/* Ignore whether the perk was rolled recently */
 #define ROLLFLAG_IGNORE_PLAYER_REPEATS	(1 << 4)	/* Ignore whether the client has rolled the perk recently */
 
-#define RTD2_MAX_PERK_NAME_LENGTH	MAX_NAME_LENGTH // Should be enough for Cyrillic etc. (MAX_NAME_LENGTH now is 128)
+#define RTD2_MAX_PERK_NAME_LENGTH	128
 
 
 /*
