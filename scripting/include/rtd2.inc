@@ -103,7 +103,8 @@ enum RTDRemoveReason{
 	RTDRemove_ClassChange,
 	RTDRemove_WearOff,
 	RTDRemove_Disconnect,
-	RTDRemove_Custom
+	RTDRemove_Custom,
+	RTDRemove_NoPrint
 }
 
 enum RTDForceResult{
@@ -844,9 +845,6 @@ see the RTD's thread on AlliedModders:
 
 https://forums.alliedmods.net/showthread.php?t=278579
 */
-
-#pragma deprecated Use RTDCall instead
-functag RTD2Manager public(client, iPerkId, bool:bEnable);
 
 /**
  * Registers a perk from a different plugin to the core.

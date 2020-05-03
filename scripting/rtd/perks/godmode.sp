@@ -19,6 +19,8 @@
 
 #define GODMODE_PARTICLE "powerup_supernova_ready"
 
+int g_iInGodmode = 0;
+
 public void Godmode_Call(int client, Perk perk, bool bApply){
 	if(bApply) Godmode_ApplyPerk(client, perk);
 	else Godmode_RemovePerk(client);
@@ -42,15 +44,21 @@ void Godmode_ApplyPerk(int client, Perk perk){
 	int iUber = perk.GetPrefCell("uber");
 	SetIntCache(client, iUber);
 	if(iUber) TF2_AddCondition(client, TFCond_UberchargedCanteen);
+
+	g_iInGodmode |= client;
 }
 
 void Godmode_RemovePerk(int client){
 	KillEntCache(client);
+
 	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_NoSelf);
 	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Pushback);
 	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Self);
+
 	if(GetIntCacheBool(client))
 		TF2_RemoveCondition(client, TFCond_UberchargedCanteen);
+
+	g_iInGodmode &= ~client;
 }
 
 public Action Godmode_OnTakeDamage_NoSelf(int client, int &iAttacker){

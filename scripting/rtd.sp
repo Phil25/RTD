@@ -44,7 +44,7 @@
 
 /******* D E F I N E S ******/
 
-#define PLUGIN_VERSION	"2.3.1"
+#define PLUGIN_VERSION	"2.3.2"
 
 #define CHAT_PREFIX 	"\x07FFD700[RTD]\x01"
 #define CONS_PREFIX 	"[RTD]"
@@ -313,7 +313,9 @@ public void OnPluginStart(){
 	RegAdminCmd("sm_rtdsearch",	Command_PerkSearchup,	ADMFLAG_SLAY,	"Displays customized perk list.");
 
 	RegAdminCmd("sm_reloadrtd",	Command_Reload,			ADMFLAG_CONFIG,	"Reloads the config files.");
+#if defined _updater_included
 	RegAdminCmd("sm_updatertd",	Command_Update,			ADMFLAG_ROOT,	"Force an update check. Does nothing if Updater is not installed.");
+#endif
 
 
 		//-----[ Listeners ]-----//
@@ -344,10 +346,10 @@ public void OnPluginEnd(){
 	ReloadPluginState();
 }
 
-void ReloadPluginState(){
+void ReloadPluginState(RTDRemoveReason reason=RTDRemove_PluginUnload){
 	for(int i = 1; i <= MaxClients; i++){
 		if(g_hRollers.GetInRoll(i))
-			ForceRemovePerk(i, RTDRemove_PluginUnload);
+			ForceRemovePerk(i, reason);
 
 		g_hRollers.Reset(i);
 	}
@@ -359,6 +361,10 @@ public void OnMapStart(){
 	HookEvent("teamplay_round_active",		Event_RoundActive);
 	HookEvent("post_inventory_application",	Event_Resupply, EventHookMode_Post);
 	HookEvent("player_hurt",				Event_PlayerHurt);
+
+	HookEvent("teamplay_round_start",		Event_RoundStart);
+	HookEvent("arena_round_start",			Event_RoundStart);
+	HookEvent("mvm_begin_wave",				Event_RoundStart);
 
 	Stocks_OnMapStart(); // rtd/stocks.sp
 	Forward_OnMapStart(); // rtd/manager.sp
@@ -373,6 +379,10 @@ public void OnMapEnd(){
 	UnhookEvent("teamplay_round_active",	Event_RoundActive);
 	UnhookEvent("post_inventory_application",Event_Resupply, EventHookMode_Post);
 	UnhookEvent("player_hurt",				Event_PlayerHurt);
+
+	UnhookEvent("teamplay_round_start",		Event_RoundStart);
+	UnhookEvent("arena_round_start",		Event_RoundStart);
+	UnhookEvent("mvm_begin_wave",			Event_RoundStart);
 }
 
 public void OnClientPutInServer(int client){
@@ -595,6 +605,7 @@ public Action Command_Reload(int client, int args){
 	return Plugin_Handled;
 }
 
+#if defined _updater_included
 public Action Command_Update(int client, int args){
 	if(!g_bPluginUpdater){
 		ReplyToCommand(client, CONS_PREFIX ... " Updater is not installed.");
@@ -609,6 +620,7 @@ public Action Command_Update(int client, int args){
 	g_bIsUpdateForced = false;
 	return Plugin_Handled;
 }
+#endif
 
 
 
@@ -789,6 +801,11 @@ public Action Event_Resupply(Handle hEvent, const char[] sEventName, bool bDontB
 public Action Event_PlayerHurt(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
 	if(client) Forward_PlayerHurt(client, hEvent);
+	return Plugin_Continue;
+}
+
+public Action Event_RoundStart(Handle hEvent, const char[] sEventName, bool dontBroadcast){
+	ReloadPluginState(RTDRemove_NoPrint);
 	return Plugin_Continue;
 }
 
@@ -1267,7 +1284,9 @@ void RemovedPerk(int client, RTDRemoveReason reason, const char[] sReason=""){
 
 	Forward_PerkRemoved(client, g_hRollers.GetPerk(client), reason);
 	g_hRollers.SetPerk(client, null);
-	PrintPerkEndReason(client, reason, sReason);
+
+	if(reason != RTDRemove_NoPrint)
+		PrintPerkEndReason(client, reason, sReason);
 
 	Handle hTimer = g_hRollers.GetTimer(client);
 	KillTimerSafe(hTimer);
@@ -1604,6 +1623,9 @@ bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
 		return false;
 
 	if(GetEntProp(client, Prop_Data, "m_takedamage") != 2)
+		return false;
+
+	if(g_iInGodmode & client)
 		return false;
 
 	return true;
