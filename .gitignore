@@ -1,9 +1,11 @@
 *pass*
 
 scripting/compiled/
+scripting/spcomp
 
 !scripting/include
 scripting/include/*
 !scripting/include/rtd2.inc
 
 *.zip
+.exrc

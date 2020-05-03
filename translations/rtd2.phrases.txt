@@ -1,4 +1,4 @@
-﻿"Phrases"
+"Phrases"
 {
 
 	"RTD2_Ad"
@@ -8,6 +8,8 @@
 		"pl"				"Napisz {1}rtd{2} aby użyć RTD."
 		"sv"				"Skriv {1}rtd{2} för en slumpmässig effekt."
 		"de"				"Tippe {1}rtd{2} ein um einen zufälligen Effekt zu würfeln."
+		"chi"				"输入 {1}rtd{2} 抽取随机效果."
+		"ru"				"Напишите {1}rtd{2} чтобы попытать удачу с случайными эффектами."
 	}
 
 	"RTD2_Not_In_Round"
@@ -16,6 +18,8 @@
 		"pl"				"Poczekaj na rozpoczęcie rundy."
 		"sv"				"Vänta tills rundan har börjat."
 		"de"				"Warte bis die Runde startet."
+		"chi"				"请等待游戏开始."
+		"ru"				"Ожидание начала раунда."
 	}
 
 	"RTD2_Rolled_Perk_Roller"
@@ -25,6 +29,8 @@
 		"pl"			"Wylosowałeś {1}{2}{3}."
 		"sv"			"Du fick {1}{2}{3}."
 		"de"			"Gewürfelt {1}{2}{3}."
+		"chi"			"抽得 {1}{2}{3}."
+		"ru"			"Получил {1}{2}{3}."
 	}
 
 	"RTD2_Rolled_Perk_Roller_Time"
@@ -34,6 +40,8 @@
 		"pl"			"Wylosowałeś {1}{2}{3} na {4}{5}{6} sekund(y)."
 		"sv"			"Du fick {1}{2}{3} i {4}{5}{6} sekund(er)."
 		"de"			"Du hast {1}{2}{3} für {4}{5}{6} Sekunde(n) gewürfelt"
+		"chi"			"抽得 {1}{2}{3} 持续 {4}{5}{6} 秒."
+		"ru"			"Получил {1}{2}{3} на {4}{5}{6} секунд(ы)."
 	}
 
 	"RTD2_Rolled_Perk_Others"
@@ -43,6 +51,8 @@
 		"pl"			"{1}{2}{3} wylosował {4}{5}{6}."
 		"sv"			"{1}{2}{3} fick {4}{5}{6}."
 		"de"			"{1}{2}{3} hat {4}{5}{6} gewürfelt."
+		"chi"			"{1}{2}{3} 抽得 {4}{5}{6}."
+		"ru"			"{1}{2}{3} получил {4}{5}{6}."
 	}
 
 	"RTD2_Rolled_Perk_Others_Time"
@@ -52,6 +62,8 @@
 		"pl"			"{1}{2}{3} wylosował {4}{5}{6} na {7}{8}{9} sekund(y)."
 		"sv"			"{1}{2}{3} fick {4}{5}{6} i {7}{8}{9} sekund(er)."
 		"de"			"{1}{2}{3} hat {4}{5}{6} für {7}{8}{9} Sekunde(n) gewürfelt."
+		"chi"			"{1}{2}{3} 抽得 {4}{5}{6} 持续 {7}{8}{9} 秒."
+		"ru"			"{1}{2}{3} получил {4}{5}{6} на {7}{8}{9} секунд(ы)."
 	}
 
 	///////////////////////////
@@ -65,6 +77,8 @@
 		"pl"			"{1} graczy wylosowało {2}{3}{4}."
 		"sv"			"{1} spelare fick {2}{3}{4}."
 		"de"			"{1} Spieler haben {2}{3}{4} gewürfelt."
+		"chi"			"{1} 玩家抽得 {2}{3}{4}."
+		"ru"			"{1} игроки получили {2}{3}{4}."
 	}
 
 	"RTD2_Rolled_Perk_Multi_Time"
@@ -74,6 +88,8 @@
 		"pl"			"{1} graczy wylosowało {2}{3}{4} na {5}{6}{7} sekund(y)."
 		"sv"			"{1} spelare fick {2}{3}{4} i {5}{6}{7} sekund(er)."
 		"de"			"{1} Spieler haben {2}{3}{4} für {5}{6}{7} Sekunde(n) gewürfelt."
+		"chi"			"{1} 玩家抽得 {2}{3}{4} 持续 {5}{6}{7} 秒."
+		"ru"			"{1} игроки получили {2}{3}{4} на {5}{6}{7} секунд(ы)."
 	}
 
 	/////////////////////////
@@ -87,6 +103,8 @@
 		"pl"			"Musisz być żywy aby używać RTD."
 		"sv"			"Du måste vara vid liv för att använda RTD."
 		"de"			"Du musst am Leben sein, um zu würfeln."
+		"chi"			"活着的玩家才能使用 RTD."
+		"ru"			"Вы должны быть живы, чтобы использовать RTD."
 	}
 
 	//[RTD] You are already using RTD.
@@ -96,6 +114,8 @@
 		"pl"			"Już używasz RTD."
 		"sv"			"Du använder redan RTD."
 		"de"			"Du benutzt momentan RTD."
+		"chi"			"你已经使用 RTD 了."
+		"ru"			"Вы уже используете RTD."
 	}
 
 	//[RTD] You must wait {Color3}{TimeLeft}{ColorNormal} second(s).
@@ -106,6 +126,8 @@
 		"pl"			"Musisz poczekać {1}{2}{3} sekund(y/ę)."
 		"sv"			"Du måste vänta {1}{2}{3} sekund(er)."
 		"de"			"Du musst {1}{2}{3} Sekunde(n) warten."
+		"chi"			"你必须等待 {1}{2}{3} 秒."
+		"ru"			"Вы должны подождать {1}{2}{3} секунд(ы)."
 	}
 
 	//[RTD] Too many players are using RTD.
@@ -115,6 +137,8 @@
 		"pl"			"Za dużo graczy używa już RTD."
 		"sv"			"För många spelare använder RTD just nu."
 		"de"			"Zu viele Spieler benutzen schon RTD"
+		"chi"			"现在有太多的玩家正在 RTD."
+		"ru"			"Слишком много игроков уже используют RTD."
 	}
 
 	//[RTD] Too many players on your team are using RTD.
@@ -124,6 +148,8 @@
 		"pl"			"Za dużo graczy w twojej drużynie używa już RTD."
 		"sv"			"För många spelare i ditt lag använder RTD just nu."
 		"de"			"Zu viele Spieler in deinem Team benutzen schon RTD."
+		"chi"			"现在你的队伍中有太多的玩家正在 RTD."
+		"ru"			"Слишком много игроков в вашей команде уже используют RTD."
 	}
 
 	//[RTD] Rolling is disabled at the moment.
@@ -133,6 +159,8 @@
 		"pl"			"Nie można używać RTD w tym momencie."
 		"sv"			"RTD är inte tillgängligt just nu."
 		"de"			"RTD ist momentan deaktiviert."
+		"chi"			"抽奖此时已禁用."
+		"ru"			"RTD отключен."
 	}
 
 	//[RTD] You do not have access to RTD.
@@ -142,6 +170,8 @@
 		"pl"			"Nie masz dostępu do RTD."
 		"sv"			"RTD är inte tillgängligt just nu."
 		"de"			"Du hast kein zugriff RTD zu benutzen."
+		"chi"			"你没有 RTD 的权限."
+		"ru"			"У вас нет доступа к RTD."
 	}
 
 	//[RTD] Your team cannot use RTD.
@@ -151,6 +181,8 @@
 		"pl"			"Twoja dróżyna nie może używać RTD."
 		"sv"			"Ditt lag kan inte använda RTD."
 		"de"			"Dein Team kann RTD nicht benutzen."
+		"chi"			"你的队伍不能 RTD."
+		"ru"			"Ваша команда не может использовать RTD."
 	}
 
 	/////////////////////////////////
@@ -164,6 +196,8 @@
 		"pl"			"Twój perk się skończył."
 		"sv"			"Din effekt har tagit slut."
 		"de"			"Dein Bonus ist abgelaufen."
+		"chi"			"你的特殊效果已过期."
+		"ru"			"Дейстие вашего перка прошло."
 	}
 
 	//[RTD] {RollerTeamColor}{RollerName}{change color to normal}'s perk has worn off.
@@ -174,6 +208,8 @@
 		"pl"			"Perk {1}{2}{3} się skończył."
 		"sv"			"{1}{2}{3}'s effekt har tagit slut."
 		"de"			"{1}{2}{3}'s Bonus ist abgelaufen."
+		"chi"			"{1}{2}{3} 的特殊效果已过期."
+		"ru"			"Дейстие перка игрока {1}{2}{3} прошло."
 	}
 
 	//[RTD] You have died during your roll.
@@ -183,6 +219,8 @@
 		"pl"			"Zginąłeś podczas używania RTD."
 		"sv"			"Du har dött under din RTD."
 		"de"			"Du bist während des Würfelns gestorben."
+		"chi"			"你在特殊效果作用时死亡."
+		"ru"			"Вы умерли во время RTD."
 	}
 
 	//[RTD] {RollerTeamColor}{RollerName}{change color to normal} has died during their roll.
@@ -193,6 +231,8 @@
 		"pl"			"{1}{2}{3} zginął podczas używania RTD."
 		"sv"			"{1}{2}{3} har dött under sin RTD."
 		"de"			"{1}{2}{3} ist während des Würfelns gestorben."
+		"chi"			"{1}{2}{3} 在特殊效果作用时死亡."
+		"ru"			"{1}{2}{3} умер во время его действия RTD."
 	}
 
 	//[RTD] You have changed class during your roll.
@@ -202,6 +242,8 @@
 		"pl"			"Zmieniłeś klasę podczas używania RTD."
 		"sv"			"Du har bytt karaktär under din RTD."
 		"de"			"Du hast während des Würfelns die Klasse gewechselt."
+		"chi"			"你在特殊效果作用时更改了职业."
+		"ru"			"Вы вы сменили класс во время RTD."
 	}
 
 	//[RTD] {RollerTeamColor}{RollerName}{change color to normal} has changed class during their roll.
@@ -212,6 +254,8 @@
 		"pl"			"{1}{2}{3} zmienił klasę podczas używania RTD."
 		"sv"			"{1}{2}{3} har bytt karaktär under sin RTD."
 		"de"			"{1}{2}{3} hat während des Würfelns die Klasse gewechselt."
+		"chi"			"{1}{2}{3} 在特殊效果作用时更改了职业."
+		"ru"			"{1}{2}{3} сменил класс во время его действия RTD."
 	}
 
 	//[RTD] The plugin has been unloaded during your roll.
@@ -221,6 +265,8 @@
 		"pl"			"Plugin został wyłączony podczas twojego użytku."
 		"sv"			"Pluginet har stängts av under din effekt."
 		"de"			"Das Plugin wurde während deines Würfelns beendet."
+		"chi"			"插件在你的特殊效果作用时重载了."
+		"ru"			"Плагин был отключен во время вашего RTD."
 	}
 
 	//[RTD] The plugin has been unloaded during {RollerTeamColor}{RollerName}{change color to normal}'s roll.
@@ -231,6 +277,8 @@
 		"pl"			"Plugin został wyłączony podczas użytku przez {1}{2}{3}."
 		"sv"			"Pluginet har stängts av under {1}{2}{3}'s effekt."
 		"de"			"Das Plugin wurde während {1}{2}{3}'s Würfelns beendet."
+		"chi"			"插件在 {1}{2}{3} 的特殊效果作用时重载了."
+		"ru"			"Плагин был отключен во время RTD игрока {1}{2}{3}."
 	}
 
 	//[RTD] {RollerTeamColor}{RollerName}{change color to normal} has disconnected during their roll.
@@ -241,6 +289,8 @@
 		"pl"			"{1}{2}{3} opuścił serwer podczas używania RTD."
 		"sv"			"{1}{2}{3} har lämnat under sin RTD."
 		"de"			"{1}{2}{3} hat während des rollens den Server verlassen."
+		"chi"			"{1}{2}{3} 在特殊效果作用时断开了连接."
+		"ru"			"{1}{2}{3} вышел из игры во время его RTD."
 	}
 
 	//[RTD] Perk removed, reason: {Reason}.
@@ -251,6 +301,8 @@
 		"pl"			"Perk zakończony, powód: {1}."
 		"sv"			"Effekt togs bort, anledning: {1}."
 		"de"			"Der Bonus wurde aus folgenden Grund entfernt: {1}."
+		"chi"			"特殊效果已删除, 原因: {1}."
+		"ru"			"Перк удален, причина: {1}."
 	}
 
 	//[RTD] {RollerTeamColor}{RollerName}{change color to normal}'s perk removed, reason: {Reason}.
@@ -261,6 +313,8 @@
 		"pl"			"Perk {1}{2}{3} zastał zakończony, powód: {4}."
 		"sv"			"{1}{2}{3}'s effekt togs bort, anledning: {4}."
 		"de"			"{1}{2}{3}'s Bonus wurde aus folgenden Grund entfernt: {4}."
+		"chi"			"{1}{2}{3} 的特殊效果已删除, 原因: {4}."
+		"ru"			"Перк игрока {1}{2}{3} был удален по причине: {4}."
 	}
 
 	//[RTD] Perk {PerkColor}{PerkName}{ChangeColor} has worn off for {PlayerCount} players.
@@ -271,6 +325,8 @@
 		"pl"			"Perk {1}{2}{3} skończył się dla {4} graczy."
 		"sv"			"Effekten {1}{2}{3} har tagit slut för {4} spelare."
 		"de"			"Der Bonus {1}{2}{3} ist für {4} Spieler abgelaufen."
+		"chi"			"{4} 名玩家的 {1}{2}{3} 特殊效果已删除."
+		"ru"			"Перк {1}{2}{3} закончился для {4} игроков."
 	}
 
 	//////////////////////////////
@@ -284,6 +340,8 @@
 		"pl"			"Byłeś uziemiony."
 		"sv"			"Du blev flyttad för att inte fastna."
 		"de"			"Du wurdest aus Platzgründen respawnt."
+		"chi"			"你已被重生以防止卡住."
+		"ru"			"Вы были возрождены, чтобы избежать застревание."
 	}
 
 	"RTD2_Perk_Attack"
@@ -293,6 +351,8 @@
 		"pl"			"Krzyknij {1}\"MEDYK!\"{2} aby zaatakować."
 		"sv"			"Ropa {1}\"MEDIC!\"{2} för att attackera."
 		"de"			"Rufe nach einen {1}Medic{2} um zu attackieren."
+		"chi"			"呼叫 {1}\"医生!\"{2} 以攻击."
+		"ru"			"Крикните {1}\"МЕДИК!\"{2} чтобы атаковать."
 	}
 
 	"RTD2_Perk_Resurrect"
@@ -302,6 +362,8 @@
 		"pl"			"Krzyknij {1}\"MEDYK!\"{2} aby się wskrzesić."
 		"sv"			""
 		"de"			""
+		"chi"			"呼叫 {1}\"医生!\"{2} 复活."
+		"ru"			"Крикните {1}\"МЕДИК!\"{2} чтобы воскресить."
 	}
 
 	"RTD2_Perk_Dispenser_Initialization"
@@ -311,6 +373,8 @@
 		"pl"			"Krzyknij {1}\"MEDIC!\"{2} aby postawić Zasobnik."
 		"sv"			"Ropa {1}\"MEDIC!\"{2} för att lägga ner en dispenser."
 		"de"			"Rufe nach einen {1}Medic{2} um einen Dispenser zu spawnen."
+		"chi"			"呼叫 {1}\"医生!\"{2} 生成一个补给器."
+		"ru"			"Крикните {1}\"МЕДИК!\"{2} чтобы создать Раздатчик."
 	}
 
 	"RTD2_Perk_Dispenser_Spawned"
@@ -320,6 +384,8 @@
 		"pl"			"Postawiono {1}{2}/{3}{4} Zasobników."
 		"sv"			"Använt {1}{2}/{3}{4} Dispensers."
 		"de"			"Dispenser {1}{2}/{3}{4} wurde gespawnt."
+		"chi"			"已生成 {1}{2}/{3}{4} 个补给器."
+		"ru"			"Создано {1}{2}/{3}{4} Раздатчиков."
 	}
 
 	"RTD2_Perk_Sentry_Initialization"
@@ -329,6 +395,8 @@
 		"pl"			"Krzyknij {1}\"MEDIC!\"{2} aby postawić Działko."
 		"sv"			"Ropa {1}\"MEDIC!\"{2} för att lägga ner en Sentry."
 		"de"			"Rufe nach einen {1}Medic{2} um eine Sentry zu spawnen."
+		"chi"			"呼叫 {1}\"医生!\"{2} 生成一个步哨枪."
+		"ru"			"Крикните {1}\"МЕДИК!\"{2} чтобы создать Турель."
 	}
 
 	"RTD2_Perk_Sentry_Spawned"
@@ -338,6 +406,8 @@
 		"pl"			"Postawiono {1}{2}/{3}{4} Działek."
 		"sv"			"Använt {1}{2}/{3}{4} Sentries."
 		"de"			"Sentry {1}{2}/{3}{4} wurde gespawnt."
+		"chi"			"已生成 {1}{2}/{3}{4} 个步哨枪."
+		"ru"			"Создано {1}{2}/{3}{4} Турелей."
 	}
 
 	"RTD2_Perk_Timebomb_Damage"
@@ -347,6 +417,8 @@
 		"pl"			"Zadano {1}{2}{3} obrażeń."
 		"sv"			"Gjorde {1}{2}{3} skada."
 		"de"			"Es wurden {1}{2}{3} Schaden zugeteilt."
+		"chi"			"已造成 {1}{2}{3} 伤害."
+		"ru"			"Нанес {1}{2}{3} урона."
 	}
 
 	"RTD2_Perk_Timebomb_Ignite"
@@ -356,6 +428,8 @@
 		"pl"			"Podpalono {1}{2}{3} graczy."
 		"sv"			"Fattade eld på {1}{2}{3} spelare."
 		"de"			"Es wurden {1}{2}{3} Spieler in Flammen gesetzt."
+		"chi"			"已点燃 {1}{2}{3} 人."
+		"ru"			"Зажег {1}{2}{3} игроков."
 	}
 
 }
