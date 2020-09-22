@@ -21,7 +21,7 @@
 		"de"				"Warte bis die Runde startet."
 		"chi"				"请等待游戏开始."
 		"ru"				"Ожидание начала раунда."
-		"pt"				"Aguarde a rodada começar."
+		"pt"				"Espere a rodada começar."
 	}
 
 	"RTD2_Rolled_Perk_Roller"
@@ -315,7 +315,7 @@
 		"de"			"{1}{2}{3} hat während des rollens den Server verlassen."
 		"chi"			"{1}{2}{3} 在特殊效果作用时断开了连接."
 		"ru"			"{1}{2}{3} вышел из игры во время его RTD."
-		"pt"			"{1}{2}{3} desconectou enquanto usava o RTD."
+		"pt"			"{1}{2}{3} desconectou-se enquanto usava o RTD."
 	}
 
 	//[RTD] Perk removed, reason: {Reason}.
@@ -404,7 +404,7 @@
 		"de"			"Rufe nach einen {1}Medic{2} um einen Dispenser zu spawnen."
 		"chi"			"呼叫 {1}\"医生!\"{2} 生成一个补给器."
 		"ru"			"Крикните {1}\"МЕДИК!\"{2} чтобы создать Раздатчик."
-		"pt"			"Grite {1}\"MEDIC!\"{2} para spawnar um Fornecedor."
+		"pt"			"Grite {1}\"MEDIC!\"{2} para invocar um Fornecedor."
 	}
 
 	"RTD2_Perk_Dispenser_Spawned"
@@ -416,7 +416,7 @@
 		"de"			"Dispenser {1}{2}/{3}{4} wurde gespawnt."
 		"chi"			"已生成 {1}{2}/{3}{4} 个补给器."
 		"ru"			"Создано {1}{2}/{3}{4} Раздатчиков."
-		"pt"			"Spawnou {1}{2}/{3}{4} Fornecedores."
+		"pt"			"Invocou {1}{2}/{3}{4} Fornecedores."
 	}
 
 	"RTD2_Perk_Sentry_Initialization"
@@ -428,7 +428,7 @@
 		"de"			"Rufe nach einen {1}Medic{2} um eine Sentry zu spawnen."
 		"chi"			"呼叫 {1}\"医生!\"{2} 生成一个步哨枪."
 		"ru"			"Крикните {1}\"МЕДИК!\"{2} чтобы создать Турель."
-		"pt"			"Grite {1}\"MEDIC!\"{2} para spawnar uma Sentinela."
+		"pt"			"Grite {1}\"MEDIC!\"{2} para invocar uma Sentinela."
 	}
 
 	"RTD2_Perk_Sentry_Spawned"
@@ -440,7 +440,7 @@
 		"de"			"Sentry {1}{2}/{3}{4} wurde gespawnt."
 		"chi"			"已生成 {1}{2}/{3}{4} 个步哨枪."
 		"ru"			"Создано {1}{2}/{3}{4} Турелей."
-		"pt"			"Spawnou {1}{2}/{3}{4} Sentinelas."
+		"pt"			"Invocou {1}{2}/{3}{4} Sentinelas."
 	}
 
 	"RTD2_Perk_Timebomb_Damage"
