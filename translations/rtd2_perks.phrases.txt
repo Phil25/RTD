@@ -551,13 +551,13 @@
 
 	"RTD2_Desc_firebreath"
 	{
-		"en"	"The burning you feel? It is PURE FIRE."
-		"pl"	"To palenie w tobie. To CZYSTY OGIEŃ."
-		"sv"	"The burning you feel? It is PURE FIRE."
-		"de"	"Das brennen was du fühlst? Es ist PURES FEUER."
-		"chi"	"打出三昧真火."
-		"ru"	"Вы чувствуете жжение? Это ЧИСТЫЙ ОГОНЬ."
-		"pt"	"Você se pergunta: o que é este calor que eu sinto? Pois bem, É FOGO PURO."
+		"en"	"The burning you feel? It is PURE FIRE!"
+		"pl"	"To palenie w tobie. To CZYSTY OGIEŃ!"
+		"sv"	"The burning you feel? It is PURE FIRE!."
+		"de"	"Das brennen was du fühlst? Es ist PURES FEUER!"
+		"chi"	"打出三昧真火!"
+		"ru"	"Вы чувствуете жжение? Это ЧИСТЫЙ ОГОНЬ!"
+		"pt"	"Você se pergunta: o que é este calor que eu sinto? Pois bem, É FOGO PURO!"
 	}
 
 	"RTD2_Desc_strongrecoil"
@@ -668,7 +668,7 @@
 		"pl"	"Nareszcie, dobry z nich pożytek."
 		"chi"	"真正的帽子模拟器可以扔出帽子砸人."
 		"ru"	"Наконец, правильное использование для них."
-		"pt"	"Finalmente, uma utilização correta dos chapéus."
+		"pt"	"Finalmente, um uso correto dos chapéus."
 	}
 
 	"RTD2_Desc_madaraswhistle"
@@ -722,7 +722,7 @@
 		"pl"	"Nie uciekniesz przed piekłem."
 		"chi"	"你无法逃离地狱."
 		"ru"	"Ад это то, что вы не можете избежать."
-		"pt"	"O inferno é uma coisa que você não pode escapar."
+		"pt"	"O inferno é algo do qual você não pode escapar."
 	}
 
 	"RTD2_Desc_cursedprojectiles"
