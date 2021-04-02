@@ -74,7 +74,7 @@
 		"de"	"Deine Anziehungskraft wurde zu einer niedriegen Schwerkraft gesetzt."
 		"chi"	"你的重力降低."
 		"ru"	"Ваша гравитация является нулевой."
-		"pt"	"Sua gravidade está baixa."
+		"pt"	"Sua gravidade foi definida para um valor baixo."
 	}
 
 	"RTD2_Desc_fullubercharge"
@@ -217,7 +217,7 @@
 		"de"	"Dein Kopf ist jetzt eine Bombe, jetzt töte jemanden."
 		"chi"	"你的头变成了炸弹, 适合用来杀一些人."
 		"ru"	"Твоя голова бомба сейчас, иди убить кого-то с этим."
-		"pt"	"A sua cabeça virou uma bomba, corra atrás de alguém!"
+		"pt"	"A sua cabeça virou uma bomba! Corra atrás de alguém e o exploda!"
 	}
 
 	"RTD2_Desc_ignition"
@@ -360,7 +360,7 @@
 		"de"	"Du kannst in der Luft springen, warum nicht öfters?"
 		"chi"	"多段跳和二段跳不也差不多吗?"
 		"ru"	"Вы можете отпрыгнуть от воздуха один раз, так почему бы не несколько раз?"
-		"pt" 	"Você pode pular uma vez no ar, então porquê não várias vezes?"
+		"pt" 	"Você pode pular uma vez no ar, então por que não várias vezes?"
 	}
 
 	"RTD2_Desc_powerfulhits"
@@ -524,7 +524,7 @@
 		"de"	"Springe zum Mond und werde auf den weg dahin getötet."
 		"chi"	"月球挨揍之旅愉快."
 		"ru"	"Прыгни на Луну и убейся тем временем."
-		"pt"	"Pule em direção a lua e seja morto no meio do caminho."
+		"pt"	"Pule em direção à lua e seja morto no meio do caminho."
 	}
 
 	"RTD2_Desc_teamcriticals"
@@ -535,7 +535,7 @@
 		"de"	"Stehe in der nähe eines Teammitglieds und gebe ihn kritische Schüsse."
 		"chi"	"给附近的队友暴击加成."
 		"ru"	"Встаньте рядом с товарищами по команде, чтобы дать им криты."
-		"pt"	"Fique perto de um companheiro de equipe e garanta críticos para ele."
+		"pt"	"Fique perto dos seus colegas de equipe e garanta críticos para eles."
 	}
 
 	"RTD2_Desc_firetimebomb"
@@ -579,7 +579,7 @@
 		"de"	"Du gehts nach links und nach oben und nach rechts oder nach unten?"
 		"chi"	"你失去了方向感...?"
 		"ru"	"Вы идете налево и вы идете вверх или назад и вправо или вниз...?"
-		"pt" 	"Você vai para esquerda e você vai para cima ou para atrás e direita ou para baixo...?"
+		"pt" 	"Você vai para a esquerda e você vai para cima ou para trás e para a direita ou para baixo...?"
 	}
 
 	"RTD2_Desc_extrathrowables"
@@ -650,7 +650,7 @@
 		"pl"	"Rozprzestrzeniaj narkotyki na odległość."
 		"chi"	"从远处给敌人来一针."
 		"ru"	"Стреляйте наркотиками на расстоянии."
-		"pt"	"Drogue um inimigo a longas distâncias."
+		"pt"	"Drogue um inimigo à longas distâncias."
 	}
 
 	"RTD2_Desc_longmelee"
@@ -781,7 +781,7 @@
 
 	"RTD2_Desc_overhealbonus"
 	{
-		"en"	"Overheal boost for your MediGun."
+		"en"	"Overheal boost for your Medi Gun."
 		"pl"	"Ulepszony overheal."
 		"chi"	"提升医疗枪的超量治疗."
 		"ru"	"Увеличенние сверх-лечения для вашей Лечебной пушки."
