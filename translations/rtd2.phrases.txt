@@ -174,7 +174,7 @@
 		"de"			"RTD ist momentan deaktiviert."
 		"chi"			"抽奖此时已禁用."
 		"ru"			"RTD отключен."
-		"pt"			"O RTD está desabilitado no momento."
+		"pt"			"O RTD está desativado no momento."
 	}
 
 	//[RTD] You do not have access to RTD.
@@ -214,7 +214,7 @@
 		"de"			"Dein Bonus ist abgelaufen."
 		"chi"			"你的特殊效果已过期."
 		"ru"			"Дейстие вашего перка прошло."
-		"pt"			"O seu efeito do RTD acabou."
+		"pt"			"O efeito do seu RTD acabou."
 	}
 
 	//[RTD] {RollerTeamColor}{RollerName}{change color to normal}'s perk has worn off.
@@ -354,7 +354,7 @@
 		"de"			"Der Bonus {1}{2}{3} ist für {4} Spieler abgelaufen."
 		"chi"			"{4} 名玩家的 {1}{2}{3} 特殊效果已删除."
 		"ru"			"Перк {1}{2}{3} закончился для {4} игроков."
-		"pt"			"O RTD {1}{2}{3} foi removido para {4} jogadores."
+		"pt"			"O RTD {1}{2}{3} acabou para {4} jogadores."
 	}
 
 	//////////////////////////////
