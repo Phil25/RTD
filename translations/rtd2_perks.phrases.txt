@@ -74,7 +74,7 @@
 		"de"	"Deine Anziehungskraft wurde zu einer niedriegen Schwerkraft gesetzt."
 		"chi"	"你的重力降低."
 		"ru"	"Ваша гравитация является нулевой."
-		"pt"	"Sua gravidade foi definida para um valor baixo."
+		"pt"	"Sua gravidade está baixa."
 	}
 
 	"RTD2_Desc_fullubercharge"
