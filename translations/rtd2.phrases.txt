@@ -10,7 +10,7 @@
 		"de"				"Tippe {1}rtd{2} ein um einen zufälligen Effekt zu würfeln."
 		"chi"				"输入 {1}rtd{2} 抽取随机效果."
 		"ru"				"Напишите {1}rtd{2} чтобы попытать удачу с случайными эффектами."
-		"pt"				"Digite {1}rtd{2} para roletar efeitos aleatórios."
+		"pt"				"Digite {1}rtd{2} para sortear efeitos aleatórios."
 	}
 
 	"RTD2_Not_In_Round"
@@ -33,7 +33,7 @@
 		"de"			"Gewürfelt {1}{2}{3}."
 		"chi"			"抽得 {1}{2}{3}."
 		"ru"			"Получил {1}{2}{3}."
-		"pt"			"Você roletou {1}{2}{3}."
+		"pt"			"Efeito sorteado: {1}{2}{3}"
 	}
 
 	"RTD2_Rolled_Perk_Roller_Time"
@@ -45,7 +45,7 @@
 		"de"			"Du hast {1}{2}{3} für {4}{5}{6} Sekunde(n) gewürfelt"
 		"chi"			"抽得 {1}{2}{3} 持续 {4}{5}{6} 秒."
 		"ru"			"Получил {1}{2}{3} на {4}{5}{6} секунд(ы)."
-		"pt"			"Você roletou {1}{2}{3} por {4}{5}{6} segundo(s)."
+		"pt"			"Você sorteou {1}{2}{3} por {4}{5}{6} segundo(s)."
 	}
 
 	"RTD2_Rolled_Perk_Others"
@@ -57,7 +57,7 @@
 		"de"			"{1}{2}{3} hat {4}{5}{6} gewürfelt."
 		"chi"			"{1}{2}{3} 抽得 {4}{5}{6}."
 		"ru"			"{1}{2}{3} получил {4}{5}{6}."
-		"pt"			"{1}{2}{3} roletou {4}{5}{6}."
+		"pt"			"{1}{2}{3} sorteou {4}{5}{6}."
 	}
 
 	"RTD2_Rolled_Perk_Others_Time"
@@ -69,7 +69,7 @@
 		"de"			"{1}{2}{3} hat {4}{5}{6} für {7}{8}{9} Sekunde(n) gewürfelt."
 		"chi"			"{1}{2}{3} 抽得 {4}{5}{6} 持续 {7}{8}{9} 秒."
 		"ru"			"{1}{2}{3} получил {4}{5}{6} на {7}{8}{9} секунд(ы)."
-		"pt"			"{1}{2}{3} roletou {4}{5}{6} por {7}{8}{9} segundo(s)."
+		"pt"			"{1}{2}{3} sorteou {4}{5}{6} por {7}{8}{9} segundo(s)."
 	}
 
 	///////////////////////////
@@ -85,7 +85,7 @@
 		"de"			"{1} Spieler haben {2}{3}{4} gewürfelt."
 		"chi"			"{1} 玩家抽得 {2}{3}{4}."
 		"ru"			"{1} игроки получили {2}{3}{4}."
-		"pt"			"{1} jogadores roletaram {2}{3}{4}."
+		"pt"			"{1} jogadores sortearam {2}{3}{4}."
 	}
 
 	"RTD2_Rolled_Perk_Multi_Time"
@@ -97,7 +97,7 @@
 		"de"			"{1} Spieler haben {2}{3}{4} für {5}{6}{7} Sekunde(n) gewürfelt."
 		"chi"			"{1} 玩家抽得 {2}{3}{4} 持续 {5}{6}{7} 秒."
 		"ru"			"{1} игроки получили {2}{3}{4} на {5}{6}{7} секунд(ы)."
-		"pt"			"{1} jogadores roletaram {2}{3}{4} por {5}{6}{7} segundo(s)."
+		"pt"			"{1} jogadores sortearam {2}{3}{4} por {5}{6}{7} segundo(s)."
 	}
 
 	/////////////////////////
