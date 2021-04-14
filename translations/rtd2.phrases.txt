@@ -33,7 +33,7 @@
 		"de"			"Gewürfelt {1}{2}{3}."
 		"chi"			"抽得 {1}{2}{3}."
 		"ru"			"Получил {1}{2}{3}."
-		"pt"			"Efeito sorteado: {1}{2}{3}"
+		"pt"			"Você sorteou {1}{2}{3}."
 	}
 
 	"RTD2_Rolled_Perk_Roller_Time"
