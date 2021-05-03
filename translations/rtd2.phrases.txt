@@ -289,7 +289,7 @@
 		"de"			"Das Plugin wurde während deines Würfelns beendet."
 		"chi"			"插件在你的特殊效果作用时重载了."
 		"ru"			"Плагин был отключен во время вашего RTD."
-		"pt"			"O plugin foi descarregado durante seu RTD."
+		"pt"			"O plugin foi descarregado durante o seu RTD."
 	}
 
 	//[RTD] The plugin has been unloaded during {RollerTeamColor}{RollerName}{change color to normal}'s roll.
