@@ -41,7 +41,7 @@
 		"de"	"Dein Leben ist erhöht und der nächste Schuss ist eine kritischer Schuss."
 		"chi"	"你的生命值被加强, 下一次攻击是暴击."
 		"ru"	"Ваше здоровье увеличено, а следующая атака становится критической."
-		"pt"	"Sua vida é aumentada e seu próximo ataque será um ataque crítico."
+		"pt"	"Sua vida é aumentada e seu próximo ataque é um crítico garantido."
 	}
 
 	"RTD2_Desc_increasedspeed"
@@ -74,7 +74,7 @@
 		"de"	"Deine Anziehungskraft wurde zu einer niedriegen Schwerkraft gesetzt."
 		"chi"	"你的重力降低."
 		"ru"	"Ваша гравитация является нулевой."
-		"pt"	"Sua gravidade está baixa."
+		"pt"	"Sua gravidade ficou baixa."
 	}
 
 	"RTD2_Desc_fullubercharge"
@@ -118,7 +118,7 @@
 		"de"	"Deine Schüsse sind kritische Schüsse."
 		"chi"	"你的攻击是暴击."
 		"ru"	"Ваши атаки криты."
-		"pt"	"Seus ataques são ataques críticos."
+		"pt"	"Seus ataques são críticos garantidos."
 	}
 
 	"RTD2_Desc_infiniteammo"
@@ -393,7 +393,7 @@
 		"de"	"Du bist geschrumpt, schleich dich an die jede an die du willst!"
 		"chi"	"你被缩小了, 可以方便地站在巨人的肩膀上!"
 		"ru"	"Вы уменьшились, подкрадывайтесь к кому хотите!"
-		"pt"	"Você encolheu, rasteje por onde você quiser!"
+		"pt"	"Você encolheu, rasteje por onde quiser!"
 	}
 
 	"RTD2_Desc_firework"
@@ -535,7 +535,7 @@
 		"de"	"Stehe in der nähe eines Teammitglieds und gebe ihn kritische Schüsse."
 		"chi"	"给附近的队友暴击加成."
 		"ru"	"Встаньте рядом с товарищами по команде, чтобы дать им криты."
-		"pt"	"Fique perto dos seus colegas de equipe e garanta críticos para eles."
+		"pt"	"Fique perto dos seus aliados e garanta críticos para eles."
 	}
 
 	"RTD2_Desc_firetimebomb"
@@ -557,7 +557,7 @@
 		"de"	"Das brennen was du fühlst? Es ist PURES FEUER!"
 		"chi"	"打出三昧真火!"
 		"ru"	"Вы чувствуете жжение? Это ЧИСТЫЙ ОГОНЬ!"
-		"pt"	"Você se pergunta: o que é este calor que eu sinto? Pois bem, É FOGO PURO!"
+		"pt"	"Um Ghast no Team Fortress 2?!"
 	}
 
 	"RTD2_Desc_strongrecoil"
@@ -590,7 +590,7 @@
 		"de"	"Du hast realisiert das du mehrere davon mitnehmen kannst."
 		"chi"	"你现在有了更多垃圾可以乱扔."
 		"ru"	"Вы поняли, что можете взять больше с собой."
-		"pt"	"Você acabou de perceber que você pode carregar mais destes com você."
+		"pt"	"Você percebe que você pode carregar mais destes com você."
 	}
 
 	"RTD2_Desc_powerplay"
@@ -612,7 +612,7 @@
 		"de"	"Deine Pfeile und Armbrust Pfeile explodieren bei Berührung."
 		"chi"	"你的弓箭和弩箭会造成爆炸."
 		"ru"	"Ваши стрелы и арбалетные болты взрываются при попадании."
-		"pt"	"Suas flechas e seringas explodem ao impactarem."
+		"pt"	"Suas flechas e seringas explodem ao impacto."
 	}
 
 	"RTD2_Desc_inclineproblem"
@@ -695,7 +695,7 @@
 		"pl"	"Coś ci nie wychodzi losowanie."
 		"chi"	"谢谢惠顾."
 		"ru"	"У вас довольно плохая удача."
-		"pt"	"Você é muito ruim roletando."
+		"pt"	"Você é muito ruim sorteando."
 	}
 
 	"RTD2_Desc_mercsdietwice"
@@ -722,7 +722,7 @@
 		"pl"	"Nie uciekniesz przed piekłem."
 		"chi"	"你无法逃离地狱."
 		"ru"	"Ад это то, что вы не можете избежать."
-		"pt"	"O inferno é algo do qual você não pode escapar."
+		"pt"	"O inferno é uma coisa da qual você não pode escapar."
 	}
 
 	"RTD2_Desc_cursedprojectiles"
@@ -785,7 +785,7 @@
 		"pl"	"Ulepszony overheal."
 		"chi"	"提升医疗枪的超量治疗."
 		"ru"	"Увеличенние сверх-лечения для вашей Лечебной пушки."
-		"pt"	"Bônus de sobrecura para sua Arma Médica."
+		"pt"	"Bônus de sobrecura para a sua Arma Médica."
 	}
 
 }
