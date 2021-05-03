@@ -731,7 +731,7 @@
 		"pl"	"Nie zaufasz swoim broniom."
 		"chi"	"不要相信自己的武器."
 		"ru"	"Не могу доверять собственному оружию."
-		"pt"	"Você não pode nem confiar nas suas próprias armas."
+		"pt"	"Você não pode confiar nem nas suas próprias armas."
 	}
 
 	"RTD2_Desc_vampire"
