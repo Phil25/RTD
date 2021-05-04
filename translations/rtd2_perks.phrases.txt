@@ -283,7 +283,7 @@
 		"de"	"Lass dein Feind wissen wo du bist, du hast keine Angst vor den."
 		"chi"	"敌人现在知道你的位置, 反正你也不怕他们."
 		"ru"	"Пусть враги знают, где ты, ты их не боишься."
-		"pt"	"Deixe o inimigo saber onde você está, você não tem medo deles."
+		"pt"	"Deixe os inimigos saberem onde você está, você não tem medo deles."
 	}
 
 	"RTD2_Desc_forcedtaunt"
@@ -731,7 +731,7 @@
 		"pl"	"Nie zaufasz swoim broniom."
 		"chi"	"不要相信自己的武器."
 		"ru"	"Не могу доверять собственному оружию."
-		"pt"	"Você não pode confiar nem nas suas próprias armas."
+		"pt"	"Você não pode confiar em suas próprias armas."
 	}
 
 	"RTD2_Desc_vampire"
