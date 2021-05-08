@@ -8,6 +8,7 @@
 		"de"	"RTD Effekte:"
 		"chi"	"RTD 效果:"
 		"ru"	"Эффекты RTD:"
+		"pt"	"Efeitos do RTD:"
 	}
 
 	"RTD2_Desc_godmode"
@@ -18,6 +19,7 @@
 		"de"	"Du bist unverwundbar."
 		"chi"	"你对伤害免疫."
 		"ru"	"Вы неуязвимы к урону."
+		"pt"	"Você está invencível a qualquer fonte de dano."
 	}
 
 	"RTD2_Desc_toxic"
@@ -28,6 +30,7 @@
 		"de"	"Dein schrecklicher Atem schädigt Feinde in einem Umkreis."
 		"chi"	"你嘴臭到可以熏晕附近的敌人."
 		"ru"	"Твое ужасное дыхание ранит ближайших врагов."
+		"pt"	"O seu hálito terrível causa dano a inimigos próximos."
 	}
 
 	"RTD2_Desc_luckysandvich"
@@ -38,6 +41,7 @@
 		"de"	"Dein Leben ist erhöht und der nächste Schuss ist eine kritischer Schuss."
 		"chi"	"你的生命值被加强, 下一次攻击是暴击."
 		"ru"	"Ваше здоровье увеличено, а следующая атака становится критической."
+		"pt"	"Sua vida é aumentada e seu próximo ataque é um crítico garantido."
 	}
 
 	"RTD2_Desc_increasedspeed"
@@ -48,6 +52,7 @@
 		"de"	"Dein Lauftempo ist erhöht."
 		"chi"	"你的速度提升."
 		"ru"	"Ваша скорость увеличена."
+		"pt"	"Sua velocidade é aumentada."
 	}
 
 	"RTD2_Desc_flying"
@@ -58,6 +63,7 @@
 		"de"	"Du kannst in der Karte herumfliegen"
 		"chi"	"你可以飞行."
 		"ru"	"Вы можете летать по карте."
+		"pt"	"Você pode voar pelo mapa."
 	}
 
 	"RTD2_Desc_lowgravity"
@@ -68,6 +74,7 @@
 		"de"	"Deine Anziehungskraft wurde zu einer niedriegen Schwerkraft gesetzt."
 		"chi"	"你的重力降低."
 		"ru"	"Ваша гравитация является нулевой."
+		"pt"	"Sua gravidade ficou baixa."
 	}
 
 	"RTD2_Desc_fullubercharge"
@@ -78,6 +85,7 @@
 		"de"	"Dein Übercharge wurde aufgeladen."
 		"chi"	"你的 Uber 能量被蓄满."
 		"ru"	"Ваш Убер-заряд был заряжен на полную."
+		"pt"	"Sua ÜberCarga foi preenchida completamente."
 	}
 
 	"RTD2_Desc_invisibility"
@@ -88,6 +96,7 @@
 		"de"	"Du bist unsichtbar."
 		"chi"	"你已隐身."
 		"ru"	"Ты невидимка."
+		"pt"	"Você está invisível."
 	}
 
 	"RTD2_Desc_infinitecloak"
@@ -98,6 +107,7 @@
 		"de"	"Du hast unendlich Tarnung."
 		"chi"	"你有无限的隐身能量."
 		"ru"	"У вас бесконечная невидимость."
+		"pt"	"Você tem camuflagem infinita."
 	}
 
 	"RTD2_Desc_criticals"
@@ -108,6 +118,7 @@
 		"de"	"Deine Schüsse sind kritische Schüsse."
 		"chi"	"你的攻击是暴击."
 		"ru"	"Ваши атаки криты."
+		"pt"	"Seus ataques são críticos garantidos."
 	}
 
 	"RTD2_Desc_infiniteammo"
@@ -118,6 +129,7 @@
 		"de"	"Deine Munition geht niemals leer."
 		"chi"	"你获得无限弹药."
 		"ru"	"У тебя никогда не кончатся патроны."
+		"pt"	"Sua munição nunca acaba."
 	}
 
 	"RTD2_Desc_scarybullets"
@@ -128,6 +140,7 @@
 		"de"	"Erschrecke ein Feind mit deinen gruseligen Kuuuuugeln."
 		"chi"	"你的子弹可以击晕敌人."
 		"ru"	"Оглушите врага своими пугающими пууулями."
+		"pt"	"Atordoe o inimigo com suas balas fantasmagóricas."
 	}
 
 	"RTD2_Desc_spawnsentry"
@@ -138,6 +151,7 @@
 		"de"	"Du kannst eine Sentry spawnen."
 		"chi"	"你可以生成步哨枪."
 		"ru"	"Вы можете создать Турель."
+		"pt"	"Você pode invocar uma Sentinela."
 	}
 
 	"RTD2_Desc_homingprojectiles"
@@ -148,6 +162,7 @@
 		"de"	"Deine Projektile wissen schon bescheid."
 		"chi"	"你的飞行物可以自动导航."
 		"ru"	"Ваши снаряды имеют самосознание."
+		"pt"	"Seus projéteis estão teleguiados."
 	}
 
 	"RTD2_Desc_fullriflecharge"
@@ -158,6 +173,7 @@
 		"de"	"Deine Sniper Rifle oder Huntsman sind immer voll aufgeladen."
 		"chi"	"你的狙击步枪或弓箭始终充满能量."
 		"ru"	"Снайперская винтовка или Охотник постоянно заряженные."
+		"pt"	"O Rifle de Sniper ou o Caçador são carregados constantemente."
 	}
 
 	"RTD2_Desc_explode"
@@ -168,6 +184,7 @@
 		"de"	"Explosion!"
 		"chi"	"瞬间爆炸!"
 		"ru"	"Внезапно, БУМ!"
+		"pt"	"XABLAU!"
 	}
 
 	"RTD2_Desc_snail"
@@ -178,6 +195,7 @@
 		"de"	"Du bist echt langsam."
 		"chi"	"你现在慢得一逼."
 		"ru"	"Ты очень медленный."
+		"pt"	"Você está realmente lento."
 	}
 
 	"RTD2_Desc_frozen"
@@ -188,6 +206,7 @@
 		"de"	"Du bist jetzt eine Eis Statue."
 		"chi"	"你成为了冰雕."
 		"ru"	"Вы теперь ледяная статуя."
+		"pt"	"Você se transformou em uma estátua de gelo."
 	}
 
 	"RTD2_Desc_timebomb"
@@ -198,6 +217,7 @@
 		"de"	"Dein Kopf ist jetzt eine Bombe, jetzt töte jemanden."
 		"chi"	"你的头变成了炸弹, 适合用来杀一些人."
 		"ru"	"Твоя голова бомба сейчас, иди убить кого-то с этим."
+		"pt"	"A sua cabeça virou uma bomba! Corra atrás de alguém e o exploda!"
 	}
 
 	"RTD2_Desc_ignition"
@@ -208,6 +228,7 @@
 		"de"	"Sterb in ein Feuer."
 		"chi"	"欲火焚身."
 		"ru"	"Иди умри в огне."
+		"pt"	"Morra em chamas!"
 	}
 
 	"RTD2_Desc_lowhealth"
@@ -218,6 +239,7 @@
 		"de"	"Dein Leben ist nun niedrig."
 		"chi"	"你濒临死亡."
 		"ru"	"Ваше здоровье сейчас низкое."
+		"pt"	"A sua vida está baixa."
 	}
 
 	"RTD2_Desc_drugged"
@@ -228,6 +250,7 @@
 		"de"	"Du fühlst dich gut. Zu gut."
 		"chi"	"你现在觉得自己爽翻了."
 		"ru"	"Вы чувствуете себя хорошо, слишком хорошо."
+		"pt"	"Você se sente bem, muito bem."
 	}
 
 	"RTD2_Desc_blind"
@@ -238,6 +261,7 @@
 		"de"	"Wo ist jeder hin gegangen?"
 		"chi"	"人都哪去了?"
 		"ru"	"Куда все пропали?"
+		"pt"	"Para onde foi todo mundo?"
 	}
 
 	"RTD2_Desc_striptomelee"
@@ -248,6 +272,7 @@
 		"de"	"Du hast nurnach deine Nahkampfwaffe. Viel Glück!"
 		"chi"	"你只剩下近战武器了. 祝你好运!"
 		"ru"	"Вы остались только со своим оружием ближнего боя. Удачи!"
+		"pt"	"Você está armado somente com sua arma corpo a corpo. Boa sorte!"
 	}
 
 	"RTD2_Desc_beacon"
@@ -258,6 +283,7 @@
 		"de"	"Lass dein Feind wissen wo du bist, du hast keine Angst vor den."
 		"chi"	"敌人现在知道你的位置, 反正你也不怕他们."
 		"ru"	"Пусть враги знают, где ты, ты их не боишься."
+		"pt"	"Deixe os inimigos saberem onde você está, você não tem medo deles."
 	}
 
 	"RTD2_Desc_forcedtaunt"
@@ -268,6 +294,7 @@
 		"de"	"Kann...nicht...aufhören...meine Überlegenheit zu zeigen!"
 		"chi"	"老子...就是要嘲讽...根本停不下来!"
 		"ru"	"Не могу... перестать... показывать свое превосходство!"
+		"pt"	"Não... consigo... parar... de... exibir minha superioridade!"
 	}
 
 	"RTD2_Desc_monochromia"
@@ -278,6 +305,7 @@
 		"de"	"Deine Sicht ist Schwarz und Weiß."
 		"chi"	"你的视觉是黑白的."
 		"ru"	"Ваше зрение черно-белое."
+		"pt"	"Sua visão está preta e branca."
 	}
 
 	"RTD2_Desc_earthquake"
@@ -288,6 +316,7 @@
 		"de"	"Der Boden wackelt!"
 		"chi"	"你遭遇了地震!"
 		"ru"	"Земля трясется!"
+		"pt"	"O chão está tremendo!"
 	}
 
 	"RTD2_Desc_funnyfeeling"
@@ -298,6 +327,7 @@
 		"de"	"Das passiert wenn du deine Augenlieder zurück ziehst."
 		"chi"	"你的眼睛发生了一些神秘变化."
 		"ru"	"Что происходет, если вы оттяните веки назад."
+		"pt"	"Isto é o que acontece quando você puxa as suas pálpebras para trás."
 	}
 
 	"RTD2_Desc_badsauce"
@@ -308,6 +338,7 @@
 		"de"	"Milch, Blut und Jarate."
 		"chi"	"牛奶、失血、瓶手道."
 		"ru"	"Молоко, кровь и Банкате."
+		"pt"	"Leite, sangramento e Jarratê."
 	}
 
 	"RTD2_Desc_spawndispenser"
@@ -318,6 +349,7 @@
 		"de"	"Du kannst einen Dispenser spawnen."
 		"chi"	"你可以生成补给器."
 		"ru"	"Вы можете создать Раздатчик."
+		"pt" 	"Você pode invocar um Fornecedor."
 	}
 
 	"RTD2_Desc_infinitejump"
@@ -328,6 +360,7 @@
 		"de"	"Du kannst in der Luft springen, warum nicht öfters?"
 		"chi"	"多段跳和二段跳不也差不多吗?"
 		"ru"	"Вы можете отпрыгнуть от воздуха один раз, так почему бы не несколько раз?"
+		"pt" 	"Você pode pular uma vez no ar, então por que não várias vezes?"
 	}
 
 	"RTD2_Desc_powerfulhits"
@@ -338,6 +371,7 @@
 		"de"	"Dein Schaden wurde erhöht."
 		"chi"	"你的伤害提升."
 		"ru"	"Ваш урон увеличен."
+		"pt"	"O seu dano é aumentado."
 	}
 
 	"RTD2_Desc_bighead"
@@ -348,6 +382,7 @@
 		"de"	"Andere Soldaten lachen dich hinter deinen Rücken aus."
 		"chi"	"其他人正在背后笑你."
 		"ru"	"Другие наемники теперь шутят за вашей спиной."
+		"pt"	"Sua cabeça está gigante!"
 	}
 
 	"RTD2_Desc_tinymann"
@@ -358,6 +393,7 @@
 		"de"	"Du bist geschrumpt, schleich dich an die jede an die du willst!"
 		"chi"	"你被缩小了, 可以方便地站在巨人的肩膀上!"
 		"ru"	"Вы уменьшились, подкрадывайтесь к кому хотите!"
+		"pt"	"Você encolheu, rasteje por onde quiser!"
 	}
 
 	"RTD2_Desc_firework"
@@ -368,6 +404,7 @@
 		"de"	"Steig hoch und geh mit einen awe runter."
 		"chi"	"一炮把你轰上天, 你与太阳肩并肩."
 		"ru"	"Поднимись высоко и опустись с восхищением."
+		"pt"	"Erga-se e desça com estilo."
 	}
 
 	"RTD2_Desc_deadlyvoice"
@@ -378,6 +415,7 @@
 		"de"	"Sprach Commands teilen Schaden aus."
 		"chi"	"语音指令可以造成伤害."
 		"ru"	"Голосовые команды наносят урон."
+		"pt"	"Comandos de voz causam dano."
 	}
 
 	"RTD2_Desc_stronggravity"
@@ -388,6 +426,7 @@
 		"de"	"Fall nicht hin oder du brichst dir dein Bein... oder beide."
 		"chi"	"不要走动, 否则你会伤到腿......或两者兼得."
 		"ru"	"Не споткнись, иначе сломаешь ногу... или обе."
+		"pt"	"Não tropece ou você vai quebrar sua perna... ou ambas."
 	}
 
 	"RTD2_Desc_eyeforaneye"
@@ -398,6 +437,7 @@
 		"de"	"So fühlt sich das an."
 		"chi"	"一报还一报."
 		"ru"	"Вот как это чувствуется."
+		"pt"	"Olho por olho, dente por dente."
 	}
 
 	"RTD2_Desc_weakened"
@@ -408,16 +448,17 @@
 		"de"	"Du bist jetzt ein Schwächling!"
 		"chi"	"你现在很虚弱."
 		"ru"	"Вы теперь слабак."
+		"pt"	"Você agora é um covarde."
 	}
 
 	"RTD2_Desc_necromash"
 	{
 		"en"	"That helmet ain't gonna save ya."
 		"pl"	"Ten hełm ci nie pomoże."
-		"sv"	"That helmet ain't gonna save ya."
 		"de"	"Dieser Helm wird dich nich' beschützen."
 		"chi"	"头盔也救不了你."
 		"ru"	"Этот шлем не спасет тебя."
+		"pt"	"Um capacete não vai te salvar."
 	}
 
 	"RTD2_Desc_extraammo"
@@ -428,6 +469,7 @@
 		"de"	"Mehr Munition, mehr Skill.
 		"chi"	"子弹越多越牛逼."
 		"ru"	"Больше боеприпасов, больше навыков."
+		"pt"	"Mais munição, mais habilidade."
 	}
 
 	"RTD2_Desc_suffocation"
@@ -438,6 +480,7 @@
 		"de"	"Du hast vergessen zu atmen."
 		"chi"	"你忘记了如何呼吸."
 		"ru"	"Вы забыли, как дышать."
+		"pt"	"Você se esqueceu de como respirar."
 	}
 
 	"RTD2_Desc_fasthands"
@@ -448,6 +491,7 @@
 		"de"	"Du bist jetzt ein schneller Soldat."
 		"chi"	"你现在是职业玩家."
 		"ru"	"Вы теперь умелый наемник."
+		"pt"	"Você agora é um mercenário habilidoso."
 	}
 
 	"RTD2_Desc_outline"
@@ -458,6 +502,7 @@
 		"de"	"Dein schönes Aussehen scheint durch die Wände. Und alarmiert Feinde."
 		"chi"	"你浑身发光, 所有人都看得见你."
 		"ru"	"Твоя крутость светится сквозь стены. И светит врагам тоже."
+		"pt"	"Sua magnificência brilha através das paredes. E informa seus inimigos."
 	}
 
 	"RTD2_Desc_vital"
@@ -468,6 +513,7 @@
 		"de"	"Dein Maximales Leben wurde erhöht."
 		"chi"	"你的生命值上限提升."
 		"ru"	"Ваше максимальное здоровье увеличено."
+		"pt"	"Sua vida máxima é aumentada."
 	}
 
 	"RTD2_Desc_nogravity"
@@ -478,6 +524,7 @@
 		"de"	"Springe zum Mond und werde auf den weg dahin getötet."
 		"chi"	"月球挨揍之旅愉快."
 		"ru"	"Прыгни на Луну и убейся тем временем."
+		"pt"	"Pule em direção à lua e seja morto no meio do caminho."
 	}
 
 	"RTD2_Desc_teamcriticals"
@@ -488,6 +535,7 @@
 		"de"	"Stehe in der nähe eines Teammitglieds und gebe ihn kritische Schüsse."
 		"chi"	"给附近的队友暴击加成."
 		"ru"	"Встаньте рядом с товарищами по команде, чтобы дать им криты."
+		"pt"	"Fique perto dos seus aliados e garanta críticos para eles."
 	}
 
 	"RTD2_Desc_firetimebomb"
@@ -498,16 +546,18 @@
 		"de"	"Du explodierst nicht, setzt aber jeden in einem Umkreis in Flammen."
 		"chi"	"你不会瞬间爆炸, 但是会点燃附近的人."
 		"ru"	"Вы не взорветесь, но зажжете всех вокруг."
+		"pt"	"Você não explode, mas incendeia todos ao seu redor."
 	}
 
 	"RTD2_Desc_firebreath"
 	{
-		"en"	"The burning you feel? It is PURE FIRE."
-		"pl"	"To palenie w tobie. To CZYSTY OGIEŃ."
-		"sv"	"The burning you feel? It is PURE FIRE."
-		"de"	"Das brennen was du fühlst? Es ist PURES FEUER."
-		"chi"	"打出三昧真火."
-		"ru"	"Вы чувствуете жжение? Это ЧИСТЫЙ ОГОНЬ."
+		"en"	"The burning you feel? It is PURE FIRE!"
+		"pl"	"To palenie w tobie. To CZYSTY OGIEŃ!"
+		"sv"	"The burning you feel? It is PURE FIRE!."
+		"de"	"Das brennen was du fühlst? Es ist PURES FEUER!"
+		"chi"	"打出三昧真火!"
+		"ru"	"Вы чувствуете жжение? Это ЧИСТЫЙ ОГОНЬ!"
+		"pt"	"Um Ghast no Team Fortress 2?!"
 	}
 
 	"RTD2_Desc_strongrecoil"
@@ -518,6 +568,7 @@
 		"de"	"Deine Schuss Fähigkeiten sind weg."
 		"chi"	"你的瞄准技巧不见了."
 		"ru"	"Ваши навыки стрельбы из огнестрельного оружия пропали."
+		"pt"	"Suas habilidades com armas de fogo sumiram."
 	}
 
 	"RTD2_Desc_cursed"
@@ -528,6 +579,7 @@
 		"de"	"Du gehts nach links und nach oben und nach rechts oder nach unten?"
 		"chi"	"你失去了方向感...?"
 		"ru"	"Вы идете налево и вы идете вверх или назад и вправо или вниз...?"
+		"pt" 	"Você vai para a esquerda e você vai para cima ou para trás e para a direita ou para baixo...?"
 	}
 
 	"RTD2_Desc_extrathrowables"
@@ -538,6 +590,7 @@
 		"de"	"Du hast realisiert das du mehrere davon mitnehmen kannst."
 		"chi"	"你现在有了更多垃圾可以乱扔."
 		"ru"	"Вы поняли, что можете взять больше с собой."
+		"pt"	"Você percebe que você pode carregar mais destes com você."
 	}
 
 	"RTD2_Desc_powerplay"
@@ -548,6 +601,7 @@
 		"de"	"Nehm das, Robin!"
 		"chi"	"你被强化了, 快上!"
 		"ru"	"Получай, Робин!"
+		"pt"	"Toma essa, Robin!"
 	}
 
 	"RTD2_Desc_explosivearrows"
@@ -558,6 +612,7 @@
 		"de"	"Deine Pfeile und Armbrust Pfeile explodieren bei Berührung."
 		"chi"	"你的弓箭和弩箭会造成爆炸."
 		"ru"	"Ваши стрелы и арбалетные болты взрываются при попадании."
+		"pt"	"Suas flechas e seringas explodem ao impacto."
 	}
 
 	"RTD2_Desc_inclineproblem"
@@ -568,186 +623,169 @@
 		"de"	"Du hast vergessen wie man Treppen steigt."
 		"chi"	"你突然忘记了如何上坡."
 		"ru"	"Вы забыли, как пользоваться лестницей."
+		"pt"	"Você se esqueceu de como usar as escadas."
 	}
 
 	"RTD2_Desc_springshoes"
 	{
 		"en"	"Cannot stop jumping."
 		"pl"	"Nie możesz przestać skakać."
-		"sv"	""
-		"de"	""
 		"chi"	"跳来跳去."
 		"ru"	"Не могу перестать прыгать."
+		"pt"	"Não consegue parar de pular."
 	}
 
 	"RTD2_Desc_lag"
 	{
 		"en"	"Must be the busy hour."
 		"pl"	"Musi być godzina szczytu."
-		"sv"	""
-		"de"	""
 		"chi"	"卡死老子了..."
 		"ru"	"Должно быть занятой час."
+		"pt"	"E de repente, todo mundo começou a usar a internet..."
 	}
 
 	"RTD2_Desc_drugbullets"
 	{
 		"en"	"Drug the enemy from a distance."
 		"pl"	"Rozprzestrzeniaj narkotyki na odległość."
-		"sv"	""
-		"de"	""
 		"chi"	"从远处给敌人来一针."
 		"ru"	"Стреляйте наркотиками на расстоянии."
+		"pt"	"Drogue um inimigo à longas distâncias."
 	}
 
 	"RTD2_Desc_longmelee"
 	{
 		"en"	"Extends arms."
 		"pl"	"Wydłuża ramiona."
-		"sv"	""
-		"de"	""
 		"chi"	"寡人手长."
 		"ru"	"Продлевает руки."
+		"pt"	"Braços estendidos."
 	}
 
 	"RTD2_Desc_hatthrow"
 	{
 		"en"	"Finally, a proper use for those."
 		"pl"	"Nareszcie, dobry z nich pożytek."
-		"sv"	""
-		"de"	""
 		"chi"	"真正的帽子模拟器可以扔出帽子砸人."
 		"ru"	"Наконец, правильное использование для них."
+		"pt"	"Finalmente, um uso correto dos chapéus."
 	}
 
 	"RTD2_Desc_madaraswhistle"
 	{
 		"en"	"Inhuman kinship with an alligator."
 		"pl"	"Przyjaźń z aligatorem."
-		"sv"	""
-		"de"	""
 		"chi"	"与鳄鱼的非人道血缘关系."
 		"ru"	"Нечеловеческое сходство с аллигатором."
+		"pt"	"Chame por um jacaré!"
 	}
 
 	"RTD2_Desc_sickness"
 	{
 		"en"	"Calling for medic won't help you."
 		"pl"	"Medyk ci nie pomoże."
-		"sv"	""
-		"de"	""
 		"chi"	"这次叫医生也没用."
 		"ru"	"Вызов медика не поможет вам."
+		"pt"	"Chamar por um médico não vai te ajudar."
 	}
 
 	"RTD2_Desc_wastedroll"
 	{
 		"en"	"You're pretty bad at rolling."
 		"pl"	"Coś ci nie wychodzi losowanie."
-		"sv"	""
-		"de"	""
 		"chi"	"谢谢惠顾."
 		"ru"	"У вас довольно плохая удача."
+		"pt"	"Você é muito ruim sorteando."
 	}
 
 	"RTD2_Desc_mercsdietwice"
 	{
 		"en"	"Resurrect yourself on death."
 		"pl"	"Wskrześ się po śmierci."
-		"sv"	""
-		"de"	""
 		"chi"	"佣兵不朽!"
 		"ru"	"Воскресить себя при смерти."
+		"pt"	"Ressuscite ao morrer."
 	}
 
 	"RTD2_Desc_drunkwalk"
 	{
 		"en"	"Don't drink and fight."
 		"pl"	"Nigdy nie pij i walcz."
-		"sv"	""
-		"de"	""
 		"chi"	"酒后玩游戏, 亲人两行泪."
 		"ru"	"Не пей и сражайся."
+		"pt"	"Não lute após beber."
 	}
 
 	"RTD2_Desc_hellsreach"
 	{
 		"en"	"Hell is something you can't escape."
 		"pl"	"Nie uciekniesz przed piekłem."
-		"sv"	""
-		"de"	""
 		"chi"	"你无法逃离地狱."
 		"ru"	"Ад это то, что вы не можете избежать."
+		"pt"	"O inferno é uma coisa da qual você não pode escapar."
 	}
 
 	"RTD2_Desc_cursedprojectiles"
 	{
 		"en"	"Cannot trust your own weapons."
 		"pl"	"Nie zaufasz swoim broniom."
-		"sv"	""
-		"de"	""
 		"chi"	"不要相信自己的武器."
 		"ru"	"Не могу доверять собственному оружию."
+		"pt"	"Você não pode confiar em suas próprias armas."
 	}
 
 	"RTD2_Desc_vampire"
 	{
 		"en"	"Loose health when not damaging enemies."
 		"pl"	"Tracisz zdrowie nie zadając obrażeń przeciwnikom."
-		"sv"	""
-		"de"	""
 		"chi"	"要么输出, 要么死."
 		"ru"	"Потеря здоровья, если не наносишь вред врагу."
+		"pt"	"Perca vida quando não estiver causando dano a inimigos."
 	}
 
 	"RTD2_Desc_batswarm"
 	{
 		"en"	"Swarmed with bats defending you."
 		"pl"	"Nietoperze cię obraniają."
-		"sv"	""
-		"de"	""
 		"chi"	"球棍之王."
 		"ru"	"Рой летучих мышей защищает тебя."
+		"pt"	"Uma revoada de morcegos está te protegendo."
 	}
 
 	"RTD2_Desc_pumpkintrail"
 	{
 		"en"	"Spawn pumpkins in front of you."
 		"pl"	"Bądź władcą dyń."
-		"sv"	""
-		"de"	""
 		"chi"	"生成南瓜攻击敌人."
 		"ru"	"Создание тыквы перед вами."
+		"pt"	"Invoque abóboras na sua frente."
 	}
 
 	"RTD2_Desc_acallbeyond"
 	{
 		"en"	"Unleash hell from the nightmares."
 		"pl"	"Rozpętaj piekło z koszmarów."
-		"sv"	""
-		"de"	""
 		"chi"	"释放来自梦靥的地狱."
 		"ru"	"Выпусти ад из ночных кошмаров."
+		"pt"	"Liberte o terror de seus pesadelos."
 	}
 
 	"RTD2_Desc_smite"
 	{
 		"en"	"Get struck down by God."
 		"pl"	"Zostań proażony z niebios."
-		"sv"	""
-		"de"	""
 		"chi"	"雷神天降."
 		"ru"	"Повержен Богом."
+		"pt"	"Seja eliminado por Deus."
 	}
 
 	"RTD2_Desc_overhealbonus"
 	{
-		"en"	"Overheal boost for your MediGun."
+		"en"	"Overheal boost for your Medi Gun."
 		"pl"	"Ulepszony overheal."
-		"sv"	""
-		"de"	""
 		"chi"	"提升医疗枪的超量治疗."
 		"ru"	"Увеличенние сверх-лечения для вашей Лечебной пушки."
+		"pt"	"Bônus de sobrecura para a sua Arma Médica."
 	}
 
 }
