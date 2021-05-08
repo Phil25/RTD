@@ -747,7 +747,7 @@
 	{
 		"en"	"Swarmed with bats defending you."
 		"pl"	"Nietoperze cię obraniają."
-		"chi"	"球棍之王."
+		"chi"	"蝙蝠竟在你身边."
 		"ru"	"Рой летучих мышей защищает тебя."
 		"pt"	"Uma revoada de morcegos está te protegendo."
 	}
