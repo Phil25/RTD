@@ -179,6 +179,8 @@ public Action Timer_NecroMash_Hit(Handle timer, any pack){
 	pos[2] += 10.0;
 	NecroMash_CreateParticle("hammer_impact_button", pos);
 	NecroMash_CreateParticle("hammer_bones_kickup", pos);
+
+	return Plugin_Stop;
 }
 
 public Action Timer_NecroMash_Whoosh(Handle timer, any pack){
@@ -190,6 +192,8 @@ public Action Timer_NecroMash_Whoosh(Handle timer, any pack){
 	pos[2] = ReadPackFloat(pack);
 
 	EmitSoundToAll("misc/halloween/strongman_fast_whoosh_01.wav", _, _, _, _, _, _, _, pos);
+
+	return Plugin_Stop;
 }
 
 stock void NecroMash_CreateParticle(char[] particle, float pos[3]){

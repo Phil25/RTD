@@ -64,13 +64,13 @@ void SetFloatCache(int client, float fVal, int iBlock=0){
 	g_fCache[client][iBlock] = fVal;
 }
 
-float GetVectorCache(int client, float fVec[3]){
+void GetVectorCache(int client, float fVec[3]){
 	fVec[0] = GetFloatCache(client, 1);
 	fVec[1] = GetFloatCache(client, 2);
 	fVec[2] = GetFloatCache(client, 3);
 }
 
-float SetVectorCache(int client, float fVec[3]){
+void SetVectorCache(int client, float fVec[3]){
 	SetFloatCache(client, fVec[0], 1);
 	SetFloatCache(client, fVec[1], 2);
 	SetFloatCache(client, fVec[2], 3);

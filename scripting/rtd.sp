@@ -660,7 +660,7 @@ public Action Listener_Sound(int clients[MAXPLAYERS], int& iLen, char sSample[PL
 			//----  C O N V A R  ----//
 			//***********************//
 
-public int ConVarChange_Plugin(Handle hCvar, const char[] sOld, const char[] sNew){
+public void ConVarChange_Plugin(Handle hCvar, const char[] sOld, const char[] sNew){
 	if(hCvar == g_hCvarPluginEnabled)
 		g_bCvarPluginEnabled = StringToInt(sNew) > 0 ? true : false;
 
@@ -677,7 +677,7 @@ public int ConVarChange_Plugin(Handle hCvar, const char[] sOld, const char[] sNe
 		g_iCvarChat = StringToInt(sNew);
 }
 
-public int ConVarChange_Perks(Handle hCvar, const char[] sOld, const char[] sNew){
+public void ConVarChange_Perks(Handle hCvar, const char[] sOld, const char[] sNew){
 	if(hCvar == g_hCvarPerkDuration)
 		g_iCvarPerkDuration = StringToInt(sNew);
 
@@ -688,7 +688,7 @@ public int ConVarChange_Perks(Handle hCvar, const char[] sOld, const char[] sNew
 		ParseDisabledPerks();
 }
 
-public int ConVarChange_Usage(Handle hCvar, const char[] sOld, const char[] sNew){
+public void ConVarChange_Usage(Handle hCvar, const char[] sOld, const char[] sNew){
 	if(hCvar == g_hCvarAllowed)
 		g_iCvarAllowed = ReadFlagString(sNew);
 
@@ -705,7 +705,7 @@ public int ConVarChange_Usage(Handle hCvar, const char[] sOld, const char[] sNew
 		g_bCvarShowTime = StringToInt(sNew) > 0 ? true : false;
 }
 
-public int ConVarChange_Rtd(Handle hCvar, const char[] sOld, const char[] sNew){
+public void ConVarChange_Rtd(Handle hCvar, const char[] sOld, const char[] sNew){
 	if(hCvar == g_hCvarRtdTeam)
 		g_iCvarRtdTeam = StringToInt(sNew);
 
@@ -722,7 +722,7 @@ public int ConVarChange_Rtd(Handle hCvar, const char[] sOld, const char[] sNew){
 		g_bCvarRespawnStuck = StringToInt(sNew) > 0 ? true : false;
 }
 
-public int ConVarChange_Repeat(Handle hCvar, const char[] sOld, const char[] sNew){
+public void ConVarChange_Repeat(Handle hCvar, const char[] sOld, const char[] sNew){
 	if(hCvar == g_hCvarRepeatPlayer){
 		g_iCvarRepeatPlayer = StringToInt(sNew);
 		g_hRollers.ResetPerkHisories();
@@ -732,7 +732,7 @@ public int ConVarChange_Repeat(Handle hCvar, const char[] sOld, const char[] sNe
 	}
 }
 
-public int ConVarChange_Good(Handle hCvar, const char[] sOld, const char[] sNew){
+public void ConVarChange_Good(Handle hCvar, const char[] sOld, const char[] sNew){
 	if(hCvar == g_hCvarGoodChance)
 		g_fCvarGoodChance = StringToFloat(sNew);
 
@@ -743,7 +743,7 @@ public int ConVarChange_Good(Handle hCvar, const char[] sOld, const char[] sNew)
 		g_iCvarDonatorFlag = ReadFlagString(sNew);
 }
 
-public int ConVarChange_Timer(Handle hCvar, const char[] sOld, const char[] sNew){
+public void ConVarChange_Timer(Handle hCvar, const char[] sOld, const char[] sNew){
 	if(hCvar == g_hCvarTimerPosX)
 		g_fCvarTimerPosX = StringToFloat(sNew);
 
