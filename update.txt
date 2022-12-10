@@ -4,8 +4,8 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.3.3"
-			"Previous"	"2.3.2"
+			"Latest"	"2.3.4"
+			"Previous"	"2.3.3"
 		}
 
 		"Notes"	"View changelog at https://github.com/Phil25/RTD/wiki/changelog"
@@ -17,12 +17,12 @@
 		{
 			"Plugin"	"Path_SM/plugins/rtd.smx"
 
-			"Plugin"	"Path_SM/translations/rtd2.phrases.txt"
-			"Plugin"	"Path_SM/translations/rtd2_perks.phrases.txt"
-
 			"Source"	"Path_SM/scripting/rtd.sp"
+			"Source"	"Path_SM/scripting/rtd/cache.sp"
+			"Source"	"Path_SM/scripting/rtd/stocks.sp"
+			"Source"	"Path_SM/scripting/rtd/classes/containers.sp"
 
-			"Source"	"Path_SM/scripting/include/rtd2.inc"
+			"Source"	"Path_SM/scripting/rtd/perks/necromash.sp"
 		}
 
 		"Plugin"	"Path_SM/plugins/rtd.smx"
@@ -34,6 +34,7 @@
 
 		"Source"	"Path_SM/scripting/include/rtd2.inc"
 
+		"Source"	"Path_SM/scripting/rtd/cache.sp"
 		"Source"	"Path_SM/scripting/rtd/includes.sp"
 		"Source"	"Path_SM/scripting/rtd/manager.sp"
 		"Source"	"Path_SM/scripting/rtd/natives.sp"
