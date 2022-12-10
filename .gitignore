@@ -9,3 +9,4 @@ scripting/include/*
 
 *.zip
 .exrc
+.vscode

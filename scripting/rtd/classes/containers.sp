@@ -156,7 +156,7 @@ methodmap PerkContainer < StringMap{
 
 		READ_STRING("tags",Tags)
 		READ_STRING("call",InternalCall)
-		iStats[perk.Good]++;
+		iStats[view_as<int>(perk.Good)]++;
 
 		this.Add(perk);
 		return true;
