@@ -455,7 +455,7 @@ stock int CreateRagdoll(int client, bool bFrozen=false){
 
 	TeleportEntity(iRag, fPos, fAng, fVel);
 
-	SetEntProp(iRag, Prop_Send, "m_iPlayerIndex", client);
+	SetEntPropEnt(iRag, Prop_Send, "m_hPlayer", client);
 	SetEntProp(iRag, Prop_Send, "m_bIceRagdoll", bFrozen);
 	SetEntProp(iRag, Prop_Send, "m_iTeam", GetClientTeam(client));
 	SetEntProp(iRag, Prop_Send, "m_iClass", view_as<int>(TF2_GetPlayerClass(client)));
