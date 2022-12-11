@@ -4,8 +4,8 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.3.4"
-			"Previous"	"2.3.3"
+			"Latest"	"2.3.5"
+			"Previous"	"2.3.4"
 		}
 
 		"Notes"	"View changelog at https://github.com/Phil25/RTD/wiki/changelog"
@@ -17,12 +17,7 @@
 		{
 			"Plugin"	"Path_SM/plugins/rtd.smx"
 
-			"Source"	"Path_SM/scripting/rtd.sp"
-			"Source"	"Path_SM/scripting/rtd/cache.sp"
-			"Source"	"Path_SM/scripting/rtd/stocks.sp"
 			"Source"	"Path_SM/scripting/rtd/classes/containers.sp"
-
-			"Source"	"Path_SM/scripting/rtd/perks/necromash.sp"
 		}
 
 		"Plugin"	"Path_SM/plugins/rtd.smx"
