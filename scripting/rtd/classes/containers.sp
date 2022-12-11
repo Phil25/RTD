@@ -28,7 +28,7 @@ methodmap PerkList < ArrayList{
 	}
 
 	public Perk Get(int i){
-		return view_as<Perk>(this.Get(i));
+		return view_as<Perk>(view_as<ArrayList>(this).Get(i));
 	}
 
 	public Perk GetRandom(){
