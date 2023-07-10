@@ -117,6 +117,6 @@ stock int SpawnDispenser(int builder, float Position[3], float Angle[3], int lev
 	return dispenser;
 }
 
-#define LEVEL 0
-#define KEEP 1
-#define AMOUNT 2
+#undef LEVEL
+#undef KEEP
+#undef AMOUNT
