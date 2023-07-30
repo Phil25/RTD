@@ -1594,7 +1594,7 @@ bool IsPlayerFriendly(int client){
 }
 
 bool IsRTDInRound(){
-	if(GameRules_GetProp("m_bInWaitingForPlayers", 1))
+	if(!GameRules_GetProp("m_bPlayingMannVsMachine") && GameRules_GetProp("m_bInWaitingForPlayers", 1))
 		return false;
 
 	if(!g_bCvarInSetup){
