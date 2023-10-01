@@ -17,40 +17,160 @@
 */
 
 
-public void PowerPlay_Call(int client, Perk perk, bool apply){
-	if(apply) PowerPlay_ApplyPerk(client);
-	else PowerPlay_RemovePerk(client);
+#define ATTRIB_CAPTURE_VALUE_INCREASE 68
+#define ATTRIB_MELEE_RANGE 264
+#define ATTRIB_JUMP_HEIGHT 326
+#define ATTRIB_CANNOT_PICK_UP_INTEL 400
+#define ATTRIB_DAMAGE_FORCE_INCREASE 535
+
+#define BASE_WALK_SPEED 0
+#define SPEED_REGAIN_TIME 1
+
+#define EFFECT 0
+
+int g_iPowerPlayId = 53;
+
+public void PowerPlay_Call(const int client, const Perk perk, const bool apply){
+	if(apply){
+		g_iPowerPlayId = perk.Id;
+		SetClientPerkCache(client, g_iPowerPlayId);
+		SetFloatCache(client, GetBaseSpeed(client), BASE_WALK_SPEED);
+		PowerPlay_ApplyPerk(client);
+	}else{
+		UnsetClientPerkCache(client, g_iPowerPlayId);
+		PowerPlay_RemovePerk(client);
+	}
 }
 
-public void PowerPlay_ApplyPerk(int client){
-	if(TF2_IsPlayerInCondition(client, TFCond_Taunting)){ // Fix for issue #9
-		TF2_RemoveCondition(client, TFCond_Taunting);
-		CreateTimer(0.0, Timer_PowerPlay_ApplyConditions, GetClientUserId(client));
-	}else PowerPlay_ApplyConditions(client);
-}
+void PowerPlay_ApplyPerk(const int client){
+	SDKHook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
 
-public Action Timer_PowerPlay_ApplyConditions(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(client) PowerPlay_ApplyConditions(client);
-	return Plugin_Stop;
-}
+	int iMeleeWeapon = GetPlayerWeaponSlot(client, 2);
+	if(iMeleeWeapon > MaxClients && IsValidEntity(iMeleeWeapon))
+		SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", iMeleeWeapon);
 
-void PowerPlay_ApplyConditions(int client){
-	TF2_AddCondition(client, TFCond_UberchargedCanteen);
+	switch(TF2_GetPlayerClass(client)){
+		case TFClass_Scout:{
+			SDKHook(client, SDKHook_OnTakeDamage, PowerPlay_ResistanceAndSlowdown);
+			TF2Attrib_SetByDefIndex(client, ATTRIB_JUMP_HEIGHT, 1.25);
+			CreateTimer(0.1, Timer_PowerPlaySlowDownCheck, GetClientUserId(client), TIMER_REPEAT);
+		}
+		case TFClass_Heavy:{
+			SDKHook(client, SDKHook_OnTakeDamage, PowerPlay_Resistance);
+		}
+		default:{
+			SDKHook(client, SDKHook_OnTakeDamage, PowerPlay_Resistance);
+			TF2Attrib_SetByDefIndex(client, ATTRIB_DAMAGE_FORCE_INCREASE, 40.0);
+		}
+	}
+
 	TF2_AddCondition(client, TFCond_CritOnFirstBlood);
 	TF2_AddCondition(client, TFCond_UberBulletResist);
 	TF2_AddCondition(client, TFCond_UberBlastResist);
 	TF2_AddCondition(client, TFCond_UberFireResist);
-	TF2_AddCondition(client, TFCond_MegaHeal);
-	TF2_SetPlayerPowerPlay(client, true);
+
+	int iMelee = GetPlayerWeaponSlot(client, 2);
+	if(iMelee > MaxClients && IsValidEntity(iMelee))
+		TF2Attrib_SetByDefIndex(iMelee, ATTRIB_MELEE_RANGE, 1.1);
+
+	TF2Attrib_SetByDefIndex(client, ATTRIB_CANNOT_PICK_UP_INTEL, 1.0);
+	TF2Attrib_SetByDefIndex(client, ATTRIB_CAPTURE_VALUE_INCREASE, -GetCaptureValue(client));
+	FakeClientCommandEx(client, "dropitem") // in case intel is already picked up
+
+	switch(TF2_GetClientTeam(client)){
+		case TFTeam_Blue:
+			SetEntCache(client, CreateParticle(client, "eyeboss_team_blue", true), EFFECT);
+		case TFTeam_Red:
+			SetEntCache(client, CreateParticle(client, "eyeboss_team_red", true), EFFECT);
+	}
 }
 
-void PowerPlay_RemovePerk(int client){
-	TF2_RemoveCondition(client, TFCond_UberchargedCanteen);
+void PowerPlay_RemovePerk(const int client){
+	KillEntCache(client, EFFECT);
+
+	SDKUnhook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
+
+	switch(TF2_GetPlayerClass(client)){
+		case TFClass_Scout:{
+			SDKUnhook(client, SDKHook_OnTakeDamage, PowerPlay_ResistanceAndSlowdown);
+			TF2Attrib_RemoveByDefIndex(client, ATTRIB_JUMP_HEIGHT);
+			SetSpeed(client, GetFloatCache(client, BASE_WALK_SPEED));
+		}
+		case TFClass_Heavy:{
+			SDKUnhook(client, SDKHook_OnTakeDamage, PowerPlay_Resistance);
+		}
+		default:{
+			SDKUnhook(client, SDKHook_OnTakeDamage, PowerPlay_Resistance);
+			TF2Attrib_RemoveByDefIndex(client, ATTRIB_DAMAGE_FORCE_INCREASE);
+		}
+	}
+
+	int iMelee = GetPlayerWeaponSlot(client, 2);
+	if(iMelee > MaxClients && IsValidEntity(iMelee))
+		TF2Attrib_RemoveByDefIndex(iMelee, ATTRIB_MELEE_RANGE);
+
+	TF2Attrib_RemoveByDefIndex(client, ATTRIB_CANNOT_PICK_UP_INTEL);
+	TF2Attrib_RemoveByDefIndex(client, ATTRIB_CAPTURE_VALUE_INCREASE);
+
 	TF2_RemoveCondition(client, TFCond_CritOnFirstBlood);
 	TF2_RemoveCondition(client, TFCond_UberBulletResist);
 	TF2_RemoveCondition(client, TFCond_UberBlastResist);
 	TF2_RemoveCondition(client, TFCond_UberFireResist);
-	TF2_RemoveCondition(client, TFCond_MegaHeal);
-	TF2_SetPlayerPowerPlay(client, false);
 }
+
+public Action PowerPlay_BlockWeaponSwitch(const int client, const int iWeapon){
+	return Plugin_Handled;
+}
+
+public Action PowerPlay_Resistance(int client, int &iAtk, int &iInflictor, float &fDamage, int &iType){
+	fDamage *= 0.025;
+
+	if(iInflictor > MaxClients && IsValidEntity(iInflictor)){
+		char sClass[32];
+		GetEntityClassname(iInflictor, sClass, sizeof(sClass));
+
+		if(StrEqual(sClass, "obj_sentrygun"))
+			iType |= DMG_PREVENT_PHYSICS_FORCE;
+	}
+
+	return Plugin_Changed;
+}
+
+public Action PowerPlay_ResistanceAndSlowdown(int client, int &iAtk, int &iInflictor, float &fDamage, int &iType){
+	float fOriginalDamage = fDamage;
+
+	fDamage *= 0.025;
+	iType |= DMG_PREVENT_PHYSICS_FORCE;
+
+	if(fOriginalDamage < 8.0)
+		return Plugin_Changed;
+
+	SetFloatCache(client, GetEngineTime() + fOriginalDamage / 50.0, SPEED_REGAIN_TIME);
+	SetSpeed(client, GetFloatCache(client, BASE_WALK_SPEED), 0.65);
+
+	return Plugin_Changed;
+}
+
+public Action Timer_PowerPlaySlowDownCheck(Handle hTimer, int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(!client) return Plugin_Stop;
+
+	if(!CheckClientPerkCache(client, g_iPowerPlayId))
+		return Plugin_Stop;
+
+	if(GetEngineTime() > GetFloatCache(client, SPEED_REGAIN_TIME))
+		SetSpeed(client, GetFloatCache(client, BASE_WALK_SPEED));
+
+	return Plugin_Continue;
+}
+
+#undef ATTRIB_CAPTURE_VALUE_INCREASE
+#undef ATTRIB_MELEE_RANGE
+#undef ATTRIB_JUMP_HEIGHT
+#undef ATTRIB_CANNOT_PICK_UP_INTEL
+#undef ATTRIB_DAMAGE_FORCE_INCREASE
+
+#undef BASE_WALK_SPEED
+#undef SPEED_REGAIN_TIME
+
+#undef EFFECT
