@@ -18,23 +18,99 @@
 
 
 UserMsg g_BlindMsgId;
+int g_iBlindId = 22;
 
 void Blind_Start(){
 	g_BlindMsgId = GetUserMessageId("Fade");
 }
 
-public void Blind_Call(int client, Perk perk, bool apply){
+public void Blind_Call(const int client, const Perk perk, const bool apply){
+	if(apply){
+		g_iBlindId = perk.Id;
+		SetClientPerkCache(client, g_iBlindId);
+		Blind_ApplyPerk(client, perk.GetPrefCell("alpha"));
+	}else{
+		UnsetClientPerkCache(client, g_iBlindId);
+		Blind_RemovePerk(client);
+	}
+}
+
+public void Blind_ApplyPerk(int client, int iAlpha){
+	SetIntCache(client, iAlpha)
+	Blind_SendFade(client, iAlpha);
+
+	int iOtherTeam = GetOppositeTeamOf(client);
+
+	for(int i = 1; i <= MaxClients; ++i){
+		Handle hAnnotation = Blind_CreateEventForPlayer("show_annotation", client, i, iOtherTeam);
+		if (hAnnotation == INVALID_HANDLE)
+			continue;
+
+		SetEventInt(hAnnotation, "follow_entindex", i);
+		SetEventInt(hAnnotation, "id", Blind_GetAnnotationId(client, i));
+		SetEventFloat(hAnnotation, "lifetime", 99999.0);
+		SetEventBool(hAnnotation, "show_distance", false);
+		SetEventString(hAnnotation, "text", "!");
+		SetEventInt(hAnnotation, "visibilityBitfield", (1 << client));
+		FireEvent(hAnnotation);
+	}
+}
+
+public void Blind_RemovePerk(int client){
+	Blind_SendFade(client, 0);
+
+	int iOtherTeam = GetOppositeTeamOf(client);
+
+	for(int i = 1; i <= MaxClients; ++i){
+		Handle hAnnotation = Blind_CreateEventForPlayer("hide_annotation", client, i, iOtherTeam);
+		if (hAnnotation == INVALID_HANDLE)
+			continue;
+
+		SetEventInt(hAnnotation, "id", Blind_GetAnnotationId(client, i));
+		FireEvent(hAnnotation);
+	}
+}
+
+void Blind_PlayerHurt(Handle hEvent){
+	int iAttacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
+	if(!(0 < iAttacker <= MaxClients) || !IsClientInGame(iAttacker))
+		return;
+
+	if(!CheckClientPerkCache(iAttacker, g_iBlindId))
+		return;
+
+	Blind_SendFade(iAttacker, 0);
+	Blind_SendFade(iAttacker, GetIntCache(iAttacker), true);
+}
+
+int Blind_GetAnnotationId(int client, int iOther){
+	return client * iOther * (GetClientTeam(client) + 1)
+}
+
+Handle Blind_CreateEventForPlayer(char sEvent[32], int client, int iTarget, int iTargetTeam){
+	if(iTarget == client || !IsClientInGame(iTarget))
+		return INVALID_HANDLE;
+
+	if(GetClientTeam(iTarget) != iTargetTeam)
+		return INVALID_HANDLE;
+
+	return CreateEvent(sEvent);
+}
+
+void Blind_SendFade(const int client, const int iAlpha, const bool bFast=false){
 	int iTargets[2];
 	iTargets[0] = client;
 
+	int iDuration = 200 + 1336 * view_as<int>(!bFast);
+
 	Handle hMsg = StartMessageEx(g_BlindMsgId, iTargets, 1);
-	BfWriteShort(hMsg, 1536);
-	BfWriteShort(hMsg, 1536);
-	BfWriteShort(hMsg, apply ? (0x0002 | 0x0008) : (0x0001 | 0x0010));
+	BfWriteShort(hMsg, iDuration);
+	BfWriteShort(hMsg, iDuration);
+	BfWriteShort(hMsg, iAlpha > 0 ? (0x0002 | 0x0008) : (0x0001 | 0x0010));
 	BfWriteByte(hMsg, 0);
 	BfWriteByte(hMsg, 0);
 	BfWriteByte(hMsg, 0);
-	BfWriteByte(hMsg, apply ? perk.GetPrefCell("alpha") : 0);
+	BfWriteByte(hMsg, iAlpha);
 
 	EndMessage();
 }

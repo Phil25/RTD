@@ -144,6 +144,7 @@ void Forward_Resupply(int client){
 	• Client is guaranteed to be valid
 */
 void Forward_PlayerHurt(int client, Handle hEvent){
+	Blind_PlayerHurt(hEvent);
 	ScaryBullets_PlayerHurt(client, hEvent);
 	EyeForAnEye_PlayerHurt(hEvent);
 	DrugBullets_PlayerHurt(client, hEvent);

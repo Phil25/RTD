@@ -22,12 +22,15 @@
 * - EscapeString
 * - AccountIDToClient
 * - KillTimerSafe
-* - IsValidClient
 * - KillEntIn
 * - GetOppositeTeam
-* - GetOppositeTeamOf
 * - GetLauncher
 * - Parent
+*
+* CLIENT
+* - IsValidClient
+* - GetOppositeTeamOf
+* - GetCaptureValue
 *
 * DAMAGE
 * - DamageRadius
@@ -161,10 +164,6 @@ stock void KillTimerSafe(Handle &hTimer){
 	hTimer = INVALID_HANDLE;
 }
 
-stock bool IsValidClient(int client){
-	return (1 <= client <= MaxClients) && IsClientInGame(client);
-}
-
 stock void KillEntIn(int iEnt, float fTime){
 	char sStr[32];
 	Format(sStr, 32, "OnUser1 !self:Kill::%f:1", fTime);
@@ -177,11 +176,6 @@ stock int GetOppositeTeam(int iTeam){
 	return iTeam == 2 ? 3 : 2;
 }
 
-stock int GetOppositeTeamOf(int client){
-	int iTeam = GetClientTeam(client);
-	return GetOppositeTeam(iTeam);
-}
-
 stock int GetLauncher(int iProjectile){
 	int iWeapon = GetEntPropEnt(iProjectile, Prop_Send, "m_hOriginalLauncher");
 	if(iWeapon > MaxClients)
@@ -192,6 +186,40 @@ stock int GetLauncher(int iProjectile){
 stock void Parent(int iEnt, int iTo){
 	SetVariantString("!activator");
 	AcceptEntityInput(iEnt, "SetParent", iTo, iEnt, 0);
+}
+
+
+/*
+* CLIENT
+*/
+
+stock bool IsValidClient(int client){
+	return (1 <= client <= MaxClients) && IsClientInGame(client);
+}
+
+stock int GetOppositeTeamOf(int client){
+	int iTeam = GetClientTeam(client);
+	return GetOppositeTeam(iTeam);
+}
+
+stock float GetCaptureValue(const int client){
+	// float instead of int so the return value can be used in a TF2Attrib call
+	float fValue = 1.0;
+
+	fValue += view_as<int>(TF2_GetPlayerClass(client) == TFClass_Scout);
+
+	for(int iSlot = 0; iSlot < 5; iSlot++){
+		int iWeapon = GetPlayerWeaponSlot(client, iSlot);
+		if(iWeapon > MaxClients && IsValidEntity(iWeapon))
+			if(GetEntProp(iWeapon, Prop_Send, "m_iItemDefinitionIndex") == 154) // Pain Train
+				fValue += 1.0;
+	}
+
+	// We could iterate weapons and use TF2Attrib_ListDefIndices on each of them instead of checking
+	// for Pain Train directly, but native attributes cannot be read without parsing the itemschema,
+	// which I don't think is worth for the ~1% of cases when it's needed.
+
+	return fValue;
 }
 
 
