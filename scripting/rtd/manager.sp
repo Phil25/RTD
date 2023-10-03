@@ -207,6 +207,7 @@ public bool Forward_OnPlayerRunCmd(int client, int &iButtons, int &iImpulse, flo
 */
 public bool Forward_AttackIsCritical(int client, int iWeapon, const char[] sWeaponName){
 	StrongRecoil_CritCheck(client, iWeapon);
+	PowerPlay_OnAttack(client);
 
 	/*
 		if(Something_SetCritical(client)

@@ -47,7 +47,7 @@ public void Blind_ApplyPerk(int client, int iAlpha){
 			continue;
 
 		SetEventInt(hAnnotation, "follow_entindex", i);
-		SetEventInt(hAnnotation, "id", Blind_GetAnnotationId(client, i));
+		SetEventInt(hAnnotation, "id", GetUniqueId(client, i));
 		SetEventFloat(hAnnotation, "lifetime", 99999.0);
 		SetEventBool(hAnnotation, "show_distance", false);
 		SetEventString(hAnnotation, "text", "!");
@@ -66,7 +66,7 @@ public void Blind_RemovePerk(int client){
 		if (hAnnotation == INVALID_HANDLE)
 			continue;
 
-		SetEventInt(hAnnotation, "id", Blind_GetAnnotationId(client, i));
+		SetEventInt(hAnnotation, "id", GetUniqueId(client, i));
 		FireEvent(hAnnotation);
 	}
 }
@@ -81,10 +81,6 @@ void Blind_PlayerHurt(Handle hEvent){
 
 	Blind_SendFade(iAttacker, 0);
 	Blind_SendFade(iAttacker, GetIntCache(iAttacker), true);
-}
-
-int Blind_GetAnnotationId(int client, int iOther){
-	return client * iOther * (GetClientTeam(client) + 1)
 }
 
 Handle Blind_CreateEventForPlayer(char sEvent[32], int client, int iTarget, int iTargetTeam){

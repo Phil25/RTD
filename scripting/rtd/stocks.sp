@@ -26,6 +26,7 @@
 * - GetOppositeTeam
 * - GetLauncher
 * - Parent
+* - TeleportTo
 *
 * CLIENT
 * - IsValidClient
@@ -64,6 +65,7 @@
 * - CreateTesla
 * - ConnectWithBeam
 * - AttachRotating
+* - AttachGlow
 *
 * SPEED MANIPULATION
 * - GetBaseSpeed
@@ -188,6 +190,19 @@ stock void Parent(int iEnt, int iTo){
 	AcceptEntityInput(iEnt, "SetParent", iTo, iEnt, 0);
 }
 
+stock void TeleportToClient(int iEnt, int client, float fOffset[3]={0.0, 0.0, 36.0}){
+	float fPosition[3], fAngles[3], fForward[3], fRight[3], fUp[3];
+	GetClientAbsOrigin(client, fPosition);
+	GetClientAbsAngles(client, fAngles);
+
+	GetAngleVectors(fAngles, fForward, fRight, fUp);
+	fPosition[0] += fRight[0]*fOffset[0] + fForward[0]*fOffset[1] + fUp[0]*fOffset[2];
+	fPosition[1] += fRight[1]*fOffset[0] + fForward[1]*fOffset[1] + fUp[1]*fOffset[2];
+	fPosition[2] += fRight[2]*fOffset[0] + fForward[2]*fOffset[1] + fUp[2]*fOffset[2];
+
+	TeleportEntity(iEnt, fPosition, fAngles, NULL_VECTOR);
+}
+
 
 /*
 * CLIENT
@@ -220,6 +235,10 @@ stock float GetCaptureValue(const int client){
 	// which I don't think is worth for the ~1% of cases when it's needed.
 
 	return fValue;
+}
+
+stock int GetUniqueId(const int client, const int iOther){
+	return client * iOther * (GetClientTeam(client) + 1)
 }
 
 
@@ -442,22 +461,11 @@ stock int CreateParticle(int iClient, char[] strParticle, bool bAttach=true, cha
 	int iParticle = CreateEntityByName("info_particle_system");
 	if(!IsValidEdict(iParticle)) return 0;
 
-	float fPosition[3], fAngles[3], fForward[3], fRight[3], fUp[3];
-	GetClientAbsOrigin(iClient, fPosition);
-	GetClientAbsAngles(iClient, fAngles);
-
-	GetAngleVectors(fAngles, fForward, fRight, fUp);
-	fPosition[0] += fRight[0]*fOffset[0] + fForward[0]*fOffset[1] + fUp[0]*fOffset[2];
-	fPosition[1] += fRight[1]*fOffset[0] + fForward[1]*fOffset[1] + fUp[1]*fOffset[2];
-	fPosition[2] += fRight[2]*fOffset[0] + fForward[2]*fOffset[1] + fUp[2]*fOffset[2];
-
-	TeleportEntity(iParticle, fPosition, fAngles, NULL_VECTOR);
+	TeleportToClient(iParticle, iClient, fOffset);
 	DispatchKeyValue(iParticle, "effect_name", strParticle);
 
 	if(bAttach){
-		SetVariantString("!activator");
-		AcceptEntityInput(iParticle, "SetParent", iClient, iParticle, 0);
-
+		Parent(iParticle, iClient);
 		if(!StrEqual(strAttachmentPoint, "")){
 			SetVariantString(strAttachmentPoint);
 			AcceptEntityInput(iParticle, "SetParentAttachmentMaintainOffset", iParticle, iParticle, 0);
@@ -604,6 +612,35 @@ stock int AttachRotating(int client, int iEnt, float fDist=128.0, float fSpeed=1
 	AcceptEntityInput(iRot, "Open");
 
 	return iRot;
+}
+
+stock int AttachGlow(const int iEntity){
+	// Thanks Pelipoika for reference on attaching tf_glow entities
+	// https://forums.alliedmods.net/showthread.php?t=287533
+
+	int iEntLookup = -1;
+	while((iEntLookup = FindEntityByClassname(iEntLookup, "tf_glow")) != -1)
+		if(GetEntPropEnt(iEntLookup, Prop_Send, "m_hTarget") == iEntity)
+			return -1; // entities can only have 1 tf_glow object
+
+	int iGlow = CreateEntityByName("tf_glow");
+	if(iGlow <= MaxClients)
+		return -1;
+
+	char sOrigName[MAX_NAME_LENGTH], sTempName[32];
+	GetEntPropString(iEntity, Prop_Data, "m_iName", sOrigName, sizeof(sOrigName));
+
+	Format(sTempName, sizeof(sTempName), "rtd_tf_glow_%d", iEntity);
+	DispatchKeyValue(iEntity, "targetname", sTempName);
+
+	DispatchKeyValue(iGlow, "target", sTempName);
+	AcceptEntityInput(iGlow, "Enable");
+	DispatchSpawn(iGlow);
+
+	// Set original name back
+	SetEntPropString(iEntity, Prop_Data, "m_iName", sOrigName);
+
+	return iGlow;
 }
 
 
