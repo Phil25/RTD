@@ -192,6 +192,7 @@ void Forward_OnConditionRemoved(int client, TFCond condition){
 public bool Forward_OnPlayerRunCmd(int client, int &iButtons, int &iImpulse, float fVel[3], float fAng[3], int &iWeapon){
 	InfiniteJump_OnPlayerRunCmd(client, iButtons);
 	BigHead_OnPlayerRunCmd(client);
+	Noclip_OnPlayerRunCmd(client, fVel, fAng)
 	if(Cursed_OnPlayerRunCmd(client, iButtons, fVel))
 		return true;
 	return false;
