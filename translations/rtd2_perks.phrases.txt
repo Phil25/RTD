@@ -466,7 +466,7 @@
 		"en"	"More ammo, more skill."
 		"pl"	"Więcej amunicji, więcej wprawy."
 		"sv"	"Mer ammo, mer skill."
-		"de"	"Mehr Munition, mehr Skill.
+		"de"	"Mehr Munition, mehr Skill."
 		"chi"	"子弹越多越牛逼."
 		"ru"	"Больше боеприпасов, больше навыков."
 		"pt"	"Mais munição, mais habilidade."

@@ -601,6 +601,7 @@ public Action Command_Reload(int client, int args){
 	ReloadPluginState();
 	ParseEffects();
 	ParseCustomEffects();
+	ParseDisabledPerks();
 	Forward_OnRegOpen();
 	return Plugin_Handled;
 }
@@ -1063,7 +1064,16 @@ void RollPerkForClient(int client){
 	}
 
 	Perk perk = RollPerk(client);
+
+	if(perk == null){ // this should not happen unless everything is disabled or not applicable to player
+		PrintToServer("[RTD] WARNING: Perk not found for player when they attempted a roll.");
+		if(g_iCvarChat & CHAT_REASONS)
+			RTDPrint(client, "%T", "RTD2_Cant_Roll_No_Access", LANG_SERVER);
+		return;
+	}
+
 	ApplyPerk(client, perk);
+
 	if(g_bCvarLog){
 		char sBuffer[64];
 		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
