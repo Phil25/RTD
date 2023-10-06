@@ -81,6 +81,15 @@ void Forward_OnClientPutInServer(int client){
 
 
 /*
+	• Editing Forward_OnClientDisconnect() is OPTIONAL
+	• This is a forward of OnClientDisconnect() from rtd.sp
+*/
+void Forward_OnClientDisconnect(int client){
+	Godmode_OnClientDisconnect(client);
+}
+
+
+/*
 	• Editing Forward_Voice() is OPTIONAL
 	• This is a forward of Listener_Voice() from rtd.sp
 	• Listener_Voice() fires when a client says something via Voicemenu
@@ -128,6 +137,17 @@ void Forward_OnEntityCreated(int iEntity, const char[] sClassname){
 
 
 /*
+	• Editing Forward_OnPlayerDeath() is OPTIONAL
+	• This is a forward of Event_PlayerDeath() from rtd.sp
+	• Client is guaranteed to be valid.
+	• Actual death, Dead Ringer feign does not count.
+*/
+void Forward_OnPlayerDeath(int client){
+	Godmode_OnPlayerDeath(client);
+}
+
+
+/*
 	• Editing Forward_Resupply() is OPTIONAL
 	• Client is guaranteed to be valid
 */
@@ -144,6 +164,7 @@ void Forward_Resupply(int client){
 	• Client is guaranteed to be valid
 */
 void Forward_PlayerHurt(int client, Handle hEvent){
+	Godmode_PlayerHurt(client, hEvent);
 	Blind_PlayerHurt(hEvent);
 	ScaryBullets_PlayerHurt(client, hEvent);
 	EyeForAnEye_PlayerHurt(hEvent);
@@ -166,6 +187,7 @@ void Forward_OnGameFrame(){
 	• It's a forward of TF2_OnConditionAdded() from rtd.sp
 */
 void Forward_OnConditionAdded(int client, TFCond condition){
+	Godmode_OnConditionAdded(client, condition);
 	FullRifleCharge_OnConditionAdded(client, condition);
 	ForcedTaunt_OnConditionAdded(client, condition);
 }
@@ -176,6 +198,7 @@ void Forward_OnConditionAdded(int client, TFCond condition){
 	• It's a forward of TF2_OnConditionRemoved() from rtd.sp
 */
 void Forward_OnConditionRemoved(int client, TFCond condition){
+	Godmode_OnConditionRemoved(client, condition);
 	FullUbercharge_OnConditionRemoved(client, condition);
 	FunnyFeeling_OnConditionRemoved(client, condition);
 	ForcedTaunt_OnConditionRemoved(client, condition);

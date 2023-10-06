@@ -66,6 +66,8 @@
 * - ConnectWithBeam
 * - AttachRotating
 * - AttachGlow
+* - ShowAnnotationFor
+* - HideAnnotationFor
 *
 * SPEED MANIPULATION
 * - GetBaseSpeed
@@ -238,7 +240,10 @@ stock float GetCaptureValue(const int client){
 }
 
 stock int GetUniqueId(const int client, const int iOther){
-	return client * iOther * (GetClientTeam(client) + 1)
+	// iOther + 100 -- in case other is negative
+	// (GetClientTeam(client) + 1) -- +1 so it won't be 0 in any case
+	// 91 -- a little bit of randomness to discern it from other plugins, on the off chance that alogs are similar
+	return client * (iOther + 100) * (GetClientTeam(client) + 1) * 91
 }
 
 
@@ -641,6 +646,29 @@ stock int AttachGlow(const int iEntity){
 	SetEntPropString(iEntity, Prop_Data, "m_iName", sOrigName);
 
 	return iGlow;
+}
+
+stock void ShowAnnotationFor(int client, int iOther, char sText[128]="", char sSound[128]=""){
+	Handle hHandle = CreateEvent("show_annotation");
+	if(hHandle == INVALID_HANDLE)
+		return;
+
+	SetEventInt(hHandle, "follow_entindex", iOther);
+	SetEventInt(hHandle, "id", GetUniqueId(client, iOther));
+	SetEventFloat(hHandle, "lifetime", 99999.0);
+	SetEventString(hHandle, "text", sText);
+	SetEventString(hHandle, "play_sound", sSound);
+	SetEventInt(hHandle, "visibilityBitfield", 1 << client);
+	FireEvent(hHandle);
+}
+
+stock void HideAnnotationFor(int client, int iOther){
+	Handle hHandle = CreateEvent("hide_annotation");
+	if(hHandle == INVALID_HANDLE)
+		return;
+
+	SetEventInt(hHandle, "id", GetUniqueId(client, iOther));
+	FireEvent(hHandle);
 }
 
 

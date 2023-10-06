@@ -41,19 +41,9 @@ public void Blind_ApplyPerk(int client, int iAlpha){
 
 	int iOtherTeam = GetOppositeTeamOf(client);
 
-	for(int i = 1; i <= MaxClients; ++i){
-		Handle hAnnotation = Blind_CreateEventForPlayer("show_annotation", client, i, iOtherTeam);
-		if (hAnnotation == INVALID_HANDLE)
-			continue;
-
-		SetEventInt(hAnnotation, "follow_entindex", i);
-		SetEventInt(hAnnotation, "id", GetUniqueId(client, i));
-		SetEventFloat(hAnnotation, "lifetime", 99999.0);
-		SetEventBool(hAnnotation, "show_distance", false);
-		SetEventString(hAnnotation, "text", "!");
-		SetEventInt(hAnnotation, "visibilityBitfield", (1 << client));
-		FireEvent(hAnnotation);
-	}
+	for(int i = 1; i <= MaxClients; ++i)
+		if(Blind_IsValidTarget(client, i, iOtherTeam))
+			ShowAnnotationFor(client, i, "<!>");
 }
 
 public void Blind_RemovePerk(int client){
@@ -61,14 +51,9 @@ public void Blind_RemovePerk(int client){
 
 	int iOtherTeam = GetOppositeTeamOf(client);
 
-	for(int i = 1; i <= MaxClients; ++i){
-		Handle hAnnotation = Blind_CreateEventForPlayer("hide_annotation", client, i, iOtherTeam);
-		if (hAnnotation == INVALID_HANDLE)
-			continue;
-
-		SetEventInt(hAnnotation, "id", GetUniqueId(client, i));
-		FireEvent(hAnnotation);
-	}
+	for(int i = 1; i <= MaxClients; ++i)
+		if(Blind_IsValidTarget(client, i, iOtherTeam))
+			HideAnnotationFor(client, i);
 }
 
 void Blind_PlayerHurt(Handle hEvent){
@@ -83,14 +68,14 @@ void Blind_PlayerHurt(Handle hEvent){
 	Blind_SendFade(iAttacker, GetIntCache(iAttacker), true);
 }
 
-Handle Blind_CreateEventForPlayer(char sEvent[32], int client, int iTarget, int iTargetTeam){
+bool Blind_IsValidTarget(int client, int iTarget, int iTargetTeam){
 	if(iTarget == client || !IsClientInGame(iTarget))
-		return INVALID_HANDLE;
+		return false;
 
 	if(GetClientTeam(iTarget) != iTargetTeam)
-		return INVALID_HANDLE;
+		return false;
 
-	return CreateEvent(sEvent);
+	return true;
 }
 
 void Blind_SendFade(const int client, const int iAlpha, const bool bFast=false){

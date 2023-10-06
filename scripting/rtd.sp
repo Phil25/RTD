@@ -399,6 +399,8 @@ public void OnClientDisconnect(int client){
 		ForceRemovePerk(client, RTDRemove_Disconnect);
 
 	g_hRollers.Reset(client);
+
+	Forward_OnClientDisconnect(client);
 }
 
 public void OnAllPluginsLoaded(){
@@ -763,9 +765,10 @@ public Action Event_PlayerDeath(Handle hEvent, const char[] sEventName, bool don
 	if(client == 0)
 		return Plugin_Continue;
 
-	int flags = GetEventInt(hEvent, "death_flags");
-	if(flags & FLAG_FEIGNDEATH)
+	if(GetEventInt(hEvent, "death_flags") & FLAG_FEIGNDEATH)
 		return Plugin_Continue;
+
+	Forward_OnPlayerDeath(client);
 
 	if(!g_hRollers.GetInRoll(client))
 		return Plugin_Continue;
