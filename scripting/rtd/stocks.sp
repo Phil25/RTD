@@ -32,6 +32,9 @@
 * - IsValidClient
 * - GetOppositeTeamOf
 * - GetCaptureValue
+* - ApplyPreventCapture
+* - RemovePreventCapture
+* - GetUniqueId
 *
 * DAMAGE
 * - DamageRadius
@@ -237,6 +240,17 @@ stock float GetCaptureValue(const int client){
 	// which I don't think is worth for the ~1% of cases when it's needed.
 
 	return fValue;
+}
+
+stock void ApplyPreventCapture(const int client){
+	TF2Attrib_SetByDefIndex(client, 400, 1.0); // cannot pick up intel
+	TF2Attrib_SetByDefIndex(client, 68, -GetCaptureValue(client)); // balance capture value to 0
+	FakeClientCommandEx(client, "dropitem") // in case intel is already picked up
+}
+
+stock void RemovePreventCapture(const int client){
+	TF2Attrib_RemoveByDefIndex(client, 400);
+	TF2Attrib_RemoveByDefIndex(client, 68);
 }
 
 stock int GetUniqueId(const int client, const int iOther){

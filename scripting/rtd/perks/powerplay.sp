@@ -17,10 +17,8 @@
 */
 
 
-#define ATTRIB_CAPTURE_VALUE_INCREASE 68
 #define ATTRIB_MELEE_RANGE 264
 #define ATTRIB_JUMP_HEIGHT 326
-#define ATTRIB_CANNOT_PICK_UP_INTEL 400
 #define ATTRIB_DAMAGE_FORCE_INCREASE 535
 
 #define BASE_WALK_SPEED 0
@@ -78,9 +76,7 @@ void PowerPlay_ApplyPerk(const int client){
 	if(iMelee > MaxClients && IsValidEntity(iMelee))
 		TF2Attrib_SetByDefIndex(iMelee, ATTRIB_MELEE_RANGE, 1.1);
 
-	TF2Attrib_SetByDefIndex(client, ATTRIB_CANNOT_PICK_UP_INTEL, 1.0);
-	TF2Attrib_SetByDefIndex(client, ATTRIB_CAPTURE_VALUE_INCREASE, -GetCaptureValue(client));
-	FakeClientCommandEx(client, "dropitem") // in case intel is already picked up
+	ApplyPreventCapture(client);
 
 	switch(TF2_GetClientTeam(client)){
 		case TFTeam_Blue:{
@@ -129,8 +125,7 @@ void PowerPlay_RemovePerk(const int client){
 	if(iMelee > MaxClients && IsValidEntity(iMelee))
 		TF2Attrib_RemoveByDefIndex(iMelee, ATTRIB_MELEE_RANGE);
 
-	TF2Attrib_RemoveByDefIndex(client, ATTRIB_CANNOT_PICK_UP_INTEL);
-	TF2Attrib_RemoveByDefIndex(client, ATTRIB_CAPTURE_VALUE_INCREASE);
+	RemovePreventCapture(client);
 
 	TF2_RemoveCondition(client, TFCond_CritOnFirstBlood);
 	TF2_RemoveCondition(client, TFCond_UberBulletResist);
@@ -219,10 +214,8 @@ public Action Timer_PowerPlaySlowDownCheck(Handle hTimer, int iUserId){
 	return Plugin_Continue;
 }
 
-#undef ATTRIB_CAPTURE_VALUE_INCREASE
 #undef ATTRIB_MELEE_RANGE
 #undef ATTRIB_JUMP_HEIGHT
-#undef ATTRIB_CANNOT_PICK_UP_INTEL
 #undef ATTRIB_DAMAGE_FORCE_INCREASE
 
 #undef BASE_WALK_SPEED

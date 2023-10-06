@@ -127,6 +127,12 @@ void Godmode_ApplyPerk(int client, Perk perk){
 	SetIntCache(client, iUber, UBER_MODE);
 	if(iUber) TF2_AddCondition(client, TFCond_UberchargedCanteen);
 
+	TF2_AddCondition(client, TFCond_UberBulletResist);
+	TF2_AddCondition(client, TFCond_UberBlastResist);
+	TF2_AddCondition(client, TFCond_UberFireResist);
+
+	ApplyPreventCapture(client);
+
 	GodmodeEnemies(client).Init(client);
 
 	g_iInGodmode |= client;
@@ -143,6 +149,12 @@ void Godmode_RemovePerk(int client){
 
 	if(GetIntCacheBool(client, UBER_MODE))
 		TF2_RemoveCondition(client, TFCond_UberchargedCanteen);
+
+	TF2_RemoveCondition(client, TFCond_UberBulletResist);
+	TF2_RemoveCondition(client, TFCond_UberBlastResist);
+	TF2_RemoveCondition(client, TFCond_UberFireResist);
+
+	RemovePreventCapture(client);
 
 	GodmodeEnemies hEnemies = GodmodeEnemies(client);
 	for(int i = 1; i <= MaxClients; ++i)
@@ -175,17 +187,18 @@ void Godmode_SpawnDeflectEffect(int client, int iType, float fPos[3]){
 	}
 }
 
-Action Godmode_OnTakeDamage_Common(const int client, iAttacker, const int iType, float fPos[3]){
+Action Godmode_OnTakeDamage_Common(const int client, const int iAttacker, float &fDamage, const int iType, float fPos[3]){
 	if(GodmodeEnemies(client).Contains(iAttacker)){
-		return Plugin_Continue;
+		fDamage *= 0.2;
+		return Plugin_Changed;
 	}
 
 	Godmode_SpawnDeflectEffect(client, iType, fPos);
-	return Plugin_Handled
+	return Plugin_Handled;
 }
 
 public Action Godmode_OnTakeDamage_NoSelf(int client, int &iAttacker, int &iInflictor, float &fDamage, int &iType, int &iWeapon, float fForce[3], float fPos[3], int iCustom){
-	return client == iAttacker ? Plugin_Handled : Godmode_OnTakeDamage_Common(client, iAttacker, iType, fPos);
+	return client == iAttacker ? Plugin_Handled : Godmode_OnTakeDamage_Common(client, iAttacker, fDamage, iType, fPos);
 }
 
 public Action Godmode_OnTakeDamage_Pushback(int client, int &iAttacker, int &iInflictor, float &fDamage, int &iType, int &iWeapon, float fForce[3], float fPos[3], int iCustom){
@@ -193,11 +206,11 @@ public Action Godmode_OnTakeDamage_Pushback(int client, int &iAttacker, int &iIn
 		TF2_AddCondition(client, TFCond_Bonked, 0.01);
 		return Plugin_Continue;
 	}
-	return Godmode_OnTakeDamage_Common(client, iAttacker, iType, fPos);
+	return Godmode_OnTakeDamage_Common(client, iAttacker, fDamage, iType, fPos);
 }
 
 public Action Godmode_OnTakeDamage_Self(int client, int &iAttacker, int &iInflictor, float &fDamage, int &iType, int &iWeapon, float fForce[3], float fPos[3], int iCustom){
-	return client == iAttacker ? Plugin_Continue : Godmode_OnTakeDamage_Common(client, iAttacker, iType, fPos);
+	return client == iAttacker ? Plugin_Continue : Godmode_OnTakeDamage_Common(client, iAttacker, fDamage, iType, fPos);
 }
 
 void Godmode_OnClientDisconnect(const int client){
