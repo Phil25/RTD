@@ -778,15 +778,37 @@ public Action Event_PlayerDeath(Handle hEvent, const char[] sEventName, bool don
 }
 
 public Action Event_ClassChange(Handle hEvent, const char[] sEventName, bool dontBroadcast){
-	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+	int iUserId = GetEventInt(hEvent, "userid");
+	int client = GetClientOfUserId(iUserId);
 	if(client == 0)
 		return Plugin_Continue;
+
+	int iClass = GetEventInt(hEvent, "class");
+	if(view_as<int>(TF2_GetPlayerClass(client)) == iClass)
+		return Plugin_Continue; // no actual class change in effect
 
 	if(!g_hRollers.GetInRoll(client))
 		return Plugin_Continue;
 
-	ForceRemovePerk(client, RTDRemove_ClassChange);
+	DataPack hData = new DataPack();
+	hData.WriteCell(iUserId);
+	hData.WriteCell(iClass);
+	CreateTimer(0.0, Timer_ClassChangePost, hData);
+
 	return Plugin_Continue;
+}
+
+public Action Timer_ClassChangePost(Handle hTimer, DataPack hData){
+	hData.Reset();
+	int client = GetClientOfUserId(hData.ReadCell());
+	int iDesiredClass = hData.ReadCell();
+	CloseHandle(hData);
+
+	if(client > 0)
+		if(view_as<int>(TF2_GetPlayerClass(client)) == iDesiredClass)
+			ForceRemovePerk(client, RTDRemove_ClassChange);
+
+	return Plugin_Stop;
 }
 
 public Action Event_RoundActive(Handle hEvent, const char[] sEventName, bool dontBroadcast){
