@@ -58,6 +58,7 @@ void Forward_OnMapStart(){
 	FireTimebomb_Start();
 	FireBreath_Start();
 	SpringShoes_Start();
+	BatSwarm_Start();
 	HatThrow_Start();
 	MadarasWhistle_Start();
 	Sickness_Start();
@@ -101,6 +102,7 @@ void Forward_Voice(int client){
 	DeadlyVoice_Voice(client);
 	FireBreath_Voice(client);
 	HatThrow_Voice(client);
+	BatSwarm_Voice(client);
 	MadarasWhistle_Voice(client);
 	MercsDieTwice_Voice(client);
 	PumpkinTrail_Voice(client);

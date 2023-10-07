@@ -25,6 +25,7 @@
 	AcceptEntityInput(%1, "FireUser1");
 
 
+
 /****** I N C L U D E S *****/
 
 #include <rtd2>
@@ -39,7 +40,13 @@
 #tryinclude <friendlysimple>
 
 #include "rtd/stocks.sp"
-#include "rtd/includes.sp"
+
+
+
+/********* E N U M S ********/
+
+Rollers g_hRollers = null;
+
 
 
 /******* D E F I N E S ******/
@@ -68,13 +75,9 @@
 
 
 
-/********* E N U M S ********/
+/********* P E R K S ********/
 
-Rollers g_hRollers = null;
-
-
-/********* M A N A G E R ********/
-
+#include "rtd/includes.sp"
 #include "rtd/manager.sp" //For info, go to the script itself
 
 
@@ -102,6 +105,7 @@ int		g_iCorePerks			= 0;
 
 bool	g_bIsGameArena			= false;
 int		g_iLastPerkTime			= -1;
+
 
 
 /***** C O N V A R S ****/

@@ -28,6 +28,10 @@
 * - Parent
 * - TeleportTo
 *
+* MATH
+* - Min
+* - Max
+*
 * CLIENT
 * - IsValidClient
 * - GetOppositeTeamOf
@@ -206,6 +210,19 @@ stock void TeleportToClient(int iEnt, int client, float fOffset[3]={0.0, 0.0, 36
 	fPosition[2] += fRight[2]*fOffset[0] + fForward[2]*fOffset[1] + fUp[2]*fOffset[2];
 
 	TeleportEntity(iEnt, fPosition, fAngles, NULL_VECTOR);
+}
+
+
+/*
+* MATH
+*/
+
+stock float Min(float f1, float f2){
+	return f1 < f2 ? f1 : f2;
+}
+
+stock float Max(float f1, float f2){
+	return f1 > f2 ? f1 : f2;
 }
 
 
