@@ -17,6 +17,8 @@
 */
 
 
+#define BLIND_ALPHA 0
+
 UserMsg g_BlindMsgId;
 int g_iBlindId = 22;
 
@@ -25,57 +27,85 @@ void Blind_Start(){
 }
 
 public void Blind_Call(const int client, const Perk perk, const bool apply){
-	if(apply){
-		g_iBlindId = perk.Id;
-		SetClientPerkCache(client, g_iBlindId);
-		Blind_ApplyPerk(client, perk.GetPrefCell("alpha"));
-	}else{
-		UnsetClientPerkCache(client, g_iBlindId);
-		Blind_RemovePerk(client);
+	if(apply) Blind_ApplyPerk(client, perk);
+	else Blind_RemovePerk(client);
+}
+
+void Blind_ApplyPerk(const int client, const Perk perk){
+	g_iBlindId = perk.Id;
+	SetClientPerkCache(client, g_iBlindId);
+
+	int iAlpha = perk.GetPrefCell("alpha")
+	Blind_SendFade(client, iAlpha);
+	SetIntCache(client, iAlpha, BLIND_ALPHA);
+	Cache(client).ResetClientFlags();
+
+	Blind_UpdateAnnotations(client);
+	CreateTimer(1.0, Blind_UpdateAnnotationsCheck, GetClientUserId(client), TIMER_REPEAT);
+}
+
+void Blind_RemovePerk(const int client){
+	UnsetClientPerkCache(client, g_iBlindId);
+	Blind_SendFade(client, 0);
+	Blind_UpdateAnnotations(client, true);
+}
+
+void Blind_UpdateAnnotations(const int client, const bool bForceDisable=false){
+	int iOtherTeam = GetOppositeTeamOf(client);
+	Cache mCache = Cache(client);
+
+	for(int i = 1; i <= MaxClients; ++i){
+		bool bSet = mCache.TestClientFlag(i);
+		bool bShouldSet = Blind_IsValidTarget(client, i, iOtherTeam) && !bForceDisable;
+
+		if(!bSet && bShouldSet){
+			ShowAnnotationFor(client, i, "<!>");
+			mCache.SetClientFlag(i);
+		}else if(bSet && !bShouldSet){
+			HideAnnotationFor(client, i);
+			mCache.UnsetClientFlag(i);
+		}
 	}
 }
 
-public void Blind_ApplyPerk(int client, int iAlpha){
-	SetIntCache(client, iAlpha)
-	Blind_SendFade(client, iAlpha);
+public Action Blind_UpdateAnnotationsCheck(Handle hTimer, const int iUserId){
+	int client = GetClientOfUserId(iUserId);
+	if(client == 0 || !CheckClientPerkCache(client, g_iBlindId))
+		return Plugin_Stop;
 
-	int iOtherTeam = GetOppositeTeamOf(client);
-
-	for(int i = 1; i <= MaxClients; ++i)
-		if(Blind_IsValidTarget(client, i, iOtherTeam))
-			ShowAnnotationFor(client, i, "<!>");
+	Blind_UpdateAnnotations(client);
+	return Plugin_Continue;
 }
 
-public void Blind_RemovePerk(int client){
-	Blind_SendFade(client, 0);
-
-	int iOtherTeam = GetOppositeTeamOf(client);
-
-	for(int i = 1; i <= MaxClients; ++i)
-		if(Blind_IsValidTarget(client, i, iOtherTeam))
-			HideAnnotationFor(client, i);
-}
-
-void Blind_PlayerHurt(Handle hEvent){
+void Blind_PlayerHurt(const int client, Handle hEvent){
 	int iAttacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
-	if(!(0 < iAttacker <= MaxClients) || !IsClientInGame(iAttacker))
+	if(!(0 < iAttacker <= MaxClients) || iAttacker == client || !IsClientInGame(iAttacker))
 		return;
 
 	if(!CheckClientPerkCache(iAttacker, g_iBlindId))
 		return;
 
 	Blind_SendFade(iAttacker, 0);
-	Blind_SendFade(iAttacker, GetIntCache(iAttacker), true);
+	Blind_SendFade(iAttacker, GetIntCache(iAttacker, BLIND_ALPHA), true);
 }
 
 bool Blind_IsValidTarget(int client, int iTarget, int iTargetTeam){
-	if(iTarget == client || !IsClientInGame(iTarget))
+	if(iTarget == client || !IsClientInGame(iTarget) || !IsPlayerAlive(iTarget))
 		return false;
 
 	if(GetClientTeam(iTarget) != iTargetTeam)
 		return false;
 
-	return true;
+	/*
+	* Updating annotation position is a client-side functionality. However, the client might not
+	* have an up-to-date position of the other player if that player is far away (ex. died and
+	* respawned). This causes annotations to linger there in the last known position.
+	*
+	* We can fix this by manually checking if the Blind player can see the target, meaning their
+	* client knows their coordinates. This unfortunately ends up a bit too expensive than it needs
+	* be, but it works.
+	*/
+	return CanEntitySeeTarget(client, iTarget)
 }
 
 void Blind_SendFade(const int client, const int iAlpha, const bool bFast=false){
@@ -95,3 +125,5 @@ void Blind_SendFade(const int client, const int iAlpha, const bool bFast=false){
 
 	EndMessage();
 }
+
+#undef BLIND_ALPHA

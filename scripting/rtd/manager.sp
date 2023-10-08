@@ -167,7 +167,7 @@ void Forward_Resupply(int client){
 */
 void Forward_PlayerHurt(int client, Handle hEvent){
 	Godmode_PlayerHurt(client, hEvent);
-	Blind_PlayerHurt(hEvent);
+	Blind_PlayerHurt(client, hEvent);
 	ScaryBullets_PlayerHurt(client, hEvent);
 	EyeForAnEye_PlayerHurt(hEvent);
 	DrugBullets_PlayerHurt(client, hEvent);

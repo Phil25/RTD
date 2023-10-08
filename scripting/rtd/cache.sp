@@ -17,11 +17,60 @@
 */
 
 
+enum struct ClientFlags{
+	int iVals[4]; // SM ints are 32 bit, 4 are needed to hold 100 players
+
+	void Set(const int iIndex){
+		int iOverflows = iIndex / 32;
+		this.iVals[iOverflows] |= 1 << (iIndex - 32 * iOverflows);
+	}
+
+	void Unset(const int iIndex){
+		int iOverflows = iIndex / 32;
+		this.iVals[iOverflows] &= ~(1 << (iIndex - 32 * iOverflows));
+	}
+
+	bool Test(const int iIndex){
+		int iOverflows = iIndex / 32;
+		return view_as<bool>(this.iVals[iOverflows] & (1 << (iIndex - 32 * iOverflows)));
+	}
+
+	void Reset(){
+		this.iVals[0] = 0;
+		this.iVals[1] = 0;
+		this.iVals[2] = 0;
+		this.iVals[3] = 0;
+	}
+}
+
 int g_iClientPerkCache[MAXPLAYERS+1] = {-1, ...}; // Used to check if client has the current perk
 int g_iEntCache[MAXPLAYERS+1][2]; // Used throughout perks to store their entities
 float g_fCache[MAXPLAYERS+1][4];
 int g_iCache[MAXPLAYERS+1][4];
+ClientFlags g_eClientFlags[MAXPLAYERS+1];
 ArrayList g_aCache[MAXPLAYERS+1] = {null, ...};
+
+methodmap Cache{
+	public Cache(const int client){
+		return view_as<Cache>(client);
+	}
+
+	public void SetClientFlag(const int iIndex){
+		g_eClientFlags[view_as<int>(this)].Set(iIndex);
+	}
+
+	public void UnsetClientFlag(const int iIndex){
+		g_eClientFlags[view_as<int>(this)].Unset(iIndex);
+	}
+
+	public bool TestClientFlag(const int iIndex){
+		return g_eClientFlags[view_as<int>(this)].Test(iIndex);
+	}
+
+	public void ResetClientFlags(){
+		g_eClientFlags[view_as<int>(this)].Reset();
+	}
+}
 
 int GetEntCache(int client, int iBlock=0){
 	return EntRefToEntIndex(g_iEntCache[client][iBlock]);

@@ -271,10 +271,10 @@ stock void RemovePreventCapture(const int client){
 }
 
 stock int GetUniqueId(const int client, const int iOther){
-	// iOther + 100 -- in case other is negative
-	// (GetClientTeam(client) + 1) -- +1 so it won't be 0 in any case
+	// iOther + MAXPLAYERS -- reversing args should yield different IDs
+	// MAXPLAYERS * 2 -- add more than MAXPLAYERS in case iOther is negative
 	// 91 -- a little bit of randomness to discern it from other plugins, on the off chance that alogs are similar
-	return client * (iOther + 100) * (GetClientTeam(client) + 1) * 91
+	return client * (iOther + MAXPLAYERS * 2) * 91
 }
 
 
@@ -680,26 +680,29 @@ stock int AttachGlow(const int iEntity){
 }
 
 stock void ShowAnnotationFor(int client, int iOther, char sText[128]="", char sSound[128]=""){
-	Handle hHandle = CreateEvent("show_annotation");
-	if(hHandle == INVALID_HANDLE)
+	Event hEvent = CreateEvent("show_annotation");
+	if(hEvent == INVALID_HANDLE)
 		return;
 
-	SetEventInt(hHandle, "follow_entindex", iOther);
-	SetEventInt(hHandle, "id", GetUniqueId(client, iOther));
-	SetEventFloat(hHandle, "lifetime", 99999.0);
-	SetEventString(hHandle, "text", sText);
-	SetEventString(hHandle, "play_sound", sSound);
-	SetEventInt(hHandle, "visibilityBitfield", 1 << client);
-	FireEvent(hHandle);
+	hEvent.SetInt("follow_entindex", iOther);
+	hEvent.SetInt("id", GetUniqueId(client, iOther));
+	hEvent.SetFloat("lifetime", 99999.0);
+	hEvent.SetString("text", sText);
+	hEvent.SetString("play_sound", sSound);
+
+	hEvent.FireToClient(client);
+	CloseHandle(hEvent);
 }
 
 stock void HideAnnotationFor(int client, int iOther){
-	Handle hHandle = CreateEvent("hide_annotation");
-	if(hHandle == INVALID_HANDLE)
+	Event hEvent = CreateEvent("hide_annotation");
+	if(hEvent == INVALID_HANDLE)
 		return;
 
-	SetEventInt(hHandle, "id", GetUniqueId(client, iOther));
-	FireEvent(hHandle);
+	hEvent.SetInt("id", GetUniqueId(client, iOther));
+
+	hEvent.FireToClient(client);
+	CloseHandle(hEvent);
 }
 
 
