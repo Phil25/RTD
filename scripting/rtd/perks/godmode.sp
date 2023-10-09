@@ -27,75 +27,82 @@
 #define GODMODE_BULLET_HIT "versus_door_sparks_floaty"
 
 #define UBER_MODE 0
-#define ENEMIES 1
 
-int g_iInGodmode = 0;
+#define GODMODE_RESISTANCE 0
+#define LAST_DEFLECT_TIME 1
+
+ClientFlags g_eInGodmode;
 int g_iGodmodeId = 0;
 
-methodmap GodmodeEnemies{
-	public GodmodeEnemies(const int client=0){
-		return view_as<GodmodeEnemies>(GetIntCache(client, ENEMIES));
+methodmap GodmodeFlags{
+	public GodmodeFlags(const int client=0){
+		return view_as<GodmodeFlags>(client);
 	}
 
-	public GodmodeEnemies Add(const int client, const int iEnemy){
+	public void Add(const int iEnemy){
+		int client = view_as<int>(this);
 		if(client == iEnemy || this.Contains(iEnemy))
-			return this;
+			return;
+
+		Cache(client).SetClientFlag(iEnemy);
+
+		if(GetIntCache(client, UBER_MODE))
+			return;
 
 		ShowAnnotationFor(iEnemy, client, GODMODE_DOWN_TEXT, GODMODE_DOWN_SOUND);
 
-		if(!TF2_IsPlayerInCondition(iEnemy, TFCond_Cloaked) && !TF2_IsPlayerInCondition(iEnemy, TFCond_Disguised)){
-			ShowAnnotationFor(client, iEnemy, GODMODE_WARN_TEXT, GODMODE_WARN_SOUND);
+		if(TF2_IsPlayerInCondition(iEnemy, TFCond_Cloaked) || TF2_IsPlayerInCondition(iEnemy, TFCond_Disguised))
+			return;
 
-			int iBeam = ConnectWithBeam(iEnemy, client, 150, 255, 150, 1.0, 1.0, 10.0);
-			if(iBeam > MaxClients){
-				KILL_ENT_IN(iBeam,0.2)
-			}
+		ShowAnnotationFor(client, iEnemy, GODMODE_WARN_TEXT, GODMODE_WARN_SOUND);
+
+		int iBeam = ConnectWithBeam(iEnemy, client, 150, 255, 150, 1.0, 1.0, 10.0);
+		if(iBeam > MaxClients){
+			KILL_ENT_IN(iBeam,0.2)
 		}
-
-		return view_as<GodmodeEnemies>(view_as<int>(this) | (1 << iEnemy));
 	}
 
-	public GodmodeEnemies Remove(const int client, const int iEnemy){
+	public void Remove(const int iEnemy){
 		if(!this.Contains(iEnemy))
-			return this;
+			return;
 
-		this.RemoveAnnotation(client, iEnemy);
-		return view_as<GodmodeEnemies>(view_as<int>(this) & ~(1 << iEnemy));
+		Cache(view_as<int>(this)).UnsetClientFlag(iEnemy);
+		this.RemoveAnnotation(iEnemy);
 	}
 
 	public void RemoveForAll(const int iEnemy){
 		for(int client = 1; client <= MaxClients; ++client)
 			if(CheckClientPerkCache(client, g_iGodmodeId))
-				GodmodeEnemies(client).Remove(client, iEnemy).Save(client);
+				GodmodeFlags(client).Remove(iEnemy);
 	}
 
-	public void RemoveAnnotation(const int client, const int iEnemy){
+	public void RemoveAnnotation(const int iEnemy){
+		int client = view_as<int>(this);
+		if(GetIntCache(client, UBER_MODE))
+			return;
+
 		HideAnnotationFor(client, iEnemy);
 		HideAnnotationFor(iEnemy, client);
 	}
 
 	public void HideAnnotationForAll(const int iEnemy){
 		for(int client = 1; client <= MaxClients; ++client)
-			if(CheckClientPerkCache(client, g_iGodmodeId)) // checking for enemy unnecesary here
+			if(CheckClientPerkCache(client, g_iGodmodeId) && !GetIntCache(client, UBER_MODE)) // checking for enemy unnecesary here
 				HideAnnotationFor(client, iEnemy);
 	}
 
 	public void ShowAnnotationForAll(const int iEnemy){
 		for(int client = 1; client <= MaxClients; ++client)
-			if(CheckClientPerkCache(client, g_iGodmodeId) && GodmodeEnemies(client).Contains(iEnemy))
+			if(CheckClientPerkCache(client, g_iGodmodeId) && this.Contains(iEnemy) && !GetIntCache(client, UBER_MODE))
 				ShowAnnotationFor(client, iEnemy, GODMODE_WARN_TEXT);
 	}
 
 	public bool Contains(const int iEnemy){
-		return view_as<bool>(view_as<int>(this) & (1 << iEnemy));
+		return Cache(view_as<int>(this)).TestClientFlag(iEnemy);
 	}
 
-	public void Init(const int client){
-		SetIntCache(client, 0, ENEMIES);
-	}
-
-	public void Save(const int client){
-		SetIntCache(client, view_as<int>(this), ENEMIES);
+	public void Reset(){
+		Cache(view_as<int>(this)).ResetClientFlags();
 	}
 }
 
@@ -107,10 +114,10 @@ public void Godmode_Call(int client, Perk perk, bool bApply){
 void Godmode_ApplyPerk(int client, Perk perk){
 	g_iGodmodeId = perk.Id;
 	SetClientPerkCache(client, g_iGodmodeId);
-	SetFloatCache(client, 0.0);
+	SetFloatCache(client, 0.0, LAST_DEFLECT_TIME);
+	SetFloatCache(client, perk.GetPrefFloat("resistance"), GODMODE_RESISTANCE);
 
 	float fParticleOffset[3] = {0.0, 0.0, 12.0};
-
 	SetEntCache(client, CreateParticle(client, GODMODE_PARTICLE, _, _, fParticleOffset));
 
 	int iMode = perk.GetPrefCell("mode");
@@ -125,17 +132,18 @@ void Godmode_ApplyPerk(int client, Perk perk){
 
 	int iUber = perk.GetPrefCell("uber");
 	SetIntCache(client, iUber, UBER_MODE);
-	if(iUber) TF2_AddCondition(client, TFCond_UberchargedCanteen);
 
-	TF2_AddCondition(client, TFCond_UberBulletResist);
-	TF2_AddCondition(client, TFCond_UberBlastResist);
-	TF2_AddCondition(client, TFCond_UberFireResist);
+	if(iUber){
+		TF2_AddCondition(client, TFCond_UberchargedCanteen);
+	}else{
+		TF2_AddCondition(client, TFCond_UberBulletResist);
+		TF2_AddCondition(client, TFCond_UberBlastResist);
+		TF2_AddCondition(client, TFCond_UberFireResist);
+		ApplyPreventCapture(client);
+	}
 
-	ApplyPreventCapture(client);
-
-	GodmodeEnemies(client).Init(client);
-
-	g_iInGodmode |= client;
+	GodmodeFlags(client).Reset();
+	g_eInGodmode.Set(client);
 }
 
 void Godmode_RemovePerk(int client){
@@ -156,20 +164,20 @@ void Godmode_RemovePerk(int client){
 
 	RemovePreventCapture(client);
 
-	GodmodeEnemies hEnemies = GodmodeEnemies(client);
+	GodmodeFlags mGodmodeFlags = GodmodeFlags(client);
 	for(int i = 1; i <= MaxClients; ++i)
-		if(IsClientInGame(i) && hEnemies.Contains(i))
-			hEnemies.RemoveAnnotation(client, i);
+		if(IsClientInGame(i) && mGodmodeFlags.Contains(i))
+			mGodmodeFlags.RemoveAnnotation(i);
 
-	g_iInGodmode &= ~client;
+	g_eInGodmode.Unset(client);
 }
 
 void Godmode_SpawnDeflectEffect(int client, int iType, float fPos[3]){
 	float fTime = GetEngineTime();
-	if(fTime < GetFloatCache(client) + 0.1)
+	if(fTime < GetFloatCache(client, LAST_DEFLECT_TIME) + 0.1)
 		return;
 
-	SetFloatCache(client, fTime);
+	SetFloatCache(client, fTime, LAST_DEFLECT_TIME);
 
 	if(iType & (DMG_BULLET | DMG_CLUB)){
 		CreateEffect(fPos, GODMODE_BULLET_HIT, 0.2);
@@ -188,8 +196,9 @@ void Godmode_SpawnDeflectEffect(int client, int iType, float fPos[3]){
 }
 
 Action Godmode_OnTakeDamage_Common(const int client, const int iAttacker, float &fDamage, const int iType, float fPos[3]){
-	if(GodmodeEnemies(client).Contains(iAttacker)){
-		fDamage *= 0.2;
+	// Attacker could be world or some various hurt entities
+	if(1 <= iAttacker <= MaxClients && GodmodeFlags(client).Contains(iAttacker)){
+		fDamage *= GetFloatCache(client, GODMODE_RESISTANCE);
 		return Plugin_Changed;
 	}
 
@@ -206,6 +215,7 @@ public Action Godmode_OnTakeDamage_Pushback(int client, int &iAttacker, int &iIn
 		TF2_AddCondition(client, TFCond_Bonked, 0.01);
 		return Plugin_Continue;
 	}
+
 	return Godmode_OnTakeDamage_Common(client, iAttacker, fDamage, iType, fPos);
 }
 
@@ -214,32 +224,31 @@ public Action Godmode_OnTakeDamage_Self(int client, int &iAttacker, int &iInflic
 }
 
 void Godmode_OnClientDisconnect(const int client){
-	GodmodeEnemies().RemoveForAll(client);
+	GodmodeFlags().RemoveForAll(client);
 }
 
 void Godmode_OnPlayerDeath(const int client){
-	GodmodeEnemies().RemoveForAll(client);
+	GodmodeFlags().RemoveForAll(client);
 }
 
 void Godmode_OnConditionAdded(const int client, const TFCond condition){
 	switch(condition){
 		case TFCond_Cloaked, TFCond_Disguised:
-			GodmodeEnemies().HideAnnotationForAll(client);
+			GodmodeFlags().HideAnnotationForAll(client);
 	}
 }
 
 void Godmode_OnConditionRemoved(const int client, const TFCond condition){
 	switch(condition){
 		case TFCond_Cloaked, TFCond_Disguised:
-			GodmodeEnemies().ShowAnnotationForAll(client);
+			GodmodeFlags().ShowAnnotationForAll(client);
 	}
 }
 
 void Godmode_PlayerHurt(const int client, Handle hEvent){
 	int iAttacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
-	if(0 < iAttacker <= MaxClients && CheckClientPerkCache(iAttacker, g_iGodmodeId) && GetEventInt(hEvent, "health") > 1){
-		GodmodeEnemies(iAttacker).Add(iAttacker, client).Save(iAttacker);
-	}
+	if(0 < iAttacker <= MaxClients && CheckClientPerkCache(iAttacker, g_iGodmodeId))
+		GodmodeFlags(iAttacker).Add(client);
 }
 
 #undef GODMODE_DOWN_TEXT
@@ -250,4 +259,6 @@ void Godmode_PlayerHurt(const int client, Handle hEvent){
 #undef GODMODE_BULLET_HIT
 
 #undef UBER_MODE
-#undef ENEMIES
+
+#undef GODMODE_RESISTANCE
+#undef LAST_DEFLECT_TIME
