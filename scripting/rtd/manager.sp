@@ -44,6 +44,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 	• This is a forward of OnMapStart() from rtd.sp
 */
 void Forward_OnMapStart(){
+	Toxic_Start();
 	InfiniteAmmo_Start();
 	Timebomb_Start();
 	Drugged_Start();

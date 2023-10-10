@@ -31,6 +31,7 @@
 * MATH
 * - Min
 * - Max
+* - GetPointOnSphere
 *
 * CLIENT
 * - IsValidClient
@@ -75,6 +76,10 @@
 * - AttachGlow
 * - ShowAnnotationFor
 * - HideAnnotationFor
+*
+* TEMPORARY ENTITIES
+* - GetEffectIndex
+* - SetupTEParticleEffect
 *
 * SPEED MANIPULATION
 * - GetBaseSpeed
@@ -223,6 +228,12 @@ stock float Min(float f1, float f2){
 
 stock float Max(float f1, float f2){
 	return f1 > f2 ? f1 : f2;
+}
+
+stock void GetPointOnSphere(const float fOrigin[3], const float fDirectionRads[2], float fRadius, float fOut[3]){
+	fOut[0] = fOrigin[0] + fRadius * Cosine(fDirectionRads[0]) * Sine(fDirectionRads[1]);
+	fOut[1] = fOrigin[1] + fRadius * Sine(fDirectionRads[0]) * Sine(fDirectionRads[1]);
+	fOut[2] = fOrigin[2] + fRadius * Cosine(fDirectionRads[1]);
 }
 
 
@@ -703,6 +714,28 @@ stock void HideAnnotationFor(int client, int iOther){
 
 	hEvent.FireToClient(client);
 	CloseHandle(hEvent);
+}
+
+
+/*
+* TEMPORARY ENTITIES
+*/
+
+stock int GetEffectIndex(const char[] sEffectName){
+	static int iTable = INVALID_STRING_TABLE;
+
+	if(iTable == INVALID_STRING_TABLE)
+		iTable = FindStringTable("ParticleEffectNames");
+
+	return FindStringIndex(iTable, sEffectName);
+}
+
+stock void SetupTEParticleEffect(const int iEffectIndex, const float fPos[3]){
+	TE_Start("TFParticleEffect");
+	TE_WriteFloat("m_vecOrigin[0]", fPos[0]);
+	TE_WriteFloat("m_vecOrigin[1]", fPos[1]);
+	TE_WriteFloat("m_vecOrigin[2]", fPos[2]);
+	TE_WriteNum("m_iParticleSystemIndex", iEffectIndex);
 }
 
 
