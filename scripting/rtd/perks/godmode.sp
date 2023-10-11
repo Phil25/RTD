@@ -27,6 +27,7 @@
 #define GODMODE_BULLET_HIT "versus_door_sparks_floaty"
 
 #define UBER_MODE 0
+#define BULLET_HIT_ID 1
 
 #define GODMODE_RESISTANCE 0
 #define LAST_DEFLECT_TIME 1
@@ -132,6 +133,7 @@ void Godmode_ApplyPerk(int client, Perk perk){
 
 	int iUber = perk.GetPrefCell("uber");
 	SetIntCache(client, iUber, UBER_MODE);
+	SetIntCache(client, GetEffectIndex(GODMODE_BULLET_HIT), BULLET_HIT_ID);
 
 	if(iUber){
 		TF2_AddCondition(client, TFCond_UberchargedCanteen);
@@ -179,8 +181,13 @@ void Godmode_SpawnDeflectEffect(int client, int iType, float fPos[3]){
 
 	SetFloatCache(client, fTime, LAST_DEFLECT_TIME);
 
+	int iEffectId = GetIntCache(client, BULLET_HIT_ID);
+	if(iEffectId == -1)
+		return;
+
 	if(iType & (DMG_BULLET | DMG_CLUB)){
-		CreateEffect(fPos, GODMODE_BULLET_HIT, 0.2);
+		SetupTEParticleEffect(iEffectId, fPos);
+		TE_SendToAllWithPriority();
 		return;
 	}
 
@@ -190,7 +197,8 @@ void Godmode_SpawnDeflectEffect(int client, int iType, float fPos[3]){
 			fShotPos[0] = fPos[0] + GetRandomFloat(-10.0, 10.0);
 			fShotPos[1] = fPos[1] + GetRandomFloat(-10.0, 10.0);
 			fShotPos[2] = fPos[2] + GetRandomFloat(-10.0, 10.0);
-			CreateEffect(fShotPos, GODMODE_BULLET_HIT, 0.2);
+			SetupTEParticleEffect(iEffectId, fShotPos);
+			TE_SendToAllWithPriority();
 		}
 	}
 }
@@ -259,6 +267,7 @@ void Godmode_PlayerHurt(const int client, Handle hEvent){
 #undef GODMODE_BULLET_HIT
 
 #undef UBER_MODE
+#undef BULLET_HIT_ID
 
 #undef GODMODE_RESISTANCE
 #undef LAST_DEFLECT_TIME

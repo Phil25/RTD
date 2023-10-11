@@ -738,6 +738,11 @@ stock void SetupTEParticleEffect(const int iEffectIndex, const float fPos[3]){
 	TE_WriteNum("m_iParticleSystemIndex", iEffectIndex);
 }
 
+stock void TE_SendToAllWithPriority(){
+	// Negative values attempt to send the TE on the same tick
+	TE_SendToAll(-1.0);
+}
+
 
 /*
 * SPEED MANIPULATION

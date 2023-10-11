@@ -54,7 +54,7 @@ public void PumpkinTrail_ApplyPerk(int client, Perk perk){
 	SetFloatCache(client, 0.0, LAST_ATTACK);
 	SetIntCache(client, perk.GetPrefCell("amount"), SPAWN_LIMIT);
 
-	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
+	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
 }
 
 void PumpkinTrail_Voice(int client){
