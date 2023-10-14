@@ -43,8 +43,39 @@ enum struct ClientFlags{
 	}
 }
 
+enum TEParticle{
+	TEParticle_ExplosionLarge,
+	TEParticle_ExplosionLargeShockwave,
+	TEParticle_GreenFog,
+	TEParticle_GreenBitsTwirl,
+	TEParticle_GreenBitsImpact,
+	TEParticle_LingeringFogSmall,
+	TEParticle_GasPasserImpactBlue,
+	TEParticle_GasPasserImpactRed,
+	TEParticle_BulletImpactHeavy,
+	TEParticle_SIZE,
+}
+
+int g_iTEParticleIds[TEParticle_SIZE];
+
+void InitTEParticleIds(){
+	g_iTEParticleIds[TEParticle_ExplosionLarge] = GetEffectIndex("rd_robot_explosion");
+	g_iTEParticleIds[TEParticle_ExplosionLargeShockwave] = GetEffectIndex("rd_robot_explosion_shockwave");
+	g_iTEParticleIds[TEParticle_GreenFog] = GetEffectIndex("merasmus_spawn_fog");
+	g_iTEParticleIds[TEParticle_GreenBitsTwirl] = GetEffectIndex("merasmus_tp_bits");
+	g_iTEParticleIds[TEParticle_GreenBitsImpact] = GetEffectIndex("merasmus_shoot_bits");
+	g_iTEParticleIds[TEParticle_LingeringFogSmall] = GetEffectIndex("god_rays_fog");
+	g_iTEParticleIds[TEParticle_GasPasserImpactBlue] = GetEffectIndex("gas_can_impact_blue");
+	g_iTEParticleIds[TEParticle_GasPasserImpactRed] = GetEffectIndex("gas_can_impact_red");
+	g_iTEParticleIds[TEParticle_BulletImpactHeavy] = GetEffectIndex("versus_door_sparks_floaty");
+}
+
+int GetTEParticleId(const TEParticle eTEParticle){
+	return g_iTEParticleIds[eTEParticle];
+}
+
 int g_iClientPerkCache[MAXPLAYERS+1] = {-1, ...}; // Used to check if client has the current perk
-int g_iEntCache[MAXPLAYERS+1][2]; // Used throughout perks to store their entities
+int g_iEntCache[MAXPLAYERS+1][3]; // Used throughout perks to store their entities
 float g_fCache[MAXPLAYERS+1][4];
 int g_iCache[MAXPLAYERS+1][4];
 ClientFlags g_eClientFlags[MAXPLAYERS+1];
@@ -74,6 +105,10 @@ methodmap Cache{
 
 int GetEntCache(int client, int iBlock=0){
 	return EntRefToEntIndex(g_iEntCache[client][iBlock]);
+}
+
+int GetEntCacheRef(int client, int iBlock=0){
+	return g_iEntCache[client][iBlock];
 }
 
 void SetEntCache(int client, int iEnt, int iBlock=0){

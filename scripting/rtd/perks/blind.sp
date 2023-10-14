@@ -19,6 +19,8 @@
 
 #define BLIND_ALPHA 0
 
+#define ANNOTATION_LIFETIME 0
+
 UserMsg g_BlindMsgId;
 int g_iBlindId = 22;
 
@@ -38,6 +40,7 @@ void Blind_ApplyPerk(const int client, const Perk perk){
 	int iAlpha = perk.GetPrefCell("alpha")
 	Blind_SendFade(client, iAlpha);
 	SetIntCache(client, iAlpha, BLIND_ALPHA);
+	SetFloatCache(client, GetPerkTimeFloat(perk), ANNOTATION_LIFETIME);
 	Cache(client).ResetClientFlags();
 
 	Blind_UpdateAnnotations(client);
@@ -59,7 +62,7 @@ void Blind_UpdateAnnotations(const int client, const bool bForceDisable=false){
 		bool bShouldSet = Blind_IsValidTarget(client, i, iOtherTeam) && !bForceDisable;
 
 		if(!bSet && bShouldSet){
-			ShowAnnotationFor(client, i, "<!>");
+			ShowAnnotationFor(client, i, GetFloatCache(client, ANNOTATION_LIFETIME), "<!>");
 			mCache.SetClientFlag(i);
 		}else if(bSet && !bShouldSet){
 			HideAnnotationFor(client, i);
@@ -127,3 +130,4 @@ void Blind_SendFade(const int client, const int iAlpha, const bool bFast=false){
 }
 
 #undef BLIND_ALPHA
+#undef ANNOTATION_LIFETIME

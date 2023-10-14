@@ -32,6 +32,7 @@
 * - Min
 * - Max
 * - GetPointOnSphere
+* - GetRandomFloatLimit
 *
 * CLIENT
 * - IsValidClient
@@ -79,7 +80,9 @@
 *
 * TEMPORARY ENTITIES
 * - GetEffectIndex
-* - SetupTEParticleEffect
+* - SetupTEParticle
+* - SendTEParticle
+* - SendTEParticleWithPriority
 *
 * SPEED MANIPULATION
 * - GetBaseSpeed
@@ -234,6 +237,11 @@ stock void GetPointOnSphere(const float fOrigin[3], const float fDirectionRads[2
 	fOut[0] = fOrigin[0] + fRadius * Cosine(fDirectionRads[0]) * Sine(fDirectionRads[1]);
 	fOut[1] = fOrigin[1] + fRadius * Sine(fDirectionRads[0]) * Sine(fDirectionRads[1]);
 	fOut[2] = fOrigin[2] + fRadius * Cosine(fDirectionRads[1]);
+}
+
+// Returns a random value that can be added to fCurrent such that fCurrent will be in [-fMaxDeviation, fMaxDeviation]
+stock float GetRandomDeviationAddition(const float fCurrent, float fMaxDeviation){
+	return GetRandomFloat(-fMaxDeviation, fMaxDeviation) - fCurrent;
 }
 
 
@@ -690,14 +698,14 @@ stock int AttachGlow(const int iEntity){
 	return iGlow;
 }
 
-stock void ShowAnnotationFor(int client, int iOther, char sText[128]="", char sSound[128]=""){
+stock void ShowAnnotationFor(int client, int iOther, float fLifetime, char sText[128]="", char sSound[128]=""){
 	Event hEvent = CreateEvent("show_annotation");
 	if(hEvent == INVALID_HANDLE)
 		return;
 
 	hEvent.SetInt("follow_entindex", iOther);
 	hEvent.SetInt("id", GetUniqueId(client, iOther));
-	hEvent.SetFloat("lifetime", 99999.0);
+	hEvent.SetFloat("lifetime", fLifetime);
 	hEvent.SetString("text", sText);
 	hEvent.SetString("play_sound", sSound);
 
@@ -730,17 +738,22 @@ stock int GetEffectIndex(const char[] sEffectName){
 	return FindStringIndex(iTable, sEffectName);
 }
 
-stock void SetupTEParticleEffect(const int iEffectIndex, const float fPos[3]){
+stock void SetupTEParticle(const TEParticle eTEParticle, const float fPos[3]){
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecOrigin[0]", fPos[0]);
 	TE_WriteFloat("m_vecOrigin[1]", fPos[1]);
 	TE_WriteFloat("m_vecOrigin[2]", fPos[2]);
-	TE_WriteNum("m_iParticleSystemIndex", iEffectIndex);
+	TE_WriteNum("m_iParticleSystemIndex", GetTEParticleId(eTEParticle));
 }
 
-stock void TE_SendToAllWithPriority(){
-	// Negative values attempt to send the TE on the same tick
-	TE_SendToAll(-1.0);
+stock void SendTEParticle(const TEParticle eTEParticle, const float fPos[3]){
+	SetupTEParticle(eTEParticle, fPos);
+	TE_SendToAll();
+}
+
+stock void SendTEParticleWithPriority(const TEParticle eTEParticle, const float fPos[3]){
+	SetupTEParticle(eTEParticle, fPos);
+	TE_SendToAll(-1.0); // negative values attempt to send the TE on the same tick
 }
 
 

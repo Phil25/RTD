@@ -24,13 +24,11 @@
 #define GODMODE_WARN_TEXT "<!>"
 #define GODMODE_WARN_SOUND "replay/snip.wav"
 
-#define GODMODE_BULLET_HIT "versus_door_sparks_floaty"
-
 #define UBER_MODE 0
-#define BULLET_HIT_ID 1
 
 #define GODMODE_RESISTANCE 0
 #define LAST_DEFLECT_TIME 1
+#define ANNOTATION_LIFETIME 2
 
 ClientFlags g_eInGodmode;
 int g_iGodmodeId = 0;
@@ -50,12 +48,12 @@ methodmap GodmodeFlags{
 		if(GetIntCache(client, UBER_MODE))
 			return;
 
-		ShowAnnotationFor(iEnemy, client, GODMODE_DOWN_TEXT, GODMODE_DOWN_SOUND);
+		ShowAnnotationFor(iEnemy, client, GetFloatCache(client, ANNOTATION_LIFETIME), GODMODE_DOWN_TEXT, GODMODE_DOWN_SOUND);
 
 		if(TF2_IsPlayerInCondition(iEnemy, TFCond_Cloaked) || TF2_IsPlayerInCondition(iEnemy, TFCond_Disguised))
 			return;
 
-		ShowAnnotationFor(client, iEnemy, GODMODE_WARN_TEXT, GODMODE_WARN_SOUND);
+		ShowAnnotationFor(client, iEnemy, GetFloatCache(client, ANNOTATION_LIFETIME), GODMODE_WARN_TEXT, GODMODE_WARN_SOUND);
 
 		int iBeam = ConnectWithBeam(iEnemy, client, 150, 255, 150, 1.0, 1.0, 10.0);
 		if(iBeam > MaxClients){
@@ -95,7 +93,7 @@ methodmap GodmodeFlags{
 	public void ShowAnnotationForAll(const int iEnemy){
 		for(int client = 1; client <= MaxClients; ++client)
 			if(CheckClientPerkCache(client, g_iGodmodeId) && this.Contains(iEnemy) && !GetIntCache(client, UBER_MODE))
-				ShowAnnotationFor(client, iEnemy, GODMODE_WARN_TEXT);
+				ShowAnnotationFor(client, iEnemy, GetFloatCache(client, ANNOTATION_LIFETIME), GODMODE_WARN_TEXT);
 	}
 
 	public bool Contains(const int iEnemy){
@@ -117,6 +115,7 @@ void Godmode_ApplyPerk(int client, Perk perk){
 	SetClientPerkCache(client, g_iGodmodeId);
 	SetFloatCache(client, 0.0, LAST_DEFLECT_TIME);
 	SetFloatCache(client, perk.GetPrefFloat("resistance"), GODMODE_RESISTANCE);
+	SetFloatCache(client, GetPerkTimeFloat(perk), ANNOTATION_LIFETIME);
 
 	float fParticleOffset[3] = {0.0, 0.0, 12.0};
 	SetEntCache(client, CreateParticle(client, GODMODE_PARTICLE, _, _, fParticleOffset));
@@ -133,7 +132,6 @@ void Godmode_ApplyPerk(int client, Perk perk){
 
 	int iUber = perk.GetPrefCell("uber");
 	SetIntCache(client, iUber, UBER_MODE);
-	SetIntCache(client, GetEffectIndex(GODMODE_BULLET_HIT), BULLET_HIT_ID);
 
 	if(iUber){
 		TF2_AddCondition(client, TFCond_UberchargedCanteen);
@@ -181,13 +179,8 @@ void Godmode_SpawnDeflectEffect(int client, int iType, float fPos[3]){
 
 	SetFloatCache(client, fTime, LAST_DEFLECT_TIME);
 
-	int iEffectId = GetIntCache(client, BULLET_HIT_ID);
-	if(iEffectId == -1)
-		return;
-
 	if(iType & (DMG_BULLET | DMG_CLUB)){
-		SetupTEParticleEffect(iEffectId, fPos);
-		TE_SendToAllWithPriority();
+		SendTEParticleWithPriority(TEParticle_BulletImpactHeavy, fPos);
 		return;
 	}
 
@@ -197,8 +190,7 @@ void Godmode_SpawnDeflectEffect(int client, int iType, float fPos[3]){
 			fShotPos[0] = fPos[0] + GetRandomFloat(-10.0, 10.0);
 			fShotPos[1] = fPos[1] + GetRandomFloat(-10.0, 10.0);
 			fShotPos[2] = fPos[2] + GetRandomFloat(-10.0, 10.0);
-			SetupTEParticleEffect(iEffectId, fShotPos);
-			TE_SendToAllWithPriority();
+			SendTEParticleWithPriority(TEParticle_BulletImpactHeavy, fShotPos);
 		}
 	}
 }
@@ -264,10 +256,8 @@ void Godmode_PlayerHurt(const int client, Handle hEvent){
 #undef GODMODE_WARN_TEXT
 #undef GODMODE_WARN_SOUND
 
-#undef GODMODE_BULLET_HIT
-
 #undef UBER_MODE
-#undef BULLET_HIT_ID
 
 #undef GODMODE_RESISTANCE
 #undef LAST_DEFLECT_TIME
+#undef ANNOTATION_LIFETIME

@@ -45,6 +45,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 */
 void Forward_OnMapStart(){
 	Toxic_Start();
+	Explode_Start();
 	InfiniteAmmo_Start();
 	Timebomb_Start();
 	Drugged_Start();

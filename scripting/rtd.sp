@@ -370,6 +370,8 @@ public void OnMapStart(){
 	HookEvent("arena_round_start",			Event_RoundStart);
 	HookEvent("mvm_begin_wave",				Event_RoundStart);
 
+	InitTEParticleIds();
+
 	Stocks_OnMapStart(); // rtd/stocks.sp
 	Forward_OnMapStart(); // rtd/manager.sp
 	PrecachePerkSounds();
@@ -1537,6 +1539,10 @@ int GetPerkTime(Perk perk){
 		return g_iLastPerkTime;
 	int iTime = perk.Time;
 	return (iTime > 0) ? iTime : g_iCvarPerkDuration;
+}
+
+float GetPerkTimeFloat(Perk perk){
+	return float(GetPerkTime(perk));
 }
 
 void RemovePerkFromClients(Perk perk){

@@ -22,8 +22,7 @@
 #define TOXIC_DAMAGE 2
 
 #define TOXIC_EFFECT_SPLAT_INDEX 0
-#define TOXIC_EFFECT_FOG_INDEX 1
-#define TOXIC_EFFECT_COUNT 2
+#define TOXIC_EFFECT_COUNT 1
 
 #define TOXIC_PARTICLE "eb_aura_angry01"
 #define TOXIC_SOUND "player/general/flesh_burn.wav"
@@ -51,22 +50,16 @@ void Toxic_ApplyPerk(int client, Perk perk){
 	SetFloatCache(client, perk.GetPrefFloat("interval"), TOXIC_INTERVAL);
 	SetFloatCache(client, perk.GetPrefFloat("damage"), TOXIC_DAMAGE);
 	SetIntCache(client, RoundFloat(fRadius / 64.0), TOXIC_EFFECT_COUNT);
-	SetIntCache(client, GetEffectIndex("god_rays_fog"), TOXIC_EFFECT_FOG_INDEX);
 
 	switch(TF2_GetClientTeam(client)){
 		case TFTeam_Blue:
-			SetIntCache(client, GetEffectIndex("gas_can_impact_blue"), TOXIC_EFFECT_SPLAT_INDEX);
+			SetIntCache(client, view_as<int>(TEParticle_GasPasserImpactBlue), TOXIC_EFFECT_SPLAT_INDEX);
 		case TFTeam_Red:
-			SetIntCache(client, GetEffectIndex("gas_can_impact_red"), TOXIC_EFFECT_SPLAT_INDEX);
+			SetIntCache(client, view_as<int>(TEParticle_GasPasserImpactRed), TOXIC_EFFECT_SPLAT_INDEX);
 	}
 
 	int iUserId = GetClientUserId(client);
 	CreateTimer(GetFloatCache(client, TOXIC_INTERVAL), Timer_Toxic, iUserId, TIMER_REPEAT);
-
-	if(GetIntCache(client, TOXIC_EFFECT_SPLAT_INDEX) == -1 || GetIntCache(client, TOXIC_EFFECT_FOG_INDEX) == -1){
-		PrintToServer("[RTD] WARNING: Toxic could not find the indexes of its desired effects, ignoring...");
-		return;
-	}
 
 	EmitSoundToAll(TOXIC_SOUND, client, _, _, _, _, 250);
 	CreateTimer(0.1, Timer_ToxicParticles, iUserId, TIMER_REPEAT);
@@ -100,7 +93,7 @@ public Action Timer_ToxicParticles(Handle hTimer, int iUserId){
 
 	float fPos[3], fDir[2];
 	int iCount = GetIntCache(client, TOXIC_EFFECT_COUNT)
-	int iEffectIndex = GetIntCache(client, TOXIC_EFFECT_SPLAT_INDEX);
+	TEParticle eTEParticle = view_as<TEParticle>(GetIntCache(client, TOXIC_EFFECT_SPLAT_INDEX));
 
 	for(int i = 0; i < iCount; ++i){
 		float fMaxRadius = GetFloatCache(client, TOXIC_RADIUS);
@@ -110,14 +103,11 @@ public Action Timer_ToxicParticles(Handle hTimer, int iUserId){
 		fDir[1] = GetRandomFloat(0.0, 2.0 * 3.1415);
 		GetPointOnSphere(fClientPos, fDir, fRadius, fPos);
 
-		SetupTEParticleEffect(iEffectIndex, fPos);
-		TE_SendToAll();
+		SendTEParticle(eTEParticle, fPos);
 	}
 
 	// Use last spawned particle's position to create the fog
-	SetupTEParticleEffect(GetIntCache(client, TOXIC_EFFECT_FOG_INDEX), fPos);
-	TE_SendToAll();
-
+	SendTEParticle(TEParticle_LingeringFogSmall, fPos);
 	return Plugin_Continue;
 }
 
@@ -126,7 +116,6 @@ public Action Timer_ToxicParticles(Handle hTimer, int iUserId){
 #undef TOXIC_DAMAGE
 
 #undef TOXIC_EFFECT_SPLAT_INDEX
-#undef TOXIC_EFFECT_FOG_INDEX
 #undef TOXIC_EFFECT_COUNT
 
 #undef TOXIC_PARTICLE
