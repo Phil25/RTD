@@ -370,7 +370,7 @@ public void OnMapStart(){
 	HookEvent("arena_round_start",			Event_RoundStart);
 	HookEvent("mvm_begin_wave",				Event_RoundStart);
 
-	InitTEParticleIds();
+	InitCache();
 
 	Stocks_OnMapStart(); // rtd/stocks.sp
 	Forward_OnMapStart(); // rtd/manager.sp

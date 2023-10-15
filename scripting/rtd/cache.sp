@@ -53,12 +53,22 @@ enum TEParticle{
 	TEParticle_GasPasserImpactBlue,
 	TEParticle_GasPasserImpactRed,
 	TEParticle_BulletImpactHeavy,
+	TEParticle_BulletImpactHeavier,
+	TEParticle_PickupTrailBlue,
+	TEParticle_PickupTrailRed,
+	TEParticle_LootExplosion,
 	TEParticle_SIZE,
 }
 
-int g_iTEParticleIds[TEParticle_SIZE];
+enum struct EntMaterial{
+	int iLaser;
+	int iHalo;
+}
 
-void InitTEParticleIds(){
+int g_iTEParticleIds[TEParticle_SIZE];
+EntMaterial g_eEntMaterial;
+
+void InitCache(){
 	g_iTEParticleIds[TEParticle_ExplosionLarge] = GetEffectIndex("rd_robot_explosion");
 	g_iTEParticleIds[TEParticle_ExplosionLargeShockwave] = GetEffectIndex("rd_robot_explosion_shockwave");
 	g_iTEParticleIds[TEParticle_GreenFog] = GetEffectIndex("merasmus_spawn_fog");
@@ -68,10 +78,21 @@ void InitTEParticleIds(){
 	g_iTEParticleIds[TEParticle_GasPasserImpactBlue] = GetEffectIndex("gas_can_impact_blue");
 	g_iTEParticleIds[TEParticle_GasPasserImpactRed] = GetEffectIndex("gas_can_impact_red");
 	g_iTEParticleIds[TEParticle_BulletImpactHeavy] = GetEffectIndex("versus_door_sparks_floaty");
+	g_iTEParticleIds[TEParticle_BulletImpactHeavier] = GetEffectIndex("versus_door_sparksB");
+	g_iTEParticleIds[TEParticle_PickupTrailBlue] = GetEffectIndex("duck_collect_trail_special_blue");
+	g_iTEParticleIds[TEParticle_PickupTrailRed] = GetEffectIndex("duck_collect_trail_special_red");
+	g_iTEParticleIds[TEParticle_LootExplosion] = GetEffectIndex("mvm_loot_explosion");
+
+	g_eEntMaterial.iLaser = PrecacheModel("materials/sprites/laser.vmt");
+	g_eEntMaterial.iHalo = PrecacheModel("materials/sprites/halo01.vmt");
 }
 
 int GetTEParticleId(const TEParticle eTEParticle){
 	return g_iTEParticleIds[eTEParticle];
+}
+
+EntMaterial GetEntMaterial(){
+	return g_eEntMaterial;
 }
 
 int g_iClientPerkCache[MAXPLAYERS+1] = {-1, ...}; // Used to check if client has the current perk

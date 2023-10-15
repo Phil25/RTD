@@ -19,13 +19,10 @@
 
 #define SOUND_BEEP "buttons/blip1.wav"
 
-int g_iSpriteBeam, g_iSpriteHalo;
 int g_iBeaconId = 24;
 
 void Beacon_Start(){
 	PrecacheSound(SOUND_BEEP);
-	g_iSpriteBeam = PrecacheModel("materials/sprites/laser.vmt");
-	g_iSpriteHalo = PrecacheModel("materials/sprites/halo01.vmt");
 }
 
 public void Beacon_Call(int client, Perk perk, bool apply){
@@ -61,14 +58,16 @@ void Beacon_Beep(int client){
 	int iColorBlu[4] = {75,75,255,255};
 
 	float fRadius = GetFloatCache(client);
+	int iLaser = GetEntMaterial().iLaser;
+	int iHalo = GetEntMaterial().iHalo;
 
-	TE_SetupBeamRingPoint(fPos, 10.0, fRadius, g_iSpriteBeam, g_iSpriteHalo, 0, 15, 0.5, 5.0, 0.0, iColorGra, 10, 0);
+	TE_SetupBeamRingPoint(fPos, 10.0, fRadius, iLaser, iHalo, 0, 15, 0.5, 5.0, 0.0, iColorGra, 10, 0);
 	TE_SendToAll();
 
 	if(TF2_GetClientTeam(client) == TFTeam_Red)
-		TE_SetupBeamRingPoint(fPos, 10.0, fRadius, g_iSpriteBeam, g_iSpriteHalo, 0, 10, 0.6, 10.0, 0.5, iColorRed, 10, 0);
+		TE_SetupBeamRingPoint(fPos, 10.0, fRadius, iLaser, iHalo, 0, 10, 0.6, 10.0, 0.5, iColorRed, 10, 0);
 	else
-		TE_SetupBeamRingPoint(fPos, 10.0, fRadius, g_iSpriteBeam, g_iSpriteHalo, 0, 10, 0.6, 10.0, 0.5, iColorBlu, 10, 0);
+		TE_SetupBeamRingPoint(fPos, 10.0, fRadius, iLaser, iHalo, 0, 10, 0.6, 10.0, 0.5, iColorBlu, 10, 0);
 
 	TE_SendToAll();
 	EmitSoundToAll(SOUND_BEEP, client);

@@ -77,7 +77,7 @@ void Explode_ApplyPerk(int client, Perk perk){
 	DispatchKeyValueVector(iBomb, "origin", fPos);
 	DispatchKeyValue(iBomb, "model", MODEL_BOMB);
 	DispatchKeyValue(iBomb, "modelscale", "1.5");
-	DispatchKeyValue(iBomb, "MoveType", "8"); // do not move
+	DispatchKeyValue(iBomb, "MoveType", "8"); // noclip
 
 	// 4 -- debris
 	// 8 -- motion disabled
@@ -87,7 +87,7 @@ void Explode_ApplyPerk(int client, Perk perk){
 	DispatchSpawn(iBomb);
 
 	SetEntProp(iBomb, Prop_Data, "m_iHealth", perk.GetPrefCell("health"));
-	SDKHook(iBomb, SDKHook_OnTakeDamage, Explode_OnTakeDamage);
+	SDKHook(iBomb, SDKHook_OnTakeDamagePost, Explode_OnBombTakeDamagePost);
 
 	fPos[2] += 22.0;
 	SetEntCache(client, CreateEffect(fPos, "flare_sparks", GetPerkTimeFloat(perk)), BOMB_ENT_SPARKS);
@@ -176,7 +176,7 @@ public Action Explode_BindToBomb(Handle hTimer, const int iUserId){
 	return Plugin_Continue;
 }
 
-public Action Explode_OnTakeDamage(int iBomb, int &iAtk, int &iInflictor, float &fDamage, int &iType, int &iWeapon, float fForce[3], float fPos[3]){
+public void Explode_OnBombTakeDamagePost(int iBomb, int iAtk, int iInflictor, float fDamage, int iType, int iWeapon, float fForce[3], float fPos[3]){
 	if(iType & (DMG_BULLET | DMG_CLUB)){
 		SendTEParticleWithPriority(TEParticle_GreenBitsImpact, fPos);
 	}else if(iType & (DMG_BUCKSHOT)){
@@ -192,7 +192,7 @@ public Action Explode_OnTakeDamage(int iBomb, int &iAtk, int &iInflictor, float 
 	int iHealth = GetEntProp(iBomb, Prop_Data, "m_iHealth") - RoundFloat(fDamage);
 	if(iHealth <= 0){
 		Explode_CompleteSuccess(iBomb, fPos);
-		return Plugin_Continue;
+		return;
 	}
 
 	SetEntProp(iBomb, Prop_Data, "m_iHealth", iHealth);
@@ -207,8 +207,6 @@ public Action Explode_OnTakeDamage(int iBomb, int &iAtk, int &iInflictor, float 
 	fAng[2] += GetRandomDeviationAddition(fAng[2], 10.0);
 
 	TeleportEntity(iBomb, NULL_VECTOR, fAng, NULL_VECTOR);
-
-	return Plugin_Continue;
 }
 
 int Explode_FindOwningClient(int iBomb){

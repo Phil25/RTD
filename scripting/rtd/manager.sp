@@ -50,6 +50,7 @@ void Forward_OnMapStart(){
 	Timebomb_Start();
 	Drugged_Start();
 	Blind_Start();
+	StripToMelee_Start();
 	Beacon_Start();
 	ForcedTaunt_Start();
 	Earthquake_Start();
@@ -157,6 +158,7 @@ void Forward_OnPlayerDeath(int client){
 */
 void Forward_Resupply(int client){
 	Invisibility_Resupply(client);
+	StripToMelee_OnResupply(client);
 	FastHands_Resupply(client);
 	LongMelee_Resupply(client);
 	OverhealBonus_Resupply(client);

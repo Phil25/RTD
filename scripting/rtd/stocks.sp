@@ -41,6 +41,7 @@
 * - ApplyPreventCapture
 * - RemovePreventCapture
 * - GetUniqueId
+* - SwitchToFirstValidWeapon
 *
 * DAMAGE
 * - DamageRadius
@@ -83,6 +84,7 @@
 * - SetupTEParticle
 * - SendTEParticle
 * - SendTEParticleWithPriority
+* - SendTEParticleAttached
 *
 * SPEED MANIPULATION
 * - GetBaseSpeed
@@ -292,8 +294,19 @@ stock void RemovePreventCapture(const int client){
 stock int GetUniqueId(const int client, const int iOther){
 	// iOther + MAXPLAYERS -- reversing args should yield different IDs
 	// MAXPLAYERS * 2 -- add more than MAXPLAYERS in case iOther is negative
-	// 91 -- a little bit of randomness to discern it from other plugins, on the off chance that alogs are similar
+	// 91 -- bit of randomness to discern it from other plugins, on the off chance that algos are similar
 	return client * (iOther + MAXPLAYERS * 2) * 91
+}
+
+stock void SwitchToFirstValidWeapon(int client){
+	if(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") > MaxClients)
+		return; // already holding an valid weapon
+
+	for(int iSlot = 0; iSlot < 5; ++iSlot){
+		int iWeapon = GetPlayerWeaponSlot(client, 2);
+		if(iWeapon > MaxClients && IsValidEntity(iWeapon))
+			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", iWeapon);
+	}
 }
 
 
@@ -698,7 +711,7 @@ stock int AttachGlow(const int iEntity){
 	return iGlow;
 }
 
-stock void ShowAnnotationFor(int client, int iOther, float fLifetime, char sText[128]="", char sSound[128]=""){
+stock void ShowAnnotationFor(int client, int iOther, float fLifetime, char[] sText="", char[] sSound=""){
 	Event hEvent = CreateEvent("show_annotation");
 	if(hEvent == INVALID_HANDLE)
 		return;
@@ -754,6 +767,14 @@ stock void SendTEParticle(const TEParticle eTEParticle, const float fPos[3]){
 stock void SendTEParticleWithPriority(const TEParticle eTEParticle, const float fPos[3]){
 	SetupTEParticle(eTEParticle, fPos);
 	TE_SendToAll(-1.0); // negative values attempt to send the TE on the same tick
+}
+
+stock void SendTEParticleAttached(const TEParticle eTEParticle, const int iEnt){
+	TE_Start("TFParticleEffect");
+	TE_WriteNum("m_iParticleSystemIndex", GetTEParticleId(eTEParticle));
+	TE_WriteNum("entindex", iEnt);
+	TE_WriteNum("m_iAttachType", 1);
+	TE_SendToAll(-1.0);
 }
 
 
