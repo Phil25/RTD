@@ -57,6 +57,10 @@ enum TEParticle{
 	TEParticle_PickupTrailBlue,
 	TEParticle_PickupTrailRed,
 	TEParticle_LootExplosion,
+	TEParticle_ExplosionWooden,
+	TEParticle_ExplosionEmbersOnly,
+	TEParticle_ShockwaveFlat,
+	TEParticle_ShockwaveBillboard,
 	TEParticle_SIZE,
 }
 
@@ -82,6 +86,10 @@ void InitCache(){
 	g_iTEParticleIds[TEParticle_PickupTrailBlue] = GetEffectIndex("duck_collect_trail_special_blue");
 	g_iTEParticleIds[TEParticle_PickupTrailRed] = GetEffectIndex("duck_collect_trail_special_red");
 	g_iTEParticleIds[TEParticle_LootExplosion] = GetEffectIndex("mvm_loot_explosion");
+	g_iTEParticleIds[TEParticle_ExplosionWooden] = GetEffectIndex("mvm_pow_gold_seq_firework_mid");
+	g_iTEParticleIds[TEParticle_ExplosionEmbersOnly] = GetEffectIndex("mvm_tank_destroy_embers");
+	g_iTEParticleIds[TEParticle_ShockwaveFlat] = GetEffectIndex("Explosion_ShockWave_01");
+	g_iTEParticleIds[TEParticle_ShockwaveBillboard] = GetEffectIndex("airburst_shockwave");
 
 	g_eEntMaterial.iLaser = PrecacheModel("materials/sprites/laser.vmt");
 	g_eEntMaterial.iHalo = PrecacheModel("materials/sprites/halo01.vmt");

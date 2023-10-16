@@ -42,7 +42,57 @@ public Action Timer_Firework_Explode(Handle hTimer, int iUserId){
 	int client = GetClientOfUserId(iUserId);
 	if(!client) return Plugin_Stop;
 
-	EmitSoundToAll(FIREWORK_EXPLOSION, client);
-	FakeClientCommandEx(client, "explode");
+	float fPos[3];
+	GetClientAbsOrigin(client, fPos);
+
+	EmitSoundToAll(FIREWORK_EXPLOSION, _, _, _, _, _, _, _, fPos);
+	SendTEParticle(TEParticle_ExplosionWooden, fPos);
+	SendTEParticle(TEParticle_ShockwaveFlat, fPos);
+	TF2_IgnitePlayer(client, client);
+
+	DataPack hFollowup = new DataPack();
+	hFollowup.WriteCell(3);
+	hFollowup.WriteFloat(fPos[0]);
+	hFollowup.WriteFloat(fPos[1]);
+	hFollowup.WriteFloat(fPos[2]);
+	CreateTimer(0.7, Timer_Firework_Followup_Trigger, hFollowup);
+
 	return Plugin_Stop;
+}
+
+public Action Timer_Firework_Followup_Trigger(Handle hTimer, DataPack hFollowup){
+	CreateTimer(0.1, Timer_Firework_Followup, hFollowup, TIMER_REPEAT);
+	return Plugin_Stop;
+}
+
+public Action Timer_Firework_Followup(Handle hTimer, DataPack hFollowup){
+	hFollowup.Reset();
+
+	float fPos[3];
+	int iTimes = hFollowup.ReadCell();
+	fPos[0] = hFollowup.ReadFloat();
+	fPos[1] = hFollowup.ReadFloat();
+	fPos[2] = hFollowup.ReadFloat();
+
+	hFollowup.Reset();
+	hFollowup.WriteCell(--iTimes);
+	// position in hFollowup is preserved
+
+	int iCount = GetRandomInt(1, 4);
+	for(int i = 0; i < iCount; ++i){
+		float fFireworkPos[3];
+		fFireworkPos[0] = fPos[0] + GetRandomFloat(100.0, 250.0) * GetRandomSign();
+		fFireworkPos[1] = fPos[1] + GetRandomFloat(100.0, 250.0) * GetRandomSign();
+		fFireworkPos[2] = fPos[2] + GetRandomFloat(100.0, 250.0) * GetRandomSign();
+		SendTEParticle(TEParticle_ExplosionEmbersOnly, fFireworkPos);
+	}
+
+	EmitSoundToAll(FIREWORK_EXPLOSION, _, _, _, _, _, 150, _, fPos);
+
+	if(iTimes <= 0){
+		CloseHandle(hFollowup);
+		return Plugin_Stop;
+	}
+
+	return Plugin_Continue;
 }

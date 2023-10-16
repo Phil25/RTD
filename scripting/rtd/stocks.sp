@@ -246,6 +246,11 @@ stock float GetRandomDeviationAddition(const float fCurrent, float fMaxDeviation
 	return GetRandomFloat(-fMaxDeviation, fMaxDeviation) - fCurrent;
 }
 
+stock int GetRandomSign(){
+	static int iSign[2] = {-1, 1};
+	return iSign[GetRandomInt(0, 1)];
+}
+
 
 /*
 * CLIENT
@@ -756,6 +761,10 @@ stock void SetupTEParticle(const TEParticle eTEParticle, const float fPos[3]){
 	TE_WriteFloat("m_vecOrigin[0]", fPos[0]);
 	TE_WriteFloat("m_vecOrigin[1]", fPos[1]);
 	TE_WriteFloat("m_vecOrigin[2]", fPos[2]);
+	TE_WriteFloat("m_vecStart[0]", 0.0);
+	TE_WriteFloat("m_vecStart[1]", 0.0);
+	TE_WriteFloat("m_vecStart[2]", 0.0);
+	TE_WriteNum("m_iAttachType", 2); // custom origin, do not follow
 	TE_WriteNum("m_iParticleSystemIndex", GetTEParticleId(eTEParticle));
 }
 
@@ -771,9 +780,12 @@ stock void SendTEParticleWithPriority(const TEParticle eTEParticle, const float 
 
 stock void SendTEParticleAttached(const TEParticle eTEParticle, const int iEnt){
 	TE_Start("TFParticleEffect");
+	TE_WriteFloat("m_vecStart[0]", 0.0);
+	TE_WriteFloat("m_vecStart[1]", 0.0);
+	TE_WriteFloat("m_vecStart[2]", 0.0);
 	TE_WriteNum("m_iParticleSystemIndex", GetTEParticleId(eTEParticle));
 	TE_WriteNum("entindex", iEnt);
-	TE_WriteNum("m_iAttachType", 1);
+	TE_WriteNum("m_iAttachType", 1); // update to follow
 	TE_SendToAll(-1.0);
 }
 
