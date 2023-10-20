@@ -71,7 +71,7 @@ methodmap Rollers < ArrayList{
 		return list.Push(perk);
 	}
 
-	public bool IsInPerkHistory(int client, Perk perk, int iLimit){
+	public bool IsIdInPerkHistory(int client, int iPerkId, int iLimit){
 		PerkList list = this.GetPerkHistory(client);
 		if(!list) return false;
 
@@ -80,9 +80,13 @@ methodmap Rollers < ArrayList{
 
 		iLimit = i -iLimit;
 		while(--i >= iLimit)
-			if(list.Get(i) == perk)
+			if(list.Get(i).Id == iPerkId)
 				return true;
 		return false;
+	}
+
+	public bool IsInPerkHistory(int client, Perk perk, int iLimit){
+		return this.IsIdInPerkHistory(client, perk.Id, iLimit);
 	}
 
 	public void ResetPerkHistory(int client){

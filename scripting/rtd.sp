@@ -370,8 +370,7 @@ public void OnMapStart(){
 	HookEvent("arena_round_start",			Event_RoundStart);
 	HookEvent("mvm_begin_wave",				Event_RoundStart);
 
-	InitCache();
-
+	Cache_OnMapStart(); // rtd/cache.sp
 	Stocks_OnMapStart(); // rtd/stocks.sp
 	Forward_OnMapStart(); // rtd/manager.sp
 	PrecachePerkSounds();
@@ -1522,7 +1521,7 @@ void RTDPrintAllExcept(int client, char[] sFormat, any ...){
 	}
 }
 
-void DisplayPerkTimeFrame(client){
+void DisplayPerkTimeFrame(int client){
 	int iTeam	= GetClientTeam(client);
 	int iRed	= (iTeam == 2) ? 255 : 32;
 	int iBlue	= (iTeam == 3) ? 255 : 32;

@@ -42,6 +42,7 @@
 * - RemovePreventCapture
 * - GetUniqueId
 * - SwitchToFirstValidWeapon
+* - ForceResupplyCrude
 *
 * DAMAGE
 * - DamageRadius
@@ -85,6 +86,7 @@
 * - SendTEParticle
 * - SendTEParticleWithPriority
 * - SendTEParticleAttached
+* - SendTEParticleLingeringAttached
 *
 * SPEED MANIPULATION
 * - GetBaseSpeed
@@ -97,6 +99,7 @@
 *
 * SOUNDS
 * - IsFootstepSound
+* - IsVoicelineSound
 *
 * HOMING
 * - Homing_Push
@@ -109,6 +112,7 @@
 */
 
 #define LASERBEAM "sprites/laserbeam.vmt"
+#define EMPTY_MODEL "models/empty.mdl"
 
 // Homing target flags
 #define HOMING_NONE 0
@@ -132,14 +136,25 @@ ArrayList g_hHoming = null;
 
 int g_iEnergyBallDamageOffset = -1;
 int g_iWaterLevel[MAXPLAYERS +1] = {0, ...};
+ClientFlags g_eMuteNextResupply;
 
 void Stocks_OnMapStart(){
 	PrecacheModel(LASERBEAM);
+	PrecacheModel(EMPTY_MODEL);
 
 	g_hHoming = new ArrayList(3);
 	HookEvent("teamplay_round_start", Event_Homing_RoundStart);
 
 	g_iEnergyBallDamageOffset = FindSendPropInfo("CTFProjectile_EnergyBall", "m_iDeflected") +4;
+}
+
+bool Stocks_Sound(int client, const char[] sSound){
+	if(g_eMuteNextResupply.Test(client) && StrEqual(sSound, "items/regenerate.wav")){
+		g_eMuteNextResupply.Unset(client);
+		return false;
+	}
+
+	return true;
 }
 
 public Action Event_Homing_RoundStart(Handle hEvent, const char[] sName, bool bDontBroadcast){
@@ -312,6 +327,41 @@ stock void SwitchToFirstValidWeapon(int client){
 		if(iWeapon > MaxClients && IsValidEntity(iWeapon))
 			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", iWeapon);
 	}
+}
+
+stock void ForceResupplyCrude(const int client, const float fPos[3]){
+	int iResupply = CreateEntityByName("func_regenerate");
+	if(iResupply <= MaxClients)
+		return;
+
+	g_eMuteNextResupply.Set(client);
+	KILL_ENT_IN(iResupply,0.1) // 0.0 (next frame) doesn't work sometimes
+
+	SetEntPropEnt(iResupply, Prop_Send, "m_hOwnerEntity", client);
+	SDKHook(iResupply, SDKHook_Touch, Stocks_ForceResupplyTouch);
+
+	SetEntityModel(iResupply, EMPTY_MODEL); // set whatever model
+
+	DispatchSpawn(iResupply);
+	ActivateEntity(iResupply);
+
+	TeleportEntity(iResupply, fPos, NULL_VECTOR, NULL_VECTOR);
+
+	// 20 x 20 x 20 HU cube
+	float fMinBounds[3] = {-10.0, -10.0, 0.0};
+	float fMaxBounds[3] = {10.0, 10.0, 20.0};
+	SetEntPropVector(iResupply, Prop_Send, "m_vecMins", fMinBounds);
+	SetEntPropVector(iResupply, Prop_Send, "m_vecMaxs", fMaxBounds);
+
+	SetEntProp(iResupply, Prop_Send, "m_nSolidType", 2); // must be 2
+
+	int iEffects = GetEntProp(iResupply, Prop_Send, "m_fEffects");
+	SetEntProp(iResupply, Prop_Send, "m_fEffects", iEffects | 32); // must have ef_nodraw flag
+}
+
+public Action Stocks_ForceResupplyTouch(int iResupply, int iOther){
+	int iOwner = GetEntPropEnt(iResupply, Prop_Send, "m_hOwnerEntity");
+	return iOther == iOwner ? Plugin_Continue : Plugin_Handled;
 }
 
 
@@ -778,15 +828,28 @@ stock void SendTEParticleWithPriority(const TEParticle eTEParticle, const float 
 	TE_SendToAll(-1.0); // negative values attempt to send the TE on the same tick
 }
 
-stock void SendTEParticleAttached(const TEParticle eTEParticle, const int iEnt){
+stock void SendTEParticleAttached(const TEParticle eTEParticle, const int iEnt, const int iAttachPoint=0){
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecStart[0]", 0.0);
 	TE_WriteFloat("m_vecStart[1]", 0.0);
 	TE_WriteFloat("m_vecStart[2]", 0.0);
 	TE_WriteNum("m_iParticleSystemIndex", GetTEParticleId(eTEParticle));
 	TE_WriteNum("entindex", iEnt);
-	TE_WriteNum("m_iAttachType", 1); // update to follow
+	TE_WriteNum("m_iAttachType", iAttachPoint > 0 ? 4 : 1); // follow point or just follow
+	if(iAttachPoint > 0) TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);
 	TE_SendToAll(-1.0);
+}
+
+stock void SendTEParticleLingeringAttached(const TEParticleLingering eTEParticle, const int iEnt, float fPos[3], const int iAttachPoint=0){
+	TE_Start("TFParticleEffect");
+	TE_WriteFloat("m_vecStart[0]", 0.0);
+	TE_WriteFloat("m_vecStart[1]", 0.0);
+	TE_WriteFloat("m_vecStart[2]", 0.0);
+	TE_WriteNum("m_iParticleSystemIndex", GetTEParticleLingeringId(eTEParticle));
+	TE_WriteNum("entindex", iEnt);
+	TE_WriteNum("m_iAttachType", iAttachPoint > 0 ? 4 : 1); // follow point or just follow
+	if(iAttachPoint > 0) TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);
+	TE_SendToAllInRange(fPos, RangeType_Visibility, -1.0);
 }
 
 
@@ -874,6 +937,10 @@ stock void RotateClientSmooth(int client, float fAngle){
 
 stock bool IsFootstepSound(const char[] sSound){
 	return !strncmp(sSound[7], "footstep", 8);
+}
+
+stock bool IsVoicelineSound(const char[] sSound){
+	return strncmp(sSound[0], "vo/", 3) == 0;
 }
 
 

@@ -46,6 +46,7 @@ void ManagePerk(int client, Perk perk, bool bEnable, RTDRemoveReason reason=RTDR
 void Forward_OnMapStart(){
 	Toxic_Start();
 	Explode_Start();
+	Frozen_Start();
 	InfiniteAmmo_Start();
 	Timebomb_Start();
 	Drugged_Start();
@@ -121,6 +122,8 @@ void Forward_Voice(int client){
 */
 bool Forward_Sound(int client, const char[] sSound){
 	bool bAllow = true;
+	bAllow &= Stocks_Sound(client, sSound);
+	bAllow &= Frozen_Sound(client, sSound);
 	bAllow &= DrunkWalk_Sound(client, sSound);
 	return bAllow;
 }
@@ -157,6 +160,7 @@ void Forward_OnPlayerDeath(int client){
 	• Client is guaranteed to be valid
 */
 void Forward_Resupply(int client){
+	Frozen_Resupply(client);
 	Invisibility_Resupply(client);
 	StripToMelee_OnResupply(client);
 	FastHands_Resupply(client);

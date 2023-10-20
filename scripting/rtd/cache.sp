@@ -50,10 +50,12 @@ enum TEParticle{
 	TEParticle_GreenBitsTwirl,
 	TEParticle_GreenBitsImpact,
 	TEParticle_LingeringFogSmall,
+	TEParticle_WaterSteam,
 	TEParticle_GasPasserImpactBlue,
 	TEParticle_GasPasserImpactRed,
 	TEParticle_BulletImpactHeavy,
 	TEParticle_BulletImpactHeavier,
+	TEParticle_IceImpact,
 	TEParticle_PickupTrailBlue,
 	TEParticle_PickupTrailRed,
 	TEParticle_LootExplosion,
@@ -61,7 +63,15 @@ enum TEParticle{
 	TEParticle_ExplosionEmbersOnly,
 	TEParticle_ShockwaveFlat,
 	TEParticle_ShockwaveBillboard,
+	TEParticle_SnowBurst,
 	TEParticle_SIZE,
+}
+
+enum TEParticleLingering{
+	TEParticle_SnowFlakes,
+	TEParticle_IceBodyGlow,
+	TEParticle_Frostbite,
+	TEParticleLingering_SIZE,
 }
 
 enum struct EntMaterial{
@@ -69,20 +79,38 @@ enum struct EntMaterial{
 	int iHalo;
 }
 
-int g_iTEParticleIds[TEParticle_SIZE];
-EntMaterial g_eEntMaterial;
+enum struct PlayerAttachmentPoint{
+	int Root; // always 0
+	int Head;
+	int Hat;
+	int EyeL;
+	int EyeR;
+	int Flag;
+	int Back;
+	int HandL;
+	int HandR;
+	int FootL;
+	int FootR;
+}
 
-void InitCache(){
+int g_iTEParticleIds[TEParticle_SIZE];
+int g_iTEParticleLingeringIds[TEParticleLingering_SIZE];
+EntMaterial g_eEntMaterial;
+PlayerAttachmentPoint g_ePlayerAttachments[10]; // per class
+
+void Cache_OnMapStart(){
 	g_iTEParticleIds[TEParticle_ExplosionLarge] = GetEffectIndex("rd_robot_explosion");
 	g_iTEParticleIds[TEParticle_ExplosionLargeShockwave] = GetEffectIndex("rd_robot_explosion_shockwave");
 	g_iTEParticleIds[TEParticle_GreenFog] = GetEffectIndex("merasmus_spawn_fog");
 	g_iTEParticleIds[TEParticle_GreenBitsTwirl] = GetEffectIndex("merasmus_tp_bits");
 	g_iTEParticleIds[TEParticle_GreenBitsImpact] = GetEffectIndex("merasmus_shoot_bits");
 	g_iTEParticleIds[TEParticle_LingeringFogSmall] = GetEffectIndex("god_rays_fog");
+	g_iTEParticleIds[TEParticle_WaterSteam] = GetEffectIndex("water_burning_steam");
 	g_iTEParticleIds[TEParticle_GasPasserImpactBlue] = GetEffectIndex("gas_can_impact_blue");
 	g_iTEParticleIds[TEParticle_GasPasserImpactRed] = GetEffectIndex("gas_can_impact_red");
 	g_iTEParticleIds[TEParticle_BulletImpactHeavy] = GetEffectIndex("versus_door_sparks_floaty");
 	g_iTEParticleIds[TEParticle_BulletImpactHeavier] = GetEffectIndex("versus_door_sparksB");
+	g_iTEParticleIds[TEParticle_IceImpact] = GetEffectIndex("xms_icicle_impact");
 	g_iTEParticleIds[TEParticle_PickupTrailBlue] = GetEffectIndex("duck_collect_trail_special_blue");
 	g_iTEParticleIds[TEParticle_PickupTrailRed] = GetEffectIndex("duck_collect_trail_special_red");
 	g_iTEParticleIds[TEParticle_LootExplosion] = GetEffectIndex("mvm_loot_explosion");
@@ -90,17 +118,129 @@ void InitCache(){
 	g_iTEParticleIds[TEParticle_ExplosionEmbersOnly] = GetEffectIndex("mvm_tank_destroy_embers");
 	g_iTEParticleIds[TEParticle_ShockwaveFlat] = GetEffectIndex("Explosion_ShockWave_01");
 	g_iTEParticleIds[TEParticle_ShockwaveBillboard] = GetEffectIndex("airburst_shockwave");
+	g_iTEParticleIds[TEParticle_SnowBurst] = GetEffectIndex("xms_snowburst");
+
+	g_iTEParticleLingeringIds[TEParticle_SnowFlakes] = GetEffectIndex("utaunt_ice_snowflakes");
+	g_iTEParticleLingeringIds[TEParticle_IceBodyGlow] = GetEffectIndex("utaunt_ice_bodyglow");
+	g_iTEParticleLingeringIds[TEParticle_Frostbite] = GetEffectIndex("unusual_eotl_frostbite");
 
 	g_eEntMaterial.iLaser = PrecacheModel("materials/sprites/laser.vmt");
 	g_eEntMaterial.iHalo = PrecacheModel("materials/sprites/halo01.vmt");
+
+	g_ePlayerAttachments[TFClass_Scout].FootL = 4;
+	g_ePlayerAttachments[TFClass_Scout].FootR = 5;
+	g_ePlayerAttachments[TFClass_Scout].Back = 7;
+	g_ePlayerAttachments[TFClass_Scout].Hat = 10;
+	g_ePlayerAttachments[TFClass_Scout].Head = 12;
+	g_ePlayerAttachments[TFClass_Scout].EyeL = 13;
+	g_ePlayerAttachments[TFClass_Scout].EyeR = 14;
+	g_ePlayerAttachments[TFClass_Scout].HandL = 16;
+	g_ePlayerAttachments[TFClass_Scout].HandR = 21;
+	g_ePlayerAttachments[TFClass_Scout].Flag = 22;
+
+	g_ePlayerAttachments[TFClass_Soldier].Back = 4;
+	g_ePlayerAttachments[TFClass_Soldier].FootL = 5;
+	g_ePlayerAttachments[TFClass_Soldier].FootR = 6;
+	g_ePlayerAttachments[TFClass_Soldier].Hat = 7;
+	g_ePlayerAttachments[TFClass_Soldier].Head = 8;
+	g_ePlayerAttachments[TFClass_Soldier].EyeL = 9;
+	g_ePlayerAttachments[TFClass_Soldier].EyeR = 10;
+	g_ePlayerAttachments[TFClass_Soldier].HandL = 12;
+	g_ePlayerAttachments[TFClass_Soldier].HandR = 16;
+	g_ePlayerAttachments[TFClass_Soldier].Flag = 17;
+
+	g_ePlayerAttachments[TFClass_Pyro].Head = 1;
+	g_ePlayerAttachments[TFClass_Pyro].EyeL = 2;
+	g_ePlayerAttachments[TFClass_Pyro].EyeR = 3;
+	g_ePlayerAttachments[TFClass_Pyro].HandL = 5;
+	g_ePlayerAttachments[TFClass_Pyro].HandR = 11;
+	g_ePlayerAttachments[TFClass_Pyro].Flag = 12;
+	g_ePlayerAttachments[TFClass_Pyro].Back = 21;
+	g_ePlayerAttachments[TFClass_Pyro].FootL = 22;
+	g_ePlayerAttachments[TFClass_Pyro].FootR = 23;
+	g_ePlayerAttachments[TFClass_Pyro].Hat = 24;
+
+	g_ePlayerAttachments[TFClass_DemoMan].Back = 3;
+	g_ePlayerAttachments[TFClass_DemoMan].FootL = 4;
+	g_ePlayerAttachments[TFClass_DemoMan].FootR = 5;
+	g_ePlayerAttachments[TFClass_DemoMan].Hat = 6;
+	g_ePlayerAttachments[TFClass_DemoMan].Head = 7;
+	g_ePlayerAttachments[TFClass_DemoMan].EyeL = 8;
+	g_ePlayerAttachments[TFClass_DemoMan].EyeR = 9;
+	g_ePlayerAttachments[TFClass_DemoMan].HandL = 12;
+	g_ePlayerAttachments[TFClass_DemoMan].HandR = 14;
+	g_ePlayerAttachments[TFClass_DemoMan].Flag = 16;
+
+	g_ePlayerAttachments[TFClass_Heavy].Back = 4;
+	g_ePlayerAttachments[TFClass_Heavy].FootL = 5;
+	g_ePlayerAttachments[TFClass_Heavy].FootR = 6;
+	g_ePlayerAttachments[TFClass_Heavy].Hat = 7;
+	g_ePlayerAttachments[TFClass_Heavy].Head = 8;
+	g_ePlayerAttachments[TFClass_Heavy].EyeL = 9;
+	g_ePlayerAttachments[TFClass_Heavy].EyeR = 10;
+	g_ePlayerAttachments[TFClass_Heavy].HandL = 11;
+	g_ePlayerAttachments[TFClass_Heavy].HandR = 12;
+	g_ePlayerAttachments[TFClass_Heavy].Flag = 13;
+
+	g_ePlayerAttachments[TFClass_Engineer].Back = 1;
+	g_ePlayerAttachments[TFClass_Engineer].FootL = 2;
+	g_ePlayerAttachments[TFClass_Engineer].FootR = 3;
+	g_ePlayerAttachments[TFClass_Engineer].Hat = 4;
+	g_ePlayerAttachments[TFClass_Engineer].Head = 5;
+	g_ePlayerAttachments[TFClass_Engineer].EyeR = 6; // yes, starts with right one
+	g_ePlayerAttachments[TFClass_Engineer].EyeL = 7;
+	g_ePlayerAttachments[TFClass_Engineer].HandL = 8;
+	g_ePlayerAttachments[TFClass_Engineer].HandR = 10;
+	g_ePlayerAttachments[TFClass_Engineer].Flag = 11;
+
+	g_ePlayerAttachments[TFClass_Medic].Back = 4;
+	g_ePlayerAttachments[TFClass_Medic].FootL = 5;
+	g_ePlayerAttachments[TFClass_Medic].FootR = 6;
+	g_ePlayerAttachments[TFClass_Medic].Hat = 7;
+	g_ePlayerAttachments[TFClass_Medic].Head = 8;
+	g_ePlayerAttachments[TFClass_Medic].EyeL = 9;
+	g_ePlayerAttachments[TFClass_Medic].EyeR = 10;
+	g_ePlayerAttachments[TFClass_Medic].HandL = 11;
+	g_ePlayerAttachments[TFClass_Medic].HandR = 12;
+	g_ePlayerAttachments[TFClass_Medic].Flag = 13;
+
+	g_ePlayerAttachments[TFClass_Sniper].Back = 4;
+	g_ePlayerAttachments[TFClass_Sniper].FootL = 5;
+	g_ePlayerAttachments[TFClass_Sniper].FootR = 6;
+	g_ePlayerAttachments[TFClass_Sniper].Hat = 7;
+	g_ePlayerAttachments[TFClass_Sniper].Head = 8;
+	g_ePlayerAttachments[TFClass_Sniper].EyeL = 9;
+	g_ePlayerAttachments[TFClass_Sniper].EyeR = 10;
+	g_ePlayerAttachments[TFClass_Sniper].HandL = 11;
+	g_ePlayerAttachments[TFClass_Sniper].HandR = 12;
+	g_ePlayerAttachments[TFClass_Sniper].Flag = 13;
+
+	g_ePlayerAttachments[TFClass_Spy].Back = 5;
+	g_ePlayerAttachments[TFClass_Spy].FootL = 6;
+	g_ePlayerAttachments[TFClass_Spy].FootR = 7;
+	g_ePlayerAttachments[TFClass_Spy].Hat = 8;
+	g_ePlayerAttachments[TFClass_Spy].Head = 10;
+	g_ePlayerAttachments[TFClass_Spy].EyeL = 11;
+	g_ePlayerAttachments[TFClass_Spy].EyeR = 12;
+	g_ePlayerAttachments[TFClass_Spy].HandL = 14;
+	g_ePlayerAttachments[TFClass_Spy].HandR = 19;
+	g_ePlayerAttachments[TFClass_Spy].Flag = 20;
 }
 
 int GetTEParticleId(const TEParticle eTEParticle){
 	return g_iTEParticleIds[eTEParticle];
 }
 
+int GetTEParticleLingeringId(const TEParticleLingering eTEParticle){
+	return g_iTEParticleLingeringIds[eTEParticle];
+}
+
 EntMaterial GetEntMaterial(){
 	return g_eEntMaterial;
+}
+
+PlayerAttachmentPoint GetPlayerAttachmentPoint(TFClassType eClass){
+	return g_ePlayerAttachments[eClass];
 }
 
 int g_iClientPerkCache[MAXPLAYERS+1] = {-1, ...}; // Used to check if client has the current perk
