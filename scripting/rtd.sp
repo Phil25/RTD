@@ -1288,6 +1288,12 @@ public Action Timer_Countdown(Handle hTimer, int iSerial){
 	if(client == 0)
 		return Plugin_Stop;
 
+	if(TF2_GetClientTeam(client) == TFTeam_Spectator)
+	{
+		ForceRemovePerk(client, RTDRemove_Death);
+		return Plugin_Stop;
+	}
+
 	if(!g_hRollers.GetInRoll(client))
 		return Plugin_Stop;
 
