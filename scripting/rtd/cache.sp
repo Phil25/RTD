@@ -69,6 +69,10 @@ enum TEParticle{
 	TEParticle_ElectrocutedBlue,
 	TEParticle_SparkVortexRed,
 	TEParticle_SparkVortexBlue,
+	TEParticle_PlayerStationarySilhouetteRed,
+	TEParticle_PlayerStationarySilhouetteBlue,
+	TEParticle_SmallPingWithEmbersRed,
+	TEParticle_SmallPingWithEmbersBlue,
 	TEParticle_SIZE,
 }
 
@@ -130,6 +134,10 @@ void Cache_OnMapStart(){
 	g_iTEParticleIds[TEParticle_ElectrocutedBlue] = GetEffectIndex("electrocuted_blue");
 	g_iTEParticleIds[TEParticle_SparkVortexRed] = GetEffectIndex("teleportedin_red");
 	g_iTEParticleIds[TEParticle_SparkVortexBlue] = GetEffectIndex("teleportedin_blue");
+	g_iTEParticleIds[TEParticle_PlayerStationarySilhouetteRed] = GetEffectIndex("player_sparkles_red");
+	g_iTEParticleIds[TEParticle_PlayerStationarySilhouetteBlue] = GetEffectIndex("player_sparkles_blue");
+	g_iTEParticleIds[TEParticle_SmallPingWithEmbersBlue] = GetEffectIndex("powercore_embers_blue");
+	g_iTEParticleIds[TEParticle_SmallPingWithEmbersRed] = GetEffectIndex("powercore_embers_red");
 
 	g_iTEParticleLingeringIds[TEParticle_SnowFlakes] = GetEffectIndex("utaunt_ice_snowflakes");
 	g_iTEParticleLingeringIds[TEParticle_IceBodyGlow] = GetEffectIndex("utaunt_ice_bodyglow");

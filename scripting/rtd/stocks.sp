@@ -858,6 +858,11 @@ stock void SendTEParticleWithPriority(const TEParticle eTEParticle, const float 
 	TE_SendToAll(-1.0); // negative values attempt to send the TE on the same tick
 }
 
+stock void SendTEParticleWithPriorityTo(const int client, const TEParticle eTEParticle, const float fPos[3]){
+	SetupTEParticle(eTEParticle, fPos);
+	TE_SendToClient(client, -1.0);
+}
+
 stock void SendTEParticleAttached(const TEParticle eTEParticle, const int iEnt, const int iAttachPoint=0){
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecStart[0]", 0.0);

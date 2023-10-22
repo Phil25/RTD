@@ -47,6 +47,7 @@ void Forward_OnMapStart(){
 	Toxic_Start();
 	Explode_Start();
 	Frozen_Start();
+	Invisibility_Start();
 	InfiniteAmmo_Start();
 	Timebomb_Start();
 	Drugged_Start();
@@ -241,6 +242,7 @@ public bool Forward_OnPlayerRunCmd(int client, int &iButtons, int &iImpulse, flo
 	• You cannot block it from this forward.
 */
 public bool Forward_AttackIsCritical(int client, int iWeapon, const char[] sWeaponName){
+	Invisibility_OnAttack(client);
 	StrongRecoil_CritCheck(client, iWeapon);
 	PowerPlay_OnAttack(client);
 

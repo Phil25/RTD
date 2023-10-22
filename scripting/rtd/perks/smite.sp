@@ -69,7 +69,7 @@ void Smite_ApplyPerk(int client, Perk perk){
 	SetIntCache(client, false, IS_ELECTROCUTED);
 	SetIntCache(client, Smite_GenerateTicksLeft(client), TICKS_LEFT);
 
-	// Due to technical reasons, client cannot die on the same frame as the perk is applied, make
+	// Due to technical reasons, client cannot die on the same frame a timed perk is applied, make
 	// sure they are left with at least 1 health.
 	float fDamage = Min(fInitialDamageMultiplier * iMaxHealth, float(GetClientHealth(client) - 1));
 
