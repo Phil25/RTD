@@ -50,6 +50,7 @@ enum TEParticle{
 	TEParticle_GreenBitsTwirl,
 	TEParticle_GreenBitsImpact,
 	TEParticle_LingeringFogSmall,
+	TEParticle_SmokePuff,
 	TEParticle_WaterSteam,
 	TEParticle_GasPasserImpactBlue,
 	TEParticle_GasPasserImpactRed,
@@ -64,6 +65,10 @@ enum TEParticle{
 	TEParticle_ShockwaveFlat,
 	TEParticle_ShockwaveBillboard,
 	TEParticle_SnowBurst,
+	TEParticle_ElectrocutedRed,
+	TEParticle_ElectrocutedBlue,
+	TEParticle_SparkVortexRed,
+	TEParticle_SparkVortexBlue,
 	TEParticle_SIZE,
 }
 
@@ -71,6 +76,7 @@ enum TEParticleLingering{
 	TEParticle_SnowFlakes,
 	TEParticle_IceBodyGlow,
 	TEParticle_Frostbite,
+	TEParticle_ElectricMist,
 	TEParticleLingering_SIZE,
 }
 
@@ -105,6 +111,7 @@ void Cache_OnMapStart(){
 	g_iTEParticleIds[TEParticle_GreenBitsTwirl] = GetEffectIndex("merasmus_tp_bits");
 	g_iTEParticleIds[TEParticle_GreenBitsImpact] = GetEffectIndex("merasmus_shoot_bits");
 	g_iTEParticleIds[TEParticle_LingeringFogSmall] = GetEffectIndex("god_rays_fog");
+	g_iTEParticleIds[TEParticle_SmokePuff] = GetEffectIndex("taunt_yeti_flash");
 	g_iTEParticleIds[TEParticle_WaterSteam] = GetEffectIndex("water_burning_steam");
 	g_iTEParticleIds[TEParticle_GasPasserImpactBlue] = GetEffectIndex("gas_can_impact_blue");
 	g_iTEParticleIds[TEParticle_GasPasserImpactRed] = GetEffectIndex("gas_can_impact_red");
@@ -119,10 +126,15 @@ void Cache_OnMapStart(){
 	g_iTEParticleIds[TEParticle_ShockwaveFlat] = GetEffectIndex("Explosion_ShockWave_01");
 	g_iTEParticleIds[TEParticle_ShockwaveBillboard] = GetEffectIndex("airburst_shockwave");
 	g_iTEParticleIds[TEParticle_SnowBurst] = GetEffectIndex("xms_snowburst");
+	g_iTEParticleIds[TEParticle_ElectrocutedRed] = GetEffectIndex("electrocuted_red");
+	g_iTEParticleIds[TEParticle_ElectrocutedBlue] = GetEffectIndex("electrocuted_blue");
+	g_iTEParticleIds[TEParticle_SparkVortexRed] = GetEffectIndex("teleportedin_red");
+	g_iTEParticleIds[TEParticle_SparkVortexBlue] = GetEffectIndex("teleportedin_blue");
 
 	g_iTEParticleLingeringIds[TEParticle_SnowFlakes] = GetEffectIndex("utaunt_ice_snowflakes");
 	g_iTEParticleLingeringIds[TEParticle_IceBodyGlow] = GetEffectIndex("utaunt_ice_bodyglow");
 	g_iTEParticleLingeringIds[TEParticle_Frostbite] = GetEffectIndex("unusual_eotl_frostbite");
+	g_iTEParticleLingeringIds[TEParticle_ElectricMist] = GetEffectIndex("utaunt_electric_mist");
 
 	g_eEntMaterial.iLaser = PrecacheModel("materials/sprites/laser.vmt");
 	g_eEntMaterial.iHalo = PrecacheModel("materials/sprites/halo01.vmt");

@@ -74,6 +74,7 @@
 * - CreateRagdoll
 * - CreateExplosion
 * - CreateTesla
+* - CreateProxy
 * - ConnectWithBeam
 * - AttachRotating
 * - AttachGlow
@@ -678,6 +679,35 @@ stock int CreateTesla(float fPos[3]){
 	AcceptEntityInput(iTesla, "TurnOn");
 
 	return iTesla;
+}
+
+/*
+ * Based on nosoop's `TF2_AttachBasicGlow`
+ * https://github.com/nosoop/stocksoup/blob/master/tf/entity_prefabs.inc
+ */
+stock int CreateProxy(int iEnt){
+	char sModel[PLATFORM_MAX_PATH];
+	GetEntPropString(iEnt, Prop_Data, "m_ModelName", sModel, sizeof(sModel));
+
+	if(strlen(sModel) == 0)
+		return -1;
+
+	int iProxy = CreateEntityByName("tf_taunt_prop");
+	if(iProxy <= MaxClients)
+		return -1;
+
+	DispatchSpawn(iProxy);
+	SetEntityModel(iProxy, sModel);
+
+	SetEntPropEnt(iProxy, Prop_Data, "m_hEffectEntity", iEnt);
+
+	// Add BONEMERGE, NOINTERP and NOSHADOW flags
+	int iFlags = GetEntProp(iProxy, Prop_Send, "m_fEffects");
+	SetEntProp(iProxy, Prop_Send, "m_fEffects", iFlags | 1 | 8 | 16);
+
+	Parent(iProxy, iEnt);
+
+	return iProxy;
 }
 
 stock int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int iBlue=255, float fStartWidth=1.0, float fEndWidth=1.0, float fAmp=1.35){

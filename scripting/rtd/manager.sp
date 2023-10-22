@@ -72,6 +72,7 @@ void Forward_OnMapStart(){
 	Vampire_Start();
 	PumpkinTrail_Start();
 	ACallBeyond_Start();
+	Smite_Start();
 }
 
 
