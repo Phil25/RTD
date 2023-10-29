@@ -16,18 +16,14 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+DEFINE_CALL_EMPTY(EyeForAnEye)
 
-int g_iEyeForAnEyeId = 38;
-
-public void EyeForAnEye_Call(int client, Perk perk, bool apply){
-	if(apply){
-		g_iEyeForAnEyeId = perk.Id;
-		SetClientPerkCache(client, g_iEyeForAnEyeId);
-	}else UnsetClientPerkCache(client, g_iEyeForAnEyeId);
+public void EyeForAnEye_Init(const Perk perk)
+{
+	Events.OnPlayerAttacked(perk, EyeForAnEye_OnPlayerAttacked);
 }
 
-void EyeForAnEye_PlayerHurt(Handle hEvent){
-	int iAttacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
-	if(CheckClientPerkCache(iAttacker, g_iEyeForAnEyeId))
-		SDKHooks_TakeDamage(iAttacker, 0, 0, float(GetEventInt(hEvent, "damageamount")));
+public void EyeForAnEye_OnPlayerAttacked(const int client, const int iVictim, const int iDamage, const int iRemainingHealth)
+{
+	SDKHooks_TakeDamage(client, 0, 0, float(iDamage));
 }

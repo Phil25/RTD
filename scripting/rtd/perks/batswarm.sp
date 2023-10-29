@@ -16,97 +16,122 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define BAT_LIFETIME 0
-#define BAT_RATE 1
-#define BAT_SPEED 2
+#include "rtd/macros.sp"
 
-#define BAT_COUNT 0
-#define BAT_FLAGS 1
+#define BAT_START_SOUND "misc/halloween/spell_bat_cast.wav"
 
 #define BAT_FLAG_ACTIVATED 1
 #define BAT_FLAG_ACTIVATING 2
 
-#define BAT_START_SOUND "misc/halloween/spell_bat_cast.wav"
+#define Count Int[0]
+#define Flags Int[1]
+#define ActivationTimer Int[2]
+#define Lifetime Float[0]
+#define Speed Float[1]
 
-methodmap BatSwarmFlags{
-	public BatSwarmFlags(const int client){
+methodmap BatSwarmFlags
+{
+	public BatSwarmFlags(const int client)
+	{
 		return view_as<BatSwarmFlags>(client)
 	}
 
-	public void Reset(){
-		SetIntCache(view_as<int>(this), 0, BAT_FLAGS);
+	public void Reset()
+	{
+		Cache[view_as<int>(this)].Flags = 0;
 	}
 
-	property bool Activated{
-		public get(){
-			return view_as<bool>(GetIntCache(view_as<int>(this), BAT_FLAGS) & BAT_FLAG_ACTIVATED);
+	property bool Activated
+	{
+		public get()
+		{
+			return view_as<bool>(Cache[view_as<int>(this)].Flags & BAT_FLAG_ACTIVATED);
 		}
 
-		public set(bool bEnable){
-			int iFlags = GetIntCache(view_as<int>(this), BAT_FLAGS);
-			if(bEnable)
-				SetIntCache(view_as<int>(this), iFlags | BAT_FLAG_ACTIVATED, BAT_FLAGS);
+		public set(bool bEnable)
+		{
+			int iFlags = Cache[view_as<int>(this)].Flags;
+
+			if (bEnable)
+			{
+				Cache[view_as<int>(this)].Flags = iFlags | BAT_FLAG_ACTIVATED;
+			}
 			else
-				SetIntCache(view_as<int>(this), iFlags & ~BAT_FLAG_ACTIVATED, BAT_FLAGS);
+			{
+				Cache[view_as<int>(this)].Flags = iFlags & ~BAT_FLAG_ACTIVATED;
+			}
 		}
 	}
 
-	property bool Activating{
-		public get(){
-			return view_as<bool>(GetIntCache(view_as<int>(this), BAT_FLAGS) & BAT_FLAG_ACTIVATING);
+	property bool Activating
+	{
+		public get()
+		{
+			return view_as<bool>(Cache[view_as<int>(this)].Flags & BAT_FLAG_ACTIVATING);
 		}
 
-		public set(bool bEnable){
-			int iFlags = GetIntCache(view_as<int>(this), BAT_FLAGS);
-			if(bEnable)
-				SetIntCache(view_as<int>(this), iFlags | BAT_FLAG_ACTIVATING, BAT_FLAGS);
+		public set(bool bEnable)
+		{
+			int iFlags = Cache[view_as<int>(this)].Flags;
+
+			if (bEnable)
+			{
+				Cache[view_as<int>(this)].Flags = iFlags | BAT_FLAG_ACTIVATING;
+			}
 			else
-				SetIntCache(view_as<int>(this), iFlags & ~BAT_FLAG_ACTIVATING, BAT_FLAGS);
+			{
+				Cache[view_as<int>(this)].Flags = iFlags & ~BAT_FLAG_ACTIVATING;
+			}
 		}
 	}
 }
 
-int g_iBatSwarmId = 69;
+DEFINE_CALL_APPLY_REMOVE(BatSwarm)
 
-void BatSwarm_Start(){
+public void BatSwarm_Init(const Perk perk)
+{
 	PrecacheSound(BAT_START_SOUND);
+
+	Events.OnVoice(perk, BatSwarm_OnVoice);
 }
 
-public void BatSwarm_Call(int client, Perk perk, bool apply){
-	if(apply) BatSwarm_ApplyPerk(client, perk);
-	else BatSwarm_RemovePerk(client);
-}
-
-void BatSwarm_ApplyPerk(int client, Perk perk){
-	g_iBatSwarmId = perk.Id;
-	SetClientPerkCache(client, g_iBatSwarmId);
-
-	SetFloatCache(client, perk.GetPrefFloat("lifetime"), BAT_LIFETIME);
-	SetFloatCache(client, perk.GetPrefFloat("rate"), BAT_RATE);
-	SetFloatCache(client, perk.GetPrefFloat("speed"), BAT_SPEED);
-	SetIntCache(client, perk.GetPrefCell("amount"), BAT_COUNT);
+void BatSwarm_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Count = perk.GetPrefCell("amount", 2);
 	BatSwarmFlags(client).Reset();
+	Cache[client].ActivationTimer = view_as<int>(INVALID_HANDLE);
+	Cache[client].Lifetime = perk.GetPrefFloat("lifetime", 1.0);
+	Cache[client].Speed = perk.GetPrefFloat("speed", 0.25);
 
 	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
+
+	Cache[client].Repeat(perk.GetPrefFloat("rate", 0.35), BatSwarm_Tick);
 }
 
-void BatSwarm_RemovePerk(int client){
-	UnsetClientPerkCache(client, g_iBatSwarmId);
+void BatSwarm_RemovePerk(const int client)
+{
+	if (Cache[client].ActivationTimer != view_as<int>(INVALID_HANDLE))
+	{
+		CloseHandle(view_as<Handle>(Cache[client].ActivationTimer));
+		Cache[client].ActivationTimer = view_as<int>(INVALID_HANDLE);
 
-	if(BatSwarmFlags(client).Activated)
+		if (GetEntityMoveType(client) == MOVETYPE_NONE)
+			SetEntityMoveType(client, MOVETYPE_WALK);
+	}
+
+	if (BatSwarmFlags(client).Activated)
 		BatSwarm_End(client);
 }
 
-void BatSwarm_Voice(int client){
-	if(!CheckClientPerkCache(client, g_iBatSwarmId))
-		return
-
-	if(BatSwarmFlags(client).Activated){
+void BatSwarm_OnVoice(const int client)
+{
+	if (BatSwarmFlags(client).Activated)
+	{
 		BatSwarm_End(client);
 		return;
 	}
 
-	if(BatSwarmFlags(client).Activating)
+	if (BatSwarmFlags(client).Activating)
 		return;
 
 	int iTimeLeft = g_hRollers.GetEndRollTime(client) - GetTime();
@@ -115,44 +140,47 @@ void BatSwarm_Voice(int client){
 
 	BatSwarmFlags(client).Activating = true;
 	SetEntityMoveType(client, MOVETYPE_NONE);
-	CreateTimer(fActivationTime, Timer_BatSwarm_ChargeEffect, GetClientUserId(client));
+
+	Handle hActivationTimer = CreateTimer(fActivationTime, Timer_BatSwarm_ChargeEffect, GetClientUserId(client));
+	Cache[client].ActivationTimer = view_as<int>(hActivationTimer);
 
 	EmitSoundToAll(BAT_START_SOUND, client, _, _, _, _, 70);
+
 	int iSpawn = CreateParticle(client, "halloween_boss_summon", true, "", {0.0, 0.0, 0.0});
-	if(!iSpawn)
+	if (!iSpawn)
 		return;
 
-	KILL_ENT_IN(iSpawn,2.0)
+	KILL_ENT_IN(iSpawn,2.0);
 }
 
-public Action Timer_BatSwarm_ChargeEffect(Handle hTimer, const int iUserId){
+public Action Timer_BatSwarm_ChargeEffect(Handle hTimer, const int iUserId)
+{
 	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	// On the off chance that somehing happens between the activation time
-	if(GetEntityMoveType(client) == MOVETYPE_NONE)
-		SetEntityMoveType(client, MOVETYPE_WALK);
-
-	if(!CheckClientPerkCache(client, g_iBatSwarmId))
+	if (!client)
 		return Plugin_Stop;
 
-	BatSwarm_Begin(client, iUserId);
+	// On the off chance that somehing happens between the activation time
+	if (GetEntityMoveType(client) == MOVETYPE_NONE)
+		SetEntityMoveType(client, MOVETYPE_WALK);
+
+	BatSwarm_Begin(client);
 	BatSwarmFlags(client).Activating = false;
 
+	Cache[client].ActivationTimer = view_as<int>(INVALID_HANDLE);
 	return Plugin_Stop;
 }
 
-void BatSwarm_Begin(const int client, const int iUserId){
-	BatSwarmFlags(client).Activated = true;
-
-	SetSpeedEx(client, GetFloatCache(client, BAT_SPEED));
+void BatSwarm_Begin(const int client)
+{
+	SetSpeedEx(client, Cache[client].Speed);
 	TF2_AddCondition(client, TFCond_UberchargedCanteen);
 	TF2_AddCondition(client, TFCond_MegaHeal);
 
-	CreateTimer(GetFloatCache(client, BAT_RATE), Timer_BatSwarm_SpawnBats, iUserId, TIMER_REPEAT);
+	BatSwarmFlags(client).Activated = true;
 }
 
-void BatSwarm_End(const int client){
+void BatSwarm_End(const int client)
+{
 	BatSwarmFlags(client).Activated = false;
 
 	SetSpeedEx(client);
@@ -162,55 +190,54 @@ void BatSwarm_End(const int client){
 	TF2_AddCondition(client, TFCond_SpeedBuffAlly, 3.0);
 }
 
-public Action Timer_BatSwarm_SpawnBats(Handle hTimer, const int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
+public Action BatSwarm_Tick(const int client)
+{
+	if (!BatSwarmFlags(client).Activated)
+		return Plugin_Continue;
 
-	if(!CheckClientPerkCache(client, g_iBatSwarmId) || !BatSwarmFlags(client).Activated)
-		return Plugin_Stop;
+	int iAmount = Cache[client].Count;
+	float fLifetime = Cache[client].Lifetime;
 
-	int iAmount = GetIntCache(client, BAT_COUNT);
-	float fLifetime = GetFloatCache(client, BAT_LIFETIME);
 	float fPos[3], fAng[3], fVel[3];
 	GetClientEyePosition(client, fPos);
 
-	while(--iAmount >= 0)
+	while (--iAmount >= 0)
 		BatSwarm_SpawnBats(client, fLifetime, fPos, fAng, fVel);
 
 	return Plugin_Continue;
 }
 
-void BatSwarm_SpawnBats(const int client, float fLifetime, float fPos[3], float fAng[3], float fVel[3]){
+void BatSwarm_SpawnBats(const int client, float fLifetime, float fPos[3], float fAng[3], float fVel[3])
+{
 	int iBats = CreateEntityByName("tf_projectile_spellbats");
-	if(iBats <= MaxClients) return;
+	if (iBats <= MaxClients)
+		return;
 
 	SetEntPropEnt(iBats, Prop_Send, "m_hOwnerEntity", client);
 
 	int iTeam = GetClientTeam(client);
 	SetEntProp(iBats, Prop_Send, "m_iTeamNum", iTeam, 1);
-	SetEntProp(iBats, Prop_Send, "m_nSkin", iTeam -2);
+	SetEntProp(iBats, Prop_Send, "m_nSkin", iTeam - 2);
 
 	DispatchSpawn(iBats);
 
-	fAng[0] = GetURandomFloat() *360.0;
-	fAng[1] = GetURandomFloat() *360.0;
+	fAng[0] = GetURandomFloat() * 360.0;
+	fAng[1] = GetURandomFloat() * 360.0;
 
 	GetAngleVectors(fAng, fVel, NULL_VECTOR, NULL_VECTOR);
-	fVel[0] *= 500.0;
-	fVel[1] *= 500.0;
-	fVel[2] *= 500.0;
+	ScaleVector(fVel, 500.0);
 
 	TeleportEntity(iBats, fPos, fAng, fVel);
 	KillEntIn(iBats, fLifetime);
 }
 
-#undef BAT_LIFETIME
-#undef BAT_RATE
-
-#undef BAT_COUNT
-#undef BAT_FLAGS
+#undef BAT_START_SOUND
 
 #undef BAT_FLAG_ACTIVATED
 #undef BAT_FLAG_ACTIVATING
 
-#undef BAT_START_SOUND
+#undef Count
+#undef Flags
+#undef ActivationTimer
+#undef Lifetime
+#undef Speed

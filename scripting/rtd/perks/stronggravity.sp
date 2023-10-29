@@ -16,13 +16,19 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Base Float[0]
 
-public void StrongGravity_Call(int client, Perk perk, bool apply){
-	if(apply) StrongGravity_ApplyPerk(client, perk);
-	else SetEntityGravity(client, GetFloatCache(client));
+DEFINE_CALL_APPLY_REMOVE(StrongGravity)
+
+public void StrongGravity_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Base = GetEntityGravity(client);
+	SetEntityGravity(client, perk.GetPrefFloat("multiplier", 4.0));
 }
 
-void StrongGravity_ApplyPerk(int client, Perk perk){
-	SetFloatCache(client, GetEntityGravity(client));
-	SetEntityGravity(client, perk.GetPrefFloat("multiplier"));
+void StrongGravity_RemovePerk(const int client)
+{
+	SetEntityGravity(client, Cache[client].Base);
 }
+
+#undef Base

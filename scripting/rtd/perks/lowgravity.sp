@@ -16,13 +16,19 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Gravity Float[0]
 
-public void LowGravity_Call(int client, Perk perk, bool apply){
-	if(apply) LowGravity_ApplyPerk(client, perk);
-	else SetEntityGravity(client, GetFloatCache(client));
+public void LowGravity_Call(int client, Perk perk, bool apply)
+{
+	if (apply)
+	{
+		Cache[client].Gravity = GetEntityGravity(client)
+		SetEntityGravity(client, perk.GetPrefFloat("multiplier", 0.25));
+	}
+	else
+	{
+		SetEntityGravity(client, Cache[client].Gravity);
+	}
 }
 
-void LowGravity_ApplyPerk(int client, Perk perk){
-	SetFloatCache(client, GetEntityGravity(client));
-	SetEntityGravity(client, perk.GetPrefFloat("multiplier"));
-}
+#undef Gravity

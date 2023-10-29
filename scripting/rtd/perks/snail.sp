@@ -16,16 +16,14 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+DEFINE_CALL_APPLY_REMOVE(Snail)
 
-public void Snail_Call(int client, Perk perk, bool apply){
-	if(apply) Snail_ApplyPerk(client, perk);
-	else Snail_RemovePerk(client);
+public void Snail_ApplyPerk(const int client, const Perk perk)
+{
+	SetSpeedEx(client, perk.GetPrefFloat("multiplier", 0.4));
 }
 
-void Snail_ApplyPerk(int client, Perk perk){
-	SetSpeedEx(client, perk.GetPrefFloat("multiplier"));
-}
-
-void Snail_RemovePerk(int client){
+public void Snail_RemovePerk(const int client)
+{
 	SetSpeedEx(client);
 }

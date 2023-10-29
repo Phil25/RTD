@@ -16,87 +16,148 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define UberchargeDeployed Int[0]
+#define MedigunEffect Int[1]
+#define CarriedMedigun EntSlot_1
 
-int g_iMediGuns[MAXPLAYERS+1] = {INVALID_ENT_REFERENCE, ...};
-int g_iFullUberchargeIndex = 6;
+ClientFlags g_eFullUberchargeExtendUbercharge;
+ClientFlags g_eFullUberchargeExtendKritzkrieg;
+ClientFlags g_eFullUberchargeExtendMegaHeal;
 
-public void FullUbercharge_Call(int client, Perk perk, bool apply){
-	if(apply) FullUbercharge_ApplyPerk(client, perk);
-	else FullUbercharge_RemovePerk(client);
+DEFINE_CALL_APPLY_REMOVE(FullUbercharge)
+
+public void FullUbercharge_Init(const Perk perk)
+{
+	Events.OnConditionRemoved(perk, FullUbercharge_OnConditionRemoved, SubscriptionType_Any);
+	Events.OnUberchargeDeployed(perk, FullUbercharge_OnUberchargeDeployed);
 }
 
-void FullUbercharge_ApplyPerk(int client, Perk perk){
-	g_iFullUberchargeIndex = perk.Id;
-	int iWeapon = GetPlayerWeaponSlot(client, 1);
-	if(iWeapon > MaxClients && IsValidEntity(iWeapon)){
-		char sClass[20];
-		GetEdictClassname(iWeapon, sClass, sizeof(sClass));
+public void FullUbercharge_ApplyPerk(const int client, const Perk perk)
+{
+	int iMedigun = GetPlayerWeaponSlot(client, 1);
+	if (iMedigun <= MaxClients || !IsValidEntity(iMedigun))
+		return;
 
-		if(strcmp(sClass, "tf_weapon_medigun") == 0){
-			g_iMediGuns[client] = EntIndexToEntRef(iWeapon);
-			SetClientPerkCache(client, g_iFullUberchargeIndex);
-			SetIntCache(client, 0);
+	char sClass[20];
+	GetEdictClassname(iMedigun, sClass, sizeof(sClass));
+	if (strcmp(sClass, "tf_weapon_medigun") != 0) // failsafe
+		return;
 
-			CreateTimer(0.2, Timer_RefreshUber, GetClientUserId(client), TIMER_REPEAT);
+	switch (GetEntProp(iMedigun, Prop_Send, "m_iItemDefinitionIndex"))
+	{
+		case 35:
+			Cache[client].MedigunEffect = view_as<int>(TFCond_Kritzkrieged);
 
-			int iWeapIndex = GetEntProp(iWeapon, Prop_Send, "m_iItemDefinitionIndex");
-			switch(iWeapIndex){
-				case 35:	SetIntCache(client, view_as<int>(TFCond_Kritzkrieged), 1);
-				case 411:	SetIntCache(client, view_as<int>(TFCond_MegaHeal), 1);
-				case 998:	SetIntCache(client, -1, 1);
-				default:	SetIntCache(client, view_as<int>(TFCond_Ubercharged), 1);
-			}
-		}
+		case 411:
+			Cache[client].MedigunEffect = view_as<int>(TFCond_MegaHeal);
+
+		case 998:
+			Cache[client].MedigunEffect = -1;
+
+		default:
+			Cache[client].MedigunEffect = view_as<int>(TFCond_Ubercharged);
 	}
+
+	g_eFullUberchargeExtendUbercharge.Unset(client);
+	g_eFullUberchargeExtendKritzkrieg.Unset(client);
+	g_eFullUberchargeExtendMegaHeal.Unset(client);
+
+	Cache[client].UberchargeDeployed = false;
+	Cache[client].SetEnt(CarriedMedigun, iMedigun, EntCleanup_None);
+	Cache[client].Repeat(0.1, FullUbercharge_RefillCharge);
 }
 
-void FullUbercharge_RemovePerk(int client){
-	UnsetClientPerkCache(client, g_iFullUberchargeIndex);
-	if(GetIntCache(client, 1) > -1)
-		CreateTimer(0.2, Timer_UberchargeEnd, GetClientUserId(client), TIMER_REPEAT);
+public void FullUbercharge_RemovePerk(const int client)
+{
+	if (!Cache[client].UberchargeDeployed)
+		return;
+
+	if (Cache[client].MedigunEffect <= 0)
+		return;
+
+	DataPack hData = new DataPack();
+	hData.WriteCell(GetClientUserId(client));
+	hData.WriteCell(Cache[client].GetEnt(CarriedMedigun).Reference);
+	hData.WriteCell(Cache[client].MedigunEffect);
+
+	CreateTimer(0.2, Timer_FullUbercharge_ExtendCharge, hData, TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
 }
 
-public Action Timer_RefreshUber(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iFullUberchargeIndex))
+public Action FullUbercharge_RefillCharge(const int client)
+{
+	int iMedigun = Cache[client].GetEnt(CarriedMedigun).Index;
+	if (iMedigun <= MaxClients)
 		return Plugin_Stop;
 
-	int iMediGun = EntRefToEntIndex(g_iMediGuns[client]);
-	if(iMediGun <= MaxClients)
-		return Plugin_Stop;
+	SetEntPropFloat(iMedigun, Prop_Send, "m_flChargeLevel", 1.0);
 
-	SetEntPropFloat(iMediGun, Prop_Send, "m_flChargeLevel", 1.0);
 	return Plugin_Continue;
-
 }
 
-public Action Timer_UberchargeEnd(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
+public void FullUbercharge_OnUberchargeDeployed(const int client, const int iTarget)
+{
+	switch (view_as<TFCond>(Cache[client].MedigunEffect))
+	{
+		case TFCond_Ubercharged:
+			g_eFullUberchargeExtendUbercharge.Set(client);
 
-	int iMediGun = EntRefToEntIndex(g_iMediGuns[client]);
-	if(iMediGun <= MaxClients){
-		SetIntCache(client, 1);
-		return Plugin_Stop;
+		case TFCond_Kritzkrieged:
+			g_eFullUberchargeExtendKritzkrieg.Set(client);
+
+		case TFCond_MegaHeal:
+			g_eFullUberchargeExtendMegaHeal.Set(client);
 	}
 
-	if(GetEntPropFloat(iMediGun, Prop_Send, "m_flChargeLevel") > 0.05)
-		return Plugin_Continue;
+	Cache[client].UberchargeDeployed = true;
+}
 
-	SetIntCache(client, 1);
+public Action Timer_FullUbercharge_ExtendCharge(Handle hTimer, DataPack hData)
+{
+	hData.Reset();
+
+	int client = GetClientOfUserId(hData.ReadCell());
+	if (!client)
+		return Plugin_Stop;
+
+	int iMedigun = EntRefToEntIndex(hData.ReadCell());
+	if (iMedigun > MaxClients && GetEntPropFloat(iMedigun, Prop_Send, "m_flChargeLevel") > 0.05)
+	{
+		return Plugin_Continue;
+	}
+
+	switch (view_as<TFCond>(hData.ReadCell()))
+	{
+		case TFCond_Ubercharged:
+			g_eFullUberchargeExtendUbercharge.Unset(client);
+
+		case TFCond_Kritzkrieged:
+			g_eFullUberchargeExtendKritzkrieg.Unset(client);
+
+		case TFCond_MegaHeal:
+			g_eFullUberchargeExtendMegaHeal.Unset(client);
+	}
+
 	return Plugin_Stop;
 }
 
-void FullUbercharge_OnConditionRemoved(int client, TFCond cond){
-	if(GetIntCache(client))
-		return;
+public void FullUbercharge_OnConditionRemoved(const int client, const TFCond eCondition)
+{
+	switch (eCondition)
+	{
+		case TFCond_Ubercharged:
+			if (g_eFullUberchargeExtendUbercharge.Test(client))
+				TF2_AddCondition(client, eCondition, 2.0);
 
-	if(view_as<int>(cond) != GetIntCache(client, 1))
-		return;
+		case TFCond_Kritzkrieged:
+			if (g_eFullUberchargeExtendKritzkrieg.Test(client))
+				TF2_AddCondition(client, eCondition, 2.0);
 
-	int iMediGun = EntRefToEntIndex(g_iMediGuns[client]);
-	if(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == iMediGun)
-		TF2_AddCondition(client, cond, 2.0);
+		case TFCond_MegaHeal:
+			if (g_eFullUberchargeExtendMegaHeal.Test(client))
+				TF2_AddCondition(client, eCondition, 2.0);
+	}
 }
+
+#undef UberchargeDeployed
+#undef MedigunEffect
+#undef CarriedMedigun

@@ -180,6 +180,9 @@ methodmap Perk < StringMap{
 	GET_STRING(InternalCall)
 	SET_STRING(InternalCall)
 
+	GET_STRING(InternalInit)
+	SET_STRING(InternalInit)
+
 	public void CallInternal(int client, bool bEnable){
 		char sFuncName[64];
 		this.GetInternalCall(sFuncName, 64);
@@ -196,6 +199,26 @@ methodmap Perk < StringMap{
 		Call_PushCell(client);
 		Call_PushCell(this);
 		Call_PushCell(bEnable);
+		Call_Finish();
+	}
+
+	public void InitInternal(){
+		char sFuncName[64];
+		this.GetInternalInit(sFuncName, 64);
+		if(sFuncName[0] == '\0')
+			return;
+
+		Function func = GetFunctionByName(INVALID_HANDLE, sFuncName);
+
+		if(func == INVALID_FUNCTION){
+			char sToken[32];
+			this.GetToken(sToken, 32);
+			LogError("Invalid function name: \"%s\", for perk %s.", sFuncName, sToken);
+			return;
+		}
+
+		Call_StartFunction(INVALID_HANDLE, func);
+		Call_PushCell(this);
 		Call_Finish();
 	}
 
@@ -232,7 +255,7 @@ methodmap Perk < StringMap{
 		switch(sProp[2]){
 			case 'I': switch(sProp[3]){
 				case 'd': return Type_Int; // m_Id
-				case 'n': return Type_String; // m_InternalCall
+				case 'n': return Type_String; // m_InternalCall & m_InternalInit
 			}
 			case 'N': return Type_String; // m_Name
 			case 'G': return Type_Bool; // m_Good

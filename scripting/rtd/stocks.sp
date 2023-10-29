@@ -30,7 +30,9 @@
 *
 * MATH
 * - Min
+* - MinInt
 * - Max
+* - MaxInt
 * - GetPointOnSphere
 * - GetRandomFloatLimit
 *
@@ -67,6 +69,10 @@
 * LOADOUT
 * - IsWearable
 * - DisarmWeapons
+* - GetAmmo
+* - SetAmmo
+* - GetClip
+* - SetClip
 *
 * ENTITY CREATION
 * - CreateEffect
@@ -112,6 +118,9 @@
 * - Homing_AptClass
 */
 
+#include "rtd/macros.sp"
+#include "rtd/storage/precached.sp"
+
 #define LASERBEAM "sprites/laserbeam.vmt"
 #define EMPTY_MODEL "models/empty.mdl"
 
@@ -135,7 +144,6 @@
 */
 ArrayList g_hHoming = null;
 
-int g_iEnergyBallDamageOffset = -1;
 int g_iWaterLevel[MAXPLAYERS +1] = {0, ...};
 ClientFlags g_eMuteNextResupply;
 
@@ -145,8 +153,6 @@ void Stocks_OnMapStart(){
 
 	g_hHoming = new ArrayList(3);
 	HookEvent("teamplay_round_start", Event_Homing_RoundStart);
-
-	g_iEnergyBallDamageOffset = FindSendPropInfo("CTFProjectile_EnergyBall", "m_iDeflected") +4;
 }
 
 bool Stocks_Sound(int client, const char[] sSound){
@@ -243,12 +249,24 @@ stock void TeleportToClient(int iEnt, int client, float fOffset[3]={0.0, 0.0, 36
 * MATH
 */
 
-stock float Min(float f1, float f2){
+stock float Min(const float f1, const float f2)
+{
 	return f1 < f2 ? f1 : f2;
 }
 
-stock float Max(float f1, float f2){
+stock int MinInt(const int i1, const int i2)
+{
+	return i1 < i2 ? i1 : i2;
+}
+
+stock float Max(const float f1, const float f2)
+{
 	return f1 > f2 ? f1 : f2;
+}
+
+stock int MaxInt(const int i1, const int i2)
+{
+	return i1 > i2 ? i1 : i2;
 }
 
 stock void GetPointOnSphere(const float fOrigin[3], const float fDirectionRads[2], float fRadius, float fOut[3]){
@@ -336,7 +354,7 @@ stock void ForceResupplyCrude(const int client, const float fPos[3]){
 		return;
 
 	g_eMuteNextResupply.Set(client);
-	KILL_ENT_IN(iResupply,0.1) // 0.0 (next frame) doesn't work sometimes
+	KILL_ENT_IN(iResupply,0.1); // 0.0 (next frame) doesn't work sometimes
 
 	SetEntPropEnt(iResupply, Prop_Send, "m_hOwnerEntity", client);
 	SDKHook(iResupply, SDKHook_Touch, Stocks_ForceResupplyTouch);
@@ -370,24 +388,30 @@ public Action Stocks_ForceResupplyTouch(int iResupply, int iOther){
 * DAMAGE
 */
 
-stock void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRadius, float fDamage, int iFlags=0, float fSelfDamage=0.0, bool bCheckSight=true, Function call=INVALID_FUNCTION){
+stock void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, float fRadius, float fDamage, int iFlags=0, float fSelfDamage=0.0, bool bCheckSight=true, Function call=INVALID_FUNCTION)
+{
 	fRadius *= fRadius;
 	float fOtherPos[3];
-	for(int i = 1; i <= MaxClients; ++i){
-		if(!IsClientInGame(i))
+	for (int i = 1; i <= MaxClients; ++i)
+	{
+		if (!IsClientInGame(i))
 			continue;
 
 		GetClientAbsOrigin(i, fOtherPos);
-		if(GetVectorDistance(fOrigin, fOtherPos, true) <= fRadius)
-			if(CanPlayerBeHurt(i, iAttacker, fSelfDamage > 0.0))
-				if(!bCheckSight || (bCheckSight && CanEntitySeeTarget(iAttacker, i)))
+		if (GetVectorDistance(fOrigin, fOtherPos, true) <= fRadius)
+			if (CanPlayerBeHurt(i, iAttacker, fSelfDamage > 0.0))
+				if (!bCheckSight || (bCheckSight && CanEntitySeeTarget(iAttacker, i)))
 					TakeDamage(i, iInflictor, iAttacker, i == iAttacker ? fSelfDamage : fDamage, iFlags, call);
 	}
 }
 
-stock void TakeDamage(int client, int iInflictor, int iAttacker, float fDamage, int iFlags, Function call){
+stock void TakeDamage(int client, int iInflictor, int iAttacker, float fDamage, int iFlags, Function call)
+{
 	SDKHooks_TakeDamage(client, iInflictor, iAttacker, fDamage, iFlags);
-	if(call == INVALID_FUNCTION) return;
+
+	if (call == INVALID_FUNCTION)
+		return;
+
 	Call_StartFunction(INVALID_HANDLE, call);
 	Call_PushCell(client);
 	Call_PushCell(iAttacker);
@@ -558,6 +582,31 @@ stock void DisarmWeapons(int client, bool bDisarm){
 		SetEntPropFloat(iWeapon, Prop_Data, "m_flNextPrimaryAttack", fNextAttack);
 		SetEntPropFloat(iWeapon, Prop_Data, "m_flNextSecondaryAttack", fNextAttack);
 	}
+}
+
+stock int GetAmmo(const int client, const int iWeapon)
+{
+	int iAmmoType = GetEntData(iWeapon, PropOffsets.CombatWeaponAmmoType, 1);
+	if (iAmmoType == 4)
+		return -1;
+
+	return GetEntData(client, PropOffsets.PlayerAmmo + iAmmoType * 4);
+}
+
+stock void SetAmmo(const int client, const int iWeapon, const int iAmount)
+{
+	int iOffset = PropOffsets.PlayerAmmo + GetEntData(iWeapon, PropOffsets.CombatWeaponAmmoType, 1) * 4;
+	SetEntData(client, iOffset, iAmount);
+}
+
+stock int GetClip(const int iWeapon)
+{
+	return GetEntData(iWeapon, PropOffsets.WeaponBaseClip);
+}
+
+stock void SetClip(const int iWeapon, const int iAmount)
+{
+	SetEntData(iWeapon, PropOffsets.WeaponBaseClip, iAmount, _, true);
 }
 
 
@@ -836,7 +885,7 @@ stock int GetEffectIndex(const char[] sEffectName){
 	return FindStringIndex(iTable, sEffectName);
 }
 
-stock void SetupTEParticle(const TEParticle eTEParticle, const float fPos[3]){
+stock void SetupTEParticle(const TEParticleId eParticleId, const float fPos[3]){
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecOrigin[0]", fPos[0]);
 	TE_WriteFloat("m_vecOrigin[1]", fPos[1]);
@@ -845,42 +894,42 @@ stock void SetupTEParticle(const TEParticle eTEParticle, const float fPos[3]){
 	TE_WriteFloat("m_vecStart[1]", 0.0);
 	TE_WriteFloat("m_vecStart[2]", 0.0);
 	TE_WriteNum("m_iAttachType", 2); // custom origin, do not follow
-	TE_WriteNum("m_iParticleSystemIndex", GetTEParticleId(eTEParticle));
+	TE_WriteNum("m_iParticleSystemIndex", view_as<int>(eParticleId));
 }
 
-stock void SendTEParticle(const TEParticle eTEParticle, const float fPos[3]){
-	SetupTEParticle(eTEParticle, fPos);
+stock void SendTEParticle(const TEParticleId eParticleId, const float fPos[3]){
+	SetupTEParticle(eParticleId, fPos);
 	TE_SendToAll();
 }
 
-stock void SendTEParticleWithPriority(const TEParticle eTEParticle, const float fPos[3]){
-	SetupTEParticle(eTEParticle, fPos);
+stock void SendTEParticleWithPriority(const TEParticleId eParticleId, const float fPos[3]){
+	SetupTEParticle(eParticleId, fPos);
 	TE_SendToAll(-1.0); // negative values attempt to send the TE on the same tick
 }
 
-stock void SendTEParticleWithPriorityTo(const int client, const TEParticle eTEParticle, const float fPos[3]){
-	SetupTEParticle(eTEParticle, fPos);
+stock void SendTEParticleWithPriorityTo(const int client, const TEParticleId eParticleId, const float fPos[3]){
+	SetupTEParticle(eParticleId, fPos);
 	TE_SendToClient(client, -1.0);
 }
 
-stock void SendTEParticleAttached(const TEParticle eTEParticle, const int iEnt, const int iAttachPoint=0){
+stock void SendTEParticleAttached(const TEParticleId eParticleId, const int iEnt, const int iAttachPoint=0){
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecStart[0]", 0.0);
 	TE_WriteFloat("m_vecStart[1]", 0.0);
 	TE_WriteFloat("m_vecStart[2]", 0.0);
-	TE_WriteNum("m_iParticleSystemIndex", GetTEParticleId(eTEParticle));
+	TE_WriteNum("m_iParticleSystemIndex", view_as<int>(eParticleId));
 	TE_WriteNum("entindex", iEnt);
 	TE_WriteNum("m_iAttachType", iAttachPoint > 0 ? 4 : 1); // follow point or just follow
 	if(iAttachPoint > 0) TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);
 	TE_SendToAll(-1.0);
 }
 
-stock void SendTEParticleLingeringAttached(const TEParticleLingering eTEParticle, const int iEnt, float fPos[3], const int iAttachPoint=0){
+stock void SendTEParticleLingeringAttached(const TEParticleLingeringId eParticleId, const int iEnt, float fPos[3], const int iAttachPoint=0){
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecStart[0]", 0.0);
 	TE_WriteFloat("m_vecStart[1]", 0.0);
 	TE_WriteFloat("m_vecStart[2]", 0.0);
-	TE_WriteNum("m_iParticleSystemIndex", GetTEParticleLingeringId(eTEParticle));
+	TE_WriteNum("m_iParticleSystemIndex", view_as<int>(eParticleId));
 	TE_WriteNum("entindex", iEnt);
 	TE_WriteNum("m_iAttachType", iAttachPoint > 0 ? 4 : 1); // follow point or just follow
 	if(iAttachPoint > 0) TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);

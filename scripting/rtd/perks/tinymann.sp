@@ -16,31 +16,25 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define SCALE 0
-#define BASE 1
+#define BaseScale Float[0]
 
-public void TinyMann_Call(int client, Perk perk, bool apply){
-	if(apply) TinyMann_ApplyPerk(client, perk);
-	else TinyMann_RemovePerk(client);
-}
+DEFINE_CALL_APPLY_REMOVE(TinyMann)
 
-void TinyMann_ApplyPerk(int client, Perk perk){
-	float fScale = perk.GetPrefFloat("scale");
-	float fBase = GetEntPropFloat(client, Prop_Send, "m_flModelScale");
+public void TinyMann_ApplyPerk(const int client, const Perk perk)
+{
+	float fScale = perk.GetPrefFloat("scale", 0.15);
+	Cache[client].BaseScale = GetEntPropFloat(client, Prop_Send, "m_flModelScale");
 
-	SetFloatCache(client, fScale, SCALE);
-	SetFloatCache(client, fBase, BASE);
-
-	TF2Attrib_SetByDefIndex(client, 2048, 1/fScale/2);
+	TF2Attrib_SetByDefIndex(client, Attribs.VoicePitch, 1.0 / fScale / 2.0);
 	SetEntPropFloat(client, Prop_Send, "m_flModelScale", fScale);
 }
 
-void TinyMann_RemovePerk(int client){
-	TF2Attrib_RemoveByDefIndex(client, 2048);
-	SetEntPropFloat(client, Prop_Send, "m_flModelScale", GetFloatCache(client, BASE));
+void TinyMann_RemovePerk(const int client)
+{
+	TF2Attrib_RemoveByDefIndex(client, Attribs.VoicePitch);
+	SetEntPropFloat(client, Prop_Send, "m_flModelScale", Cache[client].BaseScale);
 
 	FixPotentialStuck(client);
 }
 
-#undef SCALE
-#undef BASE
+#undef BaseScale

@@ -16,13 +16,19 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Base Float[0]
 
-public void NoGravity_Call(int client, Perk perk, bool apply){
-	if(apply) NoGravity_ApplyPerk(client);
-	else SetEntityGravity(client, GetFloatCache(client));
-}
+DEFINE_CALL_APPLY_REMOVE(NoGravity)
 
-void NoGravity_ApplyPerk(int client){
-	SetFloatCache(client, GetEntityGravity(client));
+public void NoGravity_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Base = GetEntityGravity(client);
 	SetEntityGravity(client, 0.0001);
 }
+
+public void NoGravity_RemovePerk(const int client)
+{
+	SetEntityGravity(client, Cache[client].Base);
+}
+
+#undef Base

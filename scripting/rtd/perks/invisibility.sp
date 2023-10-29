@@ -16,183 +16,183 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 /*
 	IF YOU TELL ME HOW TO GET THE INSIDE OF THE B.A.S.E. JUMPER TO DISAPPEAR I WILL LOVE YOU FOREVER
 */
 
 #define SOUND_PING "tools/ifm/beep.wav"
 
-#define BASE_ALPHA 0
-#define BASE_SENTRY 1
-#define INVIS_VALUE 2
-#define BLINK_ON_ATTACK 3
+#define BaseAlpha Int[0]
+#define Alpha Int[1]
+#define BlinkOnAttack Int[2]
+#define LastBlink Float[0]
+#define BlinkRate Float[1]
 
-#define LAST_PLAYER_BUMP 0
-#define BLINK_RATE 1
+DEFINE_CALL_APPLY_REMOVE(Invisibility)
 
-int g_iInvisibilityId = 7;
-
-void Invisibility_Start(){
+public void Invisibility_Init(const Perk perk)
+{
 	PrecacheSound(SOUND_PING);
+
+	Events.OnAttackCritCheck(perk, Invisiblity_OnAttackCritCheck);
+	Events.OnResupply(perk, Invisibility_OnResupply);
 }
 
-public void Invisibility_Call(int client, Perk perk, bool apply){
-	if(apply) Invisibility_ApplyPerk(client, perk);
-	else Invisibility_RemovePerk(client);
-}
-
-void Invisibility_ApplyPerk(int client, Perk perk){
-	g_iInvisibilityId = perk.Id;
-	SetClientPerkCache(client, g_iInvisibilityId);
-
-	int iAlpha = perk.GetPrefCell("alpha");
+void Invisibility_ApplyPerk(const int client, const Perk perk)
+{
+	int iAlpha = perk.GetPrefCell("alpha", 0);
 	bool bOnFoe = perk.GetPrefCell("blink_on_foe", 1) > 0;
 	bool bOnBump = perk.GetPrefCell("blink_on_bump", 0) > 0;
 
-	SetIntCache(client, iAlpha, INVIS_VALUE);
-	SetIntCache(client, GetEntityAlpha(client), BASE_ALPHA);
-	SetIntCache(client, GetEntityFlags(client) & FL_NOTARGET, BASE_SENTRY);
-	SetIntCache(client, perk.GetPrefCell("blink_on_fire", 1), BLINK_ON_ATTACK);
-
-	SetFloatCache(client, 0.0, LAST_PLAYER_BUMP);
-	SetFloatCache(client, perk.GetPrefFloat("blink_rate", 0.5), BLINK_RATE);
+	Cache[client].Alpha = iAlpha;
+	Cache[client].BaseAlpha = GetEntityAlpha(client);
+	Cache[client].BlinkOnAttack = perk.GetPrefCell("blink_on_fire", 1);
+	Cache[client].LastBlink = 0.0;
+	Cache[client].BlinkRate = perk.GetPrefFloat("blink_rate", 0.5);
 
 	Invisibility_Set(client, iAlpha);
-	SetSentryTarget(client, false);
+	TF2_AddCondition(client, TFCond_DisguisedAsDispenser);
 	ApplyPreventCapture(client);
 
-	if(bOnFoe && !bOnBump)
+	if (bOnFoe && !bOnBump)
+	{
 		SDKHook(client, SDKHook_StartTouchPost, Invisibility_OnStartTouchPlayerOnly);
-
-	else if(bOnBump)
+	}
+	else if (bOnBump)
+	{
 		SDKHook(client, SDKHook_StartTouchPost, Invisibility_OnStartTouchAny);
+	}
 
-	if(perk.GetPrefCell("blink_on_hurt", 1))
+	if (perk.GetPrefCell("blink_on_hurt", 1))
 		SDKHook(client, SDKHook_OnTakeDamagePost, Invisibility_OnTakeDamage);
 }
 
-void Invisibility_RemovePerk(int client){
-	UnsetClientPerkCache(client, g_iInvisibilityId);
-
+void Invisibility_RemovePerk(const int client)
+{
 	SDKUnhook(client, SDKHook_StartTouchPost, Invisibility_OnStartTouchPlayerOnly);
 	SDKUnhook(client, SDKHook_StartTouchPost, Invisibility_OnStartTouchAny);
 	SDKUnhook(client, SDKHook_OnTakeDamagePost, Invisibility_OnTakeDamage);
 
-	Invisibility_Set(client, GetIntCache(client, BASE_ALPHA));
-	SetSentryTarget(client, !GetIntCacheBool(client, BASE_SENTRY));
+	Invisibility_Set(client, Cache[client].BaseAlpha);
+	TF2_RemoveCondition(client, TFCond_DisguisedAsDispenser);
 	RemovePreventCapture(client);
 }
 
-public void Invisibility_OnStartTouchPlayerOnly(int client, int iOther){
+public void Invisibility_OnStartTouchPlayerOnly(int client, int iOther)
+{
 	char sClassname[24];
 	GetEntityClassname(iOther, sClassname, sizeof(sClassname));
 
-	// can only bump into enemy players
-	if(StrEqual(sClassname, "player"))
+	// can bump into enemy players only
+	if (StrEqual(sClassname, "player"))
 		Invisibility_Blink(client);
 }
 
-public void Invisibility_OnStartTouchAny(int client, int iOther){
+public void Invisibility_OnStartTouchAny(int client, int iOther)
+{
 	Invisibility_Blink(client);
 }
 
-public void Invisibility_OnTakeDamage(int client, int iAttacker){
+public void Invisibility_OnTakeDamage(int client, int iAttacker)
+{
 	Invisibility_Blink(client);
 }
 
-void Invisibility_OnAttack(int client){
-	if(CheckClientPerkCache(client, g_iInvisibilityId) && GetIntCacheBool(client, BLINK_ON_ATTACK))
+public bool Invisiblity_OnAttackCritCheck(const int client, const int iWeapon)
+{
+	if (Cache[client].BlinkOnAttack)
 		Invisibility_Blink(client);
+
+	return false;
 }
 
-void Invisibility_Blink(int client){
+void Invisibility_Blink(const int client)
+{
 	float fEngineTime = GetEngineTime();
-	if(fEngineTime < GetFloatCache(client, LAST_PLAYER_BUMP) + GetFloatCache(client, BLINK_RATE))
+	if (fEngineTime < Cache[client].LastBlink + Cache[client].BlinkRate)
 		return;
 
-	SetFloatCache(client, fEngineTime, LAST_PLAYER_BUMP);
+	Cache[client].LastBlink = fEngineTime;
 
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);
 
 	fPos[2] += 26.0;
 
-	switch(TF2_GetClientTeam(client)){
-		case TFTeam_Red:{
-			SendTEParticleWithPriorityTo(client, TEParticle_SmallPingWithEmbersRed, fPos);
-			SendTEParticleAttached(TEParticle_PlayerStationarySilhouetteRed, client);
+	switch (TF2_GetClientTeam(client))
+	{
+		case TFTeam_Red:
+		{
+			SendTEParticleWithPriorityTo(client, TEParticles.SmallPingWithEmbersRed, fPos);
+			SendTEParticleAttached(TEParticles.PlayerStationarySilhouetteRed, client);
 		}
-		case TFTeam_Blue:{
-			SendTEParticleWithPriorityTo(client, TEParticle_SmallPingWithEmbersBlue, fPos);
-			SendTEParticleAttached(TEParticle_PlayerStationarySilhouetteBlue, client);
+
+		case TFTeam_Blue:
+		{
+			SendTEParticleWithPriorityTo(client, TEParticles.SmallPingWithEmbersBlue, fPos);
+			SendTEParticleAttached(TEParticles.PlayerStationarySilhouetteBlue, client);
 		}
 	}
 
 	EmitSoundToAll(SOUND_PING, client);
 }
 
-void Invisibility_Set(int client, int iValue){
+void Invisibility_Set(const int client, const int iValue)
+{
 	if(GetEntityRenderMode(client) == RENDER_NORMAL)
 		SetEntityRenderMode(client, RENDER_TRANSCOLOR);
 
 	SetEntityAlpha(client, iValue);
 
-	int iWeapon = 0;
-	for(int i = 0; i < 5; i++){
-		iWeapon = GetPlayerWeaponSlot(client, i);
-		if(iWeapon <= MaxClients || !IsValidEntity(iWeapon))
+	for (int i = 0; i < 5; ++i)
+	{
+		int iWeapon = GetPlayerWeaponSlot(client, i);
+		if (iWeapon <= MaxClients || !IsValidEntity(iWeapon))
 			continue;
 
-		if(GetEntityRenderMode(iWeapon) == RENDER_NORMAL)
+		if (GetEntityRenderMode(iWeapon) == RENDER_NORMAL)
 			SetEntityRenderMode(iWeapon, RENDER_TRANSCOLOR);
 
 		SetEntityAlpha(iWeapon, iValue);
 	}
 
 	char sClass[24];
-	for(int i = MaxClients+1; i < GetMaxEntities(); i++){
-		if(!IsCorrectWearable(client, i, sClass, sizeof(sClass)))
+	for (int i = MaxClients + 1; i < GetMaxEntities(); ++i)
+	{
+		if (!IsCorrectWearable(client, i, sClass, sizeof(sClass)))
 			continue;
 
-		if(GetEntityRenderMode(i) == RENDER_NORMAL)
+		if (GetEntityRenderMode(i) == RENDER_NORMAL)
 			SetEntityRenderMode(i, RENDER_TRANSCOLOR);
 
 		SetEntityAlpha(i, iValue);
 	}
 }
 
-void Invisibility_Resupply(int client){
-	if(CheckClientPerkCache(client, g_iInvisibilityId))
-		Invisibility_Set(client, GetIntCache(client, INVIS_VALUE));
+public void Invisibility_OnResupply(const int client)
+{
+	Invisibility_Set(client, Cache[client].Alpha);
 }
 
-bool IsCorrectWearable(int client, int i, char[] sClass, int iBufferSize){
-	if(!IsValidEntity(i))
+stock bool IsCorrectWearable(const int client, const int iEnt, char[] sClass, const int iBufferSize)
+{
+	if (!IsValidEntity(iEnt))
 		return false;
 
-	GetEdictClassname(i, sClass, iBufferSize);
-	if(StrContains(sClass, "tf_wearable", false) < 0 && StrContains(sClass, "tf_powerup", false) < 0)
+	GetEdictClassname(iEnt, sClass, iBufferSize);
+	if (StrContains(sClass, "tf_wearable", false) < 0 && StrContains(sClass, "tf_powerup", false) < 0)
 		return false;
 
-	if(GetEntPropEnt(i, Prop_Send, "m_hOwnerEntity") != client)
+	if (GetEntPropEnt(iEnt, Prop_Send, "m_hOwnerEntity") != client)
 		return false;
 
 	return true;
 }
 
-void SetSentryTarget(int client, bool bTarget){
-	int iFlags = GetEntityFlags(client);
-	if(bTarget) SetEntityFlags(client, iFlags &~ FL_NOTARGET);
-	else SetEntityFlags(client, iFlags | FL_NOTARGET);
-}
-
 #undef SOUND_PING
 
-#undef BASE_ALPHA
-#undef BASE_SENTRY
-#undef INVIS_VALUE
-#undef BLINK_ON_ATTACK
-
-#undef LAST_PLAYER_BUMP
-#undef BLINK_RATE
+#undef BaseAlpha
+#undef Alpha
+#undef BlinkOnAttack
+#undef LastBlink
+#undef BlinkRate

@@ -16,122 +16,109 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define CritCond Int[0]
+#define RangeSquared Float[1]
 
-#define MINICRIT TFCond_Buffed
-#define FULLCRIT TFCond_CritOnFirstBlood
+int g_iTeamCriticalsBoostSourceCount[MAXPLAYERS + 1] = {0, ...};
 
-int g_iCritBoostsGetting[MAXPLAYERS+1] = {0, ...};
-int g_iCritBoostEnt[MAXPLAYERS+1][MAXPLAYERS+1];
-int g_iTeamCriticalsId = 47;
+DEFINE_CALL_APPLY_REMOVE(TeamCriticals)
 
-public void TeamCriticals_Call(int client, Perk perk, bool apply){
-	if(apply) TeamCriticals_ApplyPerk(client, perk);
-	else TeamCriticals_RemovePerk(client);
+public void TeamCriticals_ApplyPerk(const int client, const Perk perk)
+{
+	TFCond eCritType = perk.GetPrefCell("crits", 1) ? TFCond_CritOnFirstBlood : TFCond_Buffed;
+	float fRange = perk.GetPrefFloat("range", 270.0);
+
+	Cache[client].CritCond = view_as<int>(eCritType);
+	Cache[client].RangeSquared = fRange * fRange;
+	Cache[client].Flags.Reset();
+
+	++g_iTeamCriticalsBoostSourceCount[client];
+	TF2_AddCondition(client, eCritType);
+
+	Cache[client].Repeat(0.25, TeamCriticals_SetTargets);
 }
 
-void TeamCriticals_ApplyPerk(int client, Perk perk){
-	g_iTeamCriticalsId = perk.Id;
-	SetClientPerkCache(client, g_iTeamCriticalsId);
+void TeamCriticals_RemovePerk(const int client)
+{
+	--g_iTeamCriticalsBoostSourceCount[client];
+	TF2_RemoveCondition(client, view_as<TFCond>(Cache[client].CritCond));
 
-	TFCond iCritType = perk.GetPrefCell("crits") ? FULLCRIT : MINICRIT;
-	SetIntCache(client, view_as<int>(iCritType));
-	SetFloatCache(client, perk.GetPrefFloat("range"));
-
-	TF2_AddCondition(client, iCritType);
-	++g_iCritBoostsGetting[client];
-
-	CreateTimer(0.25, Timer_DrawBeamsFor, GetClientUserId(client), TIMER_REPEAT);
+	for (int i = 1; i <= MaxClients; ++i)
+		if (IsClientInGame(i))
+			TeamCriticals_UnsetCritBoost(client, i);
 }
 
-void TeamCriticals_RemovePerk(int client){
-	UnsetClientPerkCache(client, g_iTeamCriticalsId);
+public Action TeamCriticals_SetTargets(const int client)
+{
+	TFTeam eTeam = TF2_GetClientTeam(client);
+	float fRangeSquared = Cache[client].RangeSquared;
 
-	TF2_RemoveCondition(client, view_as<TFCond>(GetIntCache(client)));
-	--g_iCritBoostsGetting[client];
+	for (int i = 1; i <= MaxClients; ++i)
+	{
+		if (TeamCriticals_IsValidTarget(client, i, eTeam, fRangeSquared))
+		{
+			TeamCriticals_SetCritBoost(client, i);
+		}
+		else
+		{
+			TeamCriticals_UnsetCritBoost(client, i);
+		}
+	}
 
-	for(int i = 1; i <= MaxClients; i++)
-		if(g_iCritBoostEnt[client][i] > MaxClients)
-			TeamCriticals_SetCritBoost(client, i, false, 0);
-}
-
-public Action Timer_DrawBeamsFor(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iTeamCriticalsId))
-		return Plugin_Stop;
-
-	TeamCriticals_DrawBeamsFor(client);
 	return Plugin_Continue;
 }
 
-void TeamCriticals_DrawBeamsFor(int client){
-	int iTeam = GetClientTeam(client);
-	float fRange = GetFloatCache(client);
-	fRange *= fRange;
+void TeamCriticals_SetCritBoost(int client, int iTarget)
+{
+	if (Cache[client].Flags.Test(iTarget))
+		return;
 
-	for(int i = 1; i <= MaxClients; i++){
-		if(i == client) continue;
-
-		if(!IsClientInGame(i)){
-			if(g_iCritBoostEnt[client][i] > MaxClients)
-				TeamCriticals_SetCritBoost(client, i, false, iTeam);
-			continue;
-		}
-
-		if(!TeamCriticals_IsValidTarget(client, i, iTeam, fRange)){
-			if(g_iCritBoostEnt[client][i] > MaxClients)
-				TeamCriticals_SetCritBoost(client, i, false, iTeam);
-			continue;
-		}
-
-		if(!CanEntitySeeTarget(client, i)){
-			if(g_iCritBoostEnt[client][i] > MaxClients)
-				TeamCriticals_SetCritBoost(client, i, false, iTeam);
-			continue;
-		}
-
-		if(g_iCritBoostEnt[client][i] <= MaxClients)
-			TeamCriticals_SetCritBoost(client, i, true, iTeam);
-	}
+	Cache[client].Flags.Set(iTarget);
+	++g_iTeamCriticalsBoostSourceCount[iTarget];
+	TF2_AddCondition(iTarget, view_as<TFCond>(Cache[client].CritCond));
 }
 
-bool TeamCriticals_IsValidTarget(int client, int iTrg, int iClientTeam, float fRange){
+void TeamCriticals_UnsetCritBoost(int client, int iTarget)
+{
+	if (!Cache[client].Flags.Test(iTarget))
+		return;
+
+	Cache[client].Flags.Unset(iTarget);
+	if (--g_iTeamCriticalsBoostSourceCount[iTarget] <= 0)
+		TF2_RemoveCondition(iTarget, view_as<TFCond>(Cache[client].CritCond));
+}
+
+bool TeamCriticals_IsValidTarget(int client, int iTarget, TFTeam eClientTeam, float fRangeSquared)
+{
+	if (client == iTarget)
+		return false;
+
+	if (!IsClientInGame(iTarget))
+		return false;
+
 	float fPos[3], fEndPos[3];
 	GetClientAbsOrigin(client, fPos);
-	GetClientAbsOrigin(iTrg, fEndPos);
+	GetClientAbsOrigin(iTarget, fEndPos);
 
-	if(GetVectorDistance(fPos, fEndPos, true) > fRange)
+	if (GetVectorDistance(fPos, fEndPos, true) > fRangeSquared)
 		return false;
 
-	if(TF2_IsPlayerInCondition(iTrg, TFCond_Cloaked))
+	if (TF2_IsPlayerInCondition(iTarget, TFCond_Cloaked))
 		return false;
 
-	int iEndTeam = GetClientTeam(iTrg);
-	if(TF2_IsPlayerInCondition(iTrg, TFCond_Disguised))
-		return iClientTeam != iEndTeam;
+	bool bDisguised = TF2_IsPlayerInCondition(iTarget, TFCond_Disguised);
+	bool bSameTeam = eClientTeam == TF2_GetClientTeam(iTarget);
 
-	return iClientTeam == iEndTeam;
+	// Do not draw beam if:
+	// - our friendly Spy is disguised, or
+	// - an enemy Spy is NOT disguised.
+	// This does not account for being able to disguise as the same team.
+	if ((bDisguised && bSameTeam) || (!bDisguised && !bSameTeam))
+		return false;
+
+	// Most expensive call last
+	return CanEntitySeeTarget(client, iTarget);
 }
 
-void TeamCriticals_SetCritBoost(int client, int iTrg, bool bSet, int iTeam){
-	g_iCritBoostsGetting[iTrg] += bSet ? 1 : -1;
-	if(bSet){
-		int iRed = 255, iBlue = 64;
-		if(iTeam == 3){
-			iRed = 64;
-			iBlue = 255;
-		}
-		g_iCritBoostEnt[client][iTrg] = ConnectWithBeam(client, iTrg, iRed, 64, iBlue);
-
-		if(g_iCritBoostsGetting[iTrg] < 2)
-			TF2_AddCondition(iTrg, view_as<TFCond>(GetIntCache(client)));
-	}else{
-		if(IsValidEntity(g_iCritBoostEnt[client][iTrg]))
-			AcceptEntityInput(g_iCritBoostEnt[client][iTrg], "Kill");
-
-		g_iCritBoostEnt[client][iTrg] = 0;
-		if(g_iCritBoostsGetting[iTrg] < 1 && IsValidClient(iTrg))
-			TF2_RemoveCondition(iTrg, view_as<TFCond>(GetIntCache(client)));
-	}
-}
+#undef CritCond
+#undef RangeSquared

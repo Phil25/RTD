@@ -16,53 +16,48 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define ColorRed Int[0]
+#define ColorBlue Int[1]
+#define BaseSpeed Float[0]
+#define SpeedRegainTime Float[1]
+#define Effect EntSlot_1
+#define Glow EntSlot_2
 
-#define ATTRIB_MELEE_RANGE 264
-#define ATTRIB_JUMP_HEIGHT 326
-#define ATTRIB_DAMAGE_FORCE_INCREASE 535
+DEFINE_CALL_APPLY_REMOVE(PowerPlay)
 
-#define BASE_WALK_SPEED 0
-#define SPEED_REGAIN_TIME 1
-
-#define COLOR_RED 0
-#define COLOR_BLU 1
-
-#define EFFECT 0
-#define GLOW 1
-
-int g_iPowerPlayId = 53;
-
-public void PowerPlay_Call(const int client, const Perk perk, const bool apply){
-	if(apply){
-		g_iPowerPlayId = perk.Id;
-		SetClientPerkCache(client, g_iPowerPlayId);
-		SetFloatCache(client, GetBaseSpeed(client), BASE_WALK_SPEED);
-		PowerPlay_ApplyPerk(client);
-	}else{
-		UnsetClientPerkCache(client, g_iPowerPlayId);
-		PowerPlay_RemovePerk(client);
-	}
+public void PowerPlay_Init(const Perk perk)
+{
+	Events.OnAttackCritCheck(perk, PowerPlay_OnAttack);
 }
 
-void PowerPlay_ApplyPerk(const int client){
+public void PowerPlay_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].BaseSpeed = GetBaseSpeed(client);
+
 	SDKHook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
 
 	int iMeleeWeapon = GetPlayerWeaponSlot(client, 2);
-	if(iMeleeWeapon > MaxClients && IsValidEntity(iMeleeWeapon))
+	if (iMeleeWeapon > MaxClients && IsValidEntity(iMeleeWeapon))
 		SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", iMeleeWeapon);
 
-	switch(TF2_GetPlayerClass(client)){
-		case TFClass_Scout:{
+	switch (TF2_GetPlayerClass(client))
+	{
+		case TFClass_Scout:
+		{
 			SDKHook(client, SDKHook_OnTakeDamage, PowerPlay_ResistanceAndSlowdown);
-			TF2Attrib_SetByDefIndex(client, ATTRIB_JUMP_HEIGHT, 1.25);
-			CreateTimer(0.1, Timer_PowerPlaySlowDownCheck, GetClientUserId(client), TIMER_REPEAT);
+			TF2Attrib_SetByDefIndex(client, Attribs.JumpHeight, 1.25);
+			Cache[client].Repeat(0.1, PowerPlay_SlowDownCheck);
 		}
-		case TFClass_Heavy:{
+
+		case TFClass_Heavy:
+		{
 			SDKHook(client, SDKHook_OnTakeDamage, PowerPlay_Resistance);
 		}
-		default:{
+
+		default:
+		{
 			SDKHook(client, SDKHook_OnTakeDamage, PowerPlay_Resistance);
-			TF2Attrib_SetByDefIndex(client, ATTRIB_DAMAGE_FORCE_INCREASE, 40.0);
+			TF2Attrib_SetByDefIndex(client, Attribs.ForceDamageTaken, 40.0);
 		}
 	}
 
@@ -73,57 +68,65 @@ void PowerPlay_ApplyPerk(const int client){
 	TF2_AddCondition(client, TFCond_SpeedBuffAlly);
 
 	int iMelee = GetPlayerWeaponSlot(client, 2);
-	if(iMelee > MaxClients && IsValidEntity(iMelee))
-		TF2Attrib_SetByDefIndex(iMelee, ATTRIB_MELEE_RANGE, 1.1);
+	if (iMelee > MaxClients && IsValidEntity(iMelee))
+		TF2Attrib_SetByDefIndex(iMelee, Attribs.MeleeRange, 1.1);
 
 	ApplyPreventCapture(client);
 
-	switch(TF2_GetClientTeam(client)){
-		case TFTeam_Blue:{
-			SetEntCache(client, CreateParticle(client, "eyeboss_team_blue", true), EFFECT);
-			SetIntCache(client, 150, COLOR_RED)
-			SetIntCache(client, 255, COLOR_BLU)
+	switch (TF2_GetClientTeam(client))
+	{
+		case TFTeam_Red:
+		{
+			Cache[client].SetEnt(Effect, CreateParticle(client, "eyeboss_team_red", true));
+			Cache[client].ColorRed = 255;
+			Cache[client].ColorBlue = 150;
 		}
-		case TFTeam_Red:{
-			SetEntCache(client, CreateParticle(client, "eyeboss_team_red", true), EFFECT);
-			SetIntCache(client, 255, COLOR_RED)
-			SetIntCache(client, 150, COLOR_BLU)
+
+		case TFTeam_Blue:
+		{
+			Cache[client].SetEnt(Effect, CreateParticle(client, "eyeboss_team_blue", true));
+			Cache[client].ColorRed = 150;
+			Cache[client].ColorBlue = 255;
 		}
 	}
 
 	int iGlow = AttachGlow(client);
-	if(iGlow <= MaxClients)
+	if (iGlow <= MaxClients)
 		return;
 
+	Cache[client].SetEnt(Glow, iGlow);
 	SDKHook(client, SDKHook_PostThinkPost, PowerPlay_OnGlowUpdate);
-	SetEntCache(client, iGlow, GLOW);
 }
 
-void PowerPlay_RemovePerk(const int client){
-	KillEntCache(client, EFFECT);
-	KillEntCache(client, GLOW);
-
+void PowerPlay_RemovePerk(const int client)
+{
 	SDKUnhook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
 	SDKUnhook(client, SDKHook_PostThinkPost, PowerPlay_OnGlowUpdate);
 
-	switch(TF2_GetPlayerClass(client)){
-		case TFClass_Scout:{
+	switch (TF2_GetPlayerClass(client))
+	{
+		case TFClass_Scout:
+		{
 			SDKUnhook(client, SDKHook_OnTakeDamage, PowerPlay_ResistanceAndSlowdown);
-			TF2Attrib_RemoveByDefIndex(client, ATTRIB_JUMP_HEIGHT);
-			SetSpeed(client, GetFloatCache(client, BASE_WALK_SPEED));
+			TF2Attrib_RemoveByDefIndex(client, Attribs.JumpHeight);
+			SetSpeed(client, Cache[client].BaseSpeed);
 		}
-		case TFClass_Heavy:{
+
+		case TFClass_Heavy:
+		{
 			SDKUnhook(client, SDKHook_OnTakeDamage, PowerPlay_Resistance);
 		}
-		default:{
+
+		default:
+		{
 			SDKUnhook(client, SDKHook_OnTakeDamage, PowerPlay_Resistance);
-			TF2Attrib_RemoveByDefIndex(client, ATTRIB_DAMAGE_FORCE_INCREASE);
+			TF2Attrib_RemoveByDefIndex(client, Attribs.ForceDamageTaken);
 		}
 	}
 
 	int iMelee = GetPlayerWeaponSlot(client, 2);
-	if(iMelee > MaxClients && IsValidEntity(iMelee))
-		TF2Attrib_RemoveByDefIndex(iMelee, ATTRIB_MELEE_RANGE);
+	if (iMelee > MaxClients && IsValidEntity(iMelee))
+		TF2Attrib_RemoveByDefIndex(iMelee, Attribs.MeleeRange);
 
 	RemovePreventCapture(client);
 
@@ -134,59 +137,56 @@ void PowerPlay_RemovePerk(const int client){
 	TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);
 }
 
-public void PowerPlay_OnGlowUpdate(int client){
-	int iGlow = GetEntCache(client, GLOW);
-	if(iGlow == INVALID_ENT_REFERENCE)
+public void PowerPlay_OnGlowUpdate(const int client)
+{
+	int iGlow = Cache[client].GetEnt(Glow).Index;
+	if (iGlow <= MaxClients)
 		return;
 
 	int iColor[4];
-	iColor[0] = GetIntCache(client, COLOR_RED);
+	iColor[0] = Cache[client].ColorRed;
 	iColor[1] = 150;
-	iColor[2] = GetIntCache(client, COLOR_BLU);
+	iColor[2] = Cache[client].ColorBlue;
 	iColor[3] = RoundToNearest(Cosine(GetGameTime() * 12.0) * 60.0 + 195.0);
 
 	SetVariantColor(iColor);
 	AcceptEntityInput(iGlow, "SetGlowColor");
 }
 
-void PowerPlay_OnAttack(int client){
-	if(!CheckClientPerkCache(client, g_iPowerPlayId))
-		return;
+bool PowerPlay_OnAttack(const int client, const int iWeapon)
+{
+	if (GetPlayerWeaponSlot(client, 2) != iWeapon)
+		return false; // should never happen -- PowerPlay is melee only
 
 	TF2_AddCondition(client, TFCond_LostFooting, 1.0);
+	UserMessages.Shake(client, 10.0, 3.0, 0.4);
 
-	int iClients[2];
-	iClients[0] = client;
-
-	Handle hMsg = StartMessageEx(g_EarthquakeMsgId, iClients, 1);
-	if(hMsg != INVALID_HANDLE){
-		BfWriteByte(hMsg, 0);
-		BfWriteFloat(hMsg, 10.0);
-		BfWriteFloat(hMsg, 3.0);
-		BfWriteFloat(hMsg, 0.4);
-		EndMessage();
-	}
+	return false;
 }
 
-public Action PowerPlay_BlockWeaponSwitch(const int client, const int iWeapon){
+public Action PowerPlay_BlockWeaponSwitch(const int client, const int iWeapon)
+{
 	return Plugin_Handled;
 }
 
-public Action PowerPlay_Resistance(int client, int &iAtk, int &iInflictor, float &fDamage, int &iType){
+public Action PowerPlay_Resistance(int client, int& iAtk, int& iInflictor, float& fDamage, int& iType)
+{
 	fDamage *= 0.025;
 
-	if(iInflictor > MaxClients && IsValidEntity(iInflictor)){
+	if (iInflictor > MaxClients && IsValidEntity(iInflictor))
+	{
 		char sClass[32];
 		GetEntityClassname(iInflictor, sClass, sizeof(sClass));
 
-		if(StrEqual(sClass, "obj_sentrygun"))
+		if (StrEqual(sClass, "obj_sentrygun"))
 			iType |= DMG_PREVENT_PHYSICS_FORCE;
 	}
 
 	return Plugin_Changed;
 }
 
-public Action PowerPlay_ResistanceAndSlowdown(int client, int &iAtk, int &iInflictor, float &fDamage, int &iType){
+public Action PowerPlay_ResistanceAndSlowdown(int client, int& iAtk, int& iInflictor, float& fDamage, int& iType)
+{
 	float fOriginalDamage = fDamage;
 
 	fDamage *= 0.025;
@@ -195,34 +195,23 @@ public Action PowerPlay_ResistanceAndSlowdown(int client, int &iAtk, int &iInfli
 	if(fOriginalDamage < 8.0)
 		return Plugin_Changed;
 
-	SetFloatCache(client, GetEngineTime() + fOriginalDamage / 50.0, SPEED_REGAIN_TIME);
-	SetSpeed(client, GetFloatCache(client, BASE_WALK_SPEED), 0.65);
+	Cache[client].SpeedRegainTime = GetEngineTime() + fOriginalDamage / 50.0;
+	SetSpeed(client, Cache[client].BaseSpeed, 0.65);
 
 	return Plugin_Changed;
 }
 
-public Action Timer_PowerPlaySlowDownCheck(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iPowerPlayId))
-		return Plugin_Stop;
-
-	if(GetEngineTime() > GetFloatCache(client, SPEED_REGAIN_TIME))
-		SetSpeed(client, GetFloatCache(client, BASE_WALK_SPEED));
+public Action PowerPlay_SlowDownCheck(const int client)
+{
+	if (GetEngineTime() > Cache[client].SpeedRegainTime)
+		SetSpeed(client, Cache[client].BaseSpeed);
 
 	return Plugin_Continue;
 }
 
-#undef ATTRIB_MELEE_RANGE
-#undef ATTRIB_JUMP_HEIGHT
-#undef ATTRIB_DAMAGE_FORCE_INCREASE
-
-#undef BASE_WALK_SPEED
-#undef SPEED_REGAIN_TIME
-
-#undef COLOR_RED
-#undef COLOR_BLU
-
-#undef EFFECT
-#undef GLOW
+#undef ColorRed
+#undef ColorBlue
+#undef BaseSpeed
+#undef SpeedRegainTime
+#undef Effect
+#undef Glow

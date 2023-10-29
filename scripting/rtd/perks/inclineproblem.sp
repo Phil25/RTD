@@ -16,10 +16,19 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define BaseStepSize Float[0]
 
-public void InclineProblem_Call(int client, Perk perk, bool apply){
-	if(apply){
-		SetFloatCache(client, GetEntPropFloat(client, Prop_Send, "m_flStepSize"));
-		SetEntPropFloat(client, Prop_Send, "m_flStepSize", 1.0);
-	}else SetEntPropFloat(client, Prop_Send, "m_flStepSize", GetFloatCache(client));
+DEFINE_CALL_APPLY_REMOVE(InclineProblem)
+
+public void InclineProblem_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].BaseStepSize = GetEntPropFloat(client, Prop_Send, "m_flStepSize");
+	SetEntPropFloat(client, Prop_Send, "m_flStepSize", 1.0);
 }
+
+public void InclineProblem_RemovePerk(const int client)
+{
+	SetEntPropFloat(client, Prop_Send, "m_flStepSize", Cache[client].BaseStepSize);
+}
+
+#undef BaseStepSize

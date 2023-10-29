@@ -16,14 +16,18 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 /*
 	THESE FUNCTIONS ARE ENTIRELY MADE BY Pelipoika IN HIS PLUGIN "Necromasher":
 	https://forums.alliedmods.net/showthread.php?p=2300875
 	All credits go to him!
 */
 
-void NecroMash_Start(){
+#include "rtd/macros.sp"
+
+DEFINE_CALL_APPLY(NecroMash)
+
+public void NecroMash_Init(const Perk perk)
+{
 	PrecacheModel("models/props_halloween/hammer_gears_mechanism.mdl");
 	PrecacheModel("models/props_halloween/hammer_mechanism.mdl");
 	PrecacheModel("models/props_halloween/bell_button.mdl");
@@ -35,26 +39,33 @@ void NecroMash_Start(){
 	PrecacheSound("doors/vent_open2.wav");
 }
 
-public void NecroMash_Call(int client, Perk perk, bool apply){
-	if(!apply) return;
-
-	if(GetEntPropEnt(client, Prop_Send, "m_hGroundEntity") > -1)
+public void NecroMash_ApplyPerk(const int client, const Perk perk)
+{
+	if (GetEntPropEnt(client, Prop_Send, "m_hGroundEntity") > -1)
+	{
 		NecroMash_SmashClient(client);
-	else CreateTimer(0.1, Timer_NecroMash_Retry, GetClientUserId(client), TIMER_REPEAT);
+	}
+	else
+	{
+		CreateTimer(0.1, Timer_NecroMash_Retry, GetClientUserId(client), TIMER_REPEAT);
+	}
 }
 
-public Action Timer_NecroMash_Retry(Handle hTimer, int iUserId){
+public Action Timer_NecroMash_Retry(Handle hTimer, const int iUserId)
+{
 	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
+	if (!client)
+		return Plugin_Stop;
 
-	if(GetEntProp(client, Prop_Send, "m_hGroundEntity") < 0)
+	if (GetEntProp(client, Prop_Send, "m_hGroundEntity") < 0)
 		return Plugin_Continue;
 
 	NecroMash_SmashClient(client);
 	return Plugin_Stop;
 }
 
-void NecroMash_SmashClient(int client){
+void NecroMash_SmashClient(const int client)
+{
 	float flPos[3], flPpos[3], flAngles[3];
 	GetClientAbsOrigin(client, flPos);
 	GetClientAbsOrigin(client, flPpos);
@@ -68,24 +79,27 @@ void NecroMash_SmashClient(int client){
 	flPos[2] -= (vForward[2] * 750);
 
 	flPos[2] += 350.0;
-	int gears = CreateEntityByName("prop_dynamic");
-	if(IsValidEntity(gears)){
-		DispatchKeyValueVector(gears, "origin", flPos);
-		DispatchKeyValueVector(gears, "angles", flAngles);
-		DispatchKeyValue(gears, "model", "models/props_halloween/hammer_gears_mechanism.mdl");
-		DispatchSpawn(gears);
+	int iGears = CreateEntityByName("prop_dynamic");
+	if (IsValidEntity(iGears))
+	{
+		DispatchKeyValueVector(iGears, "origin", flPos);
+		DispatchKeyValueVector(iGears, "angles", flAngles);
+		DispatchKeyValue(iGears, "model", "models/props_halloween/hammer_gears_mechanism.mdl");
+		DispatchSpawn(iGears);
 	}
 
-	int hammer = CreateEntityByName("prop_dynamic");
-	if(IsValidEntity(hammer)){
-		DispatchKeyValueVector(hammer, "origin", flPos);
-		DispatchKeyValueVector(hammer, "angles", flAngles);
-		DispatchKeyValue(hammer, "model", "models/props_halloween/hammer_mechanism.mdl");
-		DispatchSpawn(hammer);
+	int iHammer = CreateEntityByName("prop_dynamic");
+	if (IsValidEntity(iHammer))
+	{
+		DispatchKeyValueVector(iHammer, "origin", flPos);
+		DispatchKeyValueVector(iHammer, "angles", flAngles);
+		DispatchKeyValue(iHammer, "model", "models/props_halloween/hammer_mechanism.mdl");
+		DispatchSpawn(iHammer);
 	}
 
-	int button = CreateEntityByName("prop_dynamic");
-	if(IsValidEntity(button)){
+	int iButton = CreateEntityByName("prop_dynamic");
+	if (IsValidEntity(iButton))
+	{
 		flPos[0] += (vForward[0] * 600);
 		flPos[1] += (vForward[1] * 600);
 		flPos[2] += (vForward[2] * 600);
@@ -93,131 +107,129 @@ void NecroMash_SmashClient(int client){
 		flPos[2] -= 100.0;
 		flAngles[1] += 180.0;
 
-		DispatchKeyValueVector(button, "origin", flPos);
-		DispatchKeyValueVector(button, "angles", flAngles);
-		DispatchKeyValue(button, "model", "models/props_halloween/bell_button.mdl");
-		DispatchSpawn(button);
+		DispatchKeyValueVector(iButton, "origin", flPos);
+		DispatchKeyValueVector(iButton, "angles", flAngles);
+		DispatchKeyValue(iButton, "model", "models/props_halloween/bell_button.mdl");
+		DispatchSpawn(iButton);
 
 		Handle pack;
 		CreateDataTimer(1.3, Timer_NecroMash_Hit, pack);
-		WritePackFloat(pack, flPpos[0]); //Position of effects
-		WritePackFloat(pack, flPpos[1]); //Position of effects
-		WritePackFloat(pack, flPpos[2]); //Position of effects
+		WritePackFloat(pack, flPpos[0]); // Position of effects
+		WritePackFloat(pack, flPpos[1]); // Position of effects
+		WritePackFloat(pack, flPpos[2]); // Position of effects
 
 		Handle pack2;
 		CreateDataTimer(1.0, Timer_NecroMash_Whoosh, pack2);
-		WritePackFloat(pack2, flPpos[0]); //Position of effects
-		WritePackFloat(pack2, flPpos[1]); //Position of effects
-		WritePackFloat(pack2, flPpos[2]); //Position of effects
+		WritePackFloat(pack2, flPpos[0]); // Position of effects
+		WritePackFloat(pack2, flPpos[1]); // Position of effects
+		WritePackFloat(pack2, flPpos[2]); // Position of effects
 
 		EmitSoundToAll("misc/halloween/strongman_fast_swing_01.wav", _, _, _, _, _, _, _, flPpos);
 	}
 
 	SetVariantString("OnUser2 !self:SetAnimation:smash:0:1");
-	AcceptEntityInput(gears, "AddOutput");
-	AcceptEntityInput(gears, "FireUser2");
+	AcceptEntityInput(iGears, "AddOutput");
+	AcceptEntityInput(iGears, "FireUser2");
 
 	SetVariantString("OnUser2 !self:SetAnimation:smash:0:1");
-	AcceptEntityInput(hammer, "AddOutput");
-	AcceptEntityInput(hammer, "FireUser2");
+	AcceptEntityInput(iHammer, "AddOutput");
+	AcceptEntityInput(iHammer, "FireUser2");
 
 	SetVariantString("OnUser2 !self:SetAnimation:hit:1.3:1");
-	AcceptEntityInput(button, "AddOutput");
-	AcceptEntityInput(button, "FireUser2");
+	AcceptEntityInput(iButton, "AddOutput");
+	AcceptEntityInput(iButton, "FireUser2");
 
-	KILL_ENT_IN(gears,5.0)
-	KILL_ENT_IN(hammer,5.0)
-	KILL_ENT_IN(button,5.0)
+	KILL_ENT_IN(iGears,5.0);
+	KILL_ENT_IN(iHammer,5.0);
+	KILL_ENT_IN(iButton,5.0);
 }
 
-public Action Timer_NecroMash_Hit(Handle timer, any pack){
-	ResetPack(pack);
+public Action Timer_NecroMash_Hit(Handle hTimer, any hPack)
+{
+	ResetPack(hPack);
 
-	float pos[3];
-	pos[0] = ReadPackFloat(pack);
-	pos[1] = ReadPackFloat(pack);
-	pos[2] = ReadPackFloat(pack);
+	float fPos[3];
+	fPos[0] = ReadPackFloat(hPack);
+	fPos[1] = ReadPackFloat(hPack);
+	fPos[2] = ReadPackFloat(hPack);
 
-	int shaker = CreateEntityByName("env_shake");
-	if(shaker != -1){
-		DispatchKeyValue(shaker, "amplitude", "10");
-		DispatchKeyValue(shaker, "radius", "1500");
-		DispatchKeyValue(shaker, "duration", "1");
-		DispatchKeyValue(shaker, "frequency", "2.5");
-		DispatchKeyValue(shaker, "spawnflags", "4");
-		DispatchKeyValueVector(shaker, "origin", pos);
+	int iShaker = CreateEntityByName("env_shake");
+	if (iShaker != -1)
+	{
+		DispatchKeyValue(iShaker, "amplitude", "10");
+		DispatchKeyValue(iShaker, "radius", "1500");
+		DispatchKeyValue(iShaker, "duration", "1");
+		DispatchKeyValue(iShaker, "frequency", "2.5");
+		DispatchKeyValue(iShaker, "spawnflags", "4");
+		DispatchKeyValueVector(iShaker, "origin", fPos);
 
-		DispatchSpawn(shaker);
-		AcceptEntityInput(shaker, "StartShake");
+		DispatchSpawn(iShaker);
+		AcceptEntityInput(iShaker, "StartShake");
 
-		KILL_ENT_IN(shaker,1.0)
+		KILL_ENT_IN(iShaker,1.0);
 	}
 
-	EmitSoundToAll("ambient/explosions/explode_1.wav", _, _, _, _, _, _, _, pos);
-	EmitSoundToAll("misc/halloween/strongman_fast_impact_01.wav", _, _, _, _, _, _, _, pos);
+	EmitSoundToAll("ambient/explosions/explode_1.wav", _, _, _, _, _, _, _, fPos);
+	EmitSoundToAll("misc/halloween/strongman_fast_impact_01.wav", _, _, _, _, _, _, _, fPos);
 
-	float pos2[3], Vec[3], AngBuff[3];
-	for(int i = 1; i <= MaxClients; i++){
-		if(IsClientInGame(i) && IsPlayerAlive(i)){
-			GetClientAbsOrigin(i, pos2);
-			if(GetVectorDistance(pos, pos2) <= 500.0){
-				MakeVectorFromPoints(pos, pos2, Vec);
-				GetVectorAngles(Vec, AngBuff);
-				AngBuff[0] -= 30.0;
-				GetAngleVectors(AngBuff, Vec, NULL_VECTOR, NULL_VECTOR);
-				NormalizeVector(Vec, Vec);
-				ScaleVector(Vec, 500.0);
-				Vec[2] += 250.0;
-				TeleportEntity(i, NULL_VECTOR, NULL_VECTOR, Vec);
+	float fPos2[3], fVec[3], fAngBuff[3];
+	for (int i = 1; i <= MaxClients; ++i)
+	{
+		if (IsClientInGame(i) && IsPlayerAlive(i))
+		{
+			GetClientAbsOrigin(i, fPos2);
+			if (GetVectorDistance(fPos, fPos2) <= 500.0)
+			{
+				MakeVectorFromPoints(fPos, fPos2, fVec);
+				GetVectorAngles(fVec, fAngBuff);
+				fAngBuff[0] -= 30.0;
+				GetAngleVectors(fAngBuff, fVec, NULL_VECTOR, NULL_VECTOR);
+				NormalizeVector(fVec, fVec);
+				ScaleVector(fVec, 500.0);
+				fVec[2] += 250.0;
+				TeleportEntity(i, NULL_VECTOR, NULL_VECTOR, fVec);
 			}
 
-			if(GetVectorDistance(pos, pos2) <= 60.0)
-				SDKHooks_TakeDamage(i, i, i, 999999.0, DMG_CLUB|DMG_ALWAYSGIB|DMG_BLAST);
+			if (GetVectorDistance(fPos, fPos2) <= 60.0)
+				SDKHooks_TakeDamage(i, i, i, 999999.0, DMG_CLUB | DMG_ALWAYSGIB | DMG_BLAST);
 		}
 	}
 
-	pos[2] += 10.0;
-	NecroMash_CreateParticle("hammer_impact_button", pos);
-	NecroMash_CreateParticle("hammer_bones_kickup", pos);
+	fPos[2] += 10.0;
+	NecroMash_CreateParticle("hammer_impact_button", fPos);
+	NecroMash_CreateParticle("hammer_bones_kickup", fPos);
 
 	return Plugin_Stop;
 }
 
-public Action Timer_NecroMash_Whoosh(Handle timer, any pack){
-	ResetPack(pack);
+public Action Timer_NecroMash_Whoosh(Handle hTimer, any hPack)
+{
+	ResetPack(hPack);
 
-	float pos[3];
-	pos[0] = ReadPackFloat(pack);
-	pos[1] = ReadPackFloat(pack);
-	pos[2] = ReadPackFloat(pack);
+	float fPos[3];
+	fPos[0] = ReadPackFloat(hPack);
+	fPos[1] = ReadPackFloat(hPack);
+	fPos[2] = ReadPackFloat(hPack);
 
-	EmitSoundToAll("misc/halloween/strongman_fast_whoosh_01.wav", _, _, _, _, _, _, _, pos);
+	EmitSoundToAll("misc/halloween/strongman_fast_whoosh_01.wav", _, _, _, _, _, _, _, fPos);
 
 	return Plugin_Stop;
 }
 
-stock void NecroMash_CreateParticle(char[] particle, float pos[3]){
-	int tblidx = FindStringTable("ParticleEffectNames");
-	char tmp[256];
-	int count = GetStringTableNumStrings(tblidx);
-	int stridx = INVALID_STRING_INDEX;
+stock void NecroMash_CreateParticle(const char[] sParticle, float fPos[3])
+{
+	int iParticleId = GetEffectIndex(sParticle);
 
-	for(int i = 0; i < count; i++){
-		ReadStringTable(tblidx, i, tmp, sizeof(tmp));
-		if(StrEqual(tmp, particle, false)){
-			stridx = i;
-			break;
-		}
-	}
+	for (int i = 1; i <= MaxClients; ++i)
+	{
+		if (!IsClientInGame(i))
+			continue;
 
-	for(int i = 1; i <= MaxClients; i++){
-		if(!IsValidEntity(i)) continue;
-		if(!IsClientInGame(i)) continue;
 		TE_Start("TFParticleEffect");
-		TE_WriteFloat("m_vecOrigin[0]", pos[0]);
-		TE_WriteFloat("m_vecOrigin[1]", pos[1]);
-		TE_WriteFloat("m_vecOrigin[2]", pos[2]);
-		TE_WriteNum("m_iParticleSystemIndex", stridx);
+		TE_WriteFloat("m_vecOrigin[0]", fPos[0]);
+		TE_WriteFloat("m_vecOrigin[1]", fPos[1]);
+		TE_WriteFloat("m_vecOrigin[2]", fPos[2]);
+		TE_WriteNum("m_iParticleSystemIndex", iParticleId);
 		TE_WriteNum("entindex", -1);
 		TE_WriteNum("m_iAttachType", 2);
 		TE_SendToClient(i, 0.0);

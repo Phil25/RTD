@@ -16,92 +16,96 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "rtd/macros.sp"
+
 #define SOUND_PUMPKIN_EXPLODE "weapons/cow_mangler_explode.wav"
 #define SOUND_PUMPKIN_SPAWN "misc/halloween/merasmus_appear.wav"
 #define MODEL_PUMPKIN "models/props_halloween/pumpkin_explode.mdl"
 #define PUMPKIN_DISTANCE 100.0
 
-// int cache
-#define SPAWN_INDEX 0
-#define SPAWN_LIMIT 1
+#define SpawnAmount Int[0]
+#define Rate Float[0]
+#define Range Float[1]
+#define Damage Float[2]
+#define LastAttack Float[3]
 
-// float cache
-#define RATE 0
-#define RANGE 1
-#define DAMAGE 2
-#define LAST_ATTACK 3
+DEFINE_CALL_APPLY(PumpkinTrail)
 
-int g_iPumpkinTrailId = 70;
-
-void PumpkinTrail_Start(){
+public void PumpkinTrail_Init(const Perk perk)
+{
 	PrecacheModel(MODEL_PUMPKIN);
 	PrecacheSound(SOUND_PUMPKIN_EXPLODE);
 	PrecacheSound(SOUND_PUMPKIN_SPAWN);
+
+	Events.OnVoice(perk, PumpkinTrail_OnVoice);
 }
 
-public void PumpkinTrail_Call(int client, Perk perk, bool apply){
-	if(apply) PumpkinTrail_ApplyPerk(client, perk);
-	else UnsetClientPerkCache(client, g_iPumpkinTrailId);
-}
-
-public void PumpkinTrail_ApplyPerk(int client, Perk perk){
-	g_iPumpkinTrailId = perk.Id;
-	SetClientPerkCache(client, g_iPumpkinTrailId);
-
-	SetFloatCache(client, perk.GetPrefFloat("rate"), RATE);
-	SetFloatCache(client, perk.GetPrefFloat("range"), RANGE);
-	SetFloatCache(client, perk.GetPrefFloat("damage"), DAMAGE);
-	SetFloatCache(client, 0.0, LAST_ATTACK);
-	SetIntCache(client, perk.GetPrefCell("amount"), SPAWN_LIMIT);
+void PumpkinTrail_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].SpawnAmount = perk.GetPrefCell("amount", 5);
+	Cache[client].Rate = perk.GetPrefFloat("rate", 3.0);
+	Cache[client].Range = perk.GetPrefFloat("range", 150.0);
+	Cache[client].Damage = perk.GetPrefFloat("damage", 80.0);
+	Cache[client].LastAttack = 0.0;
 
 	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
 }
 
-void PumpkinTrail_Voice(int client){
-	if(!CheckClientPerkCache(client, g_iPumpkinTrailId))
-		return;
-
+void PumpkinTrail_OnVoice(const int client)
+{
 	float fTime = GetEngineTime();
-	if(fTime < GetFloatCache(client, LAST_ATTACK) +GetFloatCache(client, RATE))
+	if (fTime < Cache[client].LastAttack + Cache[client].Rate)
 		return;
 
-	SetFloatCache(client, fTime, LAST_ATTACK);
-	SetIntCache(client, 0, SPAWN_INDEX);
+	Cache[client].LastAttack = fTime;
 
-	CreateTimer(0.25, Timer_PumpkinTrail_Spawn, GetClientUserId(client), TIMER_REPEAT);
+	DataPack hData = new DataPack();
+	hData.WriteCell(Cache[client].SpawnAmount);
+	hData.WriteCell(GetClientUserId(client));
+	hData.WriteCell(Cache[client].SpawnAmount);
+	hData.WriteFloat(Cache[client].Range);
+	hData.WriteFloat(Cache[client].Damage);
+
+	CreateTimer(0.25, Timer_PumpkinTrail_Spawn, hData, TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
 }
 
-public Action Timer_PumpkinTrail_Spawn(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
+public Action Timer_PumpkinTrail_Spawn(Handle hTimer, DataPack hData)
+{
+	hData.Reset();
+	int iLeftIndex = hData.ReadCell() - 1;
+	int client = GetClientOfUserId(hData.ReadCell());
 
-	if(!CheckClientPerkCache(client, g_iPumpkinTrailId))
+	if (iLeftIndex <= 0 || !client || !IsPlayerAlive(client))
 		return Plugin_Stop;
 
-	int iSpawnIndex = GetIntCache(client, SPAWN_INDEX);
-	PumpkinTrail_SpawnOffset(client, ++iSpawnIndex);
-	SetIntCache(client, iSpawnIndex, SPAWN_INDEX);
+	int iMaxIndex = hData.ReadCell();
+	float fRange = hData.ReadFloat();
+	float fDamage = hData.ReadFloat();
 
-	if(iSpawnIndex < GetIntCache(client, SPAWN_LIMIT))
-		return Plugin_Continue;
-	else return Plugin_Stop;
+	hData.Reset();
+	hData.WriteCell(iLeftIndex);
+
+	PumpkinTrail_SpawnOffset(client, iMaxIndex - iLeftIndex, fRange, fDamage);
+	return Plugin_Continue;
 }
 
-void PumpkinTrail_SpawnOffset(int client, int iSpawnIndex){
+void PumpkinTrail_SpawnOffset(const int client, const int iSpawnIndex, const float fRange, const float fDamage)
+{
 	float fPos[3], fAng[3], fFwd[3];
 	GetClientAbsOrigin(client, fPos);
 	GetClientAbsAngles(client, fAng);
 	GetAngleVectors(fAng, fFwd, NULL_VECTOR, NULL_VECTOR);
 
-	fPos[0] += PUMPKIN_DISTANCE *fFwd[0] *iSpawnIndex;
-	fPos[1] += PUMPKIN_DISTANCE *fFwd[1] *iSpawnIndex;
+	fPos[0] += PUMPKIN_DISTANCE * fFwd[0] * iSpawnIndex;
+	fPos[1] += PUMPKIN_DISTANCE * fFwd[1] * iSpawnIndex;
 
-	PumpkinTrail_Spawn(client, fPos);
+	PumpkinTrail_Spawn(client, fPos, fRange, fDamage);
 }
 
-void PumpkinTrail_Spawn(int client, float fPos[3]){
+void PumpkinTrail_Spawn(const int client, float fPos[3], const float fRange, const float fDamage)
+{
 	int iPumpkin = CreateEntityByName("prop_dynamic");
-	if(iPumpkin <= MaxClients)
+	if (iPumpkin <= MaxClients)
 		return;
 
 	SetEntityModel(iPumpkin, MODEL_PUMPKIN);
@@ -110,7 +114,8 @@ void PumpkinTrail_Spawn(int client, float fPos[3]){
 
 	SetEntPropEnt(iPumpkin, Prop_Send, "m_hOwnerEntity", client);
 
-	if(!CanEntitySeeTarget(iPumpkin, client)){
+	if (!CanEntitySeeTarget(iPumpkin, client))
+	{
 		AcceptEntityInput(iPumpkin, "Kill");
 		return;
 	}
@@ -118,37 +123,46 @@ void PumpkinTrail_Spawn(int client, float fPos[3]){
 	EmitSoundToAll(SOUND_PUMPKIN_SPAWN, iPumpkin, _, _, _, _, 200);
 	CreateEffect(fPos, "ghost_appearation");
 
-	CreateTimer(1.0, Timer_PumpkinTrail_Detonate, EntIndexToEntRef(iPumpkin));
-	KILL_ENT_IN(iPumpkin,1.1)
+	DataPack hData = new DataPack();
+	hData.WriteCell(EntIndexToEntRef(iPumpkin));
+	hData.WriteFloat(fRange);
+	hData.WriteFloat(fDamage);
+
+	CreateTimer(1.0, Timer_PumpkinTrail_Detonate, hData, TIMER_DATA_HNDL_CLOSE);
+	KILL_ENT_IN(iPumpkin,1.1);
 }
 
-public Action Timer_PumpkinTrail_Detonate(Handle hTimer, int iRef){
-	int iPumpkin = EntRefToEntIndex(iRef);
-	if(iPumpkin <= MaxClients)
+public Action Timer_PumpkinTrail_Detonate(Handle hTimer, DataPack hData)
+{
+	hData.Reset();
+	int iPumpkin = EntRefToEntIndex(hData.ReadCell());
+
+	if (iPumpkin <= MaxClients)
 		return Plugin_Stop;
 
 	float fPos[3];
 	GetEntPropVector(iPumpkin, Prop_Send, "m_vecOrigin", fPos);
 	int client = GetEntPropEnt(iPumpkin, Prop_Send, "m_hOwnerEntity");
 
-	PumpkinTrail_Detonate(client, iPumpkin, fPos);
+	float fRange = hData.ReadFloat();
+	float fDamage = hData.ReadFloat();
+
+	CreateEffect(fPos, "ExplosionCore_MidAir");
+	EmitSoundToAll(SOUND_PUMPKIN_EXPLODE, iPumpkin, _, _, _, _, 200);
+	DamageRadius(fPos, iPumpkin, client, fRange, fDamage);
+
 	AcceptEntityInput(iPumpkin, "Kill");
 
 	return Plugin_Stop;
 }
 
-void PumpkinTrail_Detonate(int client, int iPumpkin, float fPos[3]){
-	CreateEffect(fPos, "ExplosionCore_MidAir");
-	EmitSoundToAll(SOUND_PUMPKIN_EXPLODE, iPumpkin, _, _, _, _, 200);
+#undef SOUND_PUMPKIN_EXPLODE
+#undef SOUND_PUMPKIN_SPAWN
+#undef MODEL_PUMPKIN
+#undef PUMPKIN_DISTANCE
 
-	float fRange = GetFloatCache(client, RANGE);
-	float fDamage = GetFloatCache(client, DAMAGE);
-	DamageRadius(fPos, iPumpkin, client, fRange, fDamage);
-}
-
-#undef SPAWN_INDEX
-#undef SPAWN_LIMIT
-#undef RATE
-#undef RANGE
-#undef DAMAGE
-#undef LAST_ATTACK
+#undef SpawnAmount
+#undef Rate
+#undef Range
+#undef Damage
+#undef LastAttack

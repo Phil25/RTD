@@ -16,7 +16,9 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+DEFINE_CALL_APPLY(LowHealth)
 
-public void LowHealth_Call(int client, Perk perk, bool apply){
-	if(apply) SetEntityHealth(client, perk.GetPrefCell("health"));
+public void LowHealth_ApplyPerk(const int client, const Perk perk)
+{
+	SetEntityHealth(client, perk.GetPrefCell("health", 7));
 }

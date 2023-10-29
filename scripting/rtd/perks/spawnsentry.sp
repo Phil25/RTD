@@ -16,145 +16,120 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Level Int[0]
+#define Cleanup Int[1]
+#define Max Int[2]
+#define Spawned Int[3]
 
-#define LEVEL 0
-#define KEEP 1
-#define AMOUNT 2
+DEFINE_CALL_APPLY(SpawnSentry)
 
-int g_iSpawnSentryId = 12;
-
-public void SpawnSentry_Call(int client, Perk perk, bool apply){
-	if(apply) SpawnSentry_ApplyPerk(client, perk);
-	else SpawnSentry_RemovePerk(client);
+public void SpawnSentry_Init(const Perk perk)
+{
+	Events.OnVoice(perk, SpawnSentry_OnVoice);
 }
 
-void SpawnSentry_ApplyPerk(int client, Perk perk){
-	g_iSpawnSentryId = perk.Id;
-	SetClientPerkCache(client, g_iSpawnSentryId);
+public void SpawnSentry_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Level = perk.GetPrefCell("level", 2);
+	Cache[client].Cleanup = perk.GetPrefCell("keep", 0) > 0 ? view_as<int>(EntCleanup_None) : view_as<int>(EntCleanup_Auto);
+	Cache[client].Max = MinInt(perk.GetPrefCell("amount", 1), view_as<int>(EntSlot_SIZE));
+	Cache[client].Spawned = 0;
 
-	SetIntCache(client, perk.GetPrefCell("level"), LEVEL);
-	SetIntCache(client, perk.GetPrefCell("keep") > 0, KEEP);
-	SetIntCache(client, perk.GetPrefCell("amount"), AMOUNT);
-
-	PrepareArrayCache(client);
-
-	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Sentry_Initialization", LANG_SERVER, 0x03, 0x01);
+	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Sentry_Initialization", LANG_SERVER, 0x03, 0x01);
 }
 
-void SpawnSentry_RemovePerk(int client){
-	UnsetClientPerkCache(client, g_iSpawnSentryId);
+void SpawnSentry_OnVoice(const int client)
+{
+	int iSpawned = Cache[client].Spawned;
+	int iMax = Cache[client].Max;
 
-	if(GetIntCacheBool(client, KEEP))
-		return;
-
-	ArrayList list = GetArrayCache(client);
-	int iLen = list.Length;
-	for(int i = 0; i < iLen; i++){
-		int iEnt = EntRefToEntIndex(list.Get(i));
-		if(iEnt > MaxClients && IsValidEntity(iEnt))
-			AcceptEntityInput(iEnt, "Kill");
-	}
-}
-
-void SpawnSentry_Voice(int client){
-	if(!CheckClientPerkCache(client, g_iSpawnSentryId))
+	if (iSpawned >= iMax)
 		return;
 
 	float fPos[3];
-	if(!GetClientLookPosition(client, fPos))
+	if (!GetClientLookPosition(client, fPos))
 		return;
 
-	if(!CanBuildAtPos(fPos, true))
+	if (!CanBuildAtPos(fPos, true))
 		return;
 
-	float fSentryAng[3], fClientAng[3];
-	GetClientEyeAngles(client, fClientAng);
-	fSentryAng[1] = fClientAng[1];
+	float fAng[3];
+	GetClientEyeAngles(client, fAng);
+	fAng[0] = 0.0;
+	fAng[2] = 0.0;
 
-	int iLevel = GetIntCache(client, LEVEL);
-	int iSentry = SpawnSentry(client, fPos, fSentryAng, iLevel > 0 ? iLevel : 1, iLevel == 0);
+	int iLvl = Cache[client].Level;
+	int iSentry = SpawnSentry(client, fPos, fAng, iLvl > 0 ? iLvl : 1, iLvl == 0);
 
-	ArrayList list = GetArrayCache(client);
-	list.Push(EntIndexToEntRef(iSentry));
+	Cache[client].SetEnt(view_as<EntSlot>(iSpawned++), iSentry, view_as<EntCleanup>(Cache[client].Cleanup))
+	Cache[client].Spawned = iSpawned;
 
-	int iSpawned = list.Length;
-	int iMax = GetIntCache(client, AMOUNT);
+	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Sentry_Spawned", LANG_SERVER, 0x03, iSpawned, iMax, 0x01);
 
-	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Sentry_Spawned", LANG_SERVER, 0x03, iSpawned, iMax, 0x01);
-
-	if(iSpawned < iMax)
+	if (iSpawned < iMax)
 		return;
 
-	if(GetIntCacheBool(client, KEEP))
+	if (view_as<EntCleanup>(Cache[client].Cleanup) == EntCleanup_None)
+	{
+		// We can remove the perk early if Sentries are to be kept
 		ForceRemovePerk(client);
-	else UnsetClientPerkCache(client, g_iSpawnSentryId);
+	}
 }
 
 /*
 	The SpawnSentry stock is taken from Pelipoika's TF2 Building Spawner EXTREME
 	https://forums.alliedmods.net/showthread.php?p=2148102
 */
-stock int SpawnSentry(int builder, float Position[3], float Angle[3], int level, bool mini=false, bool disposable=false, int flags=4){
+stock int SpawnSentry(int iBuilder, float Position[3], float Angle[3], int iLevel, bool bMini=false)
+{
+	static int iSentryFlags = 4;
+	static float fMinsMini[3] = {-15.0, -15.0, 0.0}
+	static float fMaxsMini[3] = {15.0, 15.0, 49.5};
 
-	float m_vecMinsMini[3] = {-15.0, -15.0, 0.0}, m_vecMaxsMini[3] = {15.0, 15.0, 49.5};
-	float m_vecMinsDisp[3] = {-13.0, -13.0, 0.0}, m_vecMaxsDisp[3] = {13.0, 13.0, 42.9};
+	int iSentry = CreateEntityByName("obj_sentrygun");
+	if (!IsValidEntity(iSentry))
+		return 0;
 
-	int sentry = CreateEntityByName("obj_sentrygun");
-
-	if(!IsValidEntity(sentry)) return 0;
-
-	int iTeam = GetClientTeam(builder);
-
-	SetEntPropEnt(sentry, Prop_Send, "m_hBuilder", builder);
+	int iTeam = GetClientTeam(iBuilder);
+	SetEntPropEnt(iSentry, Prop_Send, "m_hBuilder", iBuilder);
 
 	SetVariantInt(iTeam);
-	AcceptEntityInput(sentry, "SetTeam");
+	AcceptEntityInput(iSentry, "SetTeam");
 
-	DispatchKeyValueVector(sentry, "origin", Position);
-	DispatchKeyValueVector(sentry, "angles", Angle);
+	DispatchKeyValueVector(iSentry, "origin", Position);
+	DispatchKeyValueVector(iSentry, "angles", Angle);
 
-	if(mini){
-		SetEntProp(sentry, Prop_Send, "m_bMiniBuilding", 1);
-		SetEntProp(sentry, Prop_Send, "m_iUpgradeLevel", level);
-		SetEntProp(sentry, Prop_Send, "m_iHighestUpgradeLevel", level);
-		SetEntProp(sentry, Prop_Data, "m_spawnflags", flags);
-		SetEntProp(sentry, Prop_Send, "m_bBuilding", 1);
-		SetEntProp(sentry, Prop_Send, "m_nSkin", level == 1 ? iTeam : iTeam -2);
-		DispatchSpawn(sentry);
-
-		SetVariantInt(100);
-		AcceptEntityInput(sentry, "SetHealth");
-
-		SetEntPropFloat(sentry, Prop_Send, "m_flModelScale", 0.75);
-		SetEntPropVector(sentry, Prop_Send, "m_vecMins", m_vecMinsMini);
-		SetEntPropVector(sentry, Prop_Send, "m_vecMaxs", m_vecMaxsMini);
-	}else if(disposable){
-		SetEntProp(sentry, Prop_Send, "m_bMiniBuilding", 1);
-		SetEntProp(sentry, Prop_Send, "m_bDisposableBuilding", 1);
-		SetEntProp(sentry, Prop_Send, "m_iUpgradeLevel", level);
-		SetEntProp(sentry, Prop_Send, "m_iHighestUpgradeLevel", level);
-		SetEntProp(sentry, Prop_Data, "m_spawnflags", flags);
-		SetEntProp(sentry, Prop_Send, "m_bBuilding", 1);
-		SetEntProp(sentry, Prop_Send, "m_nSkin", level == 1 ? iTeam : iTeam -2);
-		DispatchSpawn(sentry);
+	if (bMini)
+	{
+		SetEntProp(iSentry, Prop_Send, "m_bMiniBuilding", 1);
+		SetEntProp(iSentry, Prop_Send, "m_iUpgradeLevel", iLevel);
+		SetEntProp(iSentry, Prop_Send, "m_iHighestUpgradeLevel", iLevel);
+		SetEntProp(iSentry, Prop_Data, "m_spawnflags", iSentryFlags);
+		SetEntProp(iSentry, Prop_Send, "m_bBuilding", 1);
+		SetEntProp(iSentry, Prop_Send, "m_nSkin", iLevel == 1 ? iTeam : iTeam -2);
+		DispatchSpawn(iSentry);
 
 		SetVariantInt(100);
-		AcceptEntityInput(sentry, "SetHealth");
+		AcceptEntityInput(iSentry, "SetHealth");
 
-		SetEntPropFloat(sentry, Prop_Send, "m_flModelScale", 0.60);
-		SetEntPropVector(sentry, Prop_Send, "m_vecMins", m_vecMinsDisp);
-		SetEntPropVector(sentry, Prop_Send, "m_vecMaxs", m_vecMaxsDisp);
-	}else{
-		SetEntProp(sentry, Prop_Send, "m_iUpgradeLevel", level);
-		SetEntProp(sentry, Prop_Send, "m_iHighestUpgradeLevel", level);
-		SetEntProp(sentry, Prop_Data, "m_spawnflags", flags);
-		SetEntProp(sentry, Prop_Send, "m_bBuilding", 1);
-		SetEntProp(sentry, Prop_Send, "m_nSkin", iTeam -2);
-		DispatchSpawn(sentry);
+		SetEntPropFloat(iSentry, Prop_Send, "m_flModelScale", 0.75);
+		SetEntPropVector(iSentry, Prop_Send, "m_vecMins", fMinsMini);
+		SetEntPropVector(iSentry, Prop_Send, "m_vecMaxs", fMaxsMini);
 	}
-	return sentry;
+	else
+	{
+		SetEntProp(iSentry, Prop_Send, "m_iUpgradeLevel", iLevel);
+		SetEntProp(iSentry, Prop_Send, "m_iHighestUpgradeLevel", iLevel);
+		SetEntProp(iSentry, Prop_Data, "m_spawnflags", iSentryFlags);
+		SetEntProp(iSentry, Prop_Send, "m_bBuilding", 1);
+		SetEntProp(iSentry, Prop_Send, "m_nSkin", iTeam -2);
+		DispatchSpawn(iSentry);
+	}
+
+	return iSentry;
 }
 
-#undef LEVEL
-#undef KEEP
-#undef AMOUNT
+#undef Level
+#undef Cleanup
+#undef Max
+#undef Spawned

@@ -16,16 +16,17 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+DEFINE_CALL_APPLY_REMOVE(Vital)
 
-#define MAX_HEALTH_ATTRIB 26
+public void Vital_ApplyPerk(const int client, const Perk perk)
+{
+	int iAddedHealth = perk.GetPrefCell("health", 300);
 
-public void Vital_Call(int client, Perk perk, bool apply){
-	if(apply) Vital_ApplyPerk(client, perk);
-	else TF2Attrib_RemoveByDefIndex(client, MAX_HEALTH_ATTRIB);
+	TF2Attrib_SetByDefIndex(client, Attribs.MaxHealth, float(iAddedHealth));
+	SetEntityHealth(client, GetClientHealth(client) + iAddedHealth);
 }
 
-void Vital_ApplyPerk(int client, Perk perk){
-	int iValue = perk.GetPrefCell("health");
-	TF2Attrib_SetByDefIndex(client, MAX_HEALTH_ATTRIB, float(iValue));
-	SetEntityHealth(client, GetEntProp(client, Prop_Data, "m_iHealth") +iValue);
+public void Vital_RemovePerk(int client)
+{
+	TF2Attrib_RemoveByDefIndex(client, Attribs.MaxHealth);
 }

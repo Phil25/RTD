@@ -16,52 +16,64 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Mode Int[0]
+#define BaseGravity Float[0]
 
-int g_iNoclipId = 4;
+DEFINE_CALL_APPLY_REMOVE(Noclip)
 
-public void Noclip_Call(int client, Perk perk, bool apply){
-	if(apply){
-		g_iNoclipId = perk.Id;
-		SetIntCache(client, perk.GetPrefCell("mode"));
+public void Noclip_Init(const Perk perk)
+{
+	Events.OnPlayerRunCmd(perk, Noclip_OnPlayerRunCmd);
+}
 
-		if(GetIntCache(client))
-			SetEntityMoveType(client, MOVETYPE_NOCLIP);
-		else{
-			SetFloatCache(client, GetEntityGravity(client));
-			SetEntityGravity(client, 0.0001);
-			TF2_AddCondition(client, TFCond_SwimmingNoEffects);
-		}
+void Noclip_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Mode = perk.GetPrefCell("mode", 0);
 
-		SetClientPerkCache(client, g_iNoclipId);
-	}else{
-		UnsetClientPerkCache(client, g_iNoclipId);
-
-		if(perk.GetPrefCell("mode")){
-			SetEntityMoveType(client, MOVETYPE_WALK);
-			FixPotentialStuck(client);
-		}else{
-			SetEntityGravity(client, GetFloatCache(client));
-			TF2_RemoveCondition(client, TFCond_SwimmingNoEffects);
-		}
+	if (Cache[client].Mode)
+	{
+		SetEntityMoveType(client, MOVETYPE_NOCLIP);
+	}
+	else
+	{
+		Cache[client].BaseGravity = GetEntityGravity(client);
+		SetEntityGravity(client, 0.0001);
+		TF2_AddCondition(client, TFCond_SwimmingNoEffects);
 	}
 }
 
-void Noclip_OnPlayerRunCmd(const int client, float fVel[3], float fAng[3]){
-	if(!CheckClientPerkCache(client, g_iNoclipId))
-		return;
+void Noclip_RemovePerk(const int client)
+{
+	if (Cache[client].Mode)
+	{
+		SetEntityMoveType(client, MOVETYPE_WALK);
+		FixPotentialStuck(client);
+	}
+	else
+	{
+		SetEntityGravity(client, Cache[client].BaseGravity);
+		TF2_RemoveCondition(client, TFCond_SwimmingNoEffects);
+	}
+}
 
-	if(GetIntCache(client))
-		return;
+bool Noclip_OnPlayerRunCmd(const int client, int& iButtons, float fVel[3], float fAng[3])
+{
+	if (Cache[client].Mode)
+		return false;
 
 	bool bStationary = fVel[0] == 0.0 && fVel[1] == 0.0;
 	bool bSwimming = TF2_IsPlayerInCondition(client, TFCond_SwimmingNoEffects);
 
 	// Apply the swimming condition only during movement. When we're stationary and in air,
 	// we float down. Which is super hilarious btw if you get the reference (btw).
-	if(bStationary && bSwimming)
+	if (bStationary && bSwimming)
+	{
 		TF2_RemoveCondition(client, TFCond_SwimmingNoEffects);
-	else if(!bStationary && !bSwimming)
+	}
+	else if (!bStationary && !bSwimming)
+	{
 		TF2_AddCondition(client, TFCond_SwimmingNoEffects);
+	}
 
 	float fForward[3], fRight[3], fFinal[3];
 	GetAngleVectors(fAng, fForward, fRight, NULL_VECTOR);
@@ -75,4 +87,9 @@ void Noclip_OnPlayerRunCmd(const int client, float fVel[3], float fAng[3]){
 
 	AddVectors(fForward, fRight, fFinal);
 	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fFinal);
+
+	return false;
 }
+
+#undef Mode
+#undef BaseGravity

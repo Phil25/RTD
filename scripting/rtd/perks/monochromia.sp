@@ -16,9 +16,24 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+DEFINE_CALL_APPLY_REMOVE(Monochromia)
 
-public void Monochromia_Call(int client, Perk perk, bool apply){
-	int iFlags = GetCommandFlags("r_screenoverlay") & (~FCVAR_CHEAT);
+public void Monochromia_ApplyPerk(const int client, const Perk perk)
+{
+	Monochromia_SetOverlay(client, "debug/yuv");
+}
+
+void Monochromia_RemovePerk(const int client)
+{
+	Monochromia_SetOverlay(client, "");
+}
+
+void Monochromia_SetOverlay(const int client, const char[] sOverlay)
+{
+	int iFlags = GetCommandFlags("r_screenoverlay");
+	SetCommandFlags("r_screenoverlay", iFlags & ~FCVAR_CHEAT);
+
+	ClientCommand(client, "r_screenoverlay \"%s\"", sOverlay);
+
 	SetCommandFlags("r_screenoverlay", iFlags);
-	ClientCommand(client, "r_screenoverlay \"%s\"", apply ? "debug/yuv" : "");
 }

@@ -16,40 +16,37 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #define SCARYBULLETS_PARTICLE "ghost_glow"
 
-int g_iScaryBulletsId = 11;
+#define Duration Float[0]
+#define Particle EntSlot_1
 
-public void ScaryBullets_Call(int client, Perk perk, bool apply){
-	if(apply) ScaryBullets_ApplyPerk(client, perk);
-	else ScaryBullets_RemovePerk(client);
+DEFINE_CALL_APPLY(ScaryBullets)
+
+public void ScaryBullets_Init(const Perk perk)
+{
+	Events.OnPlayerAttacked(perk, ScaryBullets_OnPlayerAttacked);
 }
 
-void ScaryBullets_ApplyPerk(int client, Perk perk){
-	g_iScaryBulletsId = perk.Id;
-	SetClientPerkCache(client, g_iScaryBulletsId);
-	SetFloatCache(client, perk.GetPrefFloat("duration"));
-	SetEntCache(client, CreateParticle(client, SCARYBULLETS_PARTICLE));
+void ScaryBullets_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Duration = perk.GetPrefFloat("duration", 3.0);
+	Cache[client].SetEnt(Particle, CreateParticle(client, SCARYBULLETS_PARTICLE));
 }
 
-void ScaryBullets_RemovePerk(int client){
-	UnsetClientPerkCache(client, g_iScaryBulletsId);
-	KillEntCache(client);
-}
-
-void ScaryBullets_PlayerHurt(int client, Handle hEvent){
-	int iAttacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
-	if(!iAttacker) return;
-
-	if(!CheckClientPerkCache(iAttacker, g_iScaryBulletsId))
+public void ScaryBullets_OnPlayerAttacked(const int client, const int iVictim, const int iDamage, const int iRemainingHealth)
+{
+	if (client == iVictim)
 		return;
 
-	if(client == iAttacker)
+	if (iRemainingHealth <= 0)
 		return;
 
-	int iHealth = GetEventInt(hEvent, "health");
-	if(IsPlayerAlive(client) && iHealth > 0 && !TF2_IsPlayerInCondition(client, TFCond_Dazed))
-		TF2_StunPlayer(client, GetFloatCache(iAttacker), _, TF_STUNFLAGS_GHOSTSCARE, iAttacker);
-
+	if (!TF2_IsPlayerInCondition(iVictim, TFCond_Dazed))
+		TF2_StunPlayer(iVictim, Cache[client].Duration, _, TF_STUNFLAGS_GHOSTSCARE, client);
 }
+
+#undef SCARYBULLETS_PARTICLE
+
+#undef Duration
+#undef Particle

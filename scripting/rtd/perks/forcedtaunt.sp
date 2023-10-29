@@ -16,79 +16,58 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Interval Float[0]
+#define NextTaunt Float[1]
 
-int g_iForcedTauntId = 25;
-char g_sSoundScoutBB[][] = {
+static char g_sSoundScoutBB[][] = {
 	"items/scout_boombox_02.wav",
 	"items/scout_boombox_03.wav",
 	"items/scout_boombox_04.wav",
 	"items/scout_boombox_05.wav"
 };
 
-void ForcedTaunt_Start(){
-	for(int i = 0; i < sizeof(g_sSoundScoutBB); ++i)
+DEFINE_CALL_APPLY(ForcedTaunt)
+
+public void ForcedTaunt_Init(const Perk perk)
+{
+	for (int i = 0; i < sizeof(g_sSoundScoutBB); ++i)
 		PrecacheSound(g_sSoundScoutBB[i]);
+
+	Events.OnConditionAdded(perk, ForcedTaunt_OnConditionAdded);
+	Events.OnConditionRemoved(perk, ForcedTaunt_OnConditionRemoved);
 }
 
-public void ForcedTaunt_Call(int client, Perk perk, bool apply){
-	if(apply) ForcedTaunt_ApplyPerk(client, perk);
-	else UnsetClientPerkCache(client, g_iForcedTauntId);
+void ForcedTaunt_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Interval = perk.GetPrefFloat("interval", 1.0);
+
+	ForcedTaunt_Perform(client);
+	Cache[client].Repeat(0.1, ForcedTaunt_Perform);
 }
 
-void ForcedTaunt_ApplyPerk(int client, Perk perk){
-	g_iForcedTauntId = perk.Id;
-	SetClientPerkCache(client, g_iForcedTauntId);
-	SetFloatCache(client, perk.GetPrefFloat("interval"));
-	SetIntCache(client, false);
-
-	ForceTaunt_PerformTaunt(client);
-}
-
-public Action Timer_ForceTaunt(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iForcedTauntId))
-		return Plugin_Stop;
-
-	ForceTaunt_PerformTaunt(client);
-	return Plugin_Stop;
-}
-
-void ForceTaunt_PerformTaunt(int client){
-	if(GetEntProp(client, Prop_Send, "m_hGroundEntity") > -1){
-		FakeClientCommand(client, "taunt");
-		return;
-	}
-
-	SetIntCache(client, true);
-	CreateTimer(0.1, Timer_RetryForceTaunt, GetClientUserId(client), TIMER_REPEAT);
-}
-
-public Action Timer_RetryForceTaunt(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iForcedTauntId))
-		return Plugin_Stop;
-
-	if(!GetIntCacheBool(client))
-		return Plugin_Stop;
-
-	if(GetEntProp(client, Prop_Send, "m_hGroundEntity") < 0)
+public Action ForcedTaunt_Perform(const int client)
+{
+	if (GetEngineTime() < Cache[client].NextTaunt)
 		return Plugin_Continue;
 
-	SetIntCache(client, false);
+	if (GetEntProp(client, Prop_Send, "m_hGroundEntity") == -1)
+		return Plugin_Continue;
+
 	FakeClientCommand(client, "taunt");
-	return Plugin_Stop;
+	return Plugin_Continue;
 }
 
-void ForcedTaunt_OnConditionAdded(int client, TFCond condition){
-	if(condition == TFCond_Taunting && CheckClientPerkCache(client, g_iForcedTauntId))
-		EmitSoundToAll(g_sSoundScoutBB[GetRandomInt(0, sizeof(g_sSoundScoutBB)-1)], client);
+public void ForcedTaunt_OnConditionAdded(const int client, const TFCond eCondition)
+{
+	if (eCondition == TFCond_Taunting)
+		EmitSoundToAll(g_sSoundScoutBB[GetRandomInt(0, sizeof(g_sSoundScoutBB) - 1)], client);
 }
 
-void ForcedTaunt_OnConditionRemoved(int client, TFCond condition){
-	if(condition == TFCond_Taunting && CheckClientPerkCache(client, g_iForcedTauntId))
-		CreateTimer(GetFloatCache(client), Timer_ForceTaunt, GetClientUserId(client));
+public void ForcedTaunt_OnConditionRemoved(const int client, const TFCond eCondition)
+{
+	if (eCondition == TFCond_Taunting)
+		Cache[client].NextTaunt = GetEngineTime() + Cache[client].Interval;
 }
+
+#undef Interval
+#undef NextTaunt

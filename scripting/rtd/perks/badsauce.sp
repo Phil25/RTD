@@ -16,16 +16,31 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+DEFINE_CALL_APPLY(BadSauce)
 
-public void BadSauce_Call(int client, Perk perk, bool apply){
-	if(!apply) return;
+public void BadSauce_Init(const Perk perk)
+{
+	Events.OnResupply(perk, BaseSauce_OnResupply);
+}
 
-	float fMilkDuration		= perk.GetPrefFloat("milk");
-	float fJarateDuration	= perk.GetPrefFloat("jarate");
-	float fBleedDuration	= perk.GetPrefFloat("bleed");
-	float fPerkDuration		= float(GetPerkTime(perk));
+public void BadSauce_ApplyPerk(const int client, const Perk perk)
+{
+	float fMilkDuration = perk.GetPrefFloat("milk");
+	float fJarateDuration = perk.GetPrefFloat("jarate");
+	float fBleedDuration = perk.GetPrefFloat("bleed");
+	float fPerkDuration = GetPerkTimeFloat(perk);
 
-	if(fMilkDuration >= 0.0)	TF2_AddCondition(client, TFCond_Milked,		fMilkDuration	> 0.0	? fMilkDuration		: fPerkDuration);
-	if(fJarateDuration >= 0.0)	TF2_AddCondition(client, TFCond_Jarated,	fJarateDuration	> 0.0	? fJarateDuration	: fPerkDuration);
-	if(fBleedDuration >= 0.0)	TF2_MakeBleed	(client, client,			fBleedDuration	> 0.0	? fBleedDuration	: fPerkDuration);
+	if (fMilkDuration >= 0.0)
+		TF2_AddCondition(client, TFCond_Milked, fMilkDuration > 0.0 ? fMilkDuration : fPerkDuration);
+
+	if (fJarateDuration >= 0.0)
+		TF2_AddCondition(client, TFCond_Jarated, fJarateDuration > 0.0 ? fJarateDuration : fPerkDuration);
+
+	if (fBleedDuration >= 0.0)
+		TF2_MakeBleed(client, client, fBleedDuration > 0.0 ? fBleedDuration : fPerkDuration);
+}
+
+public void BaseSauce_OnResupply(const int client)
+{
+	ForceRemovePerk(client);
 }

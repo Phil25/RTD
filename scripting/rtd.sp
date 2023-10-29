@@ -17,17 +17,6 @@
 */
 #pragma semicolon 1
 
-/****** M A C R O S *****/
-
-#define KILL_ENT_IN(%1,%2) \
-	SetVariantString("OnUser1 !self:Kill::" ... #%2 ... ":1"); \
-	AcceptEntityInput(%1, "AddOutput"); \
-	AcceptEntityInput(%1, "FireUser1");
-
-
-
-/****** I N C L U D E S *****/
-
 #include <rtd2>
 #include <sdktools>
 #include <sdkhooks>
@@ -46,7 +35,6 @@
 /********* E N U M S ********/
 
 Rollers g_hRollers = null;
-
 
 
 /******* D E F I N E S ******/
@@ -78,7 +66,6 @@ Rollers g_hRollers = null;
 /********* P E R K S ********/
 
 #include "rtd/includes.sp"
-#include "rtd/manager.sp" //For info, go to the script itself
 
 
 
@@ -105,6 +92,9 @@ int		g_iCorePerks			= 0;
 
 bool	g_bIsGameArena			= false;
 int		g_iLastPerkTime			= -1;
+
+// TODO: move elsewhere
+int g_iActiveEntitySpawnedSubscribers = 0;
 
 
 
@@ -214,6 +204,12 @@ public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int iErr
 }
 
 public void OnPluginStart(){
+	for (int i = 0; i < MAXPLAYERS + 1; ++i)
+		Cache[i].Init(i); // TODO: do this elsewhere
+
+	Events.Init();
+	Storage_Precache();
+
 	LoadTranslations("rtd2.phrases.txt");
 	LoadTranslations("rtd2_perks.phrases.txt");
 	LoadTranslations("common.phrases.txt");
@@ -365,14 +361,13 @@ public void OnMapStart(){
 	HookEvent("teamplay_round_active",		Event_RoundActive);
 	HookEvent("post_inventory_application",	Event_Resupply, EventHookMode_Post);
 	HookEvent("player_hurt",				Event_PlayerHurt);
+	HookEvent("player_chargedeployed",		Event_UberchargeDeployed);
 
 	HookEvent("teamplay_round_start",		Event_RoundStart);
 	HookEvent("arena_round_start",			Event_RoundStart);
 	HookEvent("mvm_begin_wave",				Event_RoundStart);
 
-	Cache_OnMapStart(); // rtd/cache.sp
 	Stocks_OnMapStart(); // rtd/stocks.sp
-	Forward_OnMapStart(); // rtd/manager.sp
 	PrecachePerkSounds();
 
 	g_bIsGameArena = (FindEntityByClassname(MaxClients +1, "tf_logic_arena") > MaxClients);
@@ -384,6 +379,7 @@ public void OnMapEnd(){
 	UnhookEvent("teamplay_round_active",	Event_RoundActive);
 	UnhookEvent("post_inventory_application",Event_Resupply, EventHookMode_Post);
 	UnhookEvent("player_hurt",				Event_PlayerHurt);
+	UnhookEvent("player_chargedeployed",	Event_UberchargeDeployed);
 
 	UnhookEvent("teamplay_round_start",		Event_RoundStart);
 	UnhookEvent("arena_round_start",		Event_RoundStart);
@@ -395,17 +391,15 @@ public void OnClientPutInServer(int client){
 
 	if(g_hRollers.GetHud(client) == null)
 		g_hRollers.SetHud(client, CreateHudSynchronizer());
-
-	Forward_OnClientPutInServer(client);
 }
 
 public void OnClientDisconnect(int client){
+	Events.PlayerDisconnected(client);
+
 	if(g_hRollers.GetInRoll(client))
 		ForceRemovePerk(client, RTDRemove_Disconnect);
 
 	g_hRollers.Reset(client);
-
-	Forward_OnClientDisconnect(client);
 }
 
 public void OnAllPluginsLoaded(){
@@ -650,8 +644,8 @@ public Action Listener_Say(int client, const char[] sCommand, int args){
 }
 
 public Action Listener_Voice(int client, const char[] sCommand, int args){
-	if(IsValidClient(client))
-		Forward_Voice(client);
+	if (IsValidClient(client))
+		Events.Voice(client);
 
 	return Plugin_Continue;
 }
@@ -659,7 +653,7 @@ public Action Listener_Voice(int client, const char[] sCommand, int args){
 public Action Listener_Sound(int clients[MAXPLAYERS], int& iLen, char sSample[PLATFORM_MAX_PATH], int& iEnt, int& iChannel, float& fVol, int& iLevel, int& iPitch, int& iFlags, char sEntry[PLATFORM_MAX_PATH], int& iSeed){
 	if(!IsValidClient(iEnt))
 		return Plugin_Continue;
-	return Forward_Sound(iEnt, sSample) ? Plugin_Continue : Plugin_Stop;
+	return (Stocks_Sound(iEnt, sSample) && Events.Sound(iEnt, sSample)) ? Plugin_Continue : Plugin_Stop;
 }
 
 
@@ -773,7 +767,7 @@ public Action Event_PlayerDeath(Handle hEvent, const char[] sEventName, bool don
 	if(GetEventInt(hEvent, "death_flags") & FLAG_FEIGNDEATH)
 		return Plugin_Continue;
 
-	Forward_OnPlayerDeath(client);
+	Events.PlayerDied(client);
 
 	if(!g_hRollers.GetInRoll(client))
 		return Plugin_Continue;
@@ -825,13 +819,28 @@ public Action Event_RoundActive(Handle hEvent, const char[] sEventName, bool don
 
 public Action Event_Resupply(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if(client) Forward_Resupply(client);
+	if (client)
+		Events.Resupply(client);
+
 	return Plugin_Continue;
 }
 
 public Action Event_PlayerHurt(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
+	int iVictim = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+	int iAttacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
+	int iDamage = GetEventInt(hEvent, "damageamount");
+	int iRemainingHealth = GetEventInt(hEvent, "health");
+
+	if (1 <= iVictim <= MaxClients && 1 <= iAttacker <= MaxClients)
+		Events.PlayerAttacked(iAttacker, iVictim, iDamage, iRemainingHealth);
+
+	return Plugin_Continue;
+}
+
+public Action Event_UberchargeDeployed(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if(client) Forward_PlayerHurt(client, hEvent);
+	int iTarget = GetClientOfUserId(GetEventInt(hEvent, "targetid"));
+	Events.UberchargeDeployed(client, iTarget);
 	return Plugin_Continue;
 }
 
@@ -841,37 +850,49 @@ public Action Event_RoundStart(Handle hEvent, const char[] sEventName, bool dont
 }
 
 public void OnEntityCreated(int iEnt, const char[] sClassname){
-	Forward_OnEntityCreated(iEnt, sClassname);
+	if (g_iActiveEntitySpawnedSubscribers <= 0)
+		return;
+
+	if (!Events.ClassnameHasSubscribers(sClassname))
+		return;
+
+	// TODO: Hook SDKHook_Spawned instead, need to figure out a few things first
+	CreateTimer(0.1, Timer_OnEntitySpawned, EntIndexToEntRef(iEnt));
+}
+
+public Action Timer_OnEntitySpawned(Handle hTimer, const int iRef)
+{
+	int iEnt = EntRefToEntIndex(iRef);
+	if (iEnt != -1)
+		Events.EntitySpawned(iEnt);
+
+	return Plugin_Stop;
 }
 
 public void OnGameFrame(){
 	Homing_OnGameFrame();
-	Forward_OnGameFrame();
 }
 
 public void TF2_OnConditionAdded(int client, TFCond condition){
-	Forward_OnConditionAdded(client, condition);
+	Events.ConditionAdded(client, condition);
 }
 
 public void TF2_OnConditionRemoved(int client, TFCond condition){
-	Forward_OnConditionRemoved(client, condition);
+	Events.ConditionRemoved(client, condition);
 }
 
 public Action OnPlayerRunCmd(int client, int &iButtons, int &iImpulse, float fVel[3], float fAng[3], int &iWeapon){
 	if(!IsValidClient(client))
 		return Plugin_Continue;
 
-	if(Forward_OnPlayerRunCmd(client, iButtons, iImpulse, fVel, fAng, iWeapon))
-		return Plugin_Changed;
-
-	return Plugin_Continue;
+	return Events.PlayerRunCmd(client, iButtons, fVel, fAng) ? Plugin_Changed : Plugin_Continue;
 }
 
 public Action TF2_CalcIsAttackCritical(int client, int iWeapon, char[] sWeaponName, bool &bResult){
 	if(!IsValidClient(client))
 		return Plugin_Continue;
 
-	if(!Forward_AttackIsCritical(client, iWeapon, sWeaponName))
+	if(!Events.AttackCritCheck(client, iWeapon))
 		return Plugin_Continue;
 
 	bResult = true;
@@ -1231,6 +1252,32 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1){
 	PrintToNonRollers(client, perk, iDuration);
 }
 
+void ManagePerk(const int client, const Perk perk, const bool bEnable, const RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason="")
+{
+	if (perk.External)
+	{
+		perk.Call(client, bEnable);
+	}
+	else
+	{
+		perk.CallInternal(client, bEnable);
+	}
+
+	int iSubscribesToEntitySpawned = view_as<int>(Events.SubscribesToEntitySpawned(perk));
+
+	if (bEnable)
+	{
+		g_iActiveEntitySpawnedSubscribers += iSubscribesToEntitySpawned;
+	}
+	else
+	{
+		Cache[client].Cleanup();
+		RemovedPerk(client, reason, sReason);
+
+		g_iActiveEntitySpawnedSubscribers -= iSubscribesToEntitySpawned;
+	}
+}
+
 //-----[ Descriptions ]-----//
 Menu BuildDesc(){
 	Menu hMenu = new Menu(ManagerDesc);
@@ -1542,6 +1589,21 @@ int GetPerkTime(Perk perk){
 
 float GetPerkTimeFloat(Perk perk){
 	return float(GetPerkTime(perk));
+}
+
+bool IsRecentPerk(const int client, const Perk perk, const int iTimeDelta=2)
+{
+	Perk current = g_hRollers.GetPerk(client);
+	if (current == perk) // current counts as recent
+		return true;
+
+	if (current != null) // client in different perk
+		return false;
+
+	if (!g_hRollers.IsInPerkHistory(client, perk, 1))
+		return false;
+
+	return GetTime() - g_hRollers.GetLastRollTime(client) <= iTimeDelta;
 }
 
 void RemovePerkFromClients(Perk perk){

@@ -16,49 +16,40 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Pos(%1) Float[%1]
 
-int g_iLagId = 57;
+DEFINE_CALL_APPLY(Lag)
 
-public void Lag_Call(int client, Perk perk, bool apply){
-	if(!apply){
-		UnsetClientPerkCache(client, g_iLagId);
-		return;
-	}
+public void Lag_ApplyPerk(const int client, const Perk perk)
+{
+	Lag_SetPosition(client);
 
-	g_iLagId = perk.Id;
-	SetClientPerkCache(client, g_iLagId);
-
-	float fPos[3];
-	GetClientAbsOrigin(client, fPos);
-	SetVectorCache(client, fPos);
-
-	int iUserId = GetClientUserId(client);
-	CreateTimer(1.0, Timer_Lag_Teleport, iUserId, TIMER_REPEAT);
-	CreateTimer(0.5, Timer_Lag_SetPos, iUserId, TIMER_REPEAT);
+	Cache[client].Repeat(1.0, Lag_Teleport);
+	Cache[client].Repeat(0.5, Lag_SetPosition);
 }
 
-public Action Timer_Lag_Teleport(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iLagId))
-		return Plugin_Stop;
-
+public Action Lag_Teleport(const int client)
+{
 	float fPos[3];
-	GetVectorCache(client, fPos);
+	fPos[0] = Cache[client].Pos(0);
+	fPos[1] = Cache[client].Pos(1);
+	fPos[2] = Cache[client].Pos(2);
+
 	TeleportEntity(client, fPos, NULL_VECTOR, NULL_VECTOR);
+
 	return Plugin_Continue;
 }
 
-public Action Timer_Lag_SetPos(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iLagId))
-		return Plugin_Stop;
-
+public Action Lag_SetPosition(const int client)
+{
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);
-	SetVectorCache(client, fPos);
+
+	Cache[client].Pos(0) = fPos[0];
+	Cache[client].Pos(1) = fPos[1];
+	Cache[client].Pos(2) = fPos[2];
+
 	return Plugin_Continue;
 }
+
+#undef Pos

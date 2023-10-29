@@ -93,6 +93,7 @@ enum RTDPerkProp{
 	RTDPerk_WeaponClasses,
 	RTDPerk_Tags,
 	RTDPerk_InternalCall,
+	RTDPerk_InternalInit,
 	RTDPerk_Enabled,
 	RTDPerk_External
 }
@@ -268,7 +269,8 @@ native RTDPerk RTD2_SetPerkPref(RTDPerk perk, const char[] sKey, const char[] sV
  * Format specific perk properties into a buffer.
  * Available specifiers: $Id$, $Name, $Good$,
  * $Sound$, $Token$, $Time$, $Tags$, $Class$,
- * $WeaponClass$, $Settings$, $InternalCall$
+ * $WeaponClass$, $Settings$, $InternalCall$,
+ * $InternalInit$
  *
  * @note Format example: "Perk: $Id$ - $Name$"
  * @note Mind the capitalization.

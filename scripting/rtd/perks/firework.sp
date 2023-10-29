@@ -16,38 +16,45 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "rtd/macros.sp"
 
-#define FIREWORK_EXPLOSION	"weapons/flare_detonator_explode.wav"
-#define FIREWORK_PARTICLE	"burningplayer_rainbow_flame"
+#define FIREWORK_EXPLOSION "weapons/flare_detonator_explode.wav"
+#define FIREWORK_PARTICLE "burningplayer_rainbow_flame"
 
-void Firework_Start(){
+#define Particle EntSlot_1
+
+DEFINE_CALL_APPLY(Firework)
+
+public void Firework_Init(const Perk perk)
+{
 	PrecacheSound(FIREWORK_EXPLOSION);
 }
 
-public void Firework_Call(int client, Perk perk, bool apply){
-	if(!apply) return;
-
+void Firework_ApplyPerk(const int client, const Perk perk)
+{
 	float fPush[3];
-	fPush[2] = perk.GetPrefFloat("force");
+	fPush[2] = perk.GetPrefFloat("force", 4096.0);
 	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fPush);
 
 	int iParticle = CreateParticle(client, FIREWORK_PARTICLE);
-	SetEntCache(client, iParticle);
-	KILL_ENT_IN(iParticle,0.5)
+	Cache[client].SetEnt(Particle, iParticle);
+	KILL_ENT_IN(iParticle,0.5);
 
 	CreateTimer(0.5, Timer_Firework_Explode, GetClientUserId(client));
 }
 
-public Action Timer_Firework_Explode(Handle hTimer, int iUserId){
+public Action Timer_Firework_Explode(Handle hTimer, const int iUserId)
+{
 	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
+	if (!client)
+		return Plugin_Stop;
 
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);
 
 	EmitSoundToAll(FIREWORK_EXPLOSION, _, _, _, _, _, _, _, fPos);
-	SendTEParticle(TEParticle_ExplosionWooden, fPos);
-	SendTEParticle(TEParticle_ShockwaveFlat, fPos);
+	SendTEParticle(TEParticles.ExplosionWooden, fPos);
+	SendTEParticle(TEParticles.ShockwaveFlat, fPos);
 	TF2_IgnitePlayer(client, client);
 
 	DataPack hFollowup = new DataPack();
@@ -60,8 +67,9 @@ public Action Timer_Firework_Explode(Handle hTimer, int iUserId){
 	return Plugin_Stop;
 }
 
-public Action Timer_Firework_Followup_Trigger(Handle hTimer, DataPack hFollowup){
-	CreateTimer(0.1, Timer_Firework_Followup, hFollowup, TIMER_REPEAT);
+public Action Timer_Firework_Followup_Trigger(Handle hTimer, DataPack hFollowup)
+{
+	CreateTimer(0.1, Timer_Firework_Followup, hFollowup, TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
 	return Plugin_Stop;
 }
 
@@ -76,23 +84,22 @@ public Action Timer_Firework_Followup(Handle hTimer, DataPack hFollowup){
 
 	hFollowup.Reset();
 	hFollowup.WriteCell(--iTimes);
-	// position in hFollowup is preserved
 
 	int iCount = GetRandomInt(1, 4);
-	for(int i = 0; i < iCount; ++i){
+	for (int i = 0; i < iCount; ++i)
+	{
 		float fFireworkPos[3];
 		fFireworkPos[0] = fPos[0] + GetRandomFloat(100.0, 250.0) * GetRandomSign();
 		fFireworkPos[1] = fPos[1] + GetRandomFloat(100.0, 250.0) * GetRandomSign();
 		fFireworkPos[2] = fPos[2] + GetRandomFloat(100.0, 250.0) * GetRandomSign();
-		SendTEParticle(TEParticle_ExplosionEmbersOnly, fFireworkPos);
+		SendTEParticle(TEParticles.ExplosionEmbersOnly, fFireworkPos);
 	}
 
 	EmitSoundToAll(FIREWORK_EXPLOSION, _, _, _, _, _, 150, _, fPos);
-
-	if(iTimes <= 0){
-		CloseHandle(hFollowup);
-		return Plugin_Stop;
-	}
-
-	return Plugin_Continue;
+	return iTimes > 0 ? Plugin_Continue : Plugin_Stop;
 }
+
+#undef FIREWORK_EXPLOSION
+#undef FIREWORK_PARTICLE
+
+#undef Particle

@@ -16,49 +16,40 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Damage Float[0]
+#define Force Float[1]
+#define Radius Float[2]
 
-#define DAMAGE 0
-#define FORCE 0
-#define RADIUS 0
+DEFINE_CALL_APPLY(ExplosiveArrows)
 
-int g_iExplosiveArrowsId = 54;
-
-public void ExplosiveArrows_Call(int client, Perk perk, bool apply){
-	if(apply) ExplosiveArrows_Apply(client, perk);
-	else UnsetClientPerkCache(client, g_iExplosiveArrowsId);
+public void ExplosiveArrows_Init(const Perk perk)
+{
+	Events.OnEntitySpawned(perk, ExplosiveArrows_OnArrowSpawn, ExplosiveArrows_ValidClassname, Retriever_OwnerEntity);
 }
 
-void ExplosiveArrows_Apply(int client, Perk perk){
-	g_iExplosiveArrowsId = perk.Id;
-	SetClientPerkCache(client, g_iExplosiveArrowsId);
-
-	SetFloatCache(client, perk.GetPrefFloat("damage"), DAMAGE);
-	SetFloatCache(client, perk.GetPrefFloat("force"), FORCE);
-	SetFloatCache(client, perk.GetPrefFloat("radius"), RADIUS);
+public void ExplosiveArrows_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Damage = perk.GetPrefFloat("damage", 100.0);
+	Cache[client].Force = perk.GetPrefFloat("force", 80.0);
+	Cache[client].Radius = perk.GetPrefFloat("radius", 100.0);
 }
 
-void ExplosiveArrows_OnEntityCreated(int iEnt, const char[] sClassname){
-	if(ExplosiveArrows_ValidClassname(sClassname))
-		SDKHook(iEnt, SDKHook_Spawn, Timer_ExplosiveArrows_ProjectileSpawn);
+public void ExplosiveArrows_OnArrowSpawn(const int client, const int iArrow)
+{
+	SDKHook(iArrow, SDKHook_StartTouchPost, ExplosiveArrows_ArrowTouch);
 }
 
-public void Timer_ExplosiveArrows_ProjectileSpawn(int iProjectile){
-	int client = GetEntPropEnt(iProjectile, Prop_Send, "m_hOwnerEntity");
-	if(!IsValidClient(client)) return;
-
-	if(CheckClientPerkCache(client, g_iExplosiveArrowsId))
-		SDKHook(iProjectile, SDKHook_StartTouchPost, ExplosiveArrows_ProjectileTouch);
-}
-
-public void ExplosiveArrows_ProjectileTouch(int iEntity, int iOther){
+public void ExplosiveArrows_ArrowTouch(int iEntity, int iOther)
+{
 	int iExplosion = CreateEntityByName("env_explosion");
-	if(!iExplosion) return;
+	if (iExplosion <= MaxClients)
+		return;
 
 	int client = GetEntPropEnt(iEntity, Prop_Send, "m_hOwnerEntity");
 
-	DispatchKeyValueFloat(iExplosion, "iMagnitude", GetFloatCache(client, DAMAGE));
-	DispatchKeyValueFloat(iExplosion, "DamageForce", GetFloatCache(client, FORCE));
-	DispatchKeyValueFloat(iExplosion, "iRadiusOverride", GetFloatCache(client, RADIUS));
+	DispatchKeyValueFloat(iExplosion, "iMagnitude", Cache[client].Damage);
+	DispatchKeyValueFloat(iExplosion, "DamageForce", Cache[client].Force);
+	DispatchKeyValueFloat(iExplosion, "iRadiusOverride", Cache[client].Radius);
 
 	DispatchSpawn(iExplosion);
 	ActivateEntity(iExplosion);
@@ -73,14 +64,11 @@ public void ExplosiveArrows_ProjectileTouch(int iEntity, int iOther){
 	AcceptEntityInput(iExplosion, "Kill");
 }
 
-bool ExplosiveArrows_ValidClassname(const char[] sCls){
-	if(StrEqual(sCls, "tf_projectile_healing_bolt")
-	|| StrEqual(sCls, "tf_projectile_arrow"))
-		return true;
-
-	return false;
+bool ExplosiveArrows_ValidClassname(const char[] sCls)
+{
+	return StrEqual(sCls, "tf_projectile_healing_bolt") || StrEqual(sCls, "tf_projectile_arrow");
 }
 
-#undef DAMAGE
-#undef FORCE
-#undef RADIUS
+#undef Damage
+#undef Force
+#undef Radius

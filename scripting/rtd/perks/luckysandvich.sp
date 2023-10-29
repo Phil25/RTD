@@ -16,21 +16,28 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+ClientFlags g_bLuckySandvichCrit;
 
-bool g_bLuckySandvich_HasCrit[MAXPLAYERS+1] = {false, ...};
+DEFINE_CALL_APPLY(LuckySandvich)
 
-public void LuckySandvich_Call(int client, Perk perk, bool apply){
-	if(!apply) return;
-
-	int iHealth = perk.GetPrefCell("amount");
-	SetEntityHealth(client, GetEntProp(client, Prop_Data, "m_iHealth") +iHealth);
-	g_bLuckySandvich_HasCrit[client] = true;
+public void LuckySandvich_Init(const Perk perk)
+{
+	Events.OnAttackCritCheck(perk, LuckySandvich_AttackCritCheck_Any, SubscriptionType_Any);
 }
 
-bool LuckySandvich_SetCritical(int client){
-	if(!g_bLuckySandvich_HasCrit[client])
+void LuckySandvich_ApplyPerk(const int client, const Perk perk)
+{
+	g_bLuckySandvichCrit.Set(client);
+
+	int iHealth = perk.GetPrefCell("amount", 1000);
+	SetEntityHealth(client, GetEntProp(client, Prop_Data, "m_iHealth") + iHealth);
+}
+
+public bool LuckySandvich_AttackCritCheck_Any(const int client, const int iWeapon)
+{
+	if (!g_bLuckySandvichCrit.Test(client))
 		return false;
 
-	g_bLuckySandvich_HasCrit[client] = false;
+	g_bLuckySandvichCrit.Unset(client);
 	return true;
 }

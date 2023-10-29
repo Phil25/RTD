@@ -16,29 +16,45 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-int g_iPowerfulHitsId = 32;
+#define Multiplier Float[0]
 
-void PowerfulHits_OnClientPutInServer(int client){
-	SDKHook(client, SDKHook_OnTakeDamage, PowerfulHits_OnTakeDamage);
+DEFINE_CALL_APPLY_REMOVE(PowerfulHits)
+
+public void PowerfulHits_Init(const Perk perk)
+{
+	Events.OnResupply(perk, PowerfulHits_Apply);
+	Events.OnEntitySpawned(perk, PowerfulHits_OnDroppedWeaponSpawn, Classname_DroppedWeapon, Retriever_AccountId);
 }
 
-public void PowerfulHits_Call(int client, Perk perk, bool apply){
-	if(apply) PowerfulHits_Apply(client, perk);
-	else UnsetClientPerkCache(client, g_iPowerfulHitsId);
+public void PowerfulHits_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Multiplier = perk.GetPrefFloat("multiplier", 3.0);
+	PowerfulHits_Apply(client);
 }
 
-void PowerfulHits_Apply(int client, Perk perk){
-	g_iPowerfulHitsId = perk.Id;
-	SetClientPerkCache(client, g_iPowerfulHitsId);
-	SetFloatCache(client, perk.GetPrefFloat("multiplier"));
+void PowerfulHits_RemovePerk(const int client)
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		int iWeapon = GetPlayerWeaponSlot(client, i);
+		if (iWeapon > MaxClients && IsValidEntity(iWeapon))
+			TF2Attrib_RemoveByDefIndex(iWeapon, Attribs.Damage);
+	}
 }
 
-public Action PowerfulHits_OnTakeDamage(int client, int &iAtk, int &iInflictor, float &fDmg, int &iType){
-	if(client == iAtk) return Plugin_Continue;
-	if(!IsValidClient(iAtk)) return Plugin_Continue;
-	if(!CheckClientPerkCache(iAtk, g_iPowerfulHitsId))
-		return Plugin_Continue;
-
-	fDmg *= GetFloatCache(iAtk);
-	return Plugin_Changed;
+public void PowerfulHits_Apply(const int client)
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		int iWeapon = GetPlayerWeaponSlot(client, i);
+		if (iWeapon > MaxClients && IsValidEntity(iWeapon))
+			TF2Attrib_SetByDefIndex(iWeapon, Attribs.Damage, Cache[client].Multiplier);
+	}
 }
+
+public void PowerfulHits_OnDroppedWeaponSpawn(const int client, const int iEnt)
+{
+	AcceptEntityInput(iEnt, "Kill");
+}
+
+#undef Multiplier

@@ -16,16 +16,14 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-public void IncreasedSpeed_Call(int client, Perk perk, bool apply){
-	if(apply) IncreasedSpeed_ApplyPerk(client, perk);
-	else IncreasedSpeed_RemovePerk(client);
-}
-
-void IncreasedSpeed_ApplyPerk(int client, Perk perk){
-	SetSpeedEx(client, perk.GetPrefFloat("multiplier"));
-}
-
-void IncreasedSpeed_RemovePerk(int client){
-	SetSpeedEx(client);
+public void IncreasedSpeed_Call(const int client, const Perk perk, const bool apply)
+{
+	if(apply)
+	{
+		SetSpeedEx(client, perk.GetPrefFloat("multiplier", 3.0));
+	}
+	else
+	{
+		SetSpeedEx(client);
+	}
 }

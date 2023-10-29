@@ -16,34 +16,36 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+DEFINE_CALL_EMPTY(Cursed)
 
-int g_iCursedId = 51;
-
-public void Cursed_Call(int client, Perk perk, bool apply){
-	if(apply){
-		g_iCursedId = perk.Id;
-		SetClientPerkCache(client, g_iCursedId);
-	}else UnsetClientPerkCache(client, g_iCursedId);
+public void Cursed_Init(const Perk perk)
+{
+	Events.OnPlayerRunCmd(perk, Cursed_OnPlayerRunCmd);
 }
 
-bool Cursed_OnPlayerRunCmd(int client, int &iButtons, float fVel[3]){
-	if(!CheckClientPerkCache(client, g_iCursedId))
-		return false;
-
+bool Cursed_OnPlayerRunCmd(const int client, int& iButtons, float fVel[3], float fAng[3])
+{
 	fVel[0] = -fVel[0];
 	fVel[1] = -fVel[1];
-	if(iButtons & IN_MOVELEFT){
+
+	if (iButtons & IN_MOVELEFT)
+	{
 		iButtons &= ~IN_MOVELEFT;
 		iButtons |= IN_MOVERIGHT;
-	}else if(iButtons & IN_MOVERIGHT){
+	}
+	else if (iButtons & IN_MOVERIGHT)
+	{
 		iButtons &= ~IN_MOVERIGHT;
 		iButtons |= IN_MOVELEFT;
 	}
 
-	if(iButtons & IN_FORWARD){
+	if (iButtons & IN_FORWARD)
+	{
 		iButtons &= ~IN_FORWARD;
 		iButtons |= IN_BACK;
-	}else if(iButtons & IN_BACK){
+	}
+	else if (iButtons & IN_BACK)
+	{
 		iButtons &= ~IN_BACK;
 		iButtons |= IN_FORWARD;
 	}

@@ -16,52 +16,47 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define LAST_ATTACK 0
-#define RATE 1
-#define RANGE 2
-#define DAMAGE 3
-
 #define DEADLYVOICE_SOUND_ATTACK "weapons/cow_mangler_explosion_charge_04.wav"
 
-char g_sDeadlyVoiceParticles[][] = {
+#define LastAttack Float[0]
+#define Rate Float[1]
+#define Range Float[2]
+#define Damage Float[3]
+
+static char g_sDeadlyVoiceParticles[][] = {
 	"default", "default",
 	"bombinomicon_burningdebris",
 	"bombinomicon_burningdebris_halloween"
 };
 
-int g_iDeadlyVoiceId = 36;
+DEFINE_CALL_APPLY(DeadlyVoice)
 
-void DeadlyVoice_Start(){
+public void DeadlyVoice_Init(const Perk perk)
+{
 	PrecacheSound(DEADLYVOICE_SOUND_ATTACK);
+
+	Events.OnVoice(perk, DeadlyVoice_OnVoice);
 }
 
-public void DeadlyVoice_Call(int client, Perk perk, bool apply){
-	if(apply) DeadlyVoice_ApplyPerk(client, perk);
-	else UnsetClientPerkCache(client, g_iDeadlyVoiceId);
+void DeadlyVoice_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].LastAttack = 0.0;
+	Cache[client].Rate = perk.GetPrefFloat("rate", 0.8);
+	Cache[client].Range = perk.GetPrefFloat("range", 196.0);
+	Cache[client].Damage = perk.GetPrefFloat("damage", 72.0);
+
+	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
 }
 
-void DeadlyVoice_ApplyPerk(int client, Perk perk){
-	g_iDeadlyVoiceId = perk.Id;
-	SetClientPerkCache(client, g_iDeadlyVoiceId);
-
-	SetFloatCache(client, 0.0, LAST_ATTACK);
-	SetFloatCache(client, perk.GetPrefFloat("rate"), RATE);
-	SetFloatCache(client, perk.GetPrefFloat("range"), RANGE);
-	SetFloatCache(client, perk.GetPrefFloat("damage"), DAMAGE);
-
-	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
-}
-
-void DeadlyVoice_Voice(int client){
-	if(!CheckClientPerkCache(client, g_iDeadlyVoiceId))
-		return;
-
-	float fRate = GetFloatCache(client, RATE);
+void DeadlyVoice_OnVoice(const int client)
+{
 	float fEngineTime = GetEngineTime();
+	float fRate = Cache[client].Rate;
 
-	if(fEngineTime < GetFloatCache(client, LAST_ATTACK) +fRate)
+	if (fEngineTime < Cache[client].LastAttack + fRate)
 		return;
-	SetFloatCache(client, fEngineTime, LAST_ATTACK);
+
+	Cache[client].LastAttack = fEngineTime;
 
 	int iParticle = CreateParticle(client, g_sDeadlyVoiceParticles[GetClientTeam(client)]);
 	KillEntIn(iParticle, fRate);
@@ -73,25 +68,19 @@ void DeadlyVoice_Voice(int client){
 	float fPos[3];
 	GetClientEyePosition(client, fPos);
 
-	float fRange = GetFloatCache(client, RANGE);
-	float fDamage = GetFloatCache(client, DAMAGE);
-
-	DamageRadius(fPos, iParticle, client, fRange, fDamage, DMG_BLAST, _, _, DeadlyVoice_OnDamage);
+	DamageRadius(fPos, iParticle, client, Cache[client].Range, Cache[client].Damage, DMG_BLAST, _, _, DeadlyVoice_OnDamage);
 	EmitSoundToAll(DEADLYVOICE_SOUND_ATTACK, client);
 }
 
-void DeadlyVoice_OnDamage(int client, int iAttacker, float fDamage){
-	if(IsFakeClient(client))
-		return;
-
-	float fPunch[3];
-	fPunch[0] = GetRandomFloat(-15.0, 15.0);
-	fPunch[1] = GetRandomFloat(-15.0, 15.0);
-	fPunch[2] = GetRandomFloat(-15.0, 15.0);
-	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fPunch);
+void DeadlyVoice_OnDamage(int client, int iAttacker, float fDamage)
+{
+	if (!IsFakeClient(client))
+		ViewPunchRand(client, 15.0);
 }
 
-#undef LAST_ATTACK
-#undef RATE
-#undef RANGE
-#undef DAMAGE
+#undef DEADLYVOICE_SOUND_ATTACK
+
+#undef LastAttack
+#undef Rate
+#undef Range
+#undef Damage

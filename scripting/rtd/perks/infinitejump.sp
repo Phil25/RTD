@@ -16,20 +16,17 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+DEFINE_CALL_EMPTY(InfiniteJump)
 
-int g_iInfiniteJumpId = 31;
-
-public void InfiniteJump_Call(int client, Perk perk, bool apply){
-	if(apply){
-		g_iInfiniteJumpId = perk.Id;
-		SetClientPerkCache(client, g_iInfiniteJumpId);
-	}else UnsetClientPerkCache(client, g_iInfiniteJumpId);
+public void InfiniteJump_Init(const Perk perk)
+{
+	Events.OnPlayerRunCmd(perk, InfiniteJump_OnPlayerRunCmd);
 }
 
-void InfiniteJump_OnPlayerRunCmd(int client, int iButtons){
-	if(!CheckClientPerkCache(client, g_iInfiniteJumpId))
-		return;
-
-	if(iButtons & IN_JUMP)
+bool InfiniteJump_OnPlayerRunCmd(const int client, int& iButtons, float fVel[3], float fAng[3])
+{
+	if (iButtons & IN_JUMP)
 		SetEntProp(client, Prop_Send, "m_iAirDash", 0);
+
+	return false;
 }

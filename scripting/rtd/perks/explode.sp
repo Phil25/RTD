@@ -16,7 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #define MODEL_BOMB "models/passtime/ball/passtime_ball_halloween.mdl"
 
 #define BOMB_FUSE_SOUND "misc/halloween/hwn_bomb_fuse.wav"
@@ -25,14 +24,12 @@
 #define BOMB_BEAM_DRAG "weapons/gauss/chargeloop.wav"
 #define SOUND_EXPLODE "weapons/explode3.wav"
 
-#define BOMB_DESTROYED 0
-#define IN_RADIUS 1
-
-#define BOMB_RADIUS_SQR 0
-
-#define BOMB_ENT_BOMB 0
-#define BOMB_ENT_SPARKS 1
-#define BOMB_ENT_BEAM 2
+#define Destroyed Int[0]
+#define InRadius Int[2]
+#define RadiusSquared Float[0]
+#define Bomb EntSlot_1
+#define Sparks EntSlot_2
+#define Beam EntSlot_3
 
 #define BEAM_COLOR_R 60
 #define BEAM_COLOR_G 60
@@ -41,9 +38,10 @@
 #define BEAM_COLOR_INACTIVE "60 60 60"
 #define BEAM_COLOR_ACTIVE "255 255 255"
 
-int g_iExplodeId = 15;
+DEFINE_CALL_APPLY_REMOVE(Explode)
 
-void Explode_Start(){
+public void Explode_Init(const Perk perk)
+{
 	PrecacheModel(MODEL_BOMB);
 	PrecacheSound(BOMB_HIT_SOUND);
 	PrecacheSound(BOMB_FUSE_SOUND);
@@ -52,23 +50,17 @@ void Explode_Start(){
 	PrecacheSound(SOUND_EXPLODE);
 }
 
-public void Explode_Call(int client, Perk perk, bool apply){
-	if(apply) Explode_ApplyPerk(client, perk);
-	else Explode_RemovePerk(client);
-}
-
-void Explode_ApplyPerk(int client, Perk perk){
-	g_iExplodeId = perk.Id;
-	SetClientPerkCache(client, g_iExplodeId);
-
-	SetIntCache(client, false, BOMB_DESTROYED);
-	SetIntCache(client, true, IN_RADIUS);
+void Explode_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Destroyed = false;
+	Cache[client].InRadius = true;
 
 	float fBombRange = perk.GetPrefFloat("range");
-	SetFloatCache(client, fBombRange * fBombRange, BOMB_RADIUS_SQR);
+	Cache[client].RadiusSquared = fBombRange * fBombRange;
 
 	int iBomb = CreateEntityByName("prop_physics_override");
-	if(iBomb <= MaxClients) return;
+	if( iBomb <= MaxClients)
+		return;
 
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);
@@ -90,77 +82,71 @@ void Explode_ApplyPerk(int client, Perk perk){
 	SDKHook(iBomb, SDKHook_OnTakeDamagePost, Explode_OnBombTakeDamagePost);
 
 	fPos[2] += 22.0;
-	SetEntCache(client, CreateEffect(fPos, "flare_sparks", GetPerkTimeFloat(perk)), BOMB_ENT_SPARKS);
-	SetEntCache(client, iBomb, BOMB_ENT_BOMB);
-	SetEntCache(client, ConnectWithBeam(client, iBomb, BEAM_COLOR_R, BEAM_COLOR_G, BEAM_COLOR_B), BOMB_ENT_BEAM);
+	Cache[client].SetEnt(Bomb, iBomb);
+	Cache[client].SetEnt(Sparks, CreateEffect(fPos, "flare_sparks", GetPerkTimeFloat(perk)));
+	Cache[client].SetEnt(Beam, ConnectWithBeam(client, iBomb, BEAM_COLOR_R, BEAM_COLOR_G, BEAM_COLOR_B));
 
 	EmitSoundToAll(BOMB_FUSE_SOUND, iBomb);
 
-	CreateTimer(0.1, Explode_BindToBomb, GetClientUserId(client), TIMER_REPEAT);
+	Cache[client].Repeat(0.1, Explode_BindToBomb);
 }
 
-void Explode_RemovePerk(int client){
-	UnsetClientPerkCache(client, g_iExplodeId);
-
-	KillEntCache(client, BOMB_ENT_SPARKS);
-
-	int iBomb = GetEntCache(client, BOMB_ENT_BOMB);
-	if(iBomb <= MaxClients)
+void Explode_RemovePerk(int client)
+{
+	int iBomb = Cache[client].GetEnt(Bomb).Index;
+	if (iBomb <= MaxClients)
 		return;
 
 	int iTimeLeft = g_hRollers.GetEndRollTime(client) - GetTime();
 	bool bForcefullyRemoved = iTimeLeft > 1; // assumption
 
-	if(!GetIntCacheBool(client, BOMB_DESTROYED) && !bForcefullyRemoved){
+	if (!Cache[client].Destroyed && !bForcefullyRemoved)
+	{
 		float fPos[3];
 		GetEntPropVector(iBomb, Prop_Send, "m_vecOrigin", fPos);
 
-		SendTEParticle(TEParticle_ExplosionLarge, fPos);
-		SendTEParticle(TEParticle_ExplosionLargeShockwave, fPos);
+		SendTEParticle(TEParticles.ExplosionLarge, fPos);
+		SendTEParticle(TEParticles.ExplosionLargeShockwave, fPos);
 		EmitSoundToAll(SOUND_EXPLODE, iBomb);
 
 		FakeClientCommandEx(client, "explode");
 	}
 
 	StopSound(iBomb, SNDCHAN_AUTO, BOMB_FUSE_SOUND);
-	KillEntCache(client, BOMB_ENT_BOMB);
-	KillEntCache(client, BOMB_ENT_BEAM);
 }
 
-public Action Explode_BindToBomb(Handle hTimer, const int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client)
-		return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iExplodeId))
-		return Plugin_Stop;
-
-	int iBomb = GetEntCache(client, BOMB_ENT_BOMB);
-	if(iBomb <= MaxClients)
+public Action Explode_BindToBomb(const int client)
+{
+	int iBomb = Cache[client].GetEnt(Bomb).Index;
+	if (iBomb <= MaxClients)
 		return Plugin_Stop;
 
 	float fClientOrigin[3], fBombOrigin[3];
 	GetClientAbsOrigin(client, fClientOrigin);
 	GetEntPropVector(iBomb, Prop_Send, "m_vecOrigin", fBombOrigin);
 
-	if(GetVectorDistance(fClientOrigin, fBombOrigin, true) < GetFloatCache(client, BOMB_RADIUS_SQR)){
-		if(!GetIntCacheBool(client, IN_RADIUS)){
-			SetIntCache(client, true, IN_RADIUS);
+	if (GetVectorDistance(fClientOrigin, fBombOrigin, true) < Cache[client].RadiusSquared)
+	{
+		if (!Cache[client].InRadius)
+		{
+			Cache[client].InRadius = true;
 
-			int iBeam = GetEntCache(client, BOMB_ENT_BEAM);
 			SetVariantString(BEAM_COLOR_INACTIVE);
-			AcceptEntityInput(iBeam, "Color");
+			AcceptEntityInput(Cache[client].GetEnt(Beam).Index, "Color");
 
 			StopSound(client, SNDCHAN_AUTO, BOMB_BEAM_DRAG);
 		}
-		return Plugin_Continue;
-	}else{
-		if(GetIntCacheBool(client, IN_RADIUS)){
-			SetIntCache(client, false, IN_RADIUS);
 
-			int iBeam = GetEntCache(client, BOMB_ENT_BEAM);
+		return Plugin_Continue;
+	}
+	else
+	{
+		if (Cache[client].InRadius)
+		{
+			Cache[client].InRadius = false;
+
 			SetVariantString(BEAM_COLOR_ACTIVE);
-			AcceptEntityInput(iBeam, "Color");
+			AcceptEntityInput(Cache[client].GetEnt(Beam).Index, "Color");
 
 			EmitSoundToAll(BOMB_BEAM_DRAG, client);
 		}
@@ -176,21 +162,27 @@ public Action Explode_BindToBomb(Handle hTimer, const int iUserId){
 	return Plugin_Continue;
 }
 
-public void Explode_OnBombTakeDamagePost(int iBomb, int iAtk, int iInflictor, float fDamage, int iType, int iWeapon, float fForce[3], float fPos[3]){
-	if(iType & (DMG_BULLET | DMG_CLUB)){
-		SendTEParticleWithPriority(TEParticle_GreenBitsImpact, fPos);
-	}else if(iType & (DMG_BUCKSHOT)){
+public void Explode_OnBombTakeDamagePost(int iBomb, int iAtk, int iInflictor, float fDamage, int iType, int iWeapon, float fForce[3], float fPos[3])
+{
+	if (iType & (DMG_BULLET | DMG_CLUB))
+	{
+		SendTEParticleWithPriority(TEParticles.GreenBitsImpact, fPos);
+	}
+	else if (iType & DMG_BUCKSHOT)
+	{
 		float fShotPos[3];
-		for(int i = 0; i < 3; ++i){
+		for (int i = 0; i < 3; ++i)
+		{
 			fShotPos[0] = fPos[0] + GetRandomFloat(-10.0, 10.0);
 			fShotPos[1] = fPos[1] + GetRandomFloat(-10.0, 10.0);
 			fShotPos[2] = fPos[2] + GetRandomFloat(-10.0, 10.0);
-			SendTEParticleWithPriority(TEParticle_GreenBitsImpact, fShotPos);
+			SendTEParticleWithPriority(TEParticles.GreenBitsImpact, fShotPos);
 		}
 	}
 
 	int iHealth = GetEntProp(iBomb, Prop_Data, "m_iHealth") - RoundFloat(fDamage);
-	if(iHealth <= 0){
+	if (iHealth <= 0)
+	{
 		Explode_CompleteSuccess(iBomb, fPos);
 		return;
 	}
@@ -209,30 +201,33 @@ public void Explode_OnBombTakeDamagePost(int iBomb, int iAtk, int iInflictor, fl
 	TeleportEntity(iBomb, NULL_VECTOR, fAng, NULL_VECTOR);
 }
 
-int Explode_FindOwningClient(int iBomb){
-	int iEntReference = EntIndexToEntRef(iBomb);
-
-	for(int client = 1; client <= MaxClients; ++client)
-		if(GetEntCacheRef(client, BOMB_ENT_BOMB) == iEntReference)
-			return client;
-
-	return 0;
-}
-
-void Explode_CompleteSuccess(const int iBomb, const float fPos[3]){
+void Explode_CompleteSuccess(const int iBomb, const float fPos[3])
+{
 	int client = Explode_FindOwningClient(iBomb);
-	if(client == 0){ // should never happen
+	if (client == 0) // should never happen
+	{
 		AcceptEntityInput(iBomb, "Kill");
 		return;
 	}
 
-	SetIntCache(client, true, BOMB_DESTROYED);
+	Cache[client].Destroyed = true;
 
-	SendTEParticle(TEParticle_GreenBitsTwirl, fPos);
-	SendTEParticle(TEParticle_GreenFog, fPos);
+	SendTEParticle(TEParticles.GreenBitsTwirl, fPos);
+	SendTEParticle(TEParticles.GreenFog, fPos);
 	EmitSoundToAll(BOMB_DESTROY_SOUND, iBomb);
 
 	ForceRemovePerk(client);
+}
+
+int Explode_FindOwningClient(int iBomb)
+{
+	int iEntReference = EntIndexToEntRef(iBomb);
+
+	for (int client = 1; client <= MaxClients; ++client)
+		if (Cache[client].GetEnt(Bomb).Reference == iEntReference)
+			return client;
+
+	return 0;
 }
 
 #undef MODEL_BOMB
@@ -243,14 +238,12 @@ void Explode_CompleteSuccess(const int iBomb, const float fPos[3]){
 #undef BOMB_BEAM_DRAG
 #undef SOUND_EXPLODE
 
-#undef BOMB_DESTROYED
-#undef IN_RADIUS
-
-#undef BOMB_RADIUS_SQR
-
-#undef BOMB_ENT_BOMB
-#undef BOMB_ENT_SPARKS
-#undef BOMB_ENT_BEAM
+#undef Destroyed
+#undef InRadius
+#undef RadiusSquared
+#undef Bomb
+#undef Sparks
+#undef Beam
 
 #undef BEAM_COLOR_R
 #undef BEAM_COLOR_G

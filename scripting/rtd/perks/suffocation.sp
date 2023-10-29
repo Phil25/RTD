@@ -16,48 +16,34 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define RATE 0
-#define DAMAGE 1
+#define Rate Float[0]
+#define Damage Float[1]
 
-int g_iSuffocationId = 42;
+DEFINE_CALL_APPLY(Suffocation)
 
-public void Suffocation_Call(int client, Perk perk, bool apply){
-	if(apply) Suffocation_ApplyPerk(client, perk);
-	else UnsetClientPerkCache(client, g_iSuffocationId);
+public void Suffocation_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Rate = perk.GetPrefFloat("rate", 1.0);
+	Cache[client].Damage = perk.GetPrefFloat("damage", 5.0);
+
+	Cache[client].Repeat(perk.GetPrefFloat("delay", 12.0), Suffocation_Begin);
 }
 
-void Suffocation_ApplyPerk(client, Perk perk){
-	g_iSuffocationId = perk.Id;
-	SetClientPerkCache(client, g_iSuffocationId);
+public Action Suffocation_Begin(const int client)
+{
+	SDKHooks_TakeDamage(client, 0, 0, Cache[client].Damage, DMG_DROWN);
 
-	SetFloatCache(client, perk.GetPrefFloat("rate"), RATE);
-	SetFloatCache(client, perk.GetPrefFloat("damage"), DAMAGE);
+	Cache[client].Repeat(Cache[client].Rate, Suffocation_Tick);
 
-	CreateTimer(perk.GetPrefFloat("delay"), Timer_Suffocation_Begin, GetClientUserId(client));
-}
-
-public Action Timer_Suffocation_Begin(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iSuffocationId))
-		return Plugin_Stop;
-
-	SDKHooks_TakeDamage(client, 0, 0, GetFloatCache(client, DAMAGE), DMG_DROWN);
-	CreateTimer(GetFloatCache(client, RATE), Timer_Suffocation_Cont, iUserId, TIMER_REPEAT);
 	return Plugin_Stop;
 }
 
-public Action Timer_Suffocation_Cont(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
+public Action Suffocation_Tick(const int client)
+{
+	SDKHooks_TakeDamage(client, 0, 0, Cache[client].Damage, DMG_DROWN);
 
-	if(!CheckClientPerkCache(client, g_iSuffocationId))
-		return Plugin_Stop;
-
-	SDKHooks_TakeDamage(client, 0, 0, GetFloatCache(client, DAMAGE), DMG_DROWN);
 	return Plugin_Continue;
 }
 
-#undef RATE
-#undef DAMAGE
+#undef Rate
+#undef Damage

@@ -16,21 +16,29 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Multiplier Float[0]
 
-public void Weakened_Call(int client, Perk perk, bool apply){
-	if(apply) Weakened_ApplyPerk(client, perk);
-	else SDKUnhook(client, SDKHook_OnTakeDamage, Weakened_OnTakeDamage);
-}
+DEFINE_CALL_APPLY_REMOVE(Weakened)
 
-void Weakened_ApplyPerk(int client, Perk perk){
-	SetFloatCache(client, perk.GetPrefFloat("multiplier"));
+public void Weakened_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Multiplier = perk.GetPrefFloat("multiplier", 2.5);
+
 	SDKHook(client, SDKHook_OnTakeDamage, Weakened_OnTakeDamage);
 }
 
-public Action Weakened_OnTakeDamage(int client, int &iAtk, int &iInflictor, float &fDmg, int &iType){
-	if(client == iAtk)
+void Weakened_RemovePerk(const int client)
+{
+	SDKUnhook(client, SDKHook_OnTakeDamage, Weakened_OnTakeDamage);
+}
+
+public Action Weakened_OnTakeDamage(int client, int& iAtk, int& iInflictor, float& fDmg, int& iType)
+{
+	if (client == iAtk)
 		return Plugin_Continue;
 
-	fDmg *= GetFloatCache(client);
+	fDmg *= Cache[client].Multiplier;
 	return Plugin_Changed;
 }
+
+#undef Multiplier

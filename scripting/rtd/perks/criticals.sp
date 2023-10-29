@@ -16,24 +16,21 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Condition Int[0]
 
-#define FULLCRIT TFCond_CritOnFirstBlood
-#define MINICRIT TFCond_Buffed
+DEFINE_CALL_APPLY_REMOVE(Criticals)
 
-public void Criticals_Call(int client, Perk perk, bool apply){
-	if(apply) Criticals_ApplyPerk(client, perk);
-	else Criticals_RemovePerk(client);
+public void Criticals_ApplyPerk(const int client, const Perk perk)
+{
+	TFCond eCond = perk.GetPrefCell("full", 1) > 0 ? TFCond_CritOnFirstBlood : TFCond_Buffed;
+
+	Cache[client].Condition = view_as<int>(eCond);
+	TF2_AddCondition(client, eCond);
 }
 
-void Criticals_ApplyPerk(int client, Perk perk){
-	TFCond iFull = perk.GetPrefCell("full") > 0 ? FULLCRIT : MINICRIT;
-	SetIntCache(client, view_as<int>(iFull));
-	TF2_AddCondition(client, iFull);
+void Criticals_RemovePerk(int client)
+{
+	TF2_RemoveCondition(client, view_as<TFCond>(Cache[client].Condition));
 }
 
-void Criticals_RemovePerk(int client){
-	TF2_RemoveCondition(client, view_as<TFCond>(GetIntCache(client)));
-}
-
-#undef FULLCRIT
-#undef MINICRIT
+#undef Condition

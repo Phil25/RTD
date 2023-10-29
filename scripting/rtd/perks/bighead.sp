@@ -16,31 +16,33 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Scale Float[0]
 
-#define ATTRIB_VOICEPITCH 2048
+DEFINE_CALL_APPLY_REMOVE(BigHead)
 
-int g_iBigHeadId = 33;
-
-public void BigHead_Call(int client, Perk perk, bool apply){
-	if(apply) BigHead_Apply(client, perk);
-	else BigHead_Remove(client);
+public void BigHead_Init(const Perk perk)
+{
+	Events.OnPlayerRunCmd(perk, BigHead_OnPlayerRunCmd);
 }
 
-void BigHead_Apply(int client, Perk perk){
-	g_iBigHeadId = perk.Id;
-	SetClientPerkCache(client, g_iBigHeadId);
+public void BigHead_ApplyPerk(const int client, const Perk perk)
+{
+	float fScale = perk.GetPrefFloat("scale", 2.5);
 
-	float fScale = perk.GetPrefFloat("scale");
-	SetFloatCache(client, fScale);
-	TF2Attrib_SetByDefIndex(client, ATTRIB_VOICEPITCH, 1/(fScale > 3.0 ? 3.0 : fScale));
+	Cache[client].Scale = fScale;
+
+	TF2Attrib_SetByDefIndex(client, Attribs.VoicePitch, 1.0 / Min(fScale, 3.0));
 }
 
-void BigHead_Remove(int client){
-	UnsetClientPerkCache(client, g_iBigHeadId);
-	TF2Attrib_RemoveByDefIndex(client, ATTRIB_VOICEPITCH);
+void BigHead_RemovePerk(const int client)
+{
+	TF2Attrib_RemoveByDefIndex(client, Attribs.VoicePitch);
 }
 
-void BigHead_OnPlayerRunCmd(int client){
-	if(CheckClientPerkCache(client, g_iBigHeadId))
-		SetEntPropFloat(client, Prop_Send, "m_flHeadScale", GetFloatCache(client));
+bool BigHead_OnPlayerRunCmd(const int client, int& iButtons, float fVel[3], float fAng[3])
+{
+	SetEntPropFloat(client, Prop_Send, "m_flHeadScale", Cache[client].Scale);
+	return false;
 }
+
+#undef Scale

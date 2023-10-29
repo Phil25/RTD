@@ -16,61 +16,42 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Scale Float[0]
 
-#define ATTRIB_OVERHEAL_BONUS 11 //the overheal bonus attribute
+DEFINE_CALL_APPLY_REMOVE(OverhealBonus)
 
-int g_iOverhealBonusId = 43;
-
-void OverhealBonus_OnEntityCreated(int iEnt, const char[] sClassname){
-	if(StrEqual(sClassname, "tf_dropped_weapon"))
-		SDKHook(iEnt, SDKHook_SpawnPost, OverhealBonus_OnDroppedWeaponSpawn);
+public void OverhealBonus_Init(const Perk perk)
+{
+	Events.OnResupply(perk, OverhealBonus_Apply);
+	Events.OnEntitySpawned(perk, OverhealBonus_OnDroppedWeaponSpawn, Classname_DroppedWeapon, Retriever_AccountId);
 }
 
-public void OverhealBonus_OnDroppedWeaponSpawn(int iEnt){
-	int client = AccountIDToClient(GetEntProp(iEnt, Prop_Send, "m_iAccountID"));
-	if(client && GetIntCacheBool(client, 3))
-		AcceptEntityInput(iEnt, "Kill");
+void OverhealBonus_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Scale = perk.GetPrefFloat("scale", 5.0);
+
+	OverhealBonus_Apply(client);
 }
 
-public void OverhealBonus_Call(int client, Perk perk, bool apply){
-	if(apply) OverhealBonus_ApplyPerk(client, perk);
-	else OverhealBonus_RemovePerk(client);
-}
-
-void OverhealBonus_ApplyPerk(int client, Perk perk){
-	g_iOverhealBonusId = perk.Id;
-	SetClientPerkCache(client, g_iOverhealBonusId);
-
-	float fBonus = perk.GetPrefFloat("scale");
-
-	OverhealBonus_EditClientWeapons(client, true, fBonus);
-	SetIntCache(client, true, 3);
-}
-
-void OverhealBonus_RemovePerk(int client){
-	OverhealBonus_EditClientWeapons(client, false);
-	UnsetClientPerkCache(client, g_iOverhealBonusId);
-	CreateTimer(0.25, Timer_OverhealBonus_FullUnset, GetClientUserId(client));
-}
-
-public Action Timer_OverhealBonus_FullUnset(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(client) SetIntCache(client, false, 3);
-	return Plugin_Stop;
-}
-
-void OverhealBonus_EditClientWeapons(int client, bool apply, float fBonus=0.0){
+void OverhealBonus_RemovePerk(const int client)
+{
 	int iMediGun = GetPlayerWeaponSlot(client, 1);
-	if(iMediGun <= MaxClients || !IsValidEntity(iMediGun))
+	if (iMediGun > MaxClients && IsValidEntity(iMediGun))
+		TF2Attrib_RemoveByDefIndex(iMediGun, Attribs.OverhealBonus);
+}
+
+void OverhealBonus_Apply(const int client)
+{
+	int iMediGun = GetPlayerWeaponSlot(client, 1);
+	if (iMediGun <= MaxClients || !IsValidEntity(iMediGun))
 		return;
 
-	if(apply){
-		if(fBonus != 0.0)
-			TF2Attrib_SetByDefIndex(iMediGun, ATTRIB_OVERHEAL_BONUS, fBonus);
-	}else TF2Attrib_RemoveByDefIndex(iMediGun, ATTRIB_OVERHEAL_BONUS);
+	TF2Attrib_SetByDefIndex(iMediGun, Attribs.OverhealBonus, Cache[client].Scale);
 }
 
-void OverhealBonus_Resupply(int client){
-	if(CheckClientPerkCache(client, g_iOverhealBonusId))
-		OverhealBonus_EditClientWeapons(client, true);
+public void OverhealBonus_OnDroppedWeaponSpawn(const int client, const int iEnt)
+{
+	AcceptEntityInput(iEnt, "Kill");
 }
+
+#undef Scale

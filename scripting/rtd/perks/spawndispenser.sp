@@ -16,107 +16,96 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define LEVEL 0
-#define KEEP 1
-#define AMOUNT 2
+#define Level Int[0]
+#define Cleanup Int[1]
+#define Max Int[2]
+#define Spawned Int[3]
 
-int g_iSpawnDispenserId = 30;
+DEFINE_CALL_APPLY(SpawnDispenser)
 
-public SpawnDispenser_Call(int client, Perk perk, bool apply){
-	if(apply) SpawnDispenser_ApplyPerk(client, perk);
-	else SpawnDispenser_RemovePerk(client);
+public void SpawnDispenser_Init(const Perk perk)
+{
+	Events.OnVoice(perk, SpawnDispenser_OnVoice);
 }
 
-void SpawnDispenser_ApplyPerk(int client, Perk perk){
-	g_iSpawnDispenserId = perk.Id;
-	SetClientPerkCache(client, g_iSpawnDispenserId);
+public void SpawnDispenser_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Level = perk.GetPrefCell("level", 3);
+	Cache[client].Cleanup = perk.GetPrefCell("keep", 1) > 0 ? view_as<int>(EntCleanup_None) : view_as<int>(EntCleanup_Auto);
+	Cache[client].Max = MinInt(perk.GetPrefCell("amount", 1), view_as<int>(EntSlot_SIZE));
+	Cache[client].Spawned = 0;
 
-	SetIntCache(client, perk.GetPrefCell("level"), LEVEL);
-	SetIntCache(client, perk.GetPrefCell("keep") > 0, KEEP);
-	SetIntCache(client, perk.GetPrefCell("amount"), AMOUNT);
-
-	PrepareArrayCache(client);
-
-	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Dispenser_Initialization", LANG_SERVER, 0x03, 0x01);
+	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Dispenser_Initialization", LANG_SERVER, 0x03, 0x01);
 }
 
-void SpawnDispenser_RemovePerk(int client){
-	UnsetClientPerkCache(client, g_iSpawnDispenserId);
+public void SpawnDispenser_OnVoice(const int client)
+{
+	int iSpawned = Cache[client].Spawned;
+	int iMax = Cache[client].Max;
 
-	if(GetIntCacheBool(client, KEEP))
-		return;
-
-	ArrayList list = GetArrayCache(client);
-	int iLen = list.Length;
-	for(int i = 0; i < iLen; i++){
-		int iEnt = EntRefToEntIndex(list.Get(i));
-		if(iEnt > MaxClients && IsValidEntity(iEnt))
-			AcceptEntityInput(iEnt, "Kill");
-	}
-}
-
-void SpawnDispenser_Voice(int client){
-	if(!CheckClientPerkCache(client, g_iSpawnDispenserId))
+	if (iSpawned >= iMax)
 		return;
 
 	float fPos[3];
-	if(!GetClientLookPosition(client, fPos))
+	if (!GetClientLookPosition(client, fPos))
 		return;
 
-	if(!CanBuildAtPos(fPos, false))
+	if (!CanBuildAtPos(fPos, false))
 		return;
 
-	float fDispenserAng[3], fClientAng[3];
-	GetClientEyeAngles(client, fClientAng);
-	fDispenserAng[1] = fClientAng[1];
+	float fAng[3];
+	GetClientEyeAngles(client, fAng);
+	fAng[0] = 0.0;
+	fAng[2] = 0.0;
 
-	int iLevel = GetIntCache(client, LEVEL);
-	int iDispenser = SpawnDispenser(client, fPos, fDispenserAng, iLevel);
+	int iDispenser = SpawnDispenser(client, fPos, fAng, Cache[client].Level);
 
-	ArrayList list = GetArrayCache(client);
-	list.Push(EntIndexToEntRef(iDispenser));
+	Cache[client].SetEnt(view_as<EntSlot>(iSpawned++), iDispenser, view_as<EntCleanup>(Cache[client].Cleanup))
+	Cache[client].Spawned = iSpawned;
 
-	int iSpawned = list.Length;
-	int iMax = GetIntCache(client, AMOUNT);
+	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Dispenser_Spawned", LANG_SERVER, 0x03, iSpawned, iMax, 0x01);
 
-	PrintToChat(client, "%s %T", "\x07FFD700[RTD]\x01", "RTD2_Perk_Dispenser_Spawned", LANG_SERVER, 0x03, iSpawned, iMax, 0x01);
-
-	if(iSpawned < iMax)
+	if (iSpawned < iMax)
 		return;
 
-	if(GetIntCacheBool(client, KEEP))
+	if (view_as<EntCleanup>(Cache[client].Cleanup) == EntCleanup_None)
+	{
+		// We can remove the perk early if Dispensers are to be kept
 		ForceRemovePerk(client);
-	else UnsetClientPerkCache(client, g_iSpawnDispenserId);
+	}
 }
 
 /*
 	The SpawnDispenser stock is taken from Pelipoika's TF2 Building Spawner EXTREME
 	https://forums.alliedmods.net/showthread.php?p=2148102
 */
-stock int SpawnDispenser(int builder, float Position[3], float Angle[3], int level, int flags=4){
+stock int SpawnDispenser(int iBuilder, float Position[3], float Angle[3], int iLevel)
+{
 
-	int dispenser = CreateEntityByName("obj_dispenser");
-	if(!IsValidEntity(dispenser)) return 0;
+	int iDispenser = CreateEntityByName("obj_dispenser");
+	if (iDispenser <= MaxClients)
+		return 0;
 
-	int iTeam = GetClientTeam(builder);
+	int iTeam = GetClientTeam(iBuilder);
 
-	DispatchKeyValueVector(dispenser, "origin", Position);
-	DispatchKeyValueVector(dispenser, "angles", Angle);
-	SetEntProp(dispenser, Prop_Send, "m_iHighestUpgradeLevel", level);
-	SetEntProp(dispenser, Prop_Data, "m_spawnflags", flags);
-	SetEntProp(dispenser, Prop_Send, "m_bBuilding", 1);
-	DispatchSpawn(dispenser);
+	DispatchKeyValueVector(iDispenser, "origin", Position);
+	DispatchKeyValueVector(iDispenser, "angles", Angle);
+	SetEntProp(iDispenser, Prop_Send, "m_iHighestUpgradeLevel", iLevel);
+	SetEntProp(iDispenser, Prop_Data, "m_spawnflags", 4);
+	SetEntProp(iDispenser, Prop_Send, "m_bBuilding", 1);
+	DispatchSpawn(iDispenser);
 
 	SetVariantInt(iTeam);
-	AcceptEntityInput(dispenser, "SetTeam");
-	SetEntProp(dispenser, Prop_Send, "m_nSkin", iTeam -2);
+	AcceptEntityInput(iDispenser, "SetTeam");
+	SetEntProp(iDispenser, Prop_Send, "m_nSkin", iTeam - 2);
 
-	ActivateEntity(dispenser);
-	SetEntPropEnt(dispenser, Prop_Send, "m_hBuilder", builder);
+	ActivateEntity(iDispenser);
+	SetEntPropEnt(iDispenser, Prop_Send, "m_hBuilder", iBuilder);
 
-	return dispenser;
+	return iDispenser;
 }
 
-#define LEVEL 0
-#define KEEP 1
-#define AMOUNT 2
+#undef Level
+#undef Cleanup
+#undef Max
+#undef Spawned

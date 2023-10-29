@@ -16,83 +16,83 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#define HEARTBEAT_NEXT_TICK 0.5
-#define HEARTBEAT_NEXT_STEP 0.12
+#define HEARTBEAT_TICK 0.5
+#define HEARTBEAT_FOLLOWUP 0.12
 
 #define SOUND_HEARTBEAT_1 "player/taunt_yeti_chest_hit1.wav"
 #define SOUND_HEARTBEAT_2 "player/taunt_yeti_chest_hit7.wav"
 
-#define MIN_DAMAGE 0
-#define MAX_DAMAGE 1
-#define RESISTANCE 2
-#define NEXT_HURT 3
+#define MinDamage Float[0]
+#define MaxDamage Float[1]
+#define Resistance Float[2]
+#define NextHurt Float[3]
 
-int g_iVampireId = 68;
+DEFINE_CALL_APPLY(Vampire)
 
-void Vampire_Start(){
+public void Vampire_Init(const Perk perk)
+{
 	PrecacheSound(SOUND_HEARTBEAT_1);
 	PrecacheSound(SOUND_HEARTBEAT_2);
+
+	Events.OnPlayerAttacked(perk, Vampire_OnPlayerAttacked);
 }
 
-public void Vampire_Call(int client, Perk perk, bool apply){
-	if(apply) Vampire_ApplyPerk(client, perk);
-	else UnsetClientPerkCache(client, g_iVampireId);
+void Vampire_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].MinDamage = perk.GetPrefFloat("mindamage", 1.0);
+	Cache[client].MaxDamage = perk.GetPrefFloat("maxdamage", 3.0);
+	Cache[client].Resistance = perk.GetPrefFloat("resistance", 3.0);
+	Cache[client].NextHurt = GetEngineTime() + Cache[client].Resistance;
+
+	Cache[client].Repeat(HEARTBEAT_TICK, Vampire_Tick);
 }
 
-void Vampire_ApplyPerk(client, Perk perk){
-	g_iVampireId = perk.Id;
-	SetClientPerkCache(client, g_iVampireId);
+public Action Vampire_Tick(const int client)
+{
+	if (Cache[client].NextHurt > GetEngineTime())
+		return Plugin_Continue;
 
-	SetFloatCache(client, perk.GetPrefFloat("mindamage"), MIN_DAMAGE);
-	SetFloatCache(client, perk.GetPrefFloat("maxdamage"), MAX_DAMAGE);
+	Vampire_Hurt(client);
+	EmitSoundToAll(SOUND_HEARTBEAT_1, client);
 
-	float fResistance = perk.GetPrefFloat("resistance");
-	SetFloatCache(client, fResistance, RESISTANCE);
-	SetFloatCache(client, GetGameTime() +fResistance, NEXT_HURT);
+	CreateTimer(HEARTBEAT_FOLLOWUP, Vampire_Tick_Followup, GetClientUserId(client));
 
-	CreateTimer(HEARTBEAT_NEXT_TICK, Timer_Vampire_Tick, GetClientUserId(client));
+	return Plugin_Continue;
 }
 
-public Action Timer_Vampire_Tick(Handle hTimer, int iUserId){
+public Action Vampire_Tick_Followup(Handle hTimer, const int iUserId)
+{
 	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iVampireId))
+	if (!client || !IsPlayerAlive(client))
 		return Plugin_Stop;
 
-	if(GetFloatCache(client, NEXT_HURT) < GetGameTime()){
-		EmitSoundToAll(SOUND_HEARTBEAT_1, client);
-		Vampire_Hurt(client);
-		CreateTimer(HEARTBEAT_NEXT_STEP, Timer_Vampire_Tick2, iUserId);
-	}
-
-	CreateTimer(HEARTBEAT_NEXT_TICK, Timer_Vampire_Tick, iUserId);
-	return Plugin_Stop;
-}
-
-public Action Timer_Vampire_Tick2(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	EmitSoundToAll(SOUND_HEARTBEAT_2, client);
 	Vampire_Hurt(client);
+	EmitSoundToAll(SOUND_HEARTBEAT_2, client);
+
 	return Plugin_Stop;
 }
 
-void Vampire_Hurt(int client){
-	float fDamage = GetRandomFloat(GetFloatCache(client), GetFloatCache(client, 1));
+void Vampire_Hurt(const int client)
+{
+	float fDamage = GetRandomFloat(Cache[client].MinDamage, Cache[client].MaxDamage);
 	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_PREVENT_PHYSICS_FORCE);
+
 	ViewPunchRand(client, 5.0);
 }
 
-void Vampire_PlayerHurt(int client, Handle hEvent){
-	int iAttacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
-	if(iAttacker && client != iAttacker && CheckClientPerkCache(iAttacker, g_iVampireId))
-		SetFloatCache(iAttacker, GetGameTime() +GetFloatCache(iAttacker, RESISTANCE), NEXT_HURT);
+void Vampire_OnPlayerAttacked(const int client, const int iVictim, const int iDamage, const int iRemainingHealth)
+{
+	if (client != iVictim)
+		Cache[client].NextHurt = GetEngineTime() + Cache[client].Resistance;
 }
 
-#undef MIN_DAMAGE
-#undef MAX_DAMAGE
-#undef RESISTANCE
-#undef NEXT_HURT
+#undef HEARTBEAT_TICK
+#undef HEARTBEAT_FOLLOWUP
+
+#undef SOUND_HEARTBEAT_1
+#undef SOUND_HEARTBEAT_2
+
+#undef MinDamage
+#undef MaxDamage
+#undef Resistance
+#undef NextHurt

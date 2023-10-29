@@ -16,39 +16,36 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define NextStun Float[0]
 
-int g_iDrugBulletsId = 58;
+DEFINE_CALL_APPLY(DrugBullets)
 
-public void DrugBullets_Call(int client, Perk perk, bool apply){
-	if(apply){
-		g_iDrugBulletsId = perk.Id;
-		SetClientPerkCache(client, g_iDrugBulletsId);
-		SetIntCache(client, 0);
-	}else UnsetClientPerkCache(client, g_iDrugBulletsId);
+public void DrugBullets_Init(const Perk perk)
+{
+	Events.OnPlayerAttacked(perk, DrugBullets_OnPlayerAttacked);
 }
 
-void DrugBullets_PlayerHurt(int client, Handle hEvent){
-	int iAtk = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
-	if(!iAtk || iAtk == client)
-		return;
+public void DrugBullets_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].NextStun = GetEngineTime() + 1.0;
+}
 
-	if(!CheckClientPerkCache(iAtk, g_iDrugBulletsId))
-		return;
+public void DrugBullets_OnPlayerAttacked(const int client, const int iVictim, const int iDamage, const int iRemainingHealth)
+{
+	if (iRemainingHealth <= 0)
+		return
 
-	if(!IsPlayerAlive(client) || !GetEventInt(hEvent, "health"))
-		return;
-
-	int iTime = GetTime();
-	if(GetIntCache(iAtk) > iTime){
-		float fPunch[3];
-		fPunch[0] = GetRandomFloat(-15.0, 15.0);
-		fPunch[1] = GetRandomFloat(-15.0, 15.0);
-		fPunch[2] = GetRandomFloat(-15.0, 15.0);
-		SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fPunch);
+	float fTime = GetEngineTime();
+	if(Cache[client].NextStun > fTime)
+	{
+		ViewPunchRand(iVictim, 15.0);
 		return;
 	}
 
-	Drugged_Tick(client); // From Drugged perk
-	TF2_StunPlayer(client, 0.1, _, TF_STUNFLAG_THIRDPERSON, iAtk);
-	SetIntCache(iAtk, iTime +1);
+	Drugged_Tick(iVictim); // from Drugged perk
+	TF2_StunPlayer(iVictim, 0.1, _, TF_STUNFLAG_THIRDPERSON, client);
+
+	Cache[client].NextStun = fTime + 1.0;
 }
+
+#undef NextStun

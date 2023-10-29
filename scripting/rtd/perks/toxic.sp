@@ -16,106 +16,84 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define Radius Float[0]
+#define Damage Float[1]
+#define SplatIndex Int[0]
+#define EffectCount Int[1]
 
-#define TOXIC_RADIUS 0
-#define TOXIC_INTERVAL 1
-#define TOXIC_DAMAGE 2
+#define SOUND_TOXIC "player/general/flesh_burn.wav"
 
-#define TOXIC_EFFECT_SPLAT_INDEX 0
-#define TOXIC_EFFECT_COUNT 1
+DEFINE_CALL_APPLY_REMOVE(Toxic)
 
-#define TOXIC_PARTICLE "eb_aura_angry01"
-#define TOXIC_SOUND "player/general/flesh_burn.wav"
-
-int g_iToxicId = 1;
-
-void Toxic_Start(){
-	PrecacheSound(TOXIC_SOUND);
+public void Toxic_Init()
+{
+	PrecacheSound(SOUND_TOXIC);
 }
 
-public void Toxic_Call(int client, Perk perk, bool apply){
-	if(apply) Toxic_ApplyPerk(client, perk);
-	else{
-		UnsetClientPerkCache(client, g_iToxicId);
-		StopSound(client, SNDCHAN_AUTO, TOXIC_SOUND);
-	}
-}
+void Toxic_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Radius = perk.GetPrefFloat("radius", 192.0);
+	Cache[client].Damage = perk.GetPrefFloat("damage", 20.0);
+	Cache[client].EffectCount = RoundFloat(Cache[client].Radius / 64.0);
 
-void Toxic_ApplyPerk(int client, Perk perk){
-	g_iToxicId = perk.Id;
-	SetClientPerkCache(client, g_iToxicId);
-
-	float fRadius = perk.GetPrefFloat("radius")
-	SetFloatCache(client, fRadius, TOXIC_RADIUS);
-	SetFloatCache(client, perk.GetPrefFloat("interval"), TOXIC_INTERVAL);
-	SetFloatCache(client, perk.GetPrefFloat("damage"), TOXIC_DAMAGE);
-	SetIntCache(client, RoundFloat(fRadius / 64.0), TOXIC_EFFECT_COUNT);
-
-	switch(TF2_GetClientTeam(client)){
+	switch (TF2_GetClientTeam(client))
+	{
 		case TFTeam_Blue:
-			SetIntCache(client, view_as<int>(TEParticle_GasPasserImpactBlue), TOXIC_EFFECT_SPLAT_INDEX);
+			Cache[client].SplatIndex = view_as<int>(TEParticles.GasPasserImpactBlue);
+
 		case TFTeam_Red:
-			SetIntCache(client, view_as<int>(TEParticle_GasPasserImpactRed), TOXIC_EFFECT_SPLAT_INDEX);
+			Cache[client].SplatIndex = view_as<int>(TEParticles.GasPasserImpactRed);
 	}
 
-	int iUserId = GetClientUserId(client);
-	CreateTimer(GetFloatCache(client, TOXIC_INTERVAL), Timer_Toxic, iUserId, TIMER_REPEAT);
+	EmitSoundToAll(SOUND_TOXIC, client, _, _, _, _, 250);
 
-	EmitSoundToAll(TOXIC_SOUND, client, _, _, _, _, 250);
-	CreateTimer(0.1, Timer_ToxicParticles, iUserId, TIMER_REPEAT);
+	Cache[client].Repeat(perk.GetPrefFloat("interval", 0.2), Toxic_ApplyDamage);
+	Cache[client].Repeat(0.1, Toxic_SpawnParticles);
 }
 
-public Action Timer_Toxic(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(client == 0) return Plugin_Stop;
+void Toxic_RemovePerk(const int client)
+{
+	StopSound(client, SNDCHAN_AUTO, SOUND_TOXIC);
+}
 
-	if(!CheckClientPerkCache(client, g_iToxicId))
-		return Plugin_Stop;
-
+public Action Toxic_ApplyDamage(const int client)
+{
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);
 	fPos[2] += 60.0; // roughly player center
 
-	DamageRadius(fPos, client, client, GetFloatCache(client, TOXIC_RADIUS), GetFloatCache(client, TOXIC_DAMAGE), DMG_BLAST);
+	DamageRadius(fPos, client, client, Cache[client].Radius, Cache[client].Damage, DMG_BLAST);
 	return Plugin_Continue;
 }
 
-public Action Timer_ToxicParticles(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(client == 0) return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iToxicId))
-		return Plugin_Stop;
-
+public Action Toxic_SpawnParticles(const int client)
+{
 	float fClientPos[3];
 	GetClientAbsOrigin(client, fClientPos);
 	fClientPos[2] += 60.0; // roughly player center
 
 	float fPos[3], fDir[2];
-	int iCount = GetIntCache(client, TOXIC_EFFECT_COUNT)
-	TEParticle eTEParticle = view_as<TEParticle>(GetIntCache(client, TOXIC_EFFECT_SPLAT_INDEX));
+	TEParticleId eParticleId = view_as<TEParticleId>(Cache[client].SplatIndex);
 
-	for(int i = 0; i < iCount; ++i){
-		float fMaxRadius = GetFloatCache(client, TOXIC_RADIUS);
-		float fRadius = GetRandomFloat(fMaxRadius - 30.0, fMaxRadius);
+	for (int i = 0; i < Cache[client].EffectCount; ++i)
+	{
+		float fRadius = GetRandomFloat(Cache[client].Radius - 30.0, Cache[client].Radius);
 
 		fDir[0] = GetRandomFloat(0.0, 2.0 * 3.1415); // radians
 		fDir[1] = GetRandomFloat(0.0, 2.0 * 3.1415);
 		GetPointOnSphere(fClientPos, fDir, fRadius, fPos);
 
-		SendTEParticle(eTEParticle, fPos);
+		SendTEParticle(eParticleId, fPos);
 	}
 
 	// Use last spawned particle's position to create the fog
-	SendTEParticle(TEParticle_LingeringFogSmall, fPos);
+	SendTEParticle(TEParticles.LingeringFogSmall, fPos);
 	return Plugin_Continue;
 }
 
-#undef TOXIC_RADIUS
-#undef TOXIC_INTERVAL
-#undef TOXIC_DAMAGE
+#undef Radius
+#undef Damage
+#undef SplatIndex
+#undef EffectCount
 
-#undef TOXIC_EFFECT_SPLAT_INDEX
-#undef TOXIC_EFFECT_COUNT
-
-#undef TOXIC_PARTICLE
+#undef SOUND_TOXIC

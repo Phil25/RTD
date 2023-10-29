@@ -16,26 +16,23 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+DEFINE_CALL_EMPTY(StrongRecoil)
 
-int g_iStrongRecoilId = 50;
-
-public void StrongRecoil_Call(int client, Perk perk, bool apply){
-	if(apply){
-		g_iStrongRecoilId = perk.Id;
-		SetClientPerkCache(client, g_iStrongRecoilId);
-	}else UnsetClientPerkCache(client, g_iStrongRecoilId);
+public void StrongRecoil_Init(const Perk perk)
+{
+	Events.OnAttackCritCheck(perk, StrongRecoil_OnAttackCritCheck);
 }
 
-void StrongRecoil_CritCheck(int client, int iWeapon){
-	if(!CheckClientPerkCache(client, g_iStrongRecoilId))
-		return;
-
-	if(GetPlayerWeaponSlot(client, 2) == iWeapon)
-		return;
+bool StrongRecoil_OnAttackCritCheck(const int client, const int iWeapon)
+{
+	if (GetPlayerWeaponSlot(client, 2) == iWeapon)
+		return false;
 
 	float fShake[3];
 	fShake[0] = GetRandomFloat(-20.0, -80.0);
 	fShake[1] = GetRandomFloat(-25.0, 25.0);
 	fShake[2] = GetRandomFloat(-25.0, 25.0);
 	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fShake);
+
+	return false;
 }

@@ -16,58 +16,53 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "rtd/macros.sp"
+
 #define SOUND_ELECTRIC_MIST "ambient/nucleus_electricity.wav"
 
 // not configurable, distance between electrocution ticks needs this to be small
 #define TICK_INTERVAL 0.1
 
-#define TICK_DAMAGE 0
-#define BASE_SPEED 1
-#define ELECTROCUTION_TIME 2
-#define SLOWDOWN 3
+#define ElectrocutionTicks Int[0]
+#define IsElectrocuted Int[1]
+#define TicksLeft Int[2]
+#define ElectrocuteEffect Int[3]
+#define TickDamage Float[0]
+#define BaseSpeed Float[1]
+#define ElectrocutionTime Float[2]
+#define Slowdown Float[3]
+#define Proxy EntSlot_1
 
-#define ELECTROCUTION_TICKS 0
-#define IS_ELECTROCUTED 1
-#define TICKS_LEFT 2
-#define ELECTROCUTE_EFFECT 3
-
-char g_sSoundZap[][] = {
+static char g_sSoundZap[][] = {
 	"ambient/energy/zap1.wav",
 	"ambient/energy/zap2.wav",
 	"ambient/energy/zap3.wav",
 }
 
-int g_iSmiteId = 72;
+DEFINE_CALL_APPLY_REMOVE(Smite)
 
-void Smite_Start(){
+public void Smite_Init(const Perk perk)
+{
 	PrecacheSound(SOUND_ELECTRIC_MIST);
 	PrecacheSound(g_sSoundZap[0]);
 	PrecacheSound(g_sSoundZap[1]);
 	PrecacheSound(g_sSoundZap[2]);
 }
 
-public void Smite_Call(int client, Perk perk, bool apply){
-	if(apply) Smite_ApplyPerk(client, perk);
-	else Smite_RemovePerk(client);
-}
-
-void Smite_ApplyPerk(int client, Perk perk){
-	g_iSmiteId = perk.Id;
-	SetClientPerkCache(client, g_iSmiteId);
-
+void Smite_ApplyPerk(const int client, const Perk perk)
+{
 	int iMaxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
 	int iElectrocutionTics = perk.GetPrefCell("damage_ticks", 3);
 	float fInitialDamageMultiplier = perk.GetPrefFloat("initial_damage", 0.2);
 	float fTickDamageMultiplier = perk.GetPrefFloat("tick_damage", 0.04);
 
-	SetFloatCache(client, fTickDamageMultiplier * iMaxHealth, TICK_DAMAGE);
-	SetFloatCache(client, GetBaseSpeed(client), BASE_SPEED);
-	SetFloatCache(client, TICK_INTERVAL * iElectrocutionTics, ELECTROCUTION_TIME);
-	SetFloatCache(client, perk.GetPrefFloat("slowdown"), SLOWDOWN);
-
-	SetIntCache(client, iElectrocutionTics, ELECTROCUTION_TICKS);
-	SetIntCache(client, false, IS_ELECTROCUTED);
-	SetIntCache(client, Smite_GenerateTicksLeft(client), TICKS_LEFT);
+	Cache[client].ElectrocutionTicks = iElectrocutionTics;
+	Cache[client].IsElectrocuted = false;
+	Cache[client].TicksLeft = Smite_GenerateTicksLeft(client);
+	Cache[client].TickDamage = fTickDamageMultiplier * iMaxHealth;
+	Cache[client].BaseSpeed = GetBaseSpeed(client);
+	Cache[client].ElectrocutionTime = TICK_INTERVAL * iElectrocutionTics;
+	Cache[client].Slowdown = perk.GetPrefFloat("slowdown", 0.2);
 
 	// Due to technical reasons, client cannot die on the same frame a timed perk is applied, make
 	// sure they are left with at least 1 health.
@@ -78,43 +73,48 @@ void Smite_ApplyPerk(int client, Perk perk){
 
 	int iStrike[2];
 	iStrike[0] = CreateEntityByName("info_target");
-	if(iStrike[0] <= MaxClients)
+	if (iStrike[0] <= MaxClients)
 		return;
 
-	KILL_ENT_IN(iStrike[0],0.25)
+	KILL_ENT_IN(iStrike[0],0.25);
 
 	iStrike[1] = CreateEntityByName("info_target");
-	if(iStrike[1] <= MaxClients)
+	if (iStrike[1] <= MaxClients)
 		return;
 
-	KILL_ENT_IN(iStrike[1],0.25)
+	KILL_ENT_IN(iStrike[1],0.25);
 
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);
 
 	int iRed, iBlue;
-	switch(TF2_GetClientTeam(client)){
-		case TFTeam_Red:{
+	switch (TF2_GetClientTeam(client))
+	{
+		case TFTeam_Red:
+		{
 			iRed = 255;
 			iBlue = 100;
-			SetIntCache(client, view_as<int>(TEParticle_ElectrocutedRed), ELECTROCUTE_EFFECT);
-			SendTEParticleWithPriority(TEParticle_SparkVortexRed, fPos);
+			Cache[client].ElectrocuteEffect = view_as<int>(TEParticles.ElectrocutedRed);
+			SendTEParticleWithPriority(TEParticles.SparkVortexRed, fPos);
 		}
-		case TFTeam_Blue:{
+
+		case TFTeam_Blue:
+		{
 			iRed = 100;
 			iBlue = 255;
-			SetIntCache(client, view_as<int>(TEParticle_ElectrocutedBlue), ELECTROCUTE_EFFECT);
-			SendTEParticleWithPriority(TEParticle_SparkVortexBlue, fPos);
+			Cache[client].ElectrocuteEffect = view_as<int>(TEParticles.ElectrocutedBlue);
+			SendTEParticleWithPriority(TEParticles.SparkVortexBlue, fPos);
 		}
 	}
 
-	SendTEParticleWithPriority(TEParticle_ShockwaveFlat, fPos);
+	SendTEParticleWithPriority(TEParticles.ShockwaveFlat, fPos);
 	Smite_SendElectrocuteParticle(client);
 
 	int iProxy = CreateProxy(client);
-	if(iProxy > MaxClients){
-		SetEntCache(client, iProxy);
-		SendTEParticleLingeringAttached(TEParticle_ElectricMist, iProxy, fPos);
+	if (iProxy > MaxClients)
+	{
+		Cache[client].SetEnt(Proxy, iProxy);
+		SendTEParticleLingeringAttached(TEParticlesLingering.ElectricMist, iProxy, fPos);
 		EmitSoundToAll(SOUND_ELECTRIC_MIST, client, _, _, _, _, 150);
 	}
 
@@ -124,47 +124,46 @@ void Smite_ApplyPerk(int client, Perk perk){
 	TeleportEntity(iStrike[1], fPos, NULL_VECTOR, NULL_VECTOR);
 
 	int iBeam = ConnectWithBeam(iStrike[1], iStrike[0], iRed, 100, iBlue, 10.0, 4.0, 10.0);
-	KILL_ENT_IN(iBeam,0.1)
+	KILL_ENT_IN(iBeam,0.1);
 
-	CreateTimer(TICK_INTERVAL, Timer_SmiteTick, GetClientUserId(client), TIMER_REPEAT);
+	Cache[client].Repeat(TICK_INTERVAL, Smite_Tick);
 }
 
-void Smite_RemovePerk(int client){
-	UnsetClientPerkCache(client, g_iSmiteId);
-
+void Smite_RemovePerk(const int client)
+{
 	SDKUnhook(client, SDKHook_OnTakeDamagePost, Smite_OnTakeDamage);
-	KillEntCache(client);
 
-	SetSpeed(client, GetFloatCache(client, BASE_SPEED), 1.0);
+	SetSpeed(client, Cache[client].BaseSpeed);
 	StopSound(client, SNDCHAN_AUTO, SOUND_ELECTRIC_MIST);
 }
 
-public Action Timer_SmiteTick(Handle hTimer, const int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client || !CheckClientPerkCache(client, g_iSmiteId))
-		return Plugin_Stop;
+public Action Smite_Tick(const int client)
+{
+	int iTicksLeft = Cache[client].TicksLeft - 1;
+	if (iTicksLeft > 0)
+	{
+		Cache[client].TicksLeft = iTicksLeft;
 
-	int iTicksLeft = GetIntCache(client, TICKS_LEFT) - 1;
-	if(iTicksLeft > 0){
-		SetIntCache(client, iTicksLeft, TICKS_LEFT);
-
-		if(GetIntCacheBool(client, IS_ELECTROCUTED))
-			SDKHooks_TakeDamage(client, client, client, GetFloatCache(client, TICK_DAMAGE), DMG_SHOCK);
+		if (Cache[client].IsElectrocuted)
+			SDKHooks_TakeDamage(client, client, client, Cache[client].TickDamage, DMG_SHOCK);
 
 		return Plugin_Continue;
 	}
 
-	if(GetIntCacheBool(client, IS_ELECTROCUTED)){
-		SetIntCache(client, false, IS_ELECTROCUTED);
+	if (Cache[client].IsElectrocuted)
+	{
+		Cache[client].IsElectrocuted = false;
 
-		SetSpeed(client, GetFloatCache(client, BASE_SPEED), 1.0);
-		SetIntCache(client, Smite_GenerateTicksLeft(client), TICKS_LEFT);
-	}else{ // not being electrocuted
-		SetIntCache(client, true, IS_ELECTROCUTED);
-		SetIntCache(client, GetIntCache(client, ELECTROCUTION_TICKS), TICKS_LEFT);
+		SetSpeed(client, Cache[client].BaseSpeed);
+		Cache[client].TicksLeft = Smite_GenerateTicksLeft(client);
+	}
+	else // not being electrocuted
+	{
+		Cache[client].IsElectrocuted = true;
+		Cache[client].TicksLeft = Cache[client].ElectrocutionTicks;
 
-		TF2_AddCondition(client, TFCond_CritOnFirstBlood, GetFloatCache(client, ELECTROCUTION_TIME));
-		SetSpeed(client, GetFloatCache(client, BASE_SPEED), GetFloatCache(client, SLOWDOWN));
+		TF2_AddCondition(client, TFCond_CritOnFirstBlood, Cache[client].ElectrocutionTime);
+		SetSpeed(client, Cache[client].BaseSpeed, Cache[client].Slowdown);
 
 		ViewPunchRand(client, 5.0);
 		EmitSoundToAll(g_sSoundZap[GetRandomInt(0, 2)], client, _, _, _, _, GetRandomInt(90, 110));
@@ -174,32 +173,35 @@ public Action Timer_SmiteTick(Handle hTimer, const int iUserId){
 	return Plugin_Continue;
 }
 
-public void Smite_OnTakeDamage(int client, int iAttacker, int iInflictor, float fDamage, int iType){
+public void Smite_OnTakeDamage(int client, int iAttacker, int iInflictor, float fDamage, int iType)
+{
 	// Speed up the electrocution after getting hit
-	if(client != iAttacker && !GetIntCacheBool(client, IS_ELECTROCUTED) && fDamage > 8.0)
-		SetIntCache(client, GetIntCache(client, TICKS_LEFT) - 10, TICKS_LEFT);
+	if (client != iAttacker && !Cache[client].IsElectrocuted && fDamage > 8.0)
+		Cache[client].TicksLeft -= 10;
 }
 
-int Smite_GenerateTicksLeft(int client){
-	int iElectrocutionTicks = GetIntCache(client, ELECTROCUTION_TICKS);
+int Smite_GenerateTicksLeft(const int client)
+{
+	int iElectrocutionTicks = Cache[client].ElectrocutionTicks;
 	return GetRandomInt(iElectrocutionTicks + 20, iElectrocutionTicks + 30);
 }
 
-void Smite_SendElectrocuteParticle(int client){
-	int iParticle = GetIntCache(client, ELECTROCUTE_EFFECT);
-	SendTEParticleAttached(view_as<TEParticle>(iParticle), client);
+void Smite_SendElectrocuteParticle(const int client)
+{
+	int iParticle = Cache[client].ElectrocuteEffect;
+	SendTEParticleAttached(view_as<TEParticleId>(iParticle), client);
 }
 
 #undef SOUND_ELECTRIC_MIST
 
 #undef TICK_INTERVAL
 
-#undef TICK_DAMAGE
-#undef BASE_SPEED
-#undef ELECTROCUTION_TIME
-#undef SLOWDOWN
-
-#undef ELECTROCUTION_TICKS
-#undef IS_ELECTROCUTED
-#undef TICKS_LEFT
-#undef ELECTROCUTE_EFFECT
+#undef ElectrocutionTicks
+#undef IsElectrocuted
+#undef TicksLeft
+#undef ElectrocuteEffect
+#undef TickDamage
+#undef BaseSpeed
+#undef ElectrocutionTime
+#undef Slowdown
+#undef Proxy

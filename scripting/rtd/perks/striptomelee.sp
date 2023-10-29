@@ -16,148 +16,130 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #define MODEL_BOX "models/props_island/mannco_case_small.mdl"
 
 #define SOUND_RESUPPLY_DENY "replay/replaydialog_warn.wav"
 #define SOUND_BOX_DESTROY "ui/itemcrate_smash_ultrarare_short.wav"
 #define SOUND_BOX_EXPLODE "weapons/explode3.wav"
 
-#define IS_FORCED_RESUPPLY 0
-#define OWNED_WEAPONS 1
-#define LAST_WEAPONS_REMOVED 2
-#define REFILL_HEALTH 3
+#define IsForcedResupply Int[0]
+#define OwnedWeapons Int[1]
+#define LastWeaponsRemoved Int[2]
+#define RefillHealth Int[3]
+#define ChargeProgress Float[0]
+#define FlingSpeed Float[1]
+#define BoxHealth Float[2]
 
-#define CHARGE_PROGRESS 0
+DEFINE_CALL_APPLY(StripToMelee)
 
-int g_iStripToMeleeId = 23;
-
-void StripToMelee_Start(){
+public void StripToMelee_Init(const Perk perk)
+{
 	PrecacheSound(SOUND_RESUPPLY_DENY);
 	PrecacheSound(SOUND_BOX_DESTROY);
 	PrecacheSound(SOUND_BOX_EXPLODE);
 	PrecacheModel(MODEL_BOX);
+
+	Events.OnResupply(perk, StripToMelee_OnResupply);
 }
 
-public void StripToMelee_Call(int client, Perk perk, bool apply){
-	if(apply) StripToMelee_ApplyPerk(client, perk);
-	else StripToMelee_RemovePerk(client);
+void StripToMelee_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].IsForcedResupply = false;
+	Cache[client].OwnedWeapons = 0;
+	Cache[client].RefillHealth = perk.GetPrefCell("fullhealth", 1);
+	Cache[client].ChargeProgress = -1.0;
+	Cache[client].FlingSpeed = perk.GetPrefFloat("flingspeed", 2000.0);
+	Cache[client].BoxHealth = perk.GetPrefFloat("boxhealth", 100.0); // will be round to int
+
+	// Client isn't in roll during *_ApplyPerk functions. Let's wait a frame for that to happen.
+	// We need to do this because we trigger a resupply, event of which won't run this early.
+	Cache[client].Repeat(0.0, StripToMelee_ApplyPerkPost);
 }
 
-void StripToMelee_ApplyPerk(int client, Perk perk){
-	g_iStripToMeleeId = perk.Id;
-	SetClientPerkCache(client, g_iStripToMeleeId);
+public Action StripToMelee_ApplyPerkPost(const int client)
+{
+	StripToMelee_ForceResupply(client, Cache[client].RefillHealth > 0); // sets LastWeaponsRemoved
 
-	SetIntCache(client, false, IS_FORCED_RESUPPLY);
-	SetIntCache(client, 0, OWNED_WEAPONS);
-	SetIntCache(client, perk.GetPrefCell("fullhealth"), REFILL_HEALTH);
+	float fFlingSpeed = Cache[client].FlingSpeed;
+	int iBoxHealth = RoundFloat(Cache[client].BoxHealth);
 
-	SetFloatCache(client, -1.0, CHARGE_PROGRESS);
-
-	StripToMelee_ForceResupply(client, GetIntCacheBool(client, REFILL_HEALTH)); // sets LAST_WEAPONS_REMOVED
-	int iWeaponsRemoved = GetIntCache(client, LAST_WEAPONS_REMOVED);
-	int iBoxHealth = perk.GetPrefCell("boxhealth", 100);
-	float fFlingSpeed = perk.GetPrefFloat("flingspeed", 2000.0);
-
-	for(int i = 0; i < iWeaponsRemoved; ++i){
+	for (int i = 0; i < Cache[client].LastWeaponsRemoved; ++i)
+	{
 		int iBox = StripToMelee_SpawnBox(client, i, iBoxHealth, fFlingSpeed);
-		if(iBox > MaxClients)
-			SetEntCache(client, iBox, i);
+		if (iBox > MaxClients)
+			Cache[client].SetEnt(view_as<EntSlot>(i), iBox);
 	}
 
-	CreateTimer(0.5, Timer_StripToMeleeBeep, GetClientUserId(client), TIMER_REPEAT);
+	Cache[client].Repeat(0.5, StripToMelee_Ping);
+	return Plugin_Stop;
 }
 
-void StripToMelee_RemovePerk(int client){
-	UnsetClientPerkCache(client, g_iStripToMeleeId);
-
-	for(int i = 0; i < 3; ++i)
-		KillEntCache(client, i);
-}
-
-void StripToMelee_Resupply(int client, bool bRefillHealth){
-	int iHealth = GetClientHealth(client);
-
-	TF2_RegeneratePlayer(client);
-
-	if(!bRefillHealth)
-		SetEntityHealth(client, iHealth);
-}
-
-void StripToMelee_ForceResupply(int client, bool bRefillHealth){
-	SetIntCache(client, true, IS_FORCED_RESUPPLY);
-	StripToMelee_Resupply(client, bRefillHealth);
-	SetIntCache(client, false, IS_FORCED_RESUPPLY);
-}
-
-public Action Timer_StripToMeleeBeep(Handle hTimer, const int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client)
-		return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iStripToMeleeId))
-		return Plugin_Stop;
-
-	for(int i = 0; i < 3; ++i){
-		int iBox = GetEntCache(client, i);
-		if(iBox > MaxClients)
-			StripToMelee_BeepBox(iBox, i);
+public Action StripToMelee_Ping(const int client)
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		int iBox = Cache[client].GetEnt(view_as<EntSlot>(i)).Index;
+		if (iBox > MaxClients)
+			StripToMelee_PingBox(iBox, i);
 	}
 
 	return Plugin_Continue;
 }
 
-void StripToMelee_BeepBox(int iBox, int iSlot){
+void StripToMelee_PingBox(const int iBox, const int iSlot)
+{
 	float fPos[3];
 	GetEntPropVector(iBox, Prop_Send, "m_vecOrigin", fPos);
 
 	int iColor[] = {255, 255, 255, 255};
 	float fLifetime = 0.5 * (3 - iSlot); // lifetime by importance
 
-	TE_SetupBeamRingPoint(fPos, 80.0, 192.0, GetEntMaterial().iLaser, GetEntMaterial().iHalo, 0, 15, fLifetime, 5.0, 1.0, iColor, 10, 0);
+	TE_SetupBeamRingPoint(fPos, 80.0, 192.0, Materials.Laser, Materials.Halo, 0, 15, fLifetime, 5.0, 1.0, iColor, 10, 0);
 	TE_SendToAll();
 }
 
-void StripToMelee_OnResupply(int client){
-	if(!CheckClientPerkCache(client, g_iStripToMeleeId))
-		return;
-
+public void StripToMelee_OnResupply(const int client)
+{
 	int iWeaponsRemoved = StripToMelee_StripWeapons(client);
-	SetIntCache(client, iWeaponsRemoved, LAST_WEAPONS_REMOVED);
+	Cache[client].LastWeaponsRemoved = iWeaponsRemoved;
 
-	if(!GetIntCacheBool(client, IS_FORCED_RESUPPLY) && iWeaponsRemoved > 0)
+	if (!Cache[client].IsForcedResupply && iWeaponsRemoved > 0)
 		EmitSoundToClient(client, SOUND_RESUPPLY_DENY);
 
-	float fSecondaryCharge = GetFloatCache(client, CHARGE_PROGRESS);
+	float fSecondaryCharge = Cache[client].ChargeProgress;
 	int iSecondary = GetPlayerWeaponSlot(client, 1);
 
 	// Apply the saved charge to the Medigun/Gas Passer if one is stored and player regained the secondary
-	if(fSecondaryCharge > 0.0 && iSecondary > MaxClients){
+	if (fSecondaryCharge > 0.0 && iSecondary > MaxClients)
+	{
 		char sClassname[32];
 		GetEntityClassname(iSecondary, sClassname, sizeof(sClassname));
 
-		if(StrEqual(sClassname, "tf_weapon_medigun")){
+		if (StrEqual(sClassname, "tf_weapon_medigun"))
+		{
 			SetEntPropFloat(iSecondary, Prop_Send, "m_flChargeLevel", fSecondaryCharge);
-			SetFloatCache(client, -1.0, CHARGE_PROGRESS);
+			Cache[client].ChargeProgress = -1.0;
 		}
 		// TODO: Make this work for tf_weapon_jar_gas too, its `m_flEnergy` doesn't work
 	}
 }
 
-int StripToMelee_StripWeapons(int client){
-	int iOwnedWeapons = GetIntCache(client, OWNED_WEAPONS);
+int StripToMelee_StripWeapons(const int client)
+{
+	int iOwnedWeapons = Cache[client].OwnedWeapons;
 	int iWeaponsRemoved = 0;
 
-	if(!(iOwnedWeapons & (1 << 0)))
+	if (!(iOwnedWeapons & (1 << 0)))
 		iWeaponsRemoved += StripToMelee_RemoveWeaponSlotIfExists(client, 0);
 
-	if(!(iOwnedWeapons & (1 << 1)))
+	if (!(iOwnedWeapons & (1 << 1)))
 		iWeaponsRemoved += StripToMelee_RemoveWeaponSlotIfExists(client, 1);
 
-	if(!(iOwnedWeapons & (1 << 2)))
+	if (!(iOwnedWeapons & (1 << 2)))
 		iWeaponsRemoved += StripToMelee_RemoveWeaponSlotsIfExist(client, 3, 4);
 
-	if(iWeaponsRemoved == 0){
+	if (iWeaponsRemoved == 0)
+	{
 		// Can do nothing on full Demoknight, who only has melee. The perk will either run its time
 		// or be removed once a resupply cabinet is touched.
 		ForceRemovePerk(client);
@@ -169,33 +151,37 @@ int StripToMelee_StripWeapons(int client){
 	return iWeaponsRemoved;
 }
 
-int StripToMelee_RemoveWeaponSlotIfExists(int client, int iSlot){
+int StripToMelee_RemoveWeaponSlotIfExists(const int client, const int iSlot)
+{
 	int iWeap = GetPlayerWeaponSlot(client, iSlot);
-	if(iWeap <= MaxClients)
+	if (iWeap <= MaxClients)
 		return 0;
 
 	// Save Medigun/Gas Passer charge, but do not overwrite if it's already stored
-	if(iSlot == 1 && GetFloatCache(client, CHARGE_PROGRESS) < 0.0){
+	if (iSlot == 1 && Cache[client].ChargeProgress < 0.0)
+	{
 		char sClassname[32];
 		GetEntityClassname(iWeap, sClassname, sizeof(sClassname));
 
-		if(StrEqual(sClassname, "tf_weapon_medigun"))
-			SetFloatCache(client, GetEntPropFloat(iWeap, Prop_Send, "m_flChargeLevel"), CHARGE_PROGRESS);
+		if (StrEqual(sClassname, "tf_weapon_medigun"))
+			Cache[client].ChargeProgress = GetEntPropFloat(iWeap, Prop_Send, "m_flChargeLevel");
 	}
 
 	TF2_RemoveWeaponSlot(client, iSlot);
 	return 1;
 }
 
-int StripToMelee_RemoveWeaponSlotsIfExist(int client, int iSlot1, int iSlot2){
+int StripToMelee_RemoveWeaponSlotsIfExist(const int client, const int iSlot1, const int iSlot2)
+{
 	int iSlot1Removed = StripToMelee_RemoveWeaponSlotIfExists(client, iSlot1);
 	int iSlot2Removed = StripToMelee_RemoveWeaponSlotIfExists(client, iSlot2);
 	return view_as<int>(iSlot1Removed || iSlot2Removed);
 }
 
-int StripToMelee_SpawnBox(int client, int iSlot, int iHealth, float fSpeed){
+int StripToMelee_SpawnBox(const int client, const int iSlot, const int iHealth, const float fSpeed)
+{
 	int iBox = CreateEntityByName("prop_physics_override");
-	if(iBox <= MaxClients) return -1;
+	if (iBox <= MaxClients) return -1;
 
 	// 4 -- debris
 	// 4096 -- debris with trigger interaction
@@ -223,14 +209,18 @@ int StripToMelee_SpawnBox(int client, int iSlot, int iHealth, float fSpeed){
 	fVelAng[1] = GetRandomFloat(-fSpeed, fSpeed);
 	fVelAng[2] = GetRandomFloat(-fSpeed, fSpeed);
 
-	switch(TF2_GetClientTeam(client)){
-		case TFTeam_Blue:{
+	switch (TF2_GetClientTeam(client))
+	{
+		case TFTeam_Blue:
+		{
 			DispatchKeyValue(iBox, "rendercolor", "150 150 255");
-			SendTEParticleAttached(TEParticle_PickupTrailBlue, iBox);
+			SendTEParticleAttached(TEParticles.PickupTrailBlue, iBox);
 		}
-		case TFTeam_Red:{
+
+		case TFTeam_Red:
+		{
 			DispatchKeyValue(iBox, "rendercolor", "255 150 150");
-			SendTEParticleAttached(TEParticle_PickupTrailRed, iBox);
+			SendTEParticleAttached(TEParticles.PickupTrailRed, iBox);
 		}
 	}
 
@@ -239,50 +229,70 @@ int StripToMelee_SpawnBox(int client, int iSlot, int iHealth, float fSpeed){
 	return iBox;
 }
 
-public Action StripToMelee_OnBoxTakeDamage(int iBox, int &iAtk, int &iInflictor, float &fDamage, int &iType, int &iWeapon, float fForce[3], float fPos[3]){
-	if(!(1 <= iAtk <= MaxClients))
+public Action StripToMelee_OnBoxTakeDamage(int iBox, int &iAtk, int &iInflictor, float &fDamage, int &iType, int &iWeapon, float fForce[3], float fPos[3])
+{
+	if (!(1 <= iAtk <= MaxClients))
 		return Plugin_Continue; // prop_physics_override can get hurt by world
 
 	int iClientAndSlot = GetEntProp(iBox, Prop_Data, "m_iMaxHealth");
 	int client = iClientAndSlot >> 3;
 
-	if(TF2_GetClientTeam(client) != TF2_GetClientTeam(iAtk))
+	if (TF2_GetClientTeam(client) != TF2_GetClientTeam(iAtk))
 		return Plugin_Continue;
 
 	int iHealth = GetEntProp(iBox, Prop_Data, "m_iHealth") - RoundFloat(fDamage);
-	if(iHealth > 0){
+	if (iHealth > 0)
+	{
 		SetEntProp(iBox, Prop_Data, "m_iHealth", iHealth);
 
 		fForce[0] *= 40;
 		fForce[1] *= 40;
 		fForce[2] *= 40;
 
-		SendTEParticleAttached(TEParticle_BulletImpactHeavier, iBox);
+		SendTEParticleAttached(TEParticles.BulletImpactHeavier, iBox);
 
 		return Plugin_Changed;
 	}
 
-	int iOwnedWeapons = GetIntCache(client, OWNED_WEAPONS);
-	for(int i = 0; i < 3; ++i)
+	int iOwnedWeapons = Cache[client].OwnedWeapons;
+	for (int i = 0; i < 3; ++i)
 		iOwnedWeapons |= (iClientAndSlot & (1 << i));
 
-	SetIntCache(client, iOwnedWeapons, OWNED_WEAPONS);
-	StripToMelee_ForceResupply(client, GetIntCacheBool(client, REFILL_HEALTH));
+	Cache[client].OwnedWeapons = iOwnedWeapons;
+	StripToMelee_ForceResupply(client, Cache[client].RefillHealth > 0);
 
 	float fBoxPos[3];
 	GetEntPropVector(iBox, Prop_Send, "m_vecOrigin", fBoxPos);
-	SendTEParticle(TEParticle_LootExplosion, fBoxPos);
+	SendTEParticle(TEParticles.LootExplosion, fBoxPos);
 
 	AcceptEntityInput(iBox, "Kill");
 	EmitSoundToClient(client, SOUND_BOX_DESTROY);
 	EmitSoundToAll(SOUND_BOX_EXPLODE, iBox);
 
-	if(iAtk != client){
+	if (iAtk != client)
+	{
 		EmitSoundToClient(iAtk, SOUND_BOX_DESTROY);
-		StripToMelee_Resupply(iAtk, GetIntCacheBool(client, REFILL_HEALTH));
+		StripToMelee_Resupply(iAtk, Cache[client].RefillHealth > 0);
 	}
 
 	return Plugin_Continue;
+}
+
+void StripToMelee_Resupply(const int client, const bool bRefillHealth)
+{
+	int iHealth = GetClientHealth(client);
+
+	TF2_RegeneratePlayer(client);
+
+	if (!bRefillHealth)
+		SetEntityHealth(client, iHealth);
+}
+
+void StripToMelee_ForceResupply(const int client, const bool bRefillHealth)
+{
+	Cache[client].IsForcedResupply = true;
+	StripToMelee_Resupply(client, bRefillHealth);
+	Cache[client].IsForcedResupply = false;
 }
 
 #undef MODEL_BOX
@@ -291,9 +301,10 @@ public Action StripToMelee_OnBoxTakeDamage(int iBox, int &iAtk, int &iInflictor,
 #undef SOUND_BOX_DESTROY
 #undef SOUND_BOX_EXPLODE
 
-#undef IS_FORCED_RESUPPLY
-#undef OWNED_WEAPONS
-#undef LAST_WEAPONS_REMOVED
-#undef REFILL_HEALTH
-
-#undef CHARGE_PROGRESS
+#undef IsForcedResupply
+#undef OwnedWeapons
+#undef LastWeaponsRemoved
+#undef RefillHealth
+#undef ChargeProgress
+#undef FlingSpeed
+#undef BoxHealth

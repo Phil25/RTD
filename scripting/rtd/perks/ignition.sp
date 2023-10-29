@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-public void Ignition_Call(int client, Perk perk, bool apply){
+public void Ignition_Call(const int client, const Perk perk, const bool apply)
+{
 	TF2_IgnitePlayer(client, client);
 }

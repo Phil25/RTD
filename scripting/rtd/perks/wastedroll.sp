@@ -16,7 +16,4 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-public void WastedRoll_Call(int client, Perk perk, bool bEnable){
-	// jermaDafoe
-}
+DEFINE_CALL_EMPTY(WastedRoll)

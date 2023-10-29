@@ -16,27 +16,15 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+DEFINE_CALL_APPLY(InfiniteCloak)
 
-int g_iInfiniteCloakId = 8;
-
-public void InfiniteCloak_Call(int client, Perk perk, bool apply){
-	if(apply) InfiniteCloak_ApplyPerk(client, perk);
-	else UnsetClientPerkCache(client, g_iInfiniteCloakId);
+public void InfiniteCloak_ApplyPerk(const int client, const Perk perk)
+{
+	Cache[client].Repeat(0.25, InfiniteCloak_RefillMeter);
 }
 
-void InfiniteCloak_ApplyPerk(int client, Perk perk){
-	g_iInfiniteCloakId = perk.Id;
-	SetClientPerkCache(client, g_iInfiniteCloakId);
-	CreateTimer(0.25, Timer_RefreshCloak, GetClientUserId(client), TIMER_REPEAT);
-}
-
-public Action Timer_RefreshCloak(Handle hTimer, int iUserId){
-	int client = GetClientOfUserId(iUserId);
-	if(!client) return Plugin_Stop;
-
-	if(!CheckClientPerkCache(client, g_iInfiniteCloakId))
-		return Plugin_Stop;
-
+public Action InfiniteCloak_RefillMeter(const int client)
+{
 	SetEntPropFloat(client, Prop_Send, "m_flCloakMeter", 105.0);
 	return Plugin_Continue;
 }
