@@ -19,6 +19,7 @@
 /* TABLE OF CONTENTS
 *
 * GENERAL
+* - GetCallerName
 * - EscapeString
 * - AccountIDToClient
 * - KillTimerSafe
@@ -172,6 +173,18 @@ public Action Event_Homing_RoundStart(Handle hEvent, const char[] sName, bool bD
 /*
 * GENERAL
 */
+
+stock void GetCallerName(char[] sBuffer, const int iBufferLenght)
+{
+	FrameIterator eFrameIter = new FrameIterator();
+
+	eFrameIter.Next(); // exit FrameIterator ctor
+	eFrameIter.Next(); // exit GetCallerName
+	eFrameIter.Next(); // exit the function GetCallerName is called from
+
+	eFrameIter.GetFunctionName(sBuffer, iBufferLenght);
+	delete eFrameIter;
+}
 
 stock int EscapeString(const char[] input, int escape, int escaper, char[] output, int maxlen){
 	/*
@@ -847,7 +860,7 @@ stock int AttachGlow(const int iEntity){
 
 stock void ShowAnnotationFor(int client, int iOther, float fLifetime, char[] sText="", char[] sSound=""){
 	Event hEvent = CreateEvent("show_annotation");
-	if(hEvent == INVALID_HANDLE)
+	if(hEvent == null)
 		return;
 
 	hEvent.SetInt("follow_entindex", iOther);
@@ -857,18 +870,18 @@ stock void ShowAnnotationFor(int client, int iOther, float fLifetime, char[] sTe
 	hEvent.SetString("play_sound", sSound);
 
 	hEvent.FireToClient(client);
-	CloseHandle(hEvent);
+	hEvent.Cancel();
 }
 
 stock void HideAnnotationFor(int client, int iOther){
 	Event hEvent = CreateEvent("hide_annotation");
-	if(hEvent == INVALID_HANDLE)
+	if(hEvent == null)
 		return;
 
 	hEvent.SetInt("id", GetUniqueId(client, iOther));
 
 	hEvent.FireToClient(client);
-	CloseHandle(hEvent);
+	hEvent.Cancel();
 }
 
 

@@ -159,9 +159,13 @@ methodmap PerkContainer < StringMap{
 		READ_IF_EXISTS_STRING("init",InternalInit)
 		iStats[view_as<int>(perk.Good)]++;
 
-		this.Add(perk);
-		perk.InitInternal();
+#if defined DEBUG
+		char sName[64];
+		perk.GetName(sName, sizeof(sName));
+		LogError("New perk: %s (%x)", sName, perk);
+#endif
 
+		this.Add(perk);
 		return true;
 	}
 

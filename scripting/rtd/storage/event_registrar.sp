@@ -78,7 +78,7 @@ enum struct EventRegistrar
 		this._OnEntitySpawnedSubscribers = new ArrayList();
 	}
 
-	void Cleanup() // TODO: call this on reload
+	void Cleanup()
 	{
 		this._CleanupCallbackArray(this._OnEntitySpawned);
 		this._CleanupCallbackArray(this._OnConditionAdded);
@@ -98,7 +98,10 @@ enum struct EventRegistrar
 
 	void _CleanupCallbackArray(ArrayList& list)
 	{
-		// TODO: implement
+		for (int i = 0; i < list.Length; ++i)
+			CloseHandle(view_as<DataPack>(list.Get(i)));
+
+		delete list;
 	}
 
 	void OnEntitySpawned(const Perk perk, EREntitySpawned hSpawned, EREntityClassnameFilter hFilter, EREntityOwnerRetriever hOwner)

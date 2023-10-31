@@ -61,6 +61,7 @@ Rollers g_hRollers = null;
 #define UPDATE_URL		"https://phil25.github.io/RTD/update.txt"
 #endif
 
+//#define DEBUG // log extra messages
 
 
 /********* P E R K S ********/
@@ -203,16 +204,13 @@ public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int iErr
 	return APLRes_Success;
 }
 
-public void OnPluginStart(){
-	for (int i = 0; i < MAXPLAYERS + 1; ++i)
-		Cache[i].Init(i); // TODO: do this elsewhere
-
-	Events.Init();
-	Storage_Precache();
-
+public void OnPluginStart()
+{
 	LoadTranslations("rtd2.phrases.txt");
 	LoadTranslations("rtd2_perks.phrases.txt");
 	LoadTranslations("common.phrases.txt");
+
+	InitClientCache();
 
 	if(!ParseEffects())
 		return;
@@ -335,6 +333,7 @@ public void OnPluginStart(){
 }
 
 public void OnConfigsExecuted(){
+	delete g_hDescriptionMenu;
 	g_hDescriptionMenu		= BuildDesc();
 	g_bIsRegisteringOpen	= true;
 
@@ -343,10 +342,16 @@ public void OnConfigsExecuted(){
 }
 
 public void OnPluginEnd(){
-	ReloadPluginState();
+	ResetAllClients();
 }
 
-void ReloadPluginState(RTDRemoveReason reason=RTDRemove_PluginUnload){
+void InitClientCache()
+{
+	for (int i = 1; i <= MaxClients; ++i)
+		Cache[i].Init(i);
+}
+
+void ResetAllClients(RTDRemoveReason reason=RTDRemove_PluginUnload){
 	for(int i = 1; i <= MaxClients; i++){
 		if(g_hRollers.GetInRoll(i))
 			ForceRemovePerk(i, reason);
@@ -359,7 +364,7 @@ public void OnMapStart(){
 	HookEvent("player_death",				Event_PlayerDeath);
 	HookEvent("player_changeclass",			Event_ClassChange);
 	HookEvent("teamplay_round_active",		Event_RoundActive);
-	HookEvent("post_inventory_application",	Event_Resupply, EventHookMode_Post);
+	HookEvent("post_inventory_application",	Event_Resupply);
 	HookEvent("player_hurt",				Event_PlayerHurt);
 	HookEvent("player_chargedeployed",		Event_UberchargeDeployed);
 
@@ -367,17 +372,23 @@ public void OnMapStart(){
 	HookEvent("arena_round_start",			Event_RoundStart);
 	HookEvent("mvm_begin_wave",				Event_RoundStart);
 
+	Storage_Precache();
 	Stocks_OnMapStart(); // rtd/stocks.sp
 	PrecachePerkSounds();
+
+	Events.Init();
+	InitPerks();
 
 	g_bIsGameArena = (FindEntityByClassname(MaxClients +1, "tf_logic_arena") > MaxClients);
 }
 
 public void OnMapEnd(){
+	Events.Cleanup();
+
 	UnhookEvent("player_death",				Event_PlayerDeath);
 	UnhookEvent("player_changeclass",		Event_ClassChange);
 	UnhookEvent("teamplay_round_active",	Event_RoundActive);
-	UnhookEvent("post_inventory_application",Event_Resupply, EventHookMode_Post);
+	UnhookEvent("post_inventory_application",Event_Resupply);
 	UnhookEvent("player_hurt",				Event_PlayerHurt);
 	UnhookEvent("player_chargedeployed",	Event_UberchargeDeployed);
 
@@ -599,11 +610,18 @@ public Action Command_PerkSearchup(int client, int args){
 }
 
 public Action Command_Reload(int client, int args){
-	ReloadPluginState();
+	ResetAllClients();
+
 	ParseEffects();
 	ParseCustomEffects();
 	ParseDisabledPerks();
+
+	Events.Cleanup();
+	Events.Init();
+	InitPerks();
+
 	Forward_OnRegOpen();
+
 	return Plugin_Handled;
 }
 
@@ -845,7 +863,7 @@ public Action Event_UberchargeDeployed(Handle hEvent, const char[] sEventName, b
 }
 
 public Action Event_RoundStart(Handle hEvent, const char[] sEventName, bool dontBroadcast){
-	ReloadPluginState(RTDRemove_NoPrint);
+	ResetAllClients(RTDRemove_NoPrint);
 	return Plugin_Continue;
 }
 
@@ -926,10 +944,10 @@ void ParseTriggers(){
 }
 
 bool ParseEffects(){
-	char sPath[255];
+	char sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.default.cfg");
 	if(!FileExists(sPath)){
-		LogError(CONS_PREFIX ... " Failed to find rtd2_perks.default.cfg in configs/ folder!");
+		LogError("Failed to find rtd2_perks.default.cfg in configs/ folder!");
 		SetFailState("Failed to find rtd2_perks.default.cfg in configs/ folder!");
 		return false;
 	}
@@ -941,17 +959,17 @@ bool ParseEffects(){
 	int iStatus[2];
 	g_iCorePerks = g_hPerkContainer.ParseFile(sPath, iStatus);
 	if(g_iCorePerks == -1){
-		LogError(CONS_PREFIX ... " Parsing rtd2_perks.default.cfg failed!");
+		LogError("Parsing rtd2_perks.default.cfg failed!");
 		SetFailState("Parsing rtd2_perks.default.cfg failed!");
 		return false;
 	}
 
-	PrintToServer(CONS_PREFIX ... " Loaded %d perk%s (%d good, %d bad).", g_iCorePerks, g_iCorePerks > 1 ? "s" : "", iStatus[1], iStatus[0]);
+	PrintToServer(CONS_PREFIX ... " Loaded %d perk%s (%d good, %d bad).", g_iCorePerks, g_iCorePerks == 1 ? "" : "s", iStatus[1], iStatus[0]);
 	return true;
 }
 
 void ParseCustomEffects(){
-	char sPath[255];
+	char sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.custom.cfg");
 	if(!FileExists(sPath)){
 		PrecachePerkSounds();
@@ -970,6 +988,18 @@ void PrecachePerkSounds(){
 		iter.Perk().GetSound(sBuffer, 64);
 		PrecacheSound(sBuffer);
 	}
+	delete iter;
+}
+
+void InitPerks()
+{
+	PerkIter iter = new PerkContainerIter(-1);
+
+	while((++iter).Perk())
+	{
+		iter.Perk().InitInternal();
+	}
+
 	delete iter;
 }
 

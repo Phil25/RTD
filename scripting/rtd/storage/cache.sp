@@ -165,6 +165,12 @@ enum struct PlayerCache
 		hData.WriteCell(iIndex);
 
 		this._Timers[iIndex] = CreateTimer(fInterval, Timer_PerkTimer, hData, TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
+
+#if defined DEBUG
+		char sCaller[64];
+		GetCallerName(sCaller, sizeof(sCaller));
+		LogError("[%s] Created timer for %N<%d>: %x", sCaller, this._ClientIndex, this._ClientIndex, this._Timers[iIndex]);
+#endif
 	}
 
 	void NullifyTimer(const iIndex)
@@ -197,6 +203,10 @@ enum struct PlayerCache
 			case EntCleanup_Auto: this.KillEnt(EntSlot_3);
 			case EntCleanup_None: this.LeakEnt(EntSlot_3);
 		}
+
+#if defined DEBUG
+		LogError("Cleaning up timers for %N<%d>: %x, %x", this._ClientIndex, this._ClientIndex, this._Timers[0], this._Timers[1]);
+#endif
 
 		delete this._Timers[0];
 		delete this._Timers[1];
