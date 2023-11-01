@@ -20,20 +20,12 @@ DEFINE_CALL_APPLY_REMOVE(Monochromia)
 
 public void Monochromia_ApplyPerk(const int client, const Perk perk)
 {
-	Monochromia_SetOverlay(client, "debug/yuv");
+	SetVariantString("debug/yuv");
+	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
 }
 
 void Monochromia_RemovePerk(const int client)
 {
-	Monochromia_SetOverlay(client, "");
-}
-
-void Monochromia_SetOverlay(const int client, const char[] sOverlay)
-{
-	int iFlags = GetCommandFlags("r_screenoverlay");
-	SetCommandFlags("r_screenoverlay", iFlags & ~FCVAR_CHEAT);
-
-	ClientCommand(client, "r_screenoverlay \"%s\"", sOverlay);
-
-	SetCommandFlags("r_screenoverlay", iFlags);
+	SetVariantString("");
+	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
 }
