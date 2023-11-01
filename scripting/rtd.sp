@@ -84,6 +84,7 @@ int g_iLastPerkTime = -1;
 
 Rollers g_hRollers = null;
 int g_iActiveEntitySpawnedSubscribers = 0;
+int g_iLastEntitySpawnTime = 0;
 
 Handle g_hFwdCanRoll;
 Handle g_hFwdCanForce;
@@ -663,17 +664,19 @@ public void OnEntityCreated(int iEnt, const char[] sClassname)
 	if (!Events.ClassnameHasSubscribers(sClassname))
 		return;
 
-	// TODO: Hook SDKHook_Spawned instead, need to figure out a few things first
-	CreateTimer(0.1, Timer_OnEntitySpawned, EntIndexToEntRef(iEnt));
+	SDKHook(iEnt, SDKHook_SpawnPost, OnEntitySpawned);
 }
 
-public Action Timer_OnEntitySpawned(Handle hTimer, const int iRef)
+public void OnEntitySpawned(const int iEnt)
 {
-	int iEnt = EntRefToEntIndex(iRef);
-	if (iEnt != -1)
-		Events.EntitySpawned(iEnt);
+	int iSpawnTime = RoundToNearest(GetEngineTime() * 100000);
 
-	return Plugin_Stop;
+	// For certain entities Spawn hook fires twice for some reason
+	if (iSpawnTime == g_iLastEntitySpawnTime)
+		return;
+
+	g_iLastEntitySpawnTime = iSpawnTime;
+	Events.EntitySpawned(iEnt);
 }
 
 public void OnGameFrame()

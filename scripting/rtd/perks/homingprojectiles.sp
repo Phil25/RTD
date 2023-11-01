@@ -43,7 +43,16 @@ void HomingProjectiles_RemovePerk(const int client)
 
 void HomingProjectiles_OnEntitySpawned(const int client, const int iEntity)
 {
-	Homing_Push(iEntity);
+	CreateTimer(0.2, Timer_HomingProjectiles_HomeEntity, EntIndexToEntRef(iEntity));
+}
+
+public Action Timer_HomingProjectiles_HomeEntity(Handle hTimer, const int iEntityRef)
+{
+	int iEntity = EntRefToEntIndex(iEntityRef);
+	if (iEntity > MaxClients)
+		Homing_Push(iEntity);
+
+	return Plugin_Stop;
 }
 
 #undef Crits
