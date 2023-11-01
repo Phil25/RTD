@@ -61,11 +61,56 @@ public Action Timer_DumpHandles(Handle hTimer, any aData)
 
 public void OnPluginStart()
 {
+	HookEvent("teamplay_round_start", Event_RoundStart);
+	HookEvent("arena_round_start", Event_RoundStart);
+	HookEvent("mvm_begin_wave", Event_RoundStart);
+	RemoveObjectives();
+
 	RegAdminCmd("sm_rtdstress", Command_Stress, ADMFLAG_ROOT, "Run RTD stress test.");
 
 	for (int i = 1; i <= MaxClients; ++i)
 		if (IsClientInGame(i))
 			OnClientPutInServer(i);
+}
+
+public void TF2_OnWaitingForPlayersStart()
+{
+	ServerCommand("mp_waitingforplayers_cancel 1");
+}
+
+public Action Event_RoundStart(Handle hEvent, const char[] sEventName, bool dontBroadcast)
+{
+	RemoveObjectives();
+	return Plugin_Continue;
+}
+
+void RemoveObjectives()
+{
+	char sMapName[32];
+	GetCurrentMap(sMapName, sizeof(sMapName))
+	if (!StrEqual(sMapName, "ultiduo_grove_b4"))
+		return;
+
+	int iCapArea = FindEntityByClassname(MaxClients + 1, "trigger_capture_area");
+	if (iCapArea > MaxClients)
+		AcceptEntityInput(iCapArea, "Kill");
+
+	int iCapPoint = FindEntityByClassname(MaxClients + 1, "team_control_point");
+	if (iCapPoint > MaxClients)
+		AcceptEntityInput(iCapPoint, "HideModel");
+
+	int iProp = MaxClients + 1;
+	while ((iProp = FindEntityByClassname(iProp, "prop_dynamic")) != -1)
+	{
+		char sName[32];
+		GetEntPropString(iProp, Prop_Data, "m_iName", sName, sizeof(sName));
+
+		if (StrEqual(sName, "cp_koth_prop"))
+		{
+			AcceptEntityInput(iProp, "Kill");
+			break;
+		}
+	}
 }
 
 public Action Command_Stress(int client, int args)
