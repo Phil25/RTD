@@ -1,10 +1,3 @@
-#if defined _RTD2_STORAGE_CACHE
-	#endinput
-#endif
-#define _RTD2_STORAGE_CACHE
-
-#include <sdkhooks>
-
 enum struct ClientFlags
 {
 	int iVals[4]; // SM ints are 32 bit, 4 are needed to hold 100 players

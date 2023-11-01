@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/storage/precached.sp"
-
 #define NoReload Int[0]
 #define Weapon Int[1]
 #define Clip Int[2]

@@ -16,10 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-#include "rtd/storage/cache.sp"
-#include "rtd/storage/event_registrar.sp"
-
 #define GODMODE_PARTICLE "powerup_supernova_ready"
 
 #define GODMODE_DOWN_TEXT "(⋆⭒˚｡⋆) ⬇"

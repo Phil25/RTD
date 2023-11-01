@@ -16,11 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined _natives_included
-	#endinput
-#endif
-#define _natives_included
-
 void CreateNatives(){
 	CreateNative("RTD2_GetPerkAny",			Native_GetPerkAny);
 	CreateNative("RTD2_SetPerkAny",			Native_SetPerkAny);

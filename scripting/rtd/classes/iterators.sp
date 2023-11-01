@@ -16,12 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined _iterators_included
-	#endinput
-#endif
-#define _iterators_included
-
-
 PerkContainer g_hPerkContainer = null;
 
 /*

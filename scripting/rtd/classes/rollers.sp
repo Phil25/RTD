@@ -16,11 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined _rollers_included
-	#endinput
-#endif
-#define _rollers_included
-
 methodmap Rollers < ArrayList{
 	public Rollers(){
 		ArrayList data = new ArrayList(7, MAXPLAYERS+1);

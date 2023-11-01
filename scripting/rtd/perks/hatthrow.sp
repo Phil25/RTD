@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-
 #define MODEL_HAT "models/player/items/all_class/all_domination_Scout.mdl"
 #define SOUND_HAT_IMPACT "weapons/loose_cannon_ball_impact.wav"
 

@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-
 #define FIREWORK_EXPLOSION "weapons/flare_detonator_explode.wav"
 #define FIREWORK_PARTICLE "burningplayer_rainbow_flame"
 

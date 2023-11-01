@@ -22,8 +22,6 @@
 	All credits go to him!
 */
 
-#include "rtd/macros.sp"
-
 DEFINE_CALL_APPLY(NecroMash)
 
 public void NecroMash_Init(const Perk perk)

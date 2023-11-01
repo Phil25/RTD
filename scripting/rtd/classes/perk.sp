@@ -16,13 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined _perkclass_included
-	#endinput
-#endif
-#define _perkclass_included
-
-#include "rtd/parsing.sp"
-
 #define GET_PROP(%1,%2) \
 	public get(){ \
 		%1 i; \
@@ -64,9 +57,6 @@ enum PerkPropType{
 	Type_Array,
 	Type_Map
 }
-
-/* TF2 class enum offsets numbered accoring to their appearance in-game */
-int g_iClassConverter[10] = {0, 1, 8, 2, 4, 7, 5, 3, 9, 6};
 
 methodmap Perk < StringMap{
 	public Perk(){
@@ -417,8 +407,10 @@ methodmap Perk < StringMap{
 	}
 
 	public bool IsAptForClassOf(int client){
-		int iClass = view_as<int>(TF2_GetPlayerClass(client));
-		iClass = g_iClassConverter[iClass];
+		// TF2 class enum offsets numbered accoring to their order in-game
+		static int iClassConverter[10] = {0, 1, 8, 2, 4, 7, 5, 3, 9, 6};
+
+		int iClass = iClassConverter[TF2_GetPlayerClass(client)];
 		return view_as<bool>(this.Class & (1 << --iClass));
 	}
 

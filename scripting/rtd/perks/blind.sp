@@ -16,10 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-#include "rtd/storage/cache.sp"
-#include "rtd/storage/precached.sp"
-
 #define Alpha Int[0]
 #define AnnotationLifetime Float[0]
 

@@ -16,9 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-#include "rtd/storage/cache.sp"
-
 #define SOUND_BEEP "buttons/blip1.wav"
 
 #define Radius Float[0]

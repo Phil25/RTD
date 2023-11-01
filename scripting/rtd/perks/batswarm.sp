@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-
 #define BAT_START_SOUND "misc/halloween/spell_bat_cast.wav"
 
 #define BAT_FLAG_ACTIVATED 1

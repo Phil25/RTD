@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-
 #define SOUND_ACALLBEYOND_CONJURE "misc/flame_engulf.wav"
 #define ACALLBEYOND_SIZE 70.0
 

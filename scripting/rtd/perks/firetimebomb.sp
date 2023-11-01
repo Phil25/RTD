@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-
 #define MODEL_BOMB "models/props_lakeside_event/bomb_temp_hat.mdl"
 
 #define SOUND_TIMEBOMB_TICK "buttons/button17.wav"

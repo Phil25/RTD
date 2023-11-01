@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-
 #define SICKNESS_PARTICLE "spell_skeleton_goop_green"
 
 #define HealthyTicks Int[0]

@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-
 #define HELL_HURT "ghost_appearation"
 #define HELL_GHOSTS "utaunt_hellpit_parent"
 

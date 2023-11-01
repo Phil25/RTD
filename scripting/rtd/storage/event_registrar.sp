@@ -1,10 +1,3 @@
-#if defined _RTD2_STORAGE_EVENT_REGISTRAR
-	#endinput
-#endif
-#define _RTD2_STORAGE_EVENT_REGISTRAR
-
-#include <sdkhooks>
-
 typedef EREntitySpawned = function void(const int client, const int iEntity);
 typedef EREntityClassnameFilter = function bool(const char[] sClassname);
 typedef EREntityOwnerRetriever = function int(const int iEntity);

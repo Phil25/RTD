@@ -16,11 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined _perkparsing_included
-	#endinput
-#endif
-#define _perkparsing_included
-
 /* return flag value based on TF2 classes, 0 or 511 = all class */
 int StringToClass(const char[] sClasses){
 	int i = -1, iFlags = 0;

@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-
 #define SOUND_PUMPKIN_EXPLODE "weapons/cow_mangler_explode.wav"
 #define SOUND_PUMPKIN_SPAWN "misc/halloween/merasmus_appear.wav"
 #define MODEL_PUMPKIN "models/props_halloween/pumpkin_explode.mdl"

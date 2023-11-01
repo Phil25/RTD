@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-
 #define SOUND_WHISTLE "passtime/whistle.wav"
 #define MODEL_GATOR "models/props_island/crocodile/crocodile.mdl"
 #define ANIM_GATOR "attack"

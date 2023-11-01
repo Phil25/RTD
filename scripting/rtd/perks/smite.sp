@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-
 #define SOUND_ELECTRIC_MIST "ambient/nucleus_electricity.wav"
 
 // not configurable, distance between electrocution ticks needs this to be small

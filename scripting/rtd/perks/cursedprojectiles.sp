@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rtd/macros.sp"
-
 #define CURSED_PROJECTILES_TRANSFORM "halloween_ghost_flash"
 #define SOUND_COURSE_PROJECTILE "misc/halloween/merasmus_disappear.wav"
 

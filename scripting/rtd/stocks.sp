@@ -119,9 +119,6 @@
 * - Homing_AptClass
 */
 
-#include "rtd/macros.sp"
-#include "rtd/storage/precached.sp"
-
 #define LASERBEAM "sprites/laserbeam.vmt"
 #define EMPTY_MODEL "models/empty.mdl"
 
