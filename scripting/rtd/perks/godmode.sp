@@ -151,13 +151,13 @@ void Godmode_ApplyPerk(const int client, const Perk perk)
 	switch (perk.GetPrefCell("mode", 0))
 	{
 		case -1: // no self damage
-			Cache[client].HookTakeDamage(Godmode_OnTakeDamage_NoSelf);
+			SDKHook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_NoSelf);
 
 		case 0: // pushback only
-			Cache[client].HookTakeDamage(Godmode_OnTakeDamage_Pushback);
+			SDKHook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Pushback);
 
 		case 1: // deal self damage
-			Cache[client].HookTakeDamage(Godmode_OnTakeDamage_Self);
+			SDKHook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Self);
 	}
 
 	if (Cache[client].UberMode)
@@ -179,6 +179,10 @@ void Godmode_ApplyPerk(const int client, const Perk perk)
 void Godmode_RemovePerk(const int client)
 {
 	g_eInGodmode.Unset(client);
+
+	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_NoSelf);
+	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Pushback);
+	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Self);
 
 	if (Cache[client].UberMode)
 		TF2_RemoveCondition(client, TFCond_UberchargedCanteen);

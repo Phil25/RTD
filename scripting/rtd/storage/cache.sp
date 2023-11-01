@@ -81,30 +81,6 @@ enum EntCleanup
 typedef PerkRepeater = function Action(const int client);
 typedef PlayerHurt = function void(const int client, const int iAttacker);
 
-enum struct PerkEventRegistrar
-{
-	int _ClientIndex;
-	SDKHookCB _TakeDamage;
-
-	void Init(const int client)
-	{
-		this._ClientIndex = client;
-		this._TakeDamage = INVALID_FUNCTION;
-	}
-
-	void TakeDamage(SDKHookCB hCallback)
-	{
-		this._TakeDamage = hCallback;
-		SDKHook(this._ClientIndex, SDKHook_OnTakeDamage, hCallback);
-	}
-
-	void Cleanup()
-	{
-		if (this._TakeDamage != INVALID_FUNCTION)
-			SDKUnhook(this._ClientIndex, SDKHook_OnTakeDamage, this._TakeDamage);
-	}
-}
-
 enum struct PlayerCache
 {
 	int _ClientIndex;
@@ -117,13 +93,9 @@ enum struct PlayerCache
 	int _TimerCount;
 	Handle _Timers[2];
 
-	// TODO: delete (used only in Godmode), manually unhook instead
-	SDKHookCB _TakeDamage;
-
 	void Init(const int client)
 	{
 		this._ClientIndex = client;
-		this._TakeDamage = INVALID_FUNCTION;
 	}
 
 	Entity GetEnt(const EntSlot eSlot)
@@ -171,12 +143,6 @@ enum struct PlayerCache
 		this._Timers[iIndex] = null;
 	}
 
-	void HookTakeDamage(SDKHookCB hCallback)
-	{
-		this._TakeDamage = hCallback;
-		SDKHook(this._ClientIndex, SDKHook_OnTakeDamage, hCallback);
-	}
-
 	void Cleanup()
 	{
 		switch (this._EntCleanup[EntSlot_1])
@@ -204,9 +170,6 @@ enum struct PlayerCache
 		delete this._Timers[0];
 		delete this._Timers[1];
 		this._TimerCount = 0;
-
-		if (this._TakeDamage != INVALID_FUNCTION)
-			SDKUnhook(this._ClientIndex, SDKHook_OnTakeDamage, this._TakeDamage);
 	}
 }
 
