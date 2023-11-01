@@ -17,16 +17,19 @@
 */
 
 /* return flag value based on TF2 classes, 0 or 511 = all class */
-int StringToClass(const char[] sClasses){
+int StringToClass(const char[] sClasses)
+{
 	int i = -1, iFlags = 0;
-	while(sClasses[++i] != '\0')
+	while (sClasses[++i] != '\0')
 		iFlags |= ParseClassDigit(sClasses[i]);
+
 	return iFlags == 0 ? 511 : iFlags;
 }
 
-ArrayList StringToWeaponClass(const char[] sWeapClass){
+ArrayList StringToWeaponClass(const char[] sWeapClass)
+{
 	ArrayList list = new ArrayList(32);
-	if(FindCharInString(sWeapClass, '0') != -1)
+	if (FindCharInString(sWeapClass, '0') != -1)
 		return list;
 
 	char sWeapClassEsc[127];
@@ -36,12 +39,14 @@ ArrayList StringToWeaponClass(const char[] sWeapClass){
 	char[][] sPieces = new char[iSize][32];
 
 	ExplodeString(sWeapClassEsc, ",", sPieces, iSize, 64);
-	for(int i = 0; i < iSize; i++)
+	for (int i = 0; i < iSize; ++i)
 		list.PushString(sPieces[i]);
+
 	return list;
 }
 
-ArrayList StringToTags(const char[] sTags){
+ArrayList StringToTags(const char[] sTags)
+{
 	ArrayList list = new ArrayList(32);
 
 	char sTagsEsc[127];
@@ -51,26 +56,31 @@ ArrayList StringToTags(const char[] sTags){
 	char[][] sPieces = new char[iSize][24];
 
 	ExplodeString(sTagsEsc, ",", sPieces, iSize, 24);
-	for(int i = 0; i < iSize; i++)
+	for (int i = 0; i < iSize; ++i)
 		list.PushString(sPieces[i]);
+
 	return list;
 }
 
 /* return po2 value based on class */
-int ParseClassDigit(char c){
+int ParseClassDigit(char c)
+{
 	int d = CharToInt(c);
 	return !d ? 0 : 1 << --d;
 }
 
 /* return 0 if not a numeric char */
-int CharToInt(char c){
+int CharToInt(char c)
+{
 	int i = c-'0';
 	return i *view_as<int>(0 <= i <= 9);
 }
 
-int CountCharInString(const char[] s, char c){
+int CountCharInString(const char[] s, char c)
+{
 	int i = -1, count = 0;
-	while(s[++i] != '\0')
+	while (s[++i] != '\0')
 		count += view_as<int>(s[i] == c);
+
 	return count;
 }

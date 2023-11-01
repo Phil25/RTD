@@ -52,7 +52,13 @@
 
 //#define DEBUG // log extra messages
 
-/***** V A R I A B L E S ****/
+public Plugin myinfo = {
+	name = "Roll The Dice (Revamped)",
+	author = "Phil25",
+	description = "Lets players roll for temporary benefits.",
+	version	= PLUGIN_VERSION,
+	url = "https://forums.alliedmods.net/showthread.php?t=278579"
+};
 
 static char g_sTeamColors[][] = {"\x07B2B2B2", "\x07B2B2B2", "\x07FF4040", "\x0799CCFF"};
 
@@ -100,27 +106,14 @@ Handle g_hFwdOnRegOpen;
 #include "rtd/natives.sp"
 #include "rtd/convars.sp"
 
+public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int iErrorSize)
+{
+	char sGame[32];
+	sGame[0] = '\0';
 
-/********** I N F O *********/
-
-public Plugin myinfo = {
-	name = "Roll The Dice (Revamped)",
-	author = "Phil25",
-	description = "Lets players roll for temporary benefits.",
-	version	= PLUGIN_VERSION,
-	url = "https://forums.alliedmods.net/showthread.php?t=278579"
-};
-
-
-
-			//*************************//
-			//----  G E N E R A L  ----//
-			//*************************//
-
-public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int iErrorSize){
-	char sGame[32]; sGame[0] = '\0';
 	GetGameFolderName(sGame, sizeof(sGame));
-	if(!StrEqual(sGame, "tf")){
+	if (!StrEqual(sGame, "tf"))
+	{
 		Format(sError, iErrorSize, CONS_PREFIX ... " This plugin only works for Team Fortress 2.");
 		return APLRes_Failure;
 	}
@@ -142,61 +135,62 @@ public void OnPluginStart()
 	if (ParseEffects())
 		ParseCustomEffects();
 
-		//-----[ ConVars ]-----//
+	// ConVars
 	CreateConVar("sm_rtd2_version", PLUGIN_VERSION, "Current RTD2 Version", FLAGS_CVARS|FCVAR_DONTRECORD|FCVAR_SPONLY);
 	SetupConVars();
 
 	AutoExecConfig(true);
 
-		//-----[ Forwards ]-----//
-	g_hFwdCanRoll	= CreateGlobalForward("RTD2_CanRollDice",	ET_Event, Param_Cell						);
-	g_hFwdCanForce	= CreateGlobalForward("RTD2_CanForcePerk",	ET_Event, Param_Cell, Param_Cell, Param_Cell);
-	g_hFwdCanRemove	= CreateGlobalForward("RTD2_CanRemovePerk",	ET_Event, Param_Cell, Param_Cell, Param_Cell);
-	g_hFwdRolled	= CreateGlobalForward("RTD2_Rolled",		ET_Event, Param_Cell, Param_Cell, Param_Cell);
-	g_hFwdRemoved	= CreateGlobalForward("RTD2_Removed",		ET_Event, Param_Cell, Param_Cell, Param_Cell);
-	g_hFwdOnRegOpen	= CreateGlobalForward("RTD2_OnRegOpen",		ET_Ignore									);
+	// Forwards
+	g_hFwdCanRoll = CreateGlobalForward("RTD2_CanRollDice", ET_Event, Param_Cell);
+	g_hFwdCanForce = CreateGlobalForward("RTD2_CanForcePerk", ET_Event, Param_Cell, Param_Cell, Param_Cell);
+	g_hFwdCanRemove = CreateGlobalForward("RTD2_CanRemovePerk", ET_Event, Param_Cell, Param_Cell, Param_Cell);
+	g_hFwdRolled = CreateGlobalForward("RTD2_Rolled", ET_Event, Param_Cell, Param_Cell, Param_Cell);
+	g_hFwdRemoved = CreateGlobalForward("RTD2_Removed", ET_Event, Param_Cell, Param_Cell, Param_Cell);
+	g_hFwdOnRegOpen = CreateGlobalForward("RTD2_OnRegOpen", ET_Ignore);
 
 
-		//-----[ Commands ]-----//
-	RegAdminCmd("sm_rtd",		Command_RTD,			0,				"Roll a perk.");
-	RegAdminCmd("sm_perks",		Command_DescMenu,		0,				"Display a description menu of RTD perks.");
+	// Commands
+	RegAdminCmd("sm_rtd", Command_RTD, 0, "Roll a perk.");
+	RegAdminCmd("sm_perks", Command_DescMenu, 0, "Display a description menu of RTD perks.");
 
-	RegAdminCmd("sm_forcertd",	Command_ForceRTD,		ADMFLAG_SLAY,	"Applies perk to selected player(s).");
-	RegAdminCmd("sm_removertd",	Command_RemoveRTD,		ADMFLAG_SLAY,	"Removes perk from selected player(s).");
+	RegAdminCmd("sm_forcertd", Command_ForceRTD, ADMFLAG_SLAY, "Applies perk to selected player(s).");
+	RegAdminCmd("sm_removertd", Command_RemoveRTD, ADMFLAG_SLAY, "Removes perk from selected player(s).");
 
-	RegAdminCmd("sm_rtds",		Command_PerkSearchup,	ADMFLAG_SLAY,	"Displays customized perk list.");
-	RegAdminCmd("sm_rtdsearch",	Command_PerkSearchup,	ADMFLAG_SLAY,	"Displays customized perk list.");
+	RegAdminCmd("sm_rtds", Command_PerkSearchup, ADMFLAG_SLAY, "Displays customized perk list.");
+	RegAdminCmd("sm_rtdsearch", Command_PerkSearchup, ADMFLAG_SLAY, "Displays customized perk list.");
 
-	RegAdminCmd("sm_reloadrtd",	Command_Reload,			ADMFLAG_CONFIG,	"Reloads the config files.");
+	RegAdminCmd("sm_reloadrtd", Command_Reload, ADMFLAG_CONFIG, "Reloads the config files.");
 #if defined _updater_included
-	RegAdminCmd("sm_updatertd",	Command_Update,			ADMFLAG_ROOT,	"Force an update check. Does nothing if Updater is not installed.");
+	RegAdminCmd("sm_updatertd", Command_Update, ADMFLAG_ROOT, "Force an update check. Does nothing if Updater is not installed.");
 #endif
 
-		//-----[ Listeners ]-----//
-	AddCommandListener(Listener_Say,	"say");
-	AddCommandListener(Listener_Say,	"say_team");
-	AddCommandListener(Listener_Voice,	"voicemenu");
+	// Listeners
+	AddCommandListener(Listener_Say, "say");
+	AddCommandListener(Listener_Say, "say_team");
+	AddCommandListener(Listener_Voice, "voicemenu");
 	AddNormalSoundHook(Listener_Sound);
 
 	g_hRollers = new Rollers();
 	g_hPerkHistory = new PerkList();
 
-	for(int i = 1; i <= MaxClients; i++){
-		if(IsClientInGame(i))
+	for (int i = 1; i <= MaxClients; ++i)
+		if (IsClientInGame(i))
 			OnClientPutInServer(i);
-	}
 }
 
-public void OnConfigsExecuted(){
+public void OnConfigsExecuted()
+{
 	delete g_hDescriptionMenu;
-	g_hDescriptionMenu		= BuildDesc();
-	g_bIsRegisteringOpen	= true;
+	g_hDescriptionMenu = BuildDescriptionMenu();
+	g_bIsRegisteringOpen = true;
 
 	Forward_OnRegOpen();
 	ParseDisabledPerks();
 }
 
-public void OnPluginEnd(){
+public void OnPluginEnd()
+{
 	ResetAllClients();
 }
 
@@ -206,26 +200,29 @@ void InitClientCache()
 		Cache[i].Init(i);
 }
 
-void ResetAllClients(RTDRemoveReason reason=RTDRemove_PluginUnload){
-	for(int i = 1; i <= MaxClients; i++){
-		if(g_hRollers.GetInRoll(i))
+void ResetAllClients(RTDRemoveReason reason=RTDRemove_PluginUnload)
+{
+	for (int i = 1; i <= MaxClients; ++i)
+	{
+		if (g_hRollers.GetInRoll(i))
 			ForceRemovePerk(i, reason);
 
 		g_hRollers.Reset(i);
 	}
 }
 
-public void OnMapStart(){
-	HookEvent("player_death",				Event_PlayerDeath);
-	HookEvent("player_changeclass",			Event_ClassChange);
-	HookEvent("teamplay_round_active",		Event_RoundActive);
-	HookEvent("post_inventory_application",	Event_Resupply);
-	HookEvent("player_hurt",				Event_PlayerHurt);
-	HookEvent("player_chargedeployed",		Event_UberchargeDeployed);
+public void OnMapStart()
+{
+	HookEvent("player_death", Event_PlayerDeath);
+	HookEvent("player_changeclass", Event_ClassChange);
+	HookEvent("teamplay_round_active", Event_RoundActive);
+	HookEvent("post_inventory_application", Event_Resupply);
+	HookEvent("player_hurt", Event_PlayerHurt);
+	HookEvent("player_chargedeployed", Event_UberchargeDeployed);
 
-	HookEvent("teamplay_round_start",		Event_RoundStart);
-	HookEvent("arena_round_start",			Event_RoundStart);
-	HookEvent("mvm_begin_wave",				Event_RoundStart);
+	HookEvent("teamplay_round_start", Event_RoundStart);
+	HookEvent("arena_round_start", Event_RoundStart);
+	HookEvent("mvm_begin_wave", Event_RoundStart);
 
 	Storage_Precache();
 	Stocks_OnMapStart(); // rtd/stocks.sp
@@ -237,146 +234,160 @@ public void OnMapStart(){
 	g_bIsGameArena = (FindEntityByClassname(MaxClients +1, "tf_logic_arena") > MaxClients);
 }
 
-public void OnMapEnd(){
+public void OnMapEnd()
+{
 	Events.Cleanup();
 
-	UnhookEvent("player_death",				Event_PlayerDeath);
-	UnhookEvent("player_changeclass",		Event_ClassChange);
-	UnhookEvent("teamplay_round_active",	Event_RoundActive);
-	UnhookEvent("post_inventory_application",Event_Resupply);
-	UnhookEvent("player_hurt",				Event_PlayerHurt);
-	UnhookEvent("player_chargedeployed",	Event_UberchargeDeployed);
+	UnhookEvent("player_death", Event_PlayerDeath);
+	UnhookEvent("player_changeclass", Event_ClassChange);
+	UnhookEvent("teamplay_round_active", Event_RoundActive);
+	UnhookEvent("post_inventory_application", Event_Resupply);
+	UnhookEvent("player_hurt", Event_PlayerHurt);
+	UnhookEvent("player_chargedeployed", Event_UberchargeDeployed);
 
-	UnhookEvent("teamplay_round_start",		Event_RoundStart);
-	UnhookEvent("arena_round_start",		Event_RoundStart);
-	UnhookEvent("mvm_begin_wave",			Event_RoundStart);
+	UnhookEvent("teamplay_round_start", Event_RoundStart);
+	UnhookEvent("arena_round_start", Event_RoundStart);
+	UnhookEvent("mvm_begin_wave", Event_RoundStart);
 }
 
-public void OnClientPutInServer(int client){
+public void OnClientPutInServer(int client)
+{
 	g_hRollers.Reset(client);
 
-	if(g_hRollers.GetHud(client) == null)
+	if (g_hRollers.GetHud(client) == null)
 		g_hRollers.SetHud(client, CreateHudSynchronizer());
 }
 
-public void OnClientDisconnect(int client){
+public void OnClientDisconnect(int client)
+{
 	Events.PlayerDisconnected(client);
 
-	if(g_hRollers.GetInRoll(client))
+	if (g_hRollers.GetInRoll(client))
 		ForceRemovePerk(client, RTDRemove_Disconnect);
 
 	g_hRollers.Reset(client);
 }
 
-public void OnAllPluginsLoaded(){
+public void OnAllPluginsLoaded()
+{
 #if defined _updater_included
-	g_bPluginUpdater		= LibraryExists("updater");
-	if(g_bPluginUpdater)
+	g_bPluginUpdater = LibraryExists("updater");
+	if (g_bPluginUpdater)
 		Updater_AddPlugin(UPDATE_URL);
 #endif
+
 #if defined _friendly_included
-	g_bPluginFriendly		= LibraryExists("[TF2] Friendly Mode");
+	g_bPluginFriendly = LibraryExists("[TF2] Friendly Mode");
 #endif
+
 #if defined _friendlysimple_included
-	g_bPluginFriendlySimple	= LibraryExists("Friendly Simple");
+	g_bPluginFriendlySimple = LibraryExists("Friendly Simple");
 #endif
 }
 
-public void OnLibraryAdded(const char[] sLibName){
+public void OnLibraryAdded(const char[] sLibName)
+{
 #if defined _updater_included
-	if(StrEqual(sLibName, "updater")){
+	if (StrEqual(sLibName, "updater"))
+	{
 		g_bPluginUpdater = true;
 		Updater_AddPlugin(UPDATE_URL);
 		return;
 	}
 #endif
+
 #if defined _friendly_included
-	if(StrEqual(sLibName, "[TF2] Friendly Mode")) {
+	if (StrEqual(sLibName, "[TF2] Friendly Mode"))
+	{
 		g_bPluginFriendly = true;
 		return;
 	}
 #endif
+
 #if defined _friendlysimple_included
-	if(StrEqual(sLibName, "Friendly Simple")) {
+	if (StrEqual(sLibName, "Friendly Simple"))
+	{
 		g_bPluginFriendlySimple = true;
 		return;
 	}
 #endif
 }
 
-public void OnLibraryRemoved(const char[] sLibName){
+public void OnLibraryRemoved(const char[] sLibName)
+{
 #if defined _updater_included
-	if(StrEqual(sLibName, "updater")){
+	if (StrEqual(sLibName, "updater"))
+	{
 		g_bPluginUpdater = false;
 		return;
 	}
 #endif
+
 #if defined _friendly_included
-	if(StrEqual(sLibName, "[TF2] Friendly Mode")) {
+	if (StrEqual(sLibName, "[TF2] Friendly Mode"))
+	{
 		g_bPluginFriendly = false;
 		return;
 	}
 #endif
+
 #if defined _friendlysimple_included
-	if(StrEqual(sLibName, "Friendly Simple")) {
+	if(StrEqual(sLibName, "Friendly Simple"))
+	{
 		g_bPluginFriendlySimple = false;
 		return;
 	}
 #endif
 }
 
-
-
-			//*************************//
-			//----  U P D A T E R  ----//
-			//*************************//
 #if defined _updater_included
-public Action Updater_OnPluginChecking(){
-	if(!g_bCvarAutoUpdate && !g_bIsUpdateForced)
+public Action Updater_OnPluginChecking()
+{
+	if (!g_bCvarAutoUpdate && !g_bIsUpdateForced)
 		return Plugin_Handled;
 
 	g_bIsUpdateForced = false;
 	return Plugin_Continue;
 }
 
-public int Updater_OnPluginUpdated(){
-	if(g_bCvarReloadUpdate)
+public int Updater_OnPluginUpdated()
+{
+	if (g_bCvarReloadUpdate)
 		ReloadPlugin();
 }
 #endif
 
-
-
-			//***************************//
-			//----  C O M M A N D S  ----//
-			//***************************//
-
-public Action Command_RTD(int client, int args){
-	if(client != 0)
+public Action Command_RTD(int client, int args)
+{
+	if (client != 0)
 		RollPerkForClient(client);
 
 	return Plugin_Handled;
 }
 
-public Action Command_DescMenu(int client, int args){
-	if(client != 0)
-		ShowDesc(client);
+public Action Command_DescMenu(int client, int args)
+{
+	if (client != 0)
+		ShowDescriptionMenu(client);
 
 	return Plugin_Handled;
 }
 
-public Action Command_ForceRTD(int client, int args){
-	if(args < 1){
+public Action Command_ForceRTD(int client, int args)
+{
+	if (args < 1)
+	{
 		ReplyToCommand(client, "[SM] Usage: sm_forcertd <player> <perk id>* <time>* <override class restriction (0 / 1)>*");
 		return Plugin_Handled;
 	}
 
 	char sTrgName[MAX_TARGET_LENGTH], sTrg[32];
-	int	 aTrgList[MAXPLAYERS], iTrgCount;
+	int aTrgList[MAXPLAYERS], iTrgCount;
 	bool bNameMultiLang;
 	GetCmdArg(1, sTrg, sizeof(sTrg));
 
-	if((iTrgCount = ProcessTargetString(sTrg, client, aTrgList, MAXPLAYERS, COMMAND_FILTER_ALIVE, sTrgName, sizeof(sTrgName), bNameMultiLang)) <= 0){
+	if ((iTrgCount = ProcessTargetString(sTrg, client, aTrgList, MAXPLAYERS, COMMAND_FILTER_ALIVE, sTrgName, sizeof(sTrgName), bNameMultiLang)) <= 0)
+	{
 		ReplyToTargetError(client, iTrgCount);
 		return Plugin_Handled;
 	}
@@ -384,45 +395,52 @@ public Action Command_ForceRTD(int client, int args){
 	int iPerkTime = -1;
 	char sQuery[32] = "";
 
-	if(args > 1){
+	if (args > 1)
+	{
 		GetCmdArg(2, sQuery, sizeof(sQuery));
 
-		if(args > 2){
+		if (args > 2)
+		{
 			char sPerkTime[8];
 			GetCmdArg(3, sPerkTime, sizeof(sPerkTime));
 			iPerkTime = StringToInt(sPerkTime);
 		}
 	}
 
-	for(int i = 0; i < iTrgCount; i++)
+	for (int i = 0; i < iTrgCount; ++i)
 		ForcePerk(aTrgList[i], sQuery, iPerkTime, client);
 
 	return Plugin_Handled;
 }
 
-public Action Command_RemoveRTD(int client, int args){
-	if(args < 1){
+public Action Command_RemoveRTD(int client, int args)
+{
+	if (args < 1)
+	{
 		ReplyToCommand(client, "[SM] Usage: sm_removertd <player> <\"reason\">*");
 		return Plugin_Handled;
 	}
 
 	char sTrgName[MAX_TARGET_LENGTH], sTrg[32];
-	int	 aTrgList[MAXPLAYERS], iTrgCount;
+	int aTrgList[MAXPLAYERS], iTrgCount;
 	bool bNameMultiLang;
 	GetCmdArg(1, sTrg, sizeof(sTrg));
 
-	if((iTrgCount = ProcessTargetString(sTrg, client, aTrgList, MAXPLAYERS, COMMAND_FILTER_ALIVE, sTrgName, sizeof(sTrgName), bNameMultiLang)) <= 0){
+	if ((iTrgCount = ProcessTargetString(sTrg, client, aTrgList, MAXPLAYERS, COMMAND_FILTER_ALIVE, sTrgName, sizeof(sTrgName), bNameMultiLang)) <= 0)
+	{
 		ReplyToTargetError(client, iTrgCount);
 		return Plugin_Handled;
 	}
 
 	char sReason[128] = "";
-	if(args > 1)
+	if (args > 1)
 		GetCmdArg(2, sReason, sizeof(sReason));
 
 	bool bFuncCount = GetForwardFunctionCount(g_hFwdCanRemove) > 0;
-	for(int i = 0; i < iTrgCount; i++){
-		if(g_hRollers.GetInRoll(aTrgList[i]) && bFuncCount){
+	for (int i = 0; i < iTrgCount; ++i)
+	{
+		if (g_hRollers.GetInRoll(aTrgList[i]) && bFuncCount)
+		{
 			Call_StartForward(g_hFwdCanRemove);
 			Call_PushCell(client);
 			Call_PushCell(aTrgList[i]);
@@ -430,30 +448,33 @@ public Action Command_RemoveRTD(int client, int args){
 			Action result = Plugin_Continue;
 			Call_Finish(result);
 
-			if(result != Plugin_Continue)
+			if (result != Plugin_Continue)
 				continue;
 		}
 
-		if(g_hRollers.GetInRoll(aTrgList[i]))
+		if (g_hRollers.GetInRoll(aTrgList[i]))
 			ForceRemovePerk(aTrgList[i], args > 1 ? RTDRemove_Custom : RTDRemove_WearOff, sReason);
 	}
+
 	return Plugin_Handled;
 }
 
-public Action Command_PerkSearchup(int client, int args){
+public Action Command_PerkSearchup(int client, int args)
+{
 	char sQuery[64] = "";
-	if(args > 0)
+	if (args > 0)
 		GetCmdArg(1, sQuery, 64);
 
 	char sFormat[64] = "$Id$. $Name$";
-	if(args > 1)
+	if (args > 1)
 		GetCmdArg(2, sFormat, 64);
 
 	PerkList list = g_hPerkContainer.FindPerks(sQuery);
 	int iLen = list.Length;
 
 	char sBuffer[1024];
-	for(int i = 0; i < iLen; i++){
+	for (int i = 0; i < iLen; ++i)
+	{
 		list.Get(i).Format(sBuffer, 1024, sFormat);
 		PrintToConsole(client, sBuffer);
 	}
@@ -464,7 +485,8 @@ public Action Command_PerkSearchup(int client, int args){
 	return Plugin_Handled;
 }
 
-public Action Command_Reload(int client, int args){
+public Action Command_Reload(int client, int args)
+{
 	ResetAllClients();
 
 	ParseEffects();
@@ -481,216 +503,124 @@ public Action Command_Reload(int client, int args){
 }
 
 #if defined _updater_included
-public Action Command_Update(int client, int args){
-	if(!g_bPluginUpdater){
+public Action Command_Update(int client, int args)
+{
+	if (!g_bPluginUpdater)
+	{
 		ReplyToCommand(client, CONS_PREFIX ... " Updater is not installed.");
 		return Plugin_Handled;
 	}
 
 	g_bIsUpdateForced = true;
-	if(Updater_ForceUpdate())
+	if (Updater_ForceUpdate())
+	{
 		ReplyToCommand(client, CONS_PREFIX ... " New RTD version available!");
-	else ReplyToCommand(client, CONS_PREFIX ... " This RTD version is up to date or unable to update.");
+	}
+	else
+	{
+		ReplyToCommand(client, CONS_PREFIX ... " This RTD version is up to date or unable to update.");
+	}
 
 	g_bIsUpdateForced = false;
 	return Plugin_Handled;
 }
 #endif
 
-
-
-			//*****************************//
-			//----  L I S T E N E R S  ----//
-			//*****************************//
-
-public Action Listener_Say(int client, const char[] sCommand, int args){
-	if(!IsValidClient(client))
+public Action Listener_Say(int client, const char[] sCommand, int args)
+{
+	if (!IsValidClient(client))
 		return Plugin_Continue;
 
 	char sText[16];
 	GetCmdArg(1, sText, sizeof(sText));
-	if(!IsArgumentTrigger(sText))
+	if (!IsArgumentTrigger(sText))
 		return Plugin_Continue;
 
 	RollPerkForClient(client);
 	return g_bCvarShowTriggers ? Plugin_Continue : Plugin_Stop;
 }
 
-public Action Listener_Voice(int client, const char[] sCommand, int args){
+public Action Listener_Voice(int client, const char[] sCommand, int args)
+{
 	if (IsValidClient(client))
 		Events.Voice(client);
 
 	return Plugin_Continue;
 }
 
-public Action Listener_Sound(int clients[MAXPLAYERS], int& iLen, char sSample[PLATFORM_MAX_PATH], int& iEnt, int& iChannel, float& fVol, int& iLevel, int& iPitch, int& iFlags, char sEntry[PLATFORM_MAX_PATH], int& iSeed){
-	if(!IsValidClient(iEnt))
+public Action Listener_Sound(int clients[MAXPLAYERS], int& iLen, char sSample[PLATFORM_MAX_PATH], int& iEnt, int& iChannel, float& fVol, int& iLevel, int& iPitch, int& iFlags, char sEntry[PLATFORM_MAX_PATH], int& iSeed)
+{
+	if (!IsValidClient(iEnt))
 		return Plugin_Continue;
+
 	return (Stocks_Sound(iEnt, sSample) && Events.Sound(iEnt, sSample)) ? Plugin_Continue : Plugin_Stop;
 }
 
-
-
-			//***********************//
-			//----  C O N V A R  ----//
-			//***********************//
-
-public void ConVarChange_Plugin(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarPluginEnabled)
-		g_bCvarPluginEnabled = StringToInt(sNew) > 0 ? true : false;
-
-	else if(hCvar == g_hCvarAutoUpdate)
-		g_bCvarAutoUpdate = StringToInt(sNew) > 0 ? true : false;
-
-	else if(hCvar == g_hCvarReloadUpdate)
-		g_bCvarReloadUpdate = StringToInt(sNew) > 0 ? true : false;
-
-	else if(hCvar == g_hCvarLog)
-		g_bCvarLog = StringToInt(sNew) > 0 ? true : false;
-
-	else if(hCvar == g_hCvarChat)
-		g_iCvarChat = StringToInt(sNew);
-}
-
-public void ConVarChange_Perks(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarPerkDuration)
-		g_iCvarPerkDuration = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarRollInterval)
-		g_iCvarRollInterval = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarDisabledPerks)
-		ParseDisabledPerks();
-}
-
-public void ConVarChange_Usage(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarAllowed)
-		g_iCvarAllowed = ReadFlagString(sNew);
-
-	else if(hCvar == g_hCvarInSetup)
-		g_bCvarInSetup = StringToInt(sNew) > 0 ? true : false;
-
-	else if(hCvar == g_hCvarTriggers)
-		ParseTriggers();
-
-	else if(hCvar == g_hCvarShowTriggers)
-		g_bCvarShowTriggers = StringToInt(sNew) > 0 ? true : false;
-
-	else if(hCvar == g_hCvarShowTime)
-		g_bCvarShowTime = StringToInt(sNew) > 0 ? true : false;
-}
-
-public void ConVarChange_Rtd(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarRtdTeam)
-		g_iCvarRtdTeam = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarRtdMode)
-		g_iCvarRtdMode = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarClientLimit)
-		g_iCvarClientLimit = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarTeamLimit)
-		g_iCvarTeamLimit = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarRespawnStuck)
-		g_bCvarRespawnStuck = StringToInt(sNew) > 0 ? true : false;
-}
-
-public void ConVarChange_Repeat(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarRepeatPlayer){
-		g_iCvarRepeatPlayer = StringToInt(sNew);
-		g_hRollers.ResetPerkHisories();
-	}else if(hCvar == g_hCvarRepeatPerk){
-		g_iCvarRepeatPerk = StringToInt(sNew);
-		g_hPerkHistory.Clear();
-	}
-}
-
-public void ConVarChange_Good(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarGoodChance)
-		g_fCvarGoodChance = StringToFloat(sNew);
-
-	else if(hCvar == g_hCvarGoodDonatorChance)
-		g_fCvarGoodDonatorChance = StringToFloat(sNew);
-
-	else if(hCvar == g_hCvarDonatorFlag)
-		g_iCvarDonatorFlag = ReadFlagString(sNew);
-}
-
-public void ConVarChange_Timer(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarTimerPosX)
-		g_fCvarTimerPosX = StringToFloat(sNew);
-
-	else if(hCvar == g_hCvarTimerPosY)
-		g_fCvarTimerPosY = StringToFloat(sNew);
-}
-
-
-
-			//***********************//
-			//----  E V E N T S  ----//
-			//***********************//
-
-public Action Event_PlayerDeath(Handle hEvent, const char[] sEventName, bool dontBroadcast){
+public Action Event_PlayerDeath(Handle hEvent, const char[] sEventName, bool dontBroadcast)
+{
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if(client == 0)
+	if (!client)
 		return Plugin_Continue;
 
-	if(GetEventInt(hEvent, "death_flags") & FLAG_FEIGNDEATH)
+	if (GetEventInt(hEvent, "death_flags") & FLAG_FEIGNDEATH)
 		return Plugin_Continue;
 
 	Events.PlayerDied(client);
 
-	if(!g_hRollers.GetInRoll(client))
+	if (!g_hRollers.GetInRoll(client))
 		return Plugin_Continue;
 
 	ForceRemovePerk(client, RTDRemove_Death);
 	return Plugin_Continue;
 }
 
-public Action Event_ClassChange(Handle hEvent, const char[] sEventName, bool dontBroadcast){
+public Action Event_ClassChange(Handle hEvent, const char[] sEventName, bool dontBroadcast)
+{
 	int iUserId = GetEventInt(hEvent, "userid");
 	int client = GetClientOfUserId(iUserId);
-	if(client == 0)
+	if (client == 0)
 		return Plugin_Continue;
 
 	int iClass = GetEventInt(hEvent, "class");
-	if(view_as<int>(TF2_GetPlayerClass(client)) == iClass)
+	if (view_as<int>(TF2_GetPlayerClass(client)) == iClass)
 		return Plugin_Continue; // no actual class change in effect
 
-	if(!g_hRollers.GetInRoll(client))
+	if (!g_hRollers.GetInRoll(client))
 		return Plugin_Continue;
 
 	DataPack hData = new DataPack();
 	hData.WriteCell(iUserId);
 	hData.WriteCell(iClass);
-	CreateTimer(0.0, Timer_ClassChangePost, hData);
+	CreateTimer(0.0, Timer_ClassChangePost, hData, TIMER_DATA_HNDL_CLOSE);
 
 	return Plugin_Continue;
 }
 
-public Action Timer_ClassChangePost(Handle hTimer, DataPack hData){
+public Action Timer_ClassChangePost(Handle hTimer, DataPack hData)
+{
 	hData.Reset();
-	int client = GetClientOfUserId(hData.ReadCell());
-	int iDesiredClass = hData.ReadCell();
-	CloseHandle(hData);
 
-	if(client > 0)
-		if(view_as<int>(TF2_GetPlayerClass(client)) == iDesiredClass)
-			ForceRemovePerk(client, RTDRemove_ClassChange);
+	int client = GetClientOfUserId(hData.ReadCell());
+	if (!client)
+		return Plugin_Stop;
+
+	int iDesiredClass = hData.ReadCell();
+	if (view_as<int>(TF2_GetPlayerClass(client)) == iDesiredClass)
+		ForceRemovePerk(client, RTDRemove_ClassChange);
 
 	return Plugin_Stop;
 }
 
-public Action Event_RoundActive(Handle hEvent, const char[] sEventName, bool dontBroadcast){
-	if(g_bCvarPluginEnabled && (g_iCvarChat & CHAT_AD) && IsRTDInRound())
+public Action Event_RoundActive(Handle hEvent, const char[] sEventName, bool dontBroadcast)
+{
+	if (g_bCvarPluginEnabled && (g_iCvarChat & CHAT_AD) && IsRTDInRound())
 		RTDPrintAll("%T", "RTD2_Ad", LANG_SERVER, 0x03, 0x01);
 
 	return Plugin_Continue;
 }
 
-public Action Event_Resupply(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
+public Action Event_Resupply(Handle hEvent, const char[] sEventName, bool bDontBroadcast)
+{
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
 	if (client)
 		Events.Resupply(client);
@@ -698,7 +628,8 @@ public Action Event_Resupply(Handle hEvent, const char[] sEventName, bool bDontB
 	return Plugin_Continue;
 }
 
-public Action Event_PlayerHurt(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
+public Action Event_PlayerHurt(Handle hEvent, const char[] sEventName, bool bDontBroadcast)
+{
 	int iVictim = GetClientOfUserId(GetEventInt(hEvent, "userid"));
 	int iAttacker = GetClientOfUserId(GetEventInt(hEvent, "attacker"));
 	int iDamage = GetEventInt(hEvent, "damageamount");
@@ -710,19 +641,22 @@ public Action Event_PlayerHurt(Handle hEvent, const char[] sEventName, bool bDon
 	return Plugin_Continue;
 }
 
-public Action Event_UberchargeDeployed(Handle hEvent, const char[] sEventName, bool bDontBroadcast){
+public Action Event_UberchargeDeployed(Handle hEvent, const char[] sEventName, bool bDontBroadcast)
+{
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
 	int iTarget = GetClientOfUserId(GetEventInt(hEvent, "targetid"));
 	Events.UberchargeDeployed(client, iTarget);
 	return Plugin_Continue;
 }
 
-public Action Event_RoundStart(Handle hEvent, const char[] sEventName, bool dontBroadcast){
+public Action Event_RoundStart(Handle hEvent, const char[] sEventName, bool dontBroadcast)
+{
 	ResetAllClients(RTDRemove_NoPrint);
 	return Plugin_Continue;
 }
 
-public void OnEntityCreated(int iEnt, const char[] sClassname){
+public void OnEntityCreated(int iEnt, const char[] sClassname)
+{
 	if (g_iActiveEntitySpawnedSubscribers <= 0)
 		return;
 
@@ -742,78 +676,87 @@ public Action Timer_OnEntitySpawned(Handle hTimer, const int iRef)
 	return Plugin_Stop;
 }
 
-public void OnGameFrame(){
+public void OnGameFrame()
+{
 	Homing_OnGameFrame();
 }
 
-public void TF2_OnConditionAdded(int client, TFCond condition){
+public void TF2_OnConditionAdded(int client, TFCond condition)
+{
 	Events.ConditionAdded(client, condition);
 }
 
-public void TF2_OnConditionRemoved(int client, TFCond condition){
+public void TF2_OnConditionRemoved(int client, TFCond condition)
+{
 	Events.ConditionRemoved(client, condition);
 }
 
-public Action OnPlayerRunCmd(int client, int &iButtons, int &iImpulse, float fVel[3], float fAng[3], int &iWeapon){
-	if(!IsValidClient(client))
+public Action OnPlayerRunCmd(int client, int &iButtons, int &iImpulse, float fVel[3], float fAng[3], int &iWeapon)
+{
+	if (!IsValidClient(client))
 		return Plugin_Continue;
 
 	return Events.PlayerRunCmd(client, iButtons, fVel, fAng) ? Plugin_Changed : Plugin_Continue;
 }
 
-public Action TF2_CalcIsAttackCritical(int client, int iWeapon, char[] sWeaponName, bool &bResult){
-	if(!IsValidClient(client))
+public Action TF2_CalcIsAttackCritical(int client, int iWeapon, char[] sWeaponName, bool &bResult)
+{
+	if (!IsValidClient(client))
 		return Plugin_Continue;
 
-	if(!Events.AttackCritCheck(client, iWeapon))
+	if (!Events.AttackCritCheck(client, iWeapon))
 		return Plugin_Continue;
 
 	bResult = true;
 	return Plugin_Changed;
 }
 
-
-
-			//*********************//
-			//----  P E R K S  ----//
-			//*********************//
-
-//-----[ Parsing & Precaching ]-----//
-
-void ParseTriggers(){
+void ParseTriggers()
+{
 	char sCvar[64], sBuffer[64];
 	GetConVarString(g_hCvarTriggers, sCvar, sizeof(sCvar));
 	EscapeString(sCvar, ' ', '\0', sBuffer, sizeof(sBuffer));
 
-	g_iCvarTriggers = CountCharInString(sBuffer, ',')+1;
+	g_iCvarTriggers = CountCharInString(sBuffer, ',') + 1;
 	char[][] sPieces = new char[g_iCvarTriggers][64];
 
 	ExplodeString(sBuffer, ",", sPieces, g_iCvarTriggers, 64);
 
-	if(g_arrCvarTriggers == INVALID_HANDLE)
+	if (g_arrCvarTriggers == INVALID_HANDLE)
+	{
 		g_arrCvarTriggers = CreateArray(16);
-	else ClearArray(g_arrCvarTriggers);
+	}
+	else
+	{
+		ClearArray(g_arrCvarTriggers);
+	}
 
-	for(int i = 0; i < g_iCvarTriggers; i++)
+	for (int i = 0; i < g_iCvarTriggers; ++i)
 		PushArrayString(g_arrCvarTriggers, sPieces[i]);
 }
 
-bool ParseEffects(){
+bool ParseEffects()
+{
 	char sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.default.cfg");
-	if(!FileExists(sPath)){
+
+	if (!FileExists(sPath))
+	{
 		LogError("Failed to find rtd2_perks.default.cfg in configs/ folder!");
 		SetFailState("Failed to find rtd2_perks.default.cfg in configs/ folder!");
 		return false;
 	}
 
-	if(g_hPerkContainer == null)
+	if (g_hPerkContainer == null)
 		g_hPerkContainer = new PerkContainer();
+
 	g_hPerkContainer.DisposePerks();
 
 	int iStatus[2];
 	g_iCorePerks = g_hPerkContainer.ParseFile(sPath, iStatus);
-	if(g_iCorePerks == -1){
+
+	if (g_iCorePerks == -1)
+	{
 		LogError("Parsing rtd2_perks.default.cfg failed!");
 		SetFailState("Parsing rtd2_perks.default.cfg failed!");
 		return false;
@@ -823,10 +766,12 @@ bool ParseEffects(){
 	return true;
 }
 
-void ParseCustomEffects(){
+void ParseCustomEffects()
+{
 	char sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.custom.cfg");
-	if(!FileExists(sPath)){
+
+	if (!FileExists(sPath)){
 		PrecachePerkSounds();
 		return;
 	}
@@ -836,13 +781,17 @@ void ParseCustomEffects(){
 	PrecachePerkSounds();
 }
 
-void PrecachePerkSounds(){
+void PrecachePerkSounds()
+{
 	char sBuffer[64];
 	PerkIter iter = new PerkContainerIter(-1);
-	while((++iter).Perk()){
+
+	while ((++iter).Perk())
+	{
 		iter.Perk().GetSound(sBuffer, 64);
 		PrecacheSound(sBuffer);
 	}
+
 	delete iter;
 }
 
@@ -850,7 +799,7 @@ void InitPerks()
 {
 	PerkIter iter = new PerkContainerIter(-1);
 
-	while((++iter).Perk())
+	while ((++iter).Perk())
 	{
 		iter.Perk().InitInternal();
 	}
@@ -858,10 +807,13 @@ void InitPerks()
 	delete iter;
 }
 
-void ParseDisabledPerks(){
+void ParseDisabledPerks()
+{
 	PerkIter iter = new PerkContainerIter(-1);
-	while((++iter).Perk())
+
+	while ((++iter).Perk())
 		iter.Perk().Enabled = true;
+
 	delete iter;
 
 	char sDisabledPre[255], sDisabled[255];
@@ -876,9 +828,12 @@ void ParseDisabledPerks(){
 
 	Perk perk = null;
 	PerkList hDisabledPerks = new PerkList();
-	for(int i = 0; i < iDisabledCount; ++i){
+
+	for (int i = 0; i < iDisabledCount; ++i)
+	{
 		perk = g_hPerkContainer.FindPerk(sDisabledPieces[i]);
-		if(perk == null) continue;
+		if (perk == null)
+			continue;
 
 		perk.Enabled = false;
 		hDisabledPerks.Push(perk);
@@ -886,114 +841,146 @@ void ParseDisabledPerks(){
 
 	char sNameBuffer[64];
 	int iLen = hDisabledPerks.Length;
-	switch(iLen){
-		case 0:{}
+	switch (iLen)
+	{
+		case 0:
+		{
+		}
 
-		case 1:{
+		case 1:
+		{
 			hDisabledPerks.Get(0).GetName(sNameBuffer, 64);
-			if(g_bCvarLog)
+
+			if (g_bCvarLog)
 				LogMessage(CONS_PREFIX ... " Perk disabled: %s.", sNameBuffer);
+
 			PrintToServer(CONS_PREFIX ... " Perk disabled: %s.", sNameBuffer);
 		}
 
-		default:{
+		default:
+		{
 			hDisabledPerks.Get(0).GetName(sNameBuffer, 64);
-			if(g_bCvarLog)
+
+			if (g_bCvarLog)
 				LogMessage(CONS_PREFIX ... " %d perks disabled:", iLen);
+
 			PrintToServer(CONS_PREFIX ... " %d perks disabled:", iLen);
-			for(int i = 0; i < iLen; ++i){
+
+			for (int i = 0; i < iLen; ++i)
+			{
 				hDisabledPerks.Get(i).GetName(sNameBuffer, 64);
-				if(g_bCvarLog)
+
+				if (g_bCvarLog)
 					LogMessage("  • %s", sNameBuffer);
+
 				PrintToServer("  > %s", sNameBuffer);
 			}
 		}
 	}
+
 	delete hDisabledPerks;
 }
 
-//-----[ Applying ]-----//
-void RollPerkForClient(int client){
-	if(!g_bCvarPluginEnabled){
-		if(g_iCvarChat & CHAT_REASONS)
+void RollPerkForClient(int client)
+{
+	if (!g_bCvarPluginEnabled)
+	{
+		if (g_iCvarChat & CHAT_REASONS)
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_Disabled", LANG_SERVER);
+
 		return;
 	}
 
-	if(!IsRollerAllowed(client)){
-		if(g_iCvarChat & CHAT_REASONS)
+	if (!IsRollerAllowed(client))
+	{
+		if (g_iCvarChat & CHAT_REASONS)
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_No_Access", LANG_SERVER);
+
 		return;
 	}
 
-	if(!IsRTDInRound()){
-		if(g_iCvarChat & CHAT_REASONS)
+	if (!IsRTDInRound())
+	{
+		if (g_iCvarChat & CHAT_REASONS)
 			RTDPrint(client, "%T", "RTD2_Not_In_Round", LANG_SERVER);
+
 		return;
 	}
 
-	if(g_iCvarRtdTeam > 0 && g_iCvarRtdTeam == GetClientTeam(client)-1){
-		if(g_iCvarChat & CHAT_REASONS)
+	if (g_iCvarRtdTeam > 0 && g_iCvarRtdTeam == GetClientTeam(client) - 1)
+	{
+		if (g_iCvarChat & CHAT_REASONS)
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_Team", LANG_SERVER);
+
 		return;
 	}
 
-	if(GetForwardFunctionCount(g_hFwdCanRoll) > 0){
+	if (GetForwardFunctionCount(g_hFwdCanRoll) > 0)
+	{
 		Call_StartForward(g_hFwdCanRoll);
 		Call_PushCell(client);
 		Action result = Plugin_Continue;
 		Call_Finish(result);
 
-		if(result != Plugin_Continue)
+		if (result != Plugin_Continue)
 			return;
 	}
 
-	if(!IsPlayerAlive(client)){
-		if(g_iCvarChat & CHAT_REASONS)
+	if (!IsPlayerAlive(client))
+	{
+		if (g_iCvarChat & CHAT_REASONS)
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_Alive", LANG_SERVER);
+
 		return;
 	}
 
-	if(g_hRollers.GetInRoll(client)){
-		if(g_iCvarChat & CHAT_REASONS)
+	if (g_hRollers.GetInRoll(client))
+	{
+		if (g_iCvarChat & CHAT_REASONS)
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_Using", LANG_SERVER);
+
 		return;
 	}
 
-	int iTimeLeft = g_hRollers.GetLastRollTime(client) +g_iCvarRollInterval;
-	if(GetTime() < iTimeLeft){
-		if(g_iCvarChat & CHAT_REASONS)
+	int iTimeLeft = g_hRollers.GetLastRollTime(client) + g_iCvarRollInterval;
+	if (GetTime() < iTimeLeft)
+	{
+		if (g_iCvarChat & CHAT_REASONS)
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_Wait", LANG_SERVER, 0x04, iTimeLeft -GetTime(), 0x01);
+
 		return;
 	}
 
-	switch(g_iCvarRtdMode){
-		case 1:{
+	switch (g_iCvarRtdMode)
+	{
+		case 1:
+		{
 			int iCount = 0;
-			for(int i = 1; i <= MaxClients; i++){
-				if(g_hRollers.GetInRoll(i))
-					iCount++;
-			}
+			for (int i = 1; i <= MaxClients; ++i)
+				if (g_hRollers.GetInRoll(i))
+					++iCount;
 
-			if(iCount >= g_iCvarClientLimit){
-				if(g_iCvarChat & CHAT_REASONS)
+			if (iCount >= g_iCvarClientLimit)
+			{
+				if (g_iCvarChat & CHAT_REASONS)
 					RTDPrint(client, "%T", "RTD2_Cant_Roll_Mode1", LANG_SERVER);
+
 				return;
 			}
 		}
 
-		case 2:{
+		case 2:
+		{
 			int iCount = 0, iTeam = GetClientTeam(client);
-			for(int i = 1; i <= MaxClients; i++){
-				if(g_hRollers.GetInRoll(i)){
-					if(GetClientTeam(i) == iTeam)
-						iCount++;
-				}
-			}
+			for (int i = 1; i <= MaxClients; ++i)
+				if (g_hRollers.GetInRoll(i) && GetClientTeam(i) == iTeam)
+					++iCount;
 
-			if(iCount >= g_iCvarTeamLimit){
-				if(g_iCvarChat & CHAT_REASONS)
+			if (iCount >= g_iCvarTeamLimit)
+			{
+				if (g_iCvarChat & CHAT_REASONS)
 					RTDPrint(client, "%T", "RTD2_Cant_Roll_Mode2", LANG_SERVER);
+
 				return;
 			}
 		}
@@ -1001,48 +988,58 @@ void RollPerkForClient(int client){
 
 	Perk perk = RollPerk(client);
 
-	if(perk == null){ // this should not happen unless everything is disabled or not applicable to player
+	if(perk == null) // this should not happen unless everything is disabled or not applicable to player
+	{
 		PrintToServer("[RTD] WARNING: Perk not found for player when they attempted a roll.");
-		if(g_iCvarChat & CHAT_REASONS)
+
+		if (g_iCvarChat & CHAT_REASONS)
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_No_Access", LANG_SERVER);
+
 		return;
 	}
 
 	ApplyPerk(client, perk);
 
-	if(g_bCvarLog){
+	if (g_bCvarLog)
+	{
 		char sBuffer[64];
 		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
 		LogMessage("%L rolled %s.", client, sBuffer);
 	}
 }
 
-RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, int initiator=0){
-	if(!IsValidClient(client))
+RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, int initiator=0)
+{
+	if (!IsValidClient(client))
 		return RTDForce_ClientInvalid;
 
 	bool bIsValidInitiator = IsValidClient(initiator);
-	if(g_hRollers.GetInRoll(client)){
+	if (g_hRollers.GetInRoll(client))
+	{
 		RTDPrint(initiator, "%N is already using RTD.", client);
 		return RTDForce_ClientInRoll;
 	}
 
-	if(!IsPlayerAlive(client)){
+	if (!IsPlayerAlive(client))
+	{
 		RTDPrint(initiator, "%N is dead.", client);
 		return RTDForce_ClientDead;
 	}
 
 	Perk perk = g_hPerkContainer.FindPerk(sQuery);
-	if(!perk){
+	if (!perk)
+	{
 		RTDPrint(initiator, "Perk not found or invalid info, forcing a roll.");
 		perk = RollPerk(client, _, sQuery);
-		if(!perk){
+		if (!perk)
+		{
 			RTDPrint(initiator, "No perks available for %N.", client);
 			return RTDForce_NullPerk;
 		}
 	}
 
-	if(bIsValidInitiator && GetForwardFunctionCount(g_hFwdCanForce) > 0){
+	if (bIsValidInitiator && GetForwardFunctionCount(g_hFwdCanForce) > 0)
+	{
 		Call_StartForward(g_hFwdCanForce);
 		Call_PushCell(initiator);
 		Call_PushCell(client);
@@ -1050,7 +1047,7 @@ RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, int 
 		Action result = Plugin_Continue;
 		Call_Finish(result);
 
-		if(result != Plugin_Continue)
+		if (result != Plugin_Continue)
 			return RTDForce_Blocked;
 	}
 
@@ -1058,43 +1055,55 @@ RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, int 
 	ApplyPerk(client, perk, iPerkTime);
 	g_iLastPerkTime = -1; // Set back to default
 
-	if(g_bCvarLog){
+	if (g_bCvarLog)
+	{
 		char sBuffer[64];
 		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
-		if(bIsValidInitiator)
+
+		if (bIsValidInitiator)
+		{
 			LogMessage("A perk %s has been forced on %L for %d seconds by %L.", sBuffer, client, iPerkTime, initiator);
-		else LogMessage("A perk %s has been forced on %L for %d seconds.", sBuffer, client, iPerkTime);
+		}
+		else
+		{
+			LogMessage("A perk %s has been forced on %L for %d seconds.", sBuffer, client, iPerkTime);
+		}
 	}
 
 	return RTDForce_Success;
 }
 
-//-----[ General ]-----//
-bool GoodRoll(int client){
+bool GoodRoll(int client)
+{
 	float fGoodChance = g_fCvarGoodChance;
-	if(IsValidClient(client) && IsRollerDonator(client))
+
+	if (IsValidClient(client) && IsRollerDonator(client))
 		fGoodChance = g_fCvarGoodDonatorChance;
+
 	return fGoodChance > GetURandomFloat();
 }
 
-Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter=""){
+Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="")
+{
 	bool bFilter = strlen(sFilter) > 0;
 	Perk perk = null;
 	PerkList candidates = g_hPerkContainer.FindPerks(sFilter);
 	PerkList list = new PerkList();
 	PerkIter iter = new PerkListIter(candidates, -1);
 
-	if(bFilter){
-		while((perk = (++iter).Perk())){
-			if(perk.IsAptForSetupOf(client, iRollFlags))
+	if (bFilter)
+	{
+		while ((perk = (++iter).Perk()))
+			if (perk.IsAptForSetupOf(client, iRollFlags))
 				list.Push(perk);
-		}
-	}else{
+	}
+	else
+	{
 		bool bBeGood = GoodRoll(client);
-		while((perk = (++iter).Perk())){
-			if(perk.Good == bBeGood && perk.IsAptFor(client, iRollFlags))
+
+		while ((perk = (++iter).Perk()))
+			if (perk.Good == bBeGood && perk.IsAptFor(client, iRollFlags))
 				list.Push(perk);
-		}
 	}
 
 	delete iter;
@@ -1102,11 +1111,14 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 
 	perk = list.GetRandom();
 	delete list;
+
 	return perk;
 }
 
-void ApplyPerk(int client, Perk perk, int iPerkTime=-1){
-	if(!IsValidClient(client)) return;
+void ApplyPerk(int client, Perk perk, int iPerkTime=-1)
+{
+	if (!IsValidClient(client))
+		return;
 
 	perk.EmitSound(client);
 	ManagePerk(client, perk, true);
@@ -1115,7 +1127,8 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1){
 
 	int iDuration = -1;
 	int iTime = perk.Time;
-	if(iTime > -1){
+	if (iTime > -1)
+	{
 		iDuration = (iPerkTime > -1) ? iPerkTime : (iTime > 0) ? iTime : g_iCvarPerkDuration;
 		int iSerial = GetClientSerial(client);
 
@@ -1128,7 +1141,11 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1){
 
 		DisplayPerkTimeFrame(client);
 		CreateTimer(1.0, Timer_Countdown, iSerial, TIMER_REPEAT);
-	}else g_hRollers.SetLastRollTime(client, GetTime());
+	}
+	else
+	{
+		g_hRollers.SetLastRollTime(client, GetTime());
+	}
 
 	Forward_PerkApplied(client, perk, iDuration);
 	g_hRollers.PushToPerkHistory(client, perk);
@@ -1163,16 +1180,17 @@ void ManagePerk(const int client, const Perk perk, const bool bEnable, const RTD
 	}
 }
 
-//-----[ Descriptions ]-----//
-Menu BuildDesc(){
-	Menu hMenu = new Menu(ManagerDesc);
+Menu BuildDescriptionMenu()
+{
+	Menu hMenu = new Menu(ManagerDescriptionMenu);
 	hMenu.SetTitle("%T", "RTD2_Menu_Title", LANG_SERVER);
 
 	char sPerkName[RTD2_MAX_PERK_NAME_LENGTH], sPerkToken[32];
 	PerkIter iter = new PerkContainerIter(-1);
 	Perk perk = null;
 
-	while((perk = (++iter).Perk())){
+	while ((perk = (++iter).Perk()))
+	{
 		perk.GetToken(sPerkToken, 32);
 		perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
 		hMenu.AddItem(sPerkToken, sPerkName);
@@ -1186,14 +1204,21 @@ Menu BuildDesc(){
 	return hMenu;
 }
 
-void ShowDesc(int client, int iPos=0){
-	if(iPos == 0)
+void ShowDescriptionMenu(int client, int iPos=0)
+{
+	if (iPos == 0)
+	{
 		g_hDescriptionMenu.Display(client, MENU_TIME_FOREVER);
-	else g_hDescriptionMenu.DisplayAt(client, GetMenuSelectionPosition(), MENU_TIME_FOREVER);
+	}
+	else
+	{
+		g_hDescriptionMenu.DisplayAt(client, GetMenuSelectionPosition(), MENU_TIME_FOREVER);
+	}
 }
 
-public int ManagerDesc(Menu hMenu, MenuAction maState, int client, int iPos){
-	if(maState != MenuAction_Select)
+public int ManagerDescriptionMenu(Menu hMenu, MenuAction maState, int client, int iPos)
+{
+	if (maState != MenuAction_Select)
 		return 0;
 
 	Perk perk = null;
@@ -1209,29 +1234,31 @@ public int ManagerDesc(Menu hMenu, MenuAction maState, int client, int iPos){
 		sPerkName, 0x01,
 		sTranslate, LANG_SERVER);
 
-	ShowDesc(client, iPos);
+	ShowDescriptionMenu(client, iPos);
 	return 1;
 }
 
-//-----[ Timers ]-----//
-public Action Timer_Countdown(Handle hTimer, int iSerial){
+public Action Timer_Countdown(Handle hTimer, int iSerial)
+{
 	int client = GetClientFromSerial(iSerial);
-	if(client == 0)
+	if (client == 0)
 		return Plugin_Stop;
 
-	if(!g_hRollers.GetInRoll(client))
+	if (!g_hRollers.GetInRoll(client))
 		return Plugin_Stop;
 
 	DisplayPerkTimeFrame(client);
 	return Plugin_Continue;
 }
 
-public Action Timer_RemovePerk(Handle hTimer, int iSerial){
+public Action Timer_RemovePerk(Handle hTimer, int iSerial)
+{
 	int client = GetClientFromSerial(iSerial);
-	if(client == 0)
+	if (client == 0)
 		return Plugin_Stop;
 
-	if(g_bCvarLog){
+	if (g_bCvarLog)
+	{
 		char sBuffer[64];
 		g_hRollers.GetPerk(client).Format(sBuffer, 64, "$Name$ ($Token$)");
 		LogMessage("Perk %s ended on %L.", sBuffer, client);
@@ -1241,44 +1268,52 @@ public Action Timer_RemovePerk(Handle hTimer, int iSerial){
 	return Plugin_Handled;
 }
 
-//-----[ Removing ]-----//
-Perk ForceRemovePerk(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason=""){
-	if(!IsValidClient(client)) return null;
+Perk ForceRemovePerk(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason="")
+{
+	if (!IsValidClient(client))
+		return null;
 
 	Perk perk = g_hRollers.GetPerk(client);
-	if(perk) ManagePerk(client, perk, false, reason, sReason);
+
+	if (perk)
+		ManagePerk(client, perk, false, reason, sReason);
+
 	return perk;
 }
 
-void RemovedPerk(int client, RTDRemoveReason reason, const char[] sReason=""){
+void RemovedPerk(int client, RTDRemoveReason reason, const char[] sReason="")
+{
 	g_hRollers.SetInRoll(client, false);
 	g_hRollers.SetLastRollTime(client, GetTime());
 
 	Forward_PerkRemoved(client, g_hRollers.GetPerk(client), reason);
 	g_hRollers.SetPerk(client, null);
 
-	if(reason != RTDRemove_NoPrint)
+	if (reason != RTDRemove_NoPrint)
 		PrintPerkEndReason(client, reason, sReason);
 
 	Handle hTimer = g_hRollers.GetTimer(client);
 	KillTimerSafe(hTimer);
 }
 
-//-----[ Printing ]-----//
-void PrintToRoller(int client, Perk perk, int iDuration){
-	if(!(g_iCvarChat & CHAT_APPROLLER))
+void PrintToRoller(int client, Perk perk, int iDuration)
+{
+	if (!(g_iCvarChat & CHAT_APPROLLER))
 		return;
 
 	char sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
 	perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
 
-	if(!g_bCvarShowTime || perk.Time == -1){
+	if (!g_bCvarShowTime || perk.Time == -1)
+	{
 		RTDPrint(client, "%T",
 			"RTD2_Rolled_Perk_Roller", LANG_SERVER,
 			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
 			0x01);
-	}else{
+	}
+	else
+	{
 		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		RTDPrint(client, "%T",
 			"RTD2_Rolled_Perk_Roller_Time", LANG_SERVER,
@@ -1287,7 +1322,8 @@ void PrintToRoller(int client, Perk perk, int iDuration){
 			0x01, 0x03, iTrueDuration, 0x01);
 	}
 
-	if(g_hCvarShowDesc.BoolValue){
+	if (g_hCvarShowDesc.BoolValue)
+	{
 		char sPerkToken[32], sPerkDesc[64];
 		perk.GetToken(sPerkToken, sizeof(sPerkToken));
 		FormatEx(sPerkDesc, sizeof(sPerkDesc), "RTD2_Desc_%s", sPerkToken);
@@ -1295,15 +1331,17 @@ void PrintToRoller(int client, Perk perk, int iDuration){
 	}
 }
 
-void PrintToNonRollers(int client, Perk perk, int iDuration){
-	if(!(g_iCvarChat & CHAT_APPOTHER))
+void PrintToNonRollers(int client, Perk perk, int iDuration)
+{
+	if (!(g_iCvarChat & CHAT_APPOTHER))
 		return;
 
 	char sRollerName[MAX_NAME_LENGTH], sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
 	GetClientName(client, sRollerName, sizeof(sRollerName));
 	perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
 
-	if(!g_bCvarShowTime || perk.Time == -1)
+	if (!g_bCvarShowTime || perk.Time == -1)
+	{
 		RTDPrintAllExcept(client, "%T",
 			"RTD2_Rolled_Perk_Others", LANG_SERVER,
 			g_sTeamColors[GetClientTeam(client)],
@@ -1311,7 +1349,9 @@ void PrintToNonRollers(int client, Perk perk, int iDuration){
 			0x01,
 			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName, 0x01);
-	else{
+	}
+	else
+	{
 		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		RTDPrintAllExcept(client, "%T",
 			"RTD2_Rolled_Perk_Others_Time", LANG_SERVER,
@@ -1323,55 +1363,58 @@ void PrintToNonRollers(int client, Perk perk, int iDuration){
 	}
 }
 
-void PrintPerkEndReason(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sCustomReason=""){
+void PrintPerkEndReason(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sCustomReason="")
+{
 	char sReasonSelf[32], sReasonOthers[32];
-	switch(reason){
-		case RTDRemove_PluginUnload:{
+	switch (reason)
+	{
+		case RTDRemove_PluginUnload:
+		{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "RTD2_Remove_Perk_Unload_Self");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_Unload_Others");
 		}
 
-		case RTDRemove_Death:{
+		case RTDRemove_Death:
+		{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "RTD2_Remove_Perk_Died_Self");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_Died_Others");
 		}
 
-		case RTDRemove_ClassChange:{
+		case RTDRemove_ClassChange:
+		{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "RTD2_Remove_Perk_Class_Self");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_Class_Others");
 		}
 
-		case RTDRemove_WearOff:{
+		case RTDRemove_WearOff:
+		{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "RTD2_Remove_Perk_End_Self");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_End_Others");
 		}
 
-		case RTDRemove_Disconnect:{
+		case RTDRemove_Disconnect:
+		{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "0");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_Disconnected");
 		}
 
-		case RTDRemove_Custom:{
+		case RTDRemove_Custom:
+		{
 			strcopy(sReasonSelf, sizeof(sReasonSelf), "RTD2_Remove_Perk_Custom_Self");
 			strcopy(sReasonOthers, sizeof(sReasonOthers), "RTD2_Remove_Perk_Custom_Others");
 		}
 	}
 
-	if(sReasonSelf[0] != '0' && (g_iCvarChat & CHAT_REMROLLER))
+	if (sReasonSelf[0] != '0' && (g_iCvarChat & CHAT_REMROLLER))
 		RTDPrint(client, "%T", sReasonSelf, LANG_SERVER, reason == RTDRemove_Custom ? sCustomReason : "");
 
-	if(g_iCvarChat & CHAT_REMOTHER)
+	if (g_iCvarChat & CHAT_REMOTHER)
 		RTDPrintAllExcept(client, "%T", sReasonOthers, LANG_SERVER, g_sTeamColors[GetClientTeam(client)], client, 0x01, reason == RTDRemove_Custom ? sCustomReason : "");
 }
 
-
-
-			//***************************//
-			//----  F O R W A R D S  ----//
-			//***************************//
-
-void Forward_PerkApplied(int client, Perk perk, int iDuration){
-	if(GetForwardFunctionCount(g_hFwdRolled) < 1)
+void Forward_PerkApplied(int client, Perk perk, int iDuration)
+{
+	if (GetForwardFunctionCount(g_hFwdRolled) < 1)
 		return;
 
 	Call_StartForward(g_hFwdRolled);
@@ -1381,8 +1424,9 @@ void Forward_PerkApplied(int client, Perk perk, int iDuration){
 	Call_Finish();
 }
 
-void Forward_PerkRemoved(int client, Perk perk, RTDRemoveReason reason){
-	if(GetForwardFunctionCount(g_hFwdRemoved) < 1)
+void Forward_PerkRemoved(int client, Perk perk, RTDRemoveReason reason)
+{
+	if (GetForwardFunctionCount(g_hFwdRemoved) < 1)
 		return;
 
 	Call_StartForward(g_hFwdRemoved);
@@ -1392,30 +1436,27 @@ void Forward_PerkRemoved(int client, Perk perk, RTDRemoveReason reason){
 	Call_Finish();
 }
 
-void Forward_OnRegOpen(){
-	if(GetForwardFunctionCount(g_hFwdOnRegOpen) < 1)
+void Forward_OnRegOpen()
+{
+	if (GetForwardFunctionCount(g_hFwdOnRegOpen) < 1)
 		return;
 
 	Call_StartForward(g_hFwdOnRegOpen);
 	Call_Finish();
 }
 
-
-
-			//*******************//
-			//----  M I S C  ----//
-			//*******************//
-
-bool IsInPerkHistory(Perk perk){
+bool IsInPerkHistory(Perk perk)
+{
 	return perk.IsInHistory(g_hPerkHistory, g_iCvarRepeatPerk);
 }
 
-bool IsInClientHistory(int client, Perk perk){
+bool IsInClientHistory(int client, Perk perk)
+{
 	return g_hRollers.IsInPerkHistory(client, perk, g_iCvarRepeatPlayer);
 }
 
-//-----[ Feedback ]-----//
-void RTDPrint(int to, const char[] sFormat, any ...){
+void RTDPrint(int to, const char[] sFormat, any ...)
+{
 	char sMsg[255];
 	VFormat(sMsg, 255, sFormat, 3);
 	if(IsValidClient(to))
@@ -1423,32 +1464,37 @@ void RTDPrint(int to, const char[] sFormat, any ...){
 	else PrintToServer("%s %s", CONS_PREFIX, sMsg);
 }
 
-void RTDPrintAll(const char[] sFormat, any ...){
+void RTDPrintAll(const char[] sFormat, any ...)
+{
 	char sMsg[255];
 	VFormat(sMsg, 255, sFormat, 2);
 	PrintToChatAll("%s %s", CHAT_PREFIX, sMsg);
 }
 
-void RTDPrintAllExcept(int client, char[] sFormat, any ...){
+void RTDPrintAllExcept(int client, char[] sFormat, any ...)
+{
 	char sMsg[255];
 	VFormat(sMsg, 255, sFormat, 3);
 	int i = 0;
 
-	while(++i < client){
-		if(IsClientInGame(i))
+	while (++i < client)
+	{
+		if (IsClientInGame(i))
 			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
 	}
 
-	while(++i <= MaxClients){
-		if(IsClientInGame(i))
+	while (++i <= MaxClients)
+	{
+		if (IsClientInGame(i))
 			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
 	}
 }
 
-void DisplayPerkTimeFrame(int client){
-	int iTeam	= GetClientTeam(client);
-	int iRed	= (iTeam == 2) ? 255 : 32;
-	int iBlue	= (iTeam == 3) ? 255 : 32;
+void DisplayPerkTimeFrame(int client)
+{
+	int iTeam = GetClientTeam(client);
+	int iRed = (iTeam == 2) ? 255 : 32;
+	int iBlue = (iTeam == 3) ? 255 : 32;
 
 	SetHudTextParams(g_fCvarTimerPosX, g_fCvarTimerPosY, 1.0, iRed, 32, iBlue, 255);
 	char sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
@@ -1456,15 +1502,17 @@ void DisplayPerkTimeFrame(int client){
 	ShowSyncHudText(client, g_hRollers.GetHud(client), "%s: %d", sPerkName, g_hRollers.GetEndRollTime(client) -GetTime());
 }
 
-//-----[ Perks ]-----//
-int GetPerkTime(Perk perk){
-	if(g_iLastPerkTime != -1)
+int GetPerkTime(Perk perk)
+{
+	if (g_iLastPerkTime != -1)
 		return g_iLastPerkTime;
+
 	int iTime = perk.Time;
 	return (iTime > 0) ? iTime : g_iCvarPerkDuration;
 }
 
-float GetPerkTimeFloat(Perk perk){
+float GetPerkTimeFloat(Perk perk)
+{
 	return float(GetPerkTime(perk));
 }
 
@@ -1483,17 +1531,19 @@ bool IsRecentPerk(const int client, const Perk perk, const int iTimeDelta=2)
 	return GetTime() - g_hRollers.GetLastRollTime(client) <= iTimeDelta;
 }
 
-void RemovePerkFromClients(Perk perk){
-	for(int i = 1; i <= MaxClients; ++i){
-		if(IsClientInGame(i) && g_hRollers.GetPerk(i) == perk)
+void RemovePerkFromClients(Perk perk)
+{
+	for (int i = 1; i <= MaxClients; ++i)
+		if (IsClientInGame(i) && g_hRollers.GetPerk(i) == perk)
 			ForceRemovePerk(i);
-	}
 }
 
-void DisableModulePerks(Handle hPlugin){
+void DisableModulePerks(Handle hPlugin)
+{
 	Perk perk = null;
-	for(int i = 1; i <= MaxClients; ++i){
-		if(!IsClientInGame(i))
+	for (int i = 1; i <= MaxClients; ++i)
+	{
+		if (!IsClientInGame(i))
 			continue;
 
 		perk = g_hRollers.GetPerk(i);
@@ -1502,113 +1552,132 @@ void DisableModulePerks(Handle hPlugin){
 	}
 
 	PerkIter iter = new PerkContainerIter(-1);
-	while((perk = (++iter).Perk())){
-		if(perk.External && perk.Parent == hPlugin){
+
+	while ((perk = (++iter).Perk()))
+	{
+		if (perk.External && perk.Parent == hPlugin)
+		{
 			perk.Enabled = perk.Id < g_iCorePerks; // disable if external
 			perk.External = false; // set perk to unaltered call
 		}
 	}
+
 	delete iter;
 }
 
-//-----[ Miscellaneous ]-----//
-int ReadFlagFromConVar(Handle hCvar){
+int ReadFlagFromConVar(Handle hCvar)
+{
 	char sBuffer[32];
 	GetConVarString(hCvar, sBuffer, sizeof(sBuffer));
 	return ReadFlagString(sBuffer);
 }
 
-void FixPotentialStuck(int client){
-	if(g_bCvarRespawnStuck && IsValidClient(client))
+void FixPotentialStuck(int client)
+{
+	if (g_bCvarRespawnStuck && IsValidClient(client))
 		CreateTimer(0.1, Timer_FixStuck, GetClientUserId(client));
 }
 
-public Action Timer_FixStuck(Handle hTimer, int iUserId){
+public Action Timer_FixStuck(Handle hTimer, int iUserId)
+{
 	int client = GetClientOfUserId(iUserId);
-	if(client == 0) return Plugin_Stop;
-
-	if(!IsPlayerAlive(client))
+	if (client == 0)
 		return Plugin_Stop;
 
-	if(!IsEntityStuck(client))
+	if (!IsPlayerAlive(client))
+		return Plugin_Stop;
+
+	if (!IsEntityStuck(client))
 		return Plugin_Stop;
 
 	RTDPrint(client, "%T", "RTD2_Stuck_Respawn", LANG_SERVER);
 	TF2_RespawnPlayer(client);
+
 	return Plugin_Stop;
 }
 
-//-----[ Checks ]-----//
-bool IsArgumentTrigger(const char[] sArg){
+bool IsArgumentTrigger(const char[] sArg)
+{
 	char sTrigger[16];
-	for(int i = 0; i < g_iCvarTriggers; i++){
+	for (int i = 0; i < g_iCvarTriggers; i++)
+	{
 		GetArrayString(g_arrCvarTriggers, i, sTrigger, 16);
-		if(StrEqual(sArg, sTrigger, false))
+		if (StrEqual(sArg, sTrigger, false))
 			return true;
 	}
+
 	return false;
 }
 
-bool IsRollerAllowed(int client){
-	if(g_iCvarAllowed > 0)
+bool IsRollerAllowed(int client)
+{
+	if (g_iCvarAllowed > 0)
 		return view_as<bool>(GetUserFlagBits(client) & g_iCvarAllowed);
+
 	return true;
 }
 
-bool IsRollerDonator(int client){
+bool IsRollerDonator(int client)
+{
 	if(g_iCvarDonatorFlag > 0)
 		return view_as<bool>(GetUserFlagBits(client) & g_iCvarDonatorFlag);
+
 	return false;
 }
 
-bool IsPlayerFriendly(int client){
+bool IsPlayerFriendly(int client)
+{
 #if defined _friendly_included
-	if(g_bPluginFriendly)
-		if(TF2Friendly_IsFriendly(client))
-		return true;
+	if (g_bPluginFriendly)
+		if (TF2Friendly_IsFriendly(client))
+			return true;
 #endif
+
 #if defined _friendlysimple_included
-	if(g_bPluginFriendlySimple)
-		if(FriendlySimple_IsFriendly(client))
-		return true;
+	if (g_bPluginFriendlySimple)
+		if (FriendlySimple_IsFriendly(client))
+			return true;
 #endif
 
 	return false;
 }
 
-bool IsRTDInRound(){
-	if(GameRules_GetProp("m_bInWaitingForPlayers", 1))
+bool IsRTDInRound()
+{
+	if (GameRules_GetProp("m_bInWaitingForPlayers", 1))
 		return false;
 
-	if(!g_bCvarInSetup){
-		if(g_bIsGameArena && GameRules_GetRoundState() != view_as<RoundState>(7))
+	if (!g_bCvarInSetup)
+	{
+		if (g_bIsGameArena && GameRules_GetRoundState() != view_as<RoundState>(7))
 			return false;
 
-		if(GameRules_GetProp("m_bInSetup", 1))
+		if (GameRules_GetProp("m_bInSetup", 1))
 			return false;
 	}
+
 	return true;
 }
 
-bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false){
-	if(IsValidClient(by)){
-		if(GetClientTeam(by) == GetClientTeam(client)){
-			if(client != by || !bCanHurtSelf)
+bool CanPlayerBeHurt(int client, int by=0, bool bCanHurtSelf=false)
+{
+	if (IsValidClient(by))
+	{
+		if (GetClientTeam(by) == GetClientTeam(client))
+			if (client != by || !bCanHurtSelf)
 				return false;
-		}
 	}
 
-	if(IsPlayerFriendly(client))
+	if (IsPlayerFriendly(client))
 		return false;
 
-	if(TF2_IsPlayerInCondition(client, TFCond_Ubercharged)
-	|| TF2_IsPlayerInCondition(client, TFCond_UberchargedCanteen))
+	if (TF2_IsPlayerInCondition(client, TFCond_Ubercharged) || TF2_IsPlayerInCondition(client, TFCond_UberchargedCanteen))
 		return false;
 
-	if(GetEntProp(client, Prop_Data, "m_takedamage") != 2)
+	if (GetEntProp(client, Prop_Data, "m_takedamage") != 2)
 		return false;
 
-	if(g_eInGodmode.Test(client))
+	if (g_eInGodmode.Test(client))
 		return false;
 
 	return true;

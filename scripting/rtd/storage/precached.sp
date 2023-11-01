@@ -1,8 +1,3 @@
-#if defined _RTD2_STORAGE_PRECACHED
-	#endinput
-#endif
-#define _RTD2_STORAGE_PRECACHED
-
 enum struct UserMessageCache
 {
 	UserMsg Fade;
@@ -20,7 +15,8 @@ enum struct UserMessageCache
 		iClients[0] = client;
 
 		Handle hMsg = StartMessageEx(this.ShakeId, iClients, 1);
-		if(hMsg != INVALID_HANDLE){
+		if (hMsg != INVALID_HANDLE)
+		{
 			BfWriteByte(hMsg, iCommand);
 			BfWriteFloat(hMsg, fAmplitude);
 			BfWriteFloat(hMsg, fFrequency);
@@ -229,10 +225,12 @@ enum struct AttributesCache
 // only for static typing purposes
 enum TEParticleId
 {
+	INVALID_PARTICLE_ID = -1
 }
 
 enum TEParticleLingeringId
 {
+	INVALID_LINGERING_PARTICLE_ID = -1
 }
 
 enum struct TEParticlesCache

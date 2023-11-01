@@ -49,7 +49,8 @@
 	if(this.GetValue("m_" ... #%1, m_h%1)){ \
 		delete m_h%1;}
 
-enum PerkPropType{
+enum PerkPropType
+{
 	Type_Invalid = 0,
 	Type_Bool,
 	Type_Int,
@@ -58,16 +59,20 @@ enum PerkPropType{
 	Type_Map
 }
 
-methodmap Perk < StringMap{
-	public Perk(){
+methodmap Perk < StringMap
+{
+	public Perk()
+	{
 		StringMap map = new StringMap();
 		map.SetValue("m_WeaponClass", new ArrayList(127));
 		map.SetValue("m_Tags", new ArrayList(32));
 		map.SetValue("m_Class", 511);
+
 		return view_as<Perk>(map);
 	}
 
-	public void Dispose(){
+	public void Dispose()
+	{
 		DISPOSE_MEMBER(WeaponClass)
 		DISPOSE_MEMBER(Tags)
 		DISPOSE_MEMBER(Call)
@@ -76,7 +81,8 @@ methodmap Perk < StringMap{
 		delete this;
 	}
 
-	property int Id{
+	property int Id
+	{
 		GET_PROP(int,Id)
 		SET_PROP(int,Id)
 	}
@@ -84,7 +90,8 @@ methodmap Perk < StringMap{
 	GET_STRING(Name)
 	SET_STRING(Name)
 
-	property bool Good{
+	property bool Good
+	{
 		GET_PROP(bool,Good)
 		SET_PROP(bool,Good)
 	}
@@ -95,12 +102,14 @@ methodmap Perk < StringMap{
 	GET_STRING(Token)
 	SET_STRING(Token)
 
-	property int Time{
+	property int Time
+	{
 		GET_PROP(int,Time)
 		SET_PROP(int,Time)
 	}
 
-	property int Class{
+	property int Class
+	{
 		GET_PROP(int,Class)
 	}
 	public void SetClass(const char[] s){
@@ -109,60 +118,70 @@ methodmap Perk < StringMap{
 	}
 
 	GET_VALUE(ArrayList,WeaponClass) // ArrayList storing strings of weapon classes
-	public void SetWeaponClass(const char[] s){
+	public void SetWeaponClass(const char[] s)
+	{
 		delete this.GetWeaponClass();
 		ArrayList hWeapClass = StringToWeaponClass(s);
 		this.SetValue("m_WeaponClass", hWeapClass);
 	}
 
-	public bool GetPrefString(const char[] sKey, char[] sBuffer, int iLen){
+	public bool GetPrefString(const char[] sKey, char[] sBuffer, int iLen)
+	{
 		return this.GetString(sKey, sBuffer, iLen);
 	}
 
-	public int GetPrefCell(const char[] sKey, int iDefault=0){
+	public int GetPrefCell(const char[] sKey, int iDefault=0)
+	{
 		float fVal;
-		if(this.GetValue(sKey, fVal))
-			return RoundFloat(fVal);
-		else return iDefault;
+		return this.GetValue(sKey, fVal) ? RoundFloat(fVal) : iDefault;
 	}
 
-	public float GetPrefFloat(char[] sKey, float fDefault=0.0){
+	public float GetPrefFloat(char[] sKey, float fDefault=0.0)
+	{
 		float fVal;
-		if(this.GetValue(sKey, fVal))
-			return fVal;
-		else return fDefault;
+		return this.GetValue(sKey, fVal) ? fVal : fDefault;
 	}
 
-	public bool SetPref(const char[] sKey, const char[] sVal){
-		if(strlen(sKey) > 1 && sKey[0] == 'm' && sKey[1] == '_')
+	public bool SetPref(const char[] sKey, const char[] sVal)
+	{
+		if (strlen(sKey) > 1 && sKey[0] == 'm' && sKey[1] == '_')
 			return false; // prevent overriding member attributes
 
 		float fVal;
-		if(StringToFloatEx(sVal, fVal) == strlen(sVal))
+		if (StringToFloatEx(sVal, fVal) == strlen(sVal))
+		{
 			this.SetValue(sKey, fVal);
-		else this.SetString(sKey, sVal);
+		}
+		else
+		{
+			this.SetString(sKey, sVal);
+		}
 
 		return true;
 	}
 
 	GET_VALUE(ArrayList,Tags) // ArrayList storing strings of perk tags
-	public void SetTags(const char[] s){
+	public void SetTags(const char[] s)
+	{
 		delete this.GetTags();
 		ArrayList hTags = StringToTags(s);
 		this.SetValue("m_Tags", hTags);
 	}
 
-	property bool Enabled{
+	property bool Enabled
+	{
 		GET_PROP(bool,Enabled)
 		SET_PROP(bool,Enabled)
 	}
 
-	property bool External{
+	property bool External
+	{
 		GET_PROP(bool,External)
 		SET_PROP(bool,External)
 	}
 
-	property Handle Parent{
+	property Handle Parent
+	{
 		GET_PROP(Handle,Parent)
 		SET_PROP(Handle,Parent)
 	}
@@ -173,12 +192,14 @@ methodmap Perk < StringMap{
 	GET_STRING(InternalInit)
 	SET_STRING(InternalInit)
 
-	public void CallInternal(int client, bool bEnable){
+	public void CallInternal(int client, bool bEnable)
+	{
 		char sFuncName[64];
 		this.GetInternalCall(sFuncName, 64);
 		Function func = GetFunctionByName(INVALID_HANDLE, sFuncName);
 
-		if(func == INVALID_FUNCTION){
+		if (func == INVALID_FUNCTION)
+		{
 			char sToken[32];
 			this.GetToken(sToken, 32);
 			LogError("Invalid function name: \"%s\", for perk %s.", sFuncName, sToken);
@@ -192,15 +213,17 @@ methodmap Perk < StringMap{
 		Call_Finish();
 	}
 
-	public void InitInternal(){
+	public void InitInternal()
+	{
 		char sFuncName[64];
 		this.GetInternalInit(sFuncName, 64);
-		if(sFuncName[0] == '\0')
+		if (sFuncName[0] == '\0')
 			return;
 
 		Function func = GetFunctionByName(INVALID_HANDLE, sFuncName);
 
-		if(func == INVALID_FUNCTION){
+		if (func == INVALID_FUNCTION)
+		{
 			char sToken[32];
 			this.GetToken(sToken, 32);
 			LogError("Invalid function name: \"%s\", for perk %s.", sFuncName, sToken);
@@ -218,7 +241,8 @@ methodmap Perk < StringMap{
 		return hFwd;
 	}
 
-	public void SetCall(RTDCall func, Handle hPlugin){
+	public void SetCall(RTDCall func, Handle hPlugin)
+	{
 		RemovePerkFromClients(this);
 		delete this.GetCall();
 
@@ -231,7 +255,8 @@ methodmap Perk < StringMap{
 		this.SetValue("m_Call", hFwd);
 	}
 
-	public void Call(int client, bool bEnable){
+	public void Call(int client, bool bEnable)
+	{
 		Call_StartForward(this.GetCall());
 		Call_PushCell(client);
 		Call_PushCell(this.Id);
@@ -239,21 +264,27 @@ methodmap Perk < StringMap{
 		Call_Finish();
 	}
 
-	public PerkPropType GetPropType(const char[] sProp){
-		if(strlen(sProp) < 4)
+	public PerkPropType GetPropType(const char[] sProp)
+	{
+		if (strlen(sProp) < 4)
 			return Type_Invalid;
-		switch(sProp[2]){
-			case 'I': switch(sProp[3]){
+
+		switch (sProp[2])
+		{
+			case 'I': switch(sProp[3])
+			{
 				case 'd': return Type_Int; // m_Id
 				case 'n': return Type_String; // m_InternalCall & m_InternalInit
 			}
 			case 'N': return Type_String; // m_Name
 			case 'G': return Type_Bool; // m_Good
-			case 'S': switch(sProp[3]){
+			case 'S': switch(sProp[3])
+			{
 				case 'o': return Type_String; // m_Sound
 				case 'e': return Type_Map; // m_Settings
 			}
-			case 'T': switch(sProp[3]){
+			case 'T': switch(sProp[3])
+			{
 				case 'o': return Type_String; // m_Token
 				case 'i': return Type_Int; // m_Time
 				case 'a': return Type_Array; // m_Tags
@@ -261,37 +292,44 @@ methodmap Perk < StringMap{
 			case 'C': return Type_Int; // m_Class
 			case 'W': return Type_Array; // m_Array
 		}
+
 		return Type_Invalid;
 	}
 
-	public void GetStringAsString(const char[] sProp, char[] sBuffer, int iLen){
+	public void GetStringAsString(const char[] sProp, char[] sBuffer, int iLen)
+	{
 		this.GetString(sProp, sBuffer, iLen);
 	}
 
-	public void GetBoolAsString(const char[] sProp, char[] sBuffer, int iLen){
+	public void GetBoolAsString(const char[] sProp, char[] sBuffer, int iLen)
+	{
 		bool bVal = false;
-		if(this.GetValue(sProp, bVal))
+		if (this.GetValue(sProp, bVal))
 			Format(sBuffer, iLen, bVal ? "true" : "false");
 	}
 
-	public void GetIntAsString(const char[] sProp, char[] sBuffer, int iLen){
+	public void GetIntAsString(const char[] sProp, char[] sBuffer, int iLen)
+	{
 		int iVal = 0;
-		if(this.GetValue(sProp, iVal))
+		if (this.GetValue(sProp, iVal))
 			IntToString(iVal, sBuffer, iLen);
 	}
 
-	public void GetArrayAsString(const char[] sProp, char[] sBuffer, int iLen){
+	public void GetArrayAsString(const char[] sProp, char[] sBuffer, int iLen)
+	{
 		ArrayList list;
-		if(!this.GetValue(sProp, list))
+		if (!this.GetValue(sProp, list))
 			return;
 
 		FormatEx(sBuffer, iLen, "[");
 		char sItemBuffer[64];
 		int iSize = list.Length;
-		if(iSize > 0){
+		if (iSize > 0)
+		{
 			list.GetString(0, sItemBuffer, 64);
 			FormatEx(sBuffer, iLen, "%s%s", sBuffer, sItemBuffer);
-			for(int i = 1; i < iSize; ++i){
+			for (int i = 1; i < iSize; ++i)
+			{
 				list.GetString(i, sItemBuffer, 64);
 				FormatEx(sBuffer, iLen, "%s, %s", sBuffer, sItemBuffer);
 			}
@@ -300,35 +338,42 @@ methodmap Perk < StringMap{
 		FormatEx(sBuffer, iLen, "%s]", sBuffer);
 	}
 
-	public void GetMapAsString(const char[] sProp, char[] sBuffer, int iLen){
+	public void GetMapAsString(const char[] sProp, char[] sBuffer, int iLen)
+	{
 		StringMapSnapshot snap = this.Snapshot();
 		int i = snap.Length;
 		char sKey[16], sVal[32];
 		sBuffer[0] = '{';
 		bool bFirstPrint = true;
 
-		while(--i >= 0){
+		while (--i >= 0)
+		{
 			snap.GetKey(i, sKey, 16);
-			if(strlen(sKey) < 2 || (sKey[1] == '_' && sKey[0] == 'm'))
+			if (strlen(sKey) < 2 || (sKey[1] == '_' && sKey[0] == 'm'))
 				continue;
 
-			if(this.GetString(sKey, sVal, 32)){
+			if (this.GetString(sKey, sVal, 32))
+			{
 				FormatEx(sBuffer, iLen, "%s%s%s: %s", sBuffer, bFirstPrint ? "" : ", ", sKey, sVal);
 				bFirstPrint = false;
-			}else{
+			}
+			else
+			{
 				float fVal;
 				this.GetValue(sKey, fVal);
 				FormatEx(sBuffer, iLen, "%s%s%s: %.2f", sBuffer, bFirstPrint ? "" : ", ", sKey, fVal);
 				bFirstPrint = false;
 			}
 		}
+
 		FormatEx(sBuffer, iLen, "%s}", sBuffer);
 		delete snap;
 	}
 
-	public int GetPropAsString(const char[] sProp, char[] sBuffer, int iLen){
-		PerkPropType iPropType = this.GetPropType(sProp);
-		switch(iPropType){
+	public int GetPropAsString(const char[] sProp, char[] sBuffer, int iLen)
+	{
+		switch (this.GetPropType(sProp))
+		{
 			case Type_Invalid:	return 0;
 			case Type_Bool:		this.GetBoolAsString(sProp, sBuffer, iLen);
 			case Type_Int:		this.GetIntAsString(sProp, sBuffer, iLen);
@@ -336,77 +381,99 @@ methodmap Perk < StringMap{
 			case Type_Array:	this.GetArrayAsString(sProp, sBuffer, iLen);
 			case Type_Map:		this.GetMapAsString(sProp, sBuffer, iLen);
 		}
+
 		return strlen(sBuffer);
 	}
 
-	public int ExtractProp(const char[] sFormat, int iStart, int iLen, char[] sBuffer){
-		int i = iStart+1;
+	public int ExtractProp(const char[] sFormat, int iStart, int iLen, char[] sBuffer)
+	{
+		int i = iStart + 1;
 		sBuffer[2] = '\0';
-		for(; i < iLen; ++i){
-			if(sFormat[i] != '$'){
+
+		for (; i < iLen; ++i)
+		{
+			if (sFormat[i] != '$')
+			{
 				// i-iStart+1 -> sProp[2], sProp[3], ..., sProp[n]
 				sBuffer[i-iStart+1] = sFormat[i];
 				continue;
 			}
+
 			sBuffer[i-iStart+1] = '\0';
 			break;
 		}
+
 		return i-iStart;
 	}
 
-	public int FormatProp(char[] sBuffer, int iStart, int iLen, const char[] sProp){
+	public int FormatProp(char[] sBuffer, int iStart, int iLen, const char[] sProp)
+	{
 		char sPropString[127];
 		int iPropLen = this.GetPropAsString(sProp, sPropString, 127);
 		int i = 0;
-		for(; (iStart+i) < iLen && i < iPropLen; ++i)
+
+		for (; (iStart+i) < iLen && i < iPropLen; ++i)
 			sBuffer[iStart+i] = sPropString[i];
+
 		return i;
 	}
 
-	public void Format(char[] sBuffer, int iLen, const char[] sFormat){
+	public void Format(char[] sBuffer, int iLen, const char[] sFormat)
+	{
 		int iFormatLen = strlen(sFormat);
 		char sProp[32] = "m_";
 		int i = 0, j = 0;
-		for(; i < iFormatLen; ++i){
-			if(sFormat[i] != '$'){
+
+		for (; i < iFormatLen; ++i)
+		{
+			if (sFormat[i] != '$')
+			{
 				sBuffer[j++] = sFormat[i];
 				continue;
 			}
+
 			int iPropLen = this.ExtractProp(sFormat, i, iFormatLen, sProp);
 			j += this.FormatProp(sBuffer, j, iLen, sProp);
 			i += iPropLen;
 		}
+
 		sBuffer[j] = '\0';
 	}
 
-	public bool HasTag(const char[] sQuery){
+	public bool HasTag(const char[] sQuery)
+	{
 		ArrayList tags = this.GetTags();
 		char sBuffer[32];
 
 		int i = tags.Length;
-		while(--i >= 0){
+		while (--i >= 0)
+		{
 			tags.GetString(i, sBuffer, 32);
-			if(strcmp(sBuffer, sQuery, false) == 0)
+			if (strcmp(sBuffer, sQuery, false) == 0)
 				return true;
 		}
 
 		return false;
 	}
 
-	public bool IsInHistory(ArrayList history, int iLimit){
+	public bool IsInHistory(ArrayList history, int iLimit)
+	{
 		int i = history.Length;
-		if(i < iLimit) return false;
+		if (i < iLimit)
+			return false;
 
 		iLimit = i -iLimit;
 		int iId = this.Id;
 
-		while(--i >= iLimit)
-			if(history.Get(i) == iId)
+		while (--i >= iLimit)
+			if (history.Get(i) == iId)
 				return true;
+
 		return false;
 	}
 
-	public bool IsAptForClassOf(int client){
+	public bool IsAptForClassOf(int client)
+	{
 		// TF2 class enum offsets numbered accoring to their order in-game
 		static int iClassConverter[10] = {0, 1, 8, 2, 4, 7, 5, 3, 9, 6};
 
@@ -414,60 +481,70 @@ methodmap Perk < StringMap{
 		return view_as<bool>(this.Class & (1 << --iClass));
 	}
 
-	public bool IsAptForLoadoutOf(int client){
+	public bool IsAptForLoadoutOf(int client)
+	{
 		ArrayList hWeaps = this.GetWeaponClass();
-		if(hWeaps == null) return true;
+		if (hWeaps == null)
+			return true;
 
 		int iLen = hWeaps.Length;
-		if(!iLen) return true;
+		if (!iLen)
+			return true;
 
-		int iWeap = 0;
 		char sClass[32], sWeapClass[32];
+		for (int i = 0; i < 5; ++i)
+		{
+			int iWeap = GetPlayerWeaponSlot(client, i);
 
-		for(int i = 0; i < 5; i++){
-			iWeap = GetPlayerWeaponSlot(client, i);
-
-			if(iWeap <= MaxClients) continue;
-			if(!IsValidEntity(iWeap)) continue;
+			if (iWeap <= MaxClients || !IsValidEntity(iWeap))
+				continue;
 
 			GetEntityClassname(iWeap, sWeapClass, 32);
-			for(int j = 0; j < iLen; j++){
+			for (int j = 0; j < iLen; ++j)
+			{
 				hWeaps.GetString(j, sClass, 32);
-				if(StrContains(sWeapClass, sClass, false) > -1)
+				if (StrContains(sWeapClass, sClass, false) > -1)
 					return true;
 			}
 		}
+
 		return false;
 	}
 
-	public bool IsAptForSetupOf(int client, int iRollFlags){
-		if(!(iRollFlags & ROLLFLAG_OVERRIDE_CLASS))
-			if(!this.IsAptForClassOf(client))
+	public bool IsAptForSetupOf(int client, int iRollFlags)
+	{
+		if (!(iRollFlags & ROLLFLAG_OVERRIDE_CLASS))
+			if (!this.IsAptForClassOf(client))
 				return false;
 
-		if(!(iRollFlags & ROLLFLAG_OVERRIDE_LOADOUT))
-			if(!this.IsAptForLoadoutOf(client))
+		if (!(iRollFlags & ROLLFLAG_OVERRIDE_LOADOUT))
+			if (!this.IsAptForLoadoutOf(client))
 				return false;
 
 		return true;
 	}
 
-	public bool IsAptFor(int client, int iRollFlags){
-		if(!(iRollFlags & ROLLFLAG_OVERRIDE_DISABLED))
-			if(!this.Enabled) return false;
+	public bool IsAptFor(int client, int iRollFlags)
+	{
+		if (!(iRollFlags & ROLLFLAG_OVERRIDE_DISABLED))
+			if (!this.Enabled) return false;
 
-		if(client != 0){
-			if(!(iRollFlags & ROLLFLAG_IGNORE_PLAYER_REPEATS))
-				if(IsInClientHistory(client, this))
+		if (client != 0)
+		{
+			if (!(iRollFlags & ROLLFLAG_IGNORE_PLAYER_REPEATS))
+				if (IsInClientHistory(client, this))
 					return false;
-			if(!(iRollFlags & ROLLFLAG_IGNORE_PERK_REPEATS))
-				if(IsInPerkHistory(this))
+
+			if (!(iRollFlags & ROLLFLAG_IGNORE_PERK_REPEATS))
+				if (IsInPerkHistory(this))
 					return false;
 		}
+
 		return this.IsAptForSetupOf(client, iRollFlags);
 	}
 
-	public void EmitSound(int client){
+	public void EmitSound(int client)
+	{
 		char sSound[64];
 		this.GetSound(sSound, 64);
 		EmitSoundToAll(sSound, client);

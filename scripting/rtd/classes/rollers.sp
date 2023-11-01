@@ -16,12 +16,16 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-methodmap Rollers < ArrayList{
-	public Rollers(){
-		ArrayList data = new ArrayList(7, MAXPLAYERS+1);
-		for(int i = 1; i <= MaxClients; ++i)
-			for(int block = 0; block <= 6; ++block)
+methodmap Rollers < ArrayList
+{
+	public Rollers()
+	{
+		ArrayList data = new ArrayList(7, MAXPLAYERS + 1);
+
+		for (int i = 1; i <= MaxClients; ++i)
+			for (int block = 0; block <= 6; ++block)
 				data.Set(i, 0, block); // init to false/0/null
+
 		return view_as<Rollers>(data);
 	}
 
@@ -57,43 +61,54 @@ methodmap Rollers < ArrayList{
 #undef SET_PROP
 #undef GET_PROP
 
-	public int PushToPerkHistory(int client, Perk perk){
+	public int PushToPerkHistory(int client, Perk perk)
+	{
 		PerkList list = this.GetPerkHistory(client);
-		if(!list){
+		if (!list)
+		{
 			list = new PerkList();
 			this.SetPerkHistory(client, list);
 		}
+
 		return list.Push(perk);
 	}
 
-	public bool IsInPerkHistory(int client, Perk perk, int iLimit){
+	public bool IsInPerkHistory(int client, Perk perk, int iLimit)
+	{
 		PerkList list = this.GetPerkHistory(client);
-		if(!list) return false;
+		if (!list)
+			return false;
 
 		int i = list.Length;
-		if(i < iLimit) return false;
+		if (i < iLimit)
+			return false;
 
 		iLimit = i -iLimit;
-		while(--i >= iLimit)
-			if(list.Get(i) == perk)
+		while (--i >= iLimit)
+			if (list.Get(i) == perk)
 				return true;
+
 		return false;
 	}
 
-	public void ResetPerkHistory(int client){
+	public void ResetPerkHistory(int client)
+	{
 		PerkList list = this.GetPerkHistory(client);
-		if(list) list.Clear();
+		if (list)
+			list.Clear();
 	}
 
-	public void Reset(int client){
+	public void Reset(int client)
+	{
 		this.SetInRoll(client, false);
 		this.SetLastRollTime(client, 0);
 		this.SetPerk(client, null);
 		this.ResetPerkHistory(client);
 	}
 
-	public void ResetPerkHisories(){
-		for(int i = 1; i <= MaxClients; ++i)
+	public void ResetPerkHisories()
+	{
+		for (int i = 1; i <= MaxClients; ++i)
 			this.ResetPerkHistory(i);
 	}
 }

@@ -145,7 +145,8 @@ ArrayList g_hHoming = null;
 int g_iWaterLevel[MAXPLAYERS +1] = {0, ...};
 ClientFlags g_eMuteNextResupply;
 
-void Stocks_OnMapStart(){
+void Stocks_OnMapStart()
+{
 	PrecacheModel(LASERBEAM);
 	PrecacheModel(EMPTY_MODEL);
 
@@ -153,8 +154,10 @@ void Stocks_OnMapStart(){
 	HookEvent("teamplay_round_start", Event_Homing_RoundStart);
 }
 
-bool Stocks_Sound(int client, const char[] sSound){
-	if(g_eMuteNextResupply.Test(client) && StrEqual(sSound, "items/regenerate.wav")){
+bool Stocks_Sound(int client, const char[] sSound)
+{
+	if(g_eMuteNextResupply.Test(client) && StrEqual(sSound, "items/regenerate.wav"))
+	{
 		g_eMuteNextResupply.Unset(client);
 		return false;
 	}
@@ -162,7 +165,8 @@ bool Stocks_Sound(int client, const char[] sSound){
 	return true;
 }
 
-public Action Event_Homing_RoundStart(Handle hEvent, const char[] sName, bool bDontBroadcast){
+public Action Event_Homing_RoundStart(Handle hEvent, const char[] sName, bool bDontBroadcast)
+{
 	g_hHoming.Clear();
 	return Plugin_Continue;
 }
@@ -183,7 +187,8 @@ stock void GetCallerName(char[] sBuffer, const int iBufferLenght)
 	delete eFrameIter;
 }
 
-stock int EscapeString(const char[] input, int escape, int escaper, char[] output, int maxlen){
+stock int EscapeString(const char[] input, int escape, int escaper, char[] output, int maxlen)
+{
 	/*
 		Thanks Popoklopsi for EscapeString()
 		https://forums.alliedmods.net/showthread.php?t=212230
@@ -191,25 +196,36 @@ stock int EscapeString(const char[] input, int escape, int escaper, char[] outpu
 
 	int escaped = 0;
 	Format(output, maxlen, "");
-	for(int offset = 0; offset < strlen(input); offset++){
+
+	for (int offset = 0; offset < strlen(input); ++offset)
+	{
 		int ch = input[offset];
-		if(ch == escape || ch == escaper){
+		if (ch == escape || ch == escaper)
+		{
 			Format(output, maxlen, "%s%c%c", output, escaper, ch);
 			escaped++;
-		}else Format(output, maxlen, "%s%c", output, ch);
+		}
+		else
+		{
+			Format(output, maxlen, "%s%c", output, ch);
+		}
 	}
+
 	return escaped;
 }
 
-stock int AccountIDToClient(int iAccountID){
-	for(int i = 1; i <= MaxClients; i++)
-		if(IsClientInGame(i))
-			if(GetSteamAccountID(i) == iAccountID)
+stock int AccountIDToClient(int iAccountID)
+{
+	for (int i = 1; i <= MaxClients; ++i)
+		if (IsClientInGame(i))
+			if (GetSteamAccountID(i) == iAccountID)
 				return i;
+
 	return 0;
 }
 
-stock void KillTimerSafe(Handle &hTimer){
+stock void KillTimerSafe(Handle& hTimer)
+{
 	if(hTimer == INVALID_HANDLE)
 		return;
 
@@ -217,7 +233,8 @@ stock void KillTimerSafe(Handle &hTimer){
 	hTimer = INVALID_HANDLE;
 }
 
-stock void KillEntIn(int iEnt, float fTime){
+stock void KillEntIn(int iEnt, float fTime)
+{
 	char sStr[32];
 	Format(sStr, 32, "OnUser1 !self:Kill::%f:1", fTime);
 	SetVariantString(sStr);
@@ -225,23 +242,28 @@ stock void KillEntIn(int iEnt, float fTime){
 	AcceptEntityInput(iEnt, "FireUser1");
 }
 
-stock int GetOppositeTeam(int iTeam){
+stock int GetOppositeTeam(int iTeam)
+{
 	return iTeam == 2 ? 3 : 2;
 }
 
-stock int GetLauncher(int iProjectile){
+stock int GetLauncher(int iProjectile)
+{
 	int iWeapon = GetEntPropEnt(iProjectile, Prop_Send, "m_hOriginalLauncher");
-	if(iWeapon > MaxClients)
+	if (iWeapon > MaxClients)
 		return GetEntPropEnt(iWeapon, Prop_Send, "m_hOwnerEntity");
-	else return 0;
+
+	return 0;
 }
 
-stock void Parent(int iEnt, int iTo){
+stock void Parent(int iEnt, int iTo)
+{
 	SetVariantString("!activator");
 	AcceptEntityInput(iEnt, "SetParent", iTo, iEnt, 0);
 }
 
-stock void TeleportToClient(int iEnt, int client, float fOffset[3]={0.0, 0.0, 36.0}){
+stock void TeleportToClient(int iEnt, int client, float fOffset[3]={0.0, 0.0, 36.0})
+{
 	float fPosition[3], fAngles[3], fForward[3], fRight[3], fUp[3];
 	GetClientAbsOrigin(client, fPosition);
 	GetClientAbsAngles(client, fAngles);
@@ -279,18 +301,21 @@ stock int MaxInt(const int i1, const int i2)
 	return i1 > i2 ? i1 : i2;
 }
 
-stock void GetPointOnSphere(const float fOrigin[3], const float fDirectionRads[2], float fRadius, float fOut[3]){
+stock void GetPointOnSphere(const float fOrigin[3], const float fDirectionRads[2], float fRadius, float fOut[3])
+{
 	fOut[0] = fOrigin[0] + fRadius * Cosine(fDirectionRads[0]) * Sine(fDirectionRads[1]);
 	fOut[1] = fOrigin[1] + fRadius * Sine(fDirectionRads[0]) * Sine(fDirectionRads[1]);
 	fOut[2] = fOrigin[2] + fRadius * Cosine(fDirectionRads[1]);
 }
 
 // Returns a random value that can be added to fCurrent such that fCurrent will be in [-fMaxDeviation, fMaxDeviation]
-stock float GetRandomDeviationAddition(const float fCurrent, float fMaxDeviation){
+stock float GetRandomDeviationAddition(const float fCurrent, float fMaxDeviation)
+{
 	return GetRandomFloat(-fMaxDeviation, fMaxDeviation) - fCurrent;
 }
 
-stock int GetRandomSign(){
+stock int GetRandomSign()
+{
 	static int iSign[2] = {-1, 1};
 	return iSign[GetRandomInt(0, 1)];
 }
@@ -300,25 +325,29 @@ stock int GetRandomSign(){
 * CLIENT
 */
 
-stock bool IsValidClient(int client){
+stock bool IsValidClient(int client)
+{
 	return (1 <= client <= MaxClients) && IsClientInGame(client);
 }
 
-stock int GetOppositeTeamOf(int client){
+stock int GetOppositeTeamOf(int client)
+{
 	int iTeam = GetClientTeam(client);
 	return GetOppositeTeam(iTeam);
 }
 
-stock float GetCaptureValue(const int client){
+stock float GetCaptureValue(const int client)
+{
 	// float instead of int so the return value can be used in a TF2Attrib call
 	float fValue = 1.0;
 
 	fValue += view_as<int>(TF2_GetPlayerClass(client) == TFClass_Scout);
 
-	for(int iSlot = 0; iSlot < 5; iSlot++){
+	for (int iSlot = 0; iSlot < 5; iSlot++)
+	{
 		int iWeapon = GetPlayerWeaponSlot(client, iSlot);
-		if(iWeapon > MaxClients && IsValidEntity(iWeapon))
-			if(GetEntProp(iWeapon, Prop_Send, "m_iItemDefinitionIndex") == 154) // Pain Train
+		if (iWeapon > MaxClients && IsValidEntity(iWeapon))
+			if (GetEntProp(iWeapon, Prop_Send, "m_iItemDefinitionIndex") == 154) // Pain Train
 				fValue += 1.0;
 	}
 
@@ -329,38 +358,44 @@ stock float GetCaptureValue(const int client){
 	return fValue;
 }
 
-stock void ApplyPreventCapture(const int client){
+stock void ApplyPreventCapture(const int client)
+{
 	TF2Attrib_SetByDefIndex(client, 400, 1.0); // cannot pick up intel
 	TF2Attrib_SetByDefIndex(client, 68, -GetCaptureValue(client)); // balance capture value to 0
 	FakeClientCommandEx(client, "dropitem") // in case intel is already picked up
 }
 
-stock void RemovePreventCapture(const int client){
+stock void RemovePreventCapture(const int client)
+{
 	TF2Attrib_RemoveByDefIndex(client, 400);
 	TF2Attrib_RemoveByDefIndex(client, 68);
 }
 
-stock int GetUniqueId(const int client, const int iOther){
+stock int GetUniqueId(const int client, const int iOther)
+{
 	// iOther + MAXPLAYERS -- reversing args should yield different IDs
 	// MAXPLAYERS * 2 -- add more than MAXPLAYERS in case iOther is negative
 	// 91 -- bit of randomness to discern it from other plugins, on the off chance that algos are similar
 	return client * (iOther + MAXPLAYERS * 2) * 91
 }
 
-stock void SwitchToFirstValidWeapon(int client){
-	if(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") > MaxClients)
+stock void SwitchToFirstValidWeapon(int client)
+{
+	if (GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") > MaxClients)
 		return; // already holding an valid weapon
 
-	for(int iSlot = 0; iSlot < 5; ++iSlot){
+	for (int iSlot = 0; iSlot < 5; ++iSlot)
+	{
 		int iWeapon = GetPlayerWeaponSlot(client, 2);
-		if(iWeapon > MaxClients && IsValidEntity(iWeapon))
+		if (iWeapon > MaxClients && IsValidEntity(iWeapon))
 			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", iWeapon);
 	}
 }
 
-stock void ForceResupplyCrude(const int client, const float fPos[3]){
+stock void ForceResupplyCrude(const int client, const float fPos[3])
+{
 	int iResupply = CreateEntityByName("func_regenerate");
-	if(iResupply <= MaxClients)
+	if (iResupply <= MaxClients)
 		return;
 
 	g_eMuteNextResupply.Set(client);
@@ -388,7 +423,8 @@ stock void ForceResupplyCrude(const int client, const float fPos[3]){
 	SetEntProp(iResupply, Prop_Send, "m_fEffects", iEffects | 32); // must have ef_nodraw flag
 }
 
-public Action Stocks_ForceResupplyTouch(int iResupply, int iOther){
+public Action Stocks_ForceResupplyTouch(int iResupply, int iOther)
+{
 	int iOwner = GetEntPropEnt(iResupply, Prop_Send, "m_hOwnerEntity");
 	return iOther == iOwner ? Plugin_Continue : Plugin_Handled;
 }
@@ -434,10 +470,13 @@ stock void TakeDamage(int client, int iInflictor, int iAttacker, float fDamage, 
 * TRACE
 */
 
-stock bool CanBuildAtPos(float fPos[3], bool bSentry){
+stock bool CanBuildAtPos(float fPos[3], bool bSentry)
+{
 	//TODO: Figure out a neat way of checking nobuild areas. I've spent 5h non stop trying to do it, help pls.
 	float fMins[3], fMaxs[3];
-	if(bSentry){
+
+	if (bSentry)
+	{
 		fMins[0] = -20.0;
 		fMins[1] = -20.0;
 		fMins[2] = 0.0;
@@ -445,7 +484,9 @@ stock bool CanBuildAtPos(float fPos[3], bool bSentry){
 		fMaxs[0] = 20.0;
 		fMaxs[1] = 20.0;
 		fMaxs[2] = 66.0;
-	}else{
+	}
+	else
+	{
 		fMins[0] = -24.0;
 		fMins[1] = -24.0;
 		fMins[2] = 0.0;
@@ -454,11 +495,13 @@ stock bool CanBuildAtPos(float fPos[3], bool bSentry){
 		fMaxs[1] = 24.0;
 		fMaxs[2] = 55.0;
 	}
+
 	TR_TraceHull(fPos, fPos, fMins, fMaxs, MASK_SOLID);
 	return !TR_DidHit();
 }
 
-stock bool IsEntityStuck(int iEntity){
+stock bool IsEntityStuck(int iEntity)
+{
 	float fPos[3], fMins[3], fMaxs[3];
 	GetEntPropVector(iEntity, Prop_Send, "m_vecOrigin", fPos);
 	GetEntPropVector(iEntity, Prop_Send, "m_vecMins", fMins);
@@ -468,17 +511,29 @@ stock bool IsEntityStuck(int iEntity){
 	return TR_DidHit();
 }
 
-stock bool CanEntitySeeTarget(int iEnt, int iTarget){
-	if(!iEnt) return false;
+stock bool CanEntitySeeTarget(int iEnt, int iTarget)
+{
+	if (!iEnt)
+		return false;
 
 	float fStart[3], fEnd[3];
 	if(IsValidClient(iEnt))
+	{
 		GetClientEyePosition(iEnt, fStart);
-	else GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", fStart);
+	}
+	else
+	{
+		GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", fStart);
+	}
 
-	if(IsValidClient(iTarget))
+	if (IsValidClient(iTarget))
+	{
 		GetClientEyePosition(iTarget, fEnd);
-	else GetEntPropVector(iTarget, Prop_Send, "m_vecOrigin", fEnd);
+	}
+	else
+	{
+		GetEntPropVector(iTarget, Prop_Send, "m_vecOrigin", fEnd);
+	}
 
 	Handle hTrace = TR_TraceRayFilterEx(fStart, fEnd, MASK_SOLID, RayType_EndPoint, TraceFilterIgnorePlayersAndSelf, iEnt);
 	bool bResult = hTrace != INVALID_HANDLE && !TR_DidHit(hTrace);
@@ -487,17 +542,20 @@ stock bool CanEntitySeeTarget(int iEnt, int iTarget){
 	return bResult;
 }
 
-stock bool GetClientLookPosition(int client, float fPosition[3]){
+stock bool GetClientLookPosition(int client, float fPosition[3])
+{
 	float fPos[3], fAng[3];
 	GetClientEyePosition(client, fPos);
 	GetClientEyeAngles(client, fAng);
 
 	Handle hTrace = TR_TraceRayFilterEx(fPos, fAng, MASK_SHOT, RayType_Infinite, TraceFilterIgnorePlayers, client);
-	if(hTrace != INVALID_HANDLE && TR_DidHit(hTrace)){
+	if (hTrace != INVALID_HANDLE && TR_DidHit(hTrace))
+	{
 		TR_GetEndPosition(fPosition, hTrace);
 		delete hTrace;
 		return true;
 	}
+
 	delete hTrace;
 	return false;
 }
@@ -507,19 +565,22 @@ stock bool GetClientLookPosition(int client, float fPosition[3]){
 * TRACE FILTERS
 */
 
-public bool TraceFilterIgnoreSelf(int iEntity, int iContentsMask, any iTarget){
+public bool TraceFilterIgnoreSelf(int iEntity, int iContentsMask, any iTarget)
+{
 	return iEntity != iTarget;
 }
 
-public bool TraceFilterIgnorePlayers(int iEntity, int iContentsMask, any data){
+public bool TraceFilterIgnorePlayers(int iEntity, int iContentsMask, any data)
+{
 	return !(1 <= iEntity <= MaxClients);
 }
 
-public bool TraceFilterIgnorePlayersAndSelf(int iEntity, int iContentsMask, any iTarget){
-	if(iEntity == iTarget)
+public bool TraceFilterIgnorePlayersAndSelf(int iEntity, int iContentsMask, any iTarget)
+{
+	if (iEntity == iTarget)
 		return false;
 
-	if(1 <= iEntity <= MaxClients)
+	if (1 <= iEntity <= MaxClients)
 		return false;
 
 	return true;
@@ -530,27 +591,31 @@ public bool TraceFilterIgnorePlayersAndSelf(int iEntity, int iContentsMask, any 
 * ALPHA
 */
 
-stock int GetEntityAlpha(int iEnt){
+stock int GetEntityAlpha(int iEnt)
+{
 	return GetEntData(iEnt, GetEntSendPropOffs(iEnt, "m_clrRender") + 3, 1);
 }
 
-stock void SetEntityAlpha(int iEnt, int iVal){
+stock void SetEntityAlpha(int iEnt, int iVal)
+{
 	SetEntityRenderMode(iEnt, RENDER_TRANSCOLOR);
 	SetEntData(iEnt, GetEntSendPropOffs(iEnt, "m_clrRender") + 3, iVal, 1, true);
 }
 
-stock void SetClientAlpha(int client, int iVal){
+stock void SetClientAlpha(int client, int iVal)
+{
 	SetEntityAlpha(client, iVal);
 
 	int iWeapon = 0;
-	for(int i = 0; i < 5; i++){
+	for (int i = 0; i < 5; ++i)
+	{
 		iWeapon = GetPlayerWeaponSlot(client, i);
-		if(iWeapon > MaxClients && IsValidEntity(iWeapon))
+		if (iWeapon > MaxClients && IsValidEntity(iWeapon))
 			SetEntityAlpha(iWeapon, iVal);
 	}
 
-	for(int i = MaxClients+1; i < GetMaxEntities(); i++)
-		if(IsWearable(i, client))
+	for (int i = MaxClients + 1; i < GetMaxEntities(); ++i)
+		if (IsWearable(i, client))
 			SetEntityAlpha(i, iVal);
 }
 
@@ -559,34 +624,38 @@ stock void SetClientAlpha(int client, int iVal){
 * LOADOUT
 */
 
-stock bool IsWearable(int iEnt, int iOwner){
-	if(!IsValidEntity(iEnt))
+stock bool IsWearable(int iEnt, int iOwner)
+{
+	if (!IsValidEntity(iEnt))
 		return false;
 
 	char sClass[24];
 	GetEntityClassname(iEnt, sClass, 24);
-	if(strlen(sClass) < 7)
+
+	if (strlen(sClass) < 7)
 		return false;
 
-	if(strncmp(sClass, "tf_", 3) != 0)
+	if (strncmp(sClass, "tf_", 3) != 0)
 		return false;
 
-	if(strncmp(sClass[3], "wear", 4) != 0
-	&& strncmp(sClass[3], "powe", 4) != 0)
+	if (strncmp(sClass[3], "wear", 4) != 0 && strncmp(sClass[3], "powe", 4) != 0)
 		return false;
 
-	if(GetEntPropEnt(iEnt, Prop_Send, "m_hOwnerEntity") != iOwner)
+	if (GetEntPropEnt(iEnt, Prop_Send, "m_hOwnerEntity") != iOwner)
 		return false;
 
 	return true;
 }
 
-stock void DisarmWeapons(int client, bool bDisarm){
+stock void DisarmWeapons(int client, bool bDisarm)
+{
 	int iWeapon = 0;
-	float fNextAttack = bDisarm ? GetGameTime() +86400.0 : 0.1;
-	for(int i = 0; i < 3; i++){
+	float fNextAttack = bDisarm ? GetGameTime() + 86400.0 : 0.1;
+
+	for (int i = 0; i < 3; ++i)
+	{
 		iWeapon = GetPlayerWeaponSlot(client, i);
-		if(iWeapon <= MaxClients || !IsValidEntity(iWeapon))
+		if (iWeapon <= MaxClients || !IsValidEntity(iWeapon))
 			continue;
 
 		SetEntPropFloat(iWeapon, Prop_Data, "m_flNextPrimaryAttack", fNextAttack);
@@ -624,9 +693,11 @@ stock void SetClip(const int iWeapon, const int iAmount)
 * ENTITY CREATION
 */
 
-stock int CreateEffect(float fPos[3], const char[] sEffect, float fTime=1.0){
+stock int CreateEffect(float fPos[3], const char[] sEffect, float fTime=1.0)
+{
 	int iEffect = CreateEntityByName("info_particle_system");
-	if(!IsValidEdict(iEffect)) return 0;
+	if (!IsValidEdict(iEffect))
+		return 0;
 
 	TeleportEntity(iEffect, fPos, NULL_VECTOR, NULL_VECTOR);
 	DispatchKeyValue(iEffect, "effect_name", sEffect);
@@ -639,17 +710,21 @@ stock int CreateEffect(float fPos[3], const char[] sEffect, float fTime=1.0){
 	return iEffect;
 }
 
-stock int CreateParticle(int iClient, char[] strParticle, bool bAttach=true, char[] strAttachmentPoint="", float fOffset[3]={0.0, 0.0, 36.0}){
+stock int CreateParticle(int iClient, char[] strParticle, bool bAttach=true, char[] strAttachmentPoint="", float fOffset[3]={0.0, 0.0, 36.0})
+{
 	//Thanks J-Factor for CreateParticle()
 	int iParticle = CreateEntityByName("info_particle_system");
-	if(!IsValidEdict(iParticle)) return 0;
+	if (!IsValidEdict(iParticle))
+		return 0;
 
 	TeleportToClient(iParticle, iClient, fOffset);
 	DispatchKeyValue(iParticle, "effect_name", strParticle);
 
-	if(bAttach){
+	if (bAttach)
+	{
 		Parent(iParticle, iClient);
-		if(!StrEqual(strAttachmentPoint, "")){
+		if(!StrEqual(strAttachmentPoint, ""))
+		{
 			SetVariantString(strAttachmentPoint);
 			AcceptEntityInput(iParticle, "SetParentAttachmentMaintainOffset", iParticle, iParticle, 0);
 		}
@@ -662,9 +737,10 @@ stock int CreateParticle(int iClient, char[] strParticle, bool bAttach=true, cha
 	return iParticle;
 }
 
-stock int CreateRagdoll(int client, bool bFrozen=false){
+stock int CreateRagdoll(int client, bool bFrozen=false)
+{
 	int iRag = CreateEntityByName("tf_ragdoll");
-	if(iRag <= MaxClients || !IsValidEntity(iRag))
+	if (iRag <= MaxClients || !IsValidEntity(iRag))
 		return 0;
 
 	float fPos[3], fAng[3], fVel[3];
@@ -695,9 +771,11 @@ stock int CreateRagdoll(int client, bool bFrozen=false){
 	return iRag;
 }
 
-stock void CreateExplosion(float fPos[3], float fDamage=100.0, float fRadius=80.0, float fForce=100.0, int iOwner=0){
+stock void CreateExplosion(float fPos[3], float fDamage=100.0, float fRadius=80.0, float fForce=100.0, int iOwner=0)
+{
 	int iExplosion = CreateEntityByName("env_explosion");
-	if(!iExplosion) return;
+	if (!iExplosion)
+		return;
 
 	DispatchKeyValueFloat(iExplosion, "iMagnitude", fDamage);
 	DispatchKeyValueFloat(iExplosion, "iRadiusOverride", fRadius);
@@ -713,9 +791,10 @@ stock void CreateExplosion(float fPos[3], float fDamage=100.0, float fRadius=80.
 	AcceptEntityInput(iExplosion, "Kill");
 }
 
-stock int CreateTesla(float fPos[3]){
+stock int CreateTesla(float fPos[3])
+{
 	int iTesla = CreateEntityByName("point_tesla");
-	if(iTesla <= MaxClients || !IsValidEntity(iTesla))
+	if (iTesla <= MaxClients || !IsValidEntity(iTesla))
 		return 0;
 
 	TeleportEntity(iTesla, fPos, NULL_VECTOR, NULL_VECTOR);
@@ -744,15 +823,16 @@ stock int CreateTesla(float fPos[3]){
  * Based on nosoop's `TF2_AttachBasicGlow`
  * https://github.com/nosoop/stocksoup/blob/master/tf/entity_prefabs.inc
  */
-stock int CreateProxy(int iEnt){
+stock int CreateProxy(int iEnt)
+{
 	char sModel[PLATFORM_MAX_PATH];
 	GetEntPropString(iEnt, Prop_Data, "m_ModelName", sModel, sizeof(sModel));
 
-	if(strlen(sModel) == 0)
+	if (strlen(sModel) == 0)
 		return -1;
 
 	int iProxy = CreateEntityByName("tf_taunt_prop");
-	if(iProxy <= MaxClients)
+	if (iProxy <= MaxClients)
 		return -1;
 
 	DispatchSpawn(iProxy);
@@ -769,12 +849,13 @@ stock int CreateProxy(int iEnt){
 	return iProxy;
 }
 
-stock int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int iBlue=255, float fStartWidth=1.0, float fEndWidth=1.0, float fAmp=1.35){
+stock int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int iBlue=255, float fStartWidth=1.0, float fEndWidth=1.0, float fAmp=1.35)
+{
 	int iBeam = CreateEntityByName("env_beam");
-	if(iBeam <= MaxClients)
+	if (iBeam <= MaxClients)
 		return -1;
 
-	if(!IsValidEntity(iBeam))
+	if (!IsValidEntity(iBeam))
 		return -1;
 
 	SetEntityModel(iBeam, LASERBEAM);
@@ -800,12 +881,14 @@ stock int ConnectWithBeam(int iEnt, int iEnt2, int iRed=255, int iGreen=255, int
 	SetVariantFloat(32.0);
 	AcceptEntityInput(iBeam, "Amplitude");
 	AcceptEntityInput(iBeam, "TurnOn");
+
 	return iBeam;
 }
 
-stock int AttachRotating(int client, int iEnt, float fDist=128.0, float fSpeed=100.0){
+stock int AttachRotating(int client, int iEnt, float fDist=128.0, float fSpeed=100.0)
+{
 	int iRot = CreateEntityByName("func_door_rotating");
-	if(iRot <= MaxClients) return 0;
+	if (iRot <= MaxClients) return 0;
 
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);
@@ -826,17 +909,18 @@ stock int AttachRotating(int client, int iEnt, float fDist=128.0, float fSpeed=1
 	return iRot;
 }
 
-stock int AttachGlow(const int iEntity){
+stock int AttachGlow(const int iEntity)
+{
 	// Thanks Pelipoika for reference on attaching tf_glow entities
 	// https://forums.alliedmods.net/showthread.php?t=287533
 
 	int iEntLookup = -1;
-	while((iEntLookup = FindEntityByClassname(iEntLookup, "tf_glow")) != -1)
-		if(GetEntPropEnt(iEntLookup, Prop_Send, "m_hTarget") == iEntity)
+	while ((iEntLookup = FindEntityByClassname(iEntLookup, "tf_glow")) != -1)
+		if (GetEntPropEnt(iEntLookup, Prop_Send, "m_hTarget") == iEntity)
 			return -1; // entities can only have 1 tf_glow object
 
 	int iGlow = CreateEntityByName("tf_glow");
-	if(iGlow <= MaxClients)
+	if (iGlow <= MaxClients)
 		return -1;
 
 	char sOrigName[MAX_NAME_LENGTH], sTempName[32];
@@ -855,9 +939,10 @@ stock int AttachGlow(const int iEntity){
 	return iGlow;
 }
 
-stock void ShowAnnotationFor(int client, int iOther, float fLifetime, char[] sText="", char[] sSound=""){
+stock void ShowAnnotationFor(int client, int iOther, float fLifetime, char[] sText="", char[] sSound="")
+{
 	Event hEvent = CreateEvent("show_annotation");
-	if(hEvent == null)
+	if (hEvent == null)
 		return;
 
 	hEvent.SetInt("follow_entindex", iOther);
@@ -870,9 +955,10 @@ stock void ShowAnnotationFor(int client, int iOther, float fLifetime, char[] sTe
 	hEvent.Cancel();
 }
 
-stock void HideAnnotationFor(int client, int iOther){
+stock void HideAnnotationFor(int client, int iOther)
+{
 	Event hEvent = CreateEvent("hide_annotation");
-	if(hEvent == null)
+	if (hEvent == null)
 		return;
 
 	hEvent.SetInt("id", GetUniqueId(client, iOther));
@@ -886,16 +972,18 @@ stock void HideAnnotationFor(int client, int iOther){
 * TEMPORARY ENTITIES
 */
 
-stock int GetEffectIndex(const char[] sEffectName){
+stock int GetEffectIndex(const char[] sEffectName)
+{
 	static int iTable = INVALID_STRING_TABLE;
 
-	if(iTable == INVALID_STRING_TABLE)
+	if (iTable == INVALID_STRING_TABLE)
 		iTable = FindStringTable("ParticleEffectNames");
 
 	return FindStringIndex(iTable, sEffectName);
 }
 
-stock void SetupTEParticle(const TEParticleId eParticleId, const float fPos[3]){
+stock void SetupTEParticle(const TEParticleId eParticleId, const float fPos[3])
+{
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecOrigin[0]", fPos[0]);
 	TE_WriteFloat("m_vecOrigin[1]", fPos[1]);
@@ -907,22 +995,26 @@ stock void SetupTEParticle(const TEParticleId eParticleId, const float fPos[3]){
 	TE_WriteNum("m_iParticleSystemIndex", view_as<int>(eParticleId));
 }
 
-stock void SendTEParticle(const TEParticleId eParticleId, const float fPos[3]){
+stock void SendTEParticle(const TEParticleId eParticleId, const float fPos[3])
+{
 	SetupTEParticle(eParticleId, fPos);
 	TE_SendToAll();
 }
 
-stock void SendTEParticleWithPriority(const TEParticleId eParticleId, const float fPos[3]){
+stock void SendTEParticleWithPriority(const TEParticleId eParticleId, const float fPos[3])
+{
 	SetupTEParticle(eParticleId, fPos);
 	TE_SendToAll(-1.0); // negative values attempt to send the TE on the same tick
 }
 
-stock void SendTEParticleWithPriorityTo(const int client, const TEParticleId eParticleId, const float fPos[3]){
+stock void SendTEParticleWithPriorityTo(const int client, const TEParticleId eParticleId, const float fPos[3])
+{
 	SetupTEParticle(eParticleId, fPos);
 	TE_SendToClient(client, -1.0);
 }
 
-stock void SendTEParticleAttached(const TEParticleId eParticleId, const int iEnt, const int iAttachPoint=0){
+stock void SendTEParticleAttached(const TEParticleId eParticleId, const int iEnt, const int iAttachPoint=0)
+{
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecStart[0]", 0.0);
 	TE_WriteFloat("m_vecStart[1]", 0.0);
@@ -930,11 +1022,15 @@ stock void SendTEParticleAttached(const TEParticleId eParticleId, const int iEnt
 	TE_WriteNum("m_iParticleSystemIndex", view_as<int>(eParticleId));
 	TE_WriteNum("entindex", iEnt);
 	TE_WriteNum("m_iAttachType", iAttachPoint > 0 ? 4 : 1); // follow point or just follow
-	if(iAttachPoint > 0) TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);
+
+	if (iAttachPoint > 0)
+		TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);
+
 	TE_SendToAll(-1.0);
 }
 
-stock void SendTEParticleLingeringAttached(const TEParticleLingeringId eParticleId, const int iEnt, float fPos[3], const int iAttachPoint=0){
+stock void SendTEParticleLingeringAttached(const TEParticleLingeringId eParticleId, const int iEnt, float fPos[3], const int iAttachPoint=0)
+{
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecStart[0]", 0.0);
 	TE_WriteFloat("m_vecStart[1]", 0.0);
@@ -942,7 +1038,10 @@ stock void SendTEParticleLingeringAttached(const TEParticleLingeringId eParticle
 	TE_WriteNum("m_iParticleSystemIndex", view_as<int>(eParticleId));
 	TE_WriteNum("entindex", iEnt);
 	TE_WriteNum("m_iAttachType", iAttachPoint > 0 ? 4 : 1); // follow point or just follow
-	if(iAttachPoint > 0) TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);
+
+	if (iAttachPoint > 0)
+		TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);
+
 	TE_SendToAllInRange(fPos, RangeType_Visibility, -1.0);
 }
 
@@ -951,48 +1050,75 @@ stock void SendTEParticleLingeringAttached(const TEParticleLingeringId eParticle
 * SPEED MANIPULATION
 */
 
-stock float GetBaseSpeed(int client){
-	float fBaseSpeed = 300.0;
-	TFClassType class = TF2_GetPlayerClass(client);
-	switch(class){
-		case TFClass_Scout:		fBaseSpeed = 400.0;
-		case TFClass_Soldier:	fBaseSpeed = 240.0;
-		case TFClass_DemoMan:	fBaseSpeed = 280.0;
-		case TFClass_Heavy:		fBaseSpeed = 230.0;
-		case TFClass_Medic:		fBaseSpeed = 320.0;
-		case TFClass_Spy:		fBaseSpeed = 320.0;
+stock float GetBaseSpeed(int client)
+{
+	switch (TF2_GetPlayerClass(client))
+	{
+		case TFClass_Scout:
+			return 400.0;
+
+		case TFClass_Soldier:
+			return 240.0;
+
+		case TFClass_DemoMan:
+			return 280.0;
+
+		case TFClass_Heavy:
+			return 230.0;
+
+		case TFClass_Medic:
+			return 320.0;
+
+		case TFClass_Spy:
+			return 320.0;
 	}
-	return fBaseSpeed;
+
+	return 300.0;
 }
 
-stock void SetSpeed(int client, float fBase, float fMul=1.0){
-	if(fMul == 1.0){
+stock void SetSpeed(int client, float fBase, float fMul=1.0)
+{
+	if (fMul == 1.0)
+	{
 		TF2Attrib_RemoveByDefIndex(client, 107);
 		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase);
-	}else{
+	}
+	else
+	{
 		TF2Attrib_SetByDefIndex(client, 107, fMul);
 		SetEntPropFloat(client, Prop_Send, "m_flMaxspeed", fBase *fMul);
 	}
 }
 
 // calcualtes m_flMaxspeed itself, tad overkill for small, frequent updates (like drunkwalk)
-stock void SetSpeedEx(int client, float fMul=1.0){
-	if(fMul == 1.0)
+stock void SetSpeedEx(int client, float fMul=1.0)
+{
+	if (fMul == 1.0)
+	{
 		TF2Attrib_RemoveByDefIndex(client, 107);
-	else TF2Attrib_SetByDefIndex(client, 107, fMul);
+	}
+	else
+	{
+		TF2Attrib_SetByDefIndex(client, 107, fMul);
+	}
+
 	TriggerSpeedRecalc(client);
 }
 
 // forces water level update which triggers recalculation of m_flMaxspeed (#18)
-stock void TriggerSpeedRecalc(int client){
+stock void TriggerSpeedRecalc(int client)
+{
 	g_iWaterLevel[client] = GetEntProp(client, Prop_Data, "m_nWaterLevel");
 	SetEntProp(client, Prop_Data, "m_nWaterLevel", g_iWaterLevel[client] > 0 ? 0 : 1);
 	CreateTimer(0.1, TriggerSpeedRecalc_Frame, GetClientUserId(client));
 }
 
-public Action TriggerSpeedRecalc_Frame(Handle hTimer, int iUserId){
+public Action TriggerSpeedRecalc_Frame(Handle hTimer, int iUserId)
+{
 	int client = GetClientOfUserId(iUserId);
-	if(client) SetEntProp(client, Prop_Data, "m_nWaterLevel", g_iWaterLevel[client]);
+	if (client)
+		SetEntProp(client, Prop_Data, "m_nWaterLevel", g_iWaterLevel[client]);
+
 	return Plugin_Stop;
 }
 
@@ -1001,19 +1127,23 @@ public Action TriggerSpeedRecalc_Frame(Handle hTimer, int iUserId){
 * VIEW MANIPULATION
 */
 
-stock void ViewPunch(int client, float fPunch[3]){
+stock void ViewPunch(int client, float fPunch[3])
+{
 	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fPunch);
 }
 
-stock void ViewPunchRand(int client, float fThreshold=25.0){
+stock void ViewPunchRand(int client, float fThreshold=25.0)
+{
 	float fPunch[3];
 	fPunch[0] = GetRandomFloat(-fThreshold, fThreshold);
 	fPunch[1] = GetRandomFloat(-fThreshold, fThreshold);
 	fPunch[2] = GetRandomFloat(-fThreshold, fThreshold);
+
 	ViewPunch(client, fPunch);
 }
 
-stock void RotateClientSmooth(int client, float fAngle){
+stock void RotateClientSmooth(int client, float fAngle)
+{
 	float fPunch[3], fEyeAng[3];
 	GetClientEyeAngles(client, fEyeAng);
 
@@ -1029,11 +1159,13 @@ stock void RotateClientSmooth(int client, float fAngle){
 * SOUNDS
 */
 
-stock bool IsFootstepSound(const char[] sSound){
+stock bool IsFootstepSound(const char[] sSound)
+{
 	return !strncmp(sSound[7], "footstep", 8);
 }
 
-stock bool IsVoicelineSound(const char[] sSound){
+stock bool IsVoicelineSound(const char[] sSound)
+{
 	return strncmp(sSound[0], "vo/", 3) == 0;
 }
 
@@ -1042,85 +1174,108 @@ stock bool IsVoicelineSound(const char[] sSound){
 * HOMING
 */
 
-stock void Homing_Push(int iProjectile, int iFlags=HOMING_ENEMIES){
+stock void Homing_Push(int iProjectile, int iFlags=HOMING_ENEMIES)
+{
 	int iData[3];
 	iData[0] = EntIndexToEntRef(iProjectile);
 	iData[2] = iFlags;
 	g_hHoming.PushArray(iData);
 }
 
-stock void Homing_OnGameFrame(){
+stock void Homing_OnGameFrame()
+{
 	int iData[3];
 	int iProjectile, i = g_hHoming.Length;
 
-	while(--i >= 0){
+	while (--i >= 0)
+	{
 		g_hHoming.GetArray(i, iData);
-		if(iData[0] == 0){
+		if (iData[0] == 0)
+		{
 			g_hHoming.Erase(i);
 			continue;
 		}
 
 		iProjectile = EntRefToEntIndex(iData[0]);
-		if(iProjectile > MaxClients)
+
+		if (iProjectile > MaxClients)
+		{
 			Homing_Think(iProjectile, iData[0], i, iData[1], iData[2]);
-		else g_hHoming.Erase(i);
+		}
+		else
+		{
+			g_hHoming.Erase(i);
+		}
 	}
 }
 
-stock void Homing_Think(int iProjectile, int iRefProjectile, int iArrayIndex, int iCurrentTarget, int iFlags){
-	if(!Homing_IsValidTarget(iCurrentTarget, iProjectile, iFlags))
+stock void Homing_Think(int iProjectile, int iRefProjectile, int iArrayIndex, int iCurrentTarget, int iFlags)
+{
+	if (!Homing_IsValidTarget(iCurrentTarget, iProjectile, iFlags))
+	{
 		Homing_FindTarget(iProjectile, iRefProjectile, iArrayIndex, iFlags);
-	else Homing_TurnToTarget(iCurrentTarget, iProjectile, view_as<bool>(iFlags & HOMING_SMOOTH));
+	}
+	else
+	{
+		Homing_TurnToTarget(iCurrentTarget, iProjectile, view_as<bool>(iFlags & HOMING_SMOOTH));
+	}
 }
 
-stock bool Homing_IsValidTarget(int client, int iProjectile, int iFlags){
-	if(!IsValidClient(client) || !IsPlayerAlive(client))
+stock bool Homing_IsValidTarget(int client, int iProjectile, int iFlags)
+{
+	if (!IsValidClient(client) || !IsPlayerAlive(client))
 		return false;
 
-	int iTeam = GetEntProp(iProjectile, Prop_Send, "m_iTeamNum"),
-		iOwner = 0;
+	int iTeam = GetEntProp(iProjectile, Prop_Send, "m_iTeamNum");
+	int iOwner = (iFlags & HOMING_SELF_ORIG) ? GetLauncher(iProjectile) : GetEntPropEnt(iProjectile, Prop_Send, "m_hOwnerEntity");
 
-	iOwner = 0;
-	if(iFlags & HOMING_SELF_ORIG)
-		iOwner = GetLauncher(iProjectile);
-	else iOwner = GetEntPropEnt(iProjectile, Prop_Send, "m_hOwnerEntity");
-
-	if(iOwner == client){
-		if(!(iFlags & HOMING_SELF) && !(iFlags & HOMING_SELF_ORIG)) return false;
-	}else{
-		if(GetClientTeam(client) == iTeam){
-			if(!(iFlags & HOMING_FRIENDLIES)) return false;
-		}else{
-			if(!(iFlags & HOMING_ENEMIES)) return false;
+	if(iOwner == client)
+	{
+		if (!(iFlags & HOMING_SELF) && !(iFlags & HOMING_SELF_ORIG))
+			return false;
+	}
+	else
+	{
+		if (GetClientTeam(client) == iTeam)
+		{
+			if (!(iFlags & HOMING_FRIENDLIES))
+				return false;
+		}
+		else
+		{
+			if (!(iFlags & HOMING_ENEMIES))
+				return false;
 		}
 	}
 
-	if(TF2_IsPlayerInCondition(client, TFCond_Cloaked))
+	if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
 		return false;
 
-	if(TF2_IsPlayerInCondition(client, TFCond_Disguised) && GetEntProp(client, Prop_Send, "m_nDisguiseTeam") == iTeam)
+	if (TF2_IsPlayerInCondition(client, TFCond_Disguised) && GetEntProp(client, Prop_Send, "m_nDisguiseTeam") == iTeam)
 		return false;
 
-	if(IsPlayerFriendly(client))
+	if (IsPlayerFriendly(client))
 		return false;
 
 	return CanEntitySeeTarget(iProjectile, client);
 }
 
-stock void Homing_FindTarget(int iProjectile, int iRefProjectile, int iArrayIndex, int iFlags){
+stock void Homing_FindTarget(int iProjectile, int iRefProjectile, int iArrayIndex, int iFlags)
+{
 	float fPos[3], fPosOther[3];
 	GetEntPropVector(iProjectile, Prop_Send, "m_vecOrigin", fPos);
 
 	int iBestTarget = 0;
 	float fBestDist = 9999999999.0;
 
-	for(int i = 1; i <= MaxClients; ++i){
-		if(!Homing_IsValidTarget(i, iProjectile, iFlags))
+	for (int i = 1; i <= MaxClients; ++i)
+	{
+		if (!Homing_IsValidTarget(i, iProjectile, iFlags))
 			continue;
 
 		GetClientEyePosition(i, fPosOther);
 		float fDistance = GetVectorDistance(fPos, fPosOther, true);
-		if(fDistance > fBestDist)
+		if (fDistance > fBestDist)
 			continue;
 
 		iBestTarget = i;
@@ -1133,11 +1288,12 @@ stock void Homing_FindTarget(int iProjectile, int iRefProjectile, int iArrayInde
 	iData[2] = iFlags;
 	g_hHoming.SetArray(iArrayIndex, iData);
 
-	if(iBestTarget)
+	if (iBestTarget)
 		Homing_TurnToTarget(iBestTarget, iProjectile, view_as<bool>(iFlags & HOMING_SMOOTH));
 }
 
-stock void Homing_TurnToTarget(int client, int iProjectile, bool bSmooth=false){
+stock void Homing_TurnToTarget(int client, int iProjectile, bool bSmooth=false)
+{
 	float fTargetPos[3], fRocketPos[3], fInitialVelocity[3];
 	GetClientAbsOrigin(client, fTargetPos);
 	GetEntPropVector(iProjectile, Prop_Send, "m_vecOrigin", fRocketPos);
@@ -1147,7 +1303,8 @@ stock void Homing_TurnToTarget(int client, int iProjectile, bool bSmooth=false){
 	float fSpeedBase = fSpeedInit *HOMING_SPEED_MULTIPLIER;
 
 	fTargetPos[2] += 30 +Pow(GetVectorDistance(fTargetPos, fRocketPos), 2.0) /10000;
-	if(bSmooth) Homing_SmoothTurn(fTargetPos, fRocketPos, iProjectile);
+	if (bSmooth)
+		Homing_SmoothTurn(fTargetPos, fRocketPos, iProjectile);
 
 	float fNewVec[3], fAng[3];
 	SubtractVectors(fTargetPos, fRocketPos, fNewVec);
@@ -1160,7 +1317,8 @@ stock void Homing_TurnToTarget(int client, int iProjectile, bool bSmooth=false){
 	TeleportEntity(iProjectile, NULL_VECTOR, fAng, fNewVec);
 }
 
-stock void Homing_SmoothTurn(float fTargetPos[3], float fRocketPos[3], int iProjectile){
+stock void Homing_SmoothTurn(float fTargetPos[3], float fRocketPos[3], int iProjectile)
+{
 	float fDist = GetVectorDistance(fRocketPos, fTargetPos);
 
 	float fAng[3], fFwd[3];
@@ -1168,14 +1326,16 @@ stock void Homing_SmoothTurn(float fTargetPos[3], float fRocketPos[3], int iProj
 	GetAngleVectors(fAng, fFwd, NULL_VECTOR, NULL_VECTOR);
 
 	float fNewTargetPos[3];
-	for(int i = 0; i < 3; ++i){
+	for(int i = 0; i < 3; ++i)
+	{
 		fNewTargetPos[i] = fRocketPos[i] + fDist *fFwd[i];
 		fTargetPos[i] += (fNewTargetPos[i] -fTargetPos[i]) *0.96;
 	}
 }
 
-stock bool Homing_AptClass(const char[] sClass){
-	if(strncmp(sClass, "tf_projectile_", 14))
+stock bool Homing_AptClass(const char[] sClass)
+{
+	if (strncmp(sClass, "tf_projectile_", 14))
 		return false;
 
 	return !strcmp(sClass[14], "rocket")

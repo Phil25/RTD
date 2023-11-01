@@ -24,76 +24,103 @@ PerkContainer g_hPerkContainer = null;
 * Get(1) - Perk handle
 * Get(2) - Container (if null, indicates this is PerkContainerIter)
 */
-methodmap PerkIter < ArrayList{
-	public int Id(){
+methodmap PerkIter < ArrayList
+{
+	public int Id()
+	{
 		return this.Get(0);
 	}
 
-	public Perk Perk(){
+	public Perk Perk()
+	{
 		return this.Get(1);
 	}
 
-	public PerkList List(){
+	public PerkList List()
+	{
 		return this.Get(2);
 	}
 
-	public void SetPerk(int iId){
+	public void SetPerk(int iId)
+	{
 		this.Set(0, iId);
 		PerkList list = this.List();
-		if(list == null)
-			this.Set(1, g_hPerkContainer.GetFromId(iId));
 
-		else{
-			if(iId >= list.Length || iId < 0)
+		if (list == null)
+		{
+			this.Set(1, g_hPerkContainer.GetFromId(iId));
+		}
+		else
+		{
+			if (iId >= list.Length || iId < 0)
+			{
 				this.Set(1, view_as<Perk>(null));
-			else this.Set(1, list.Get(iId));
+			}
+			else
+			{
+				this.Set(1, list.Get(iId));
+			}
 		}
 	}
 
-	public void Next(){
+	public void Next()
+	{
 		int iId = this.Id();
 		this.SetPerk(++iId);
 	}
 
-	public void Prev(){
+	public void Prev()
+	{
 		int iId = this.Id();
 		this.SetPerk(--iId);
 	}
 }
 
 /* prefix ++ operator */
-stock PerkIter operator++(PerkIter iter){
+stock PerkIter operator++(PerkIter iter)
+{
 	iter.Next();
 	return iter;
 }
 
 /* prefix -- operator */
-stock PerkIter operator--(PerkIter iter){
+stock PerkIter operator--(PerkIter iter)
+{
 	iter.Prev();
 	return iter;
 }
 
 /* Iterator pattern for perks container */
-methodmap PerkContainerIter < PerkIter{
-	public PerkContainerIter(int iId){
+methodmap PerkContainerIter < PerkIter
+{
+	public PerkContainerIter(int iId)
+	{
 		ArrayList list = new ArrayList(_, 3);
 		list.Set(0, iId);
 		list.Set(1, g_hPerkContainer.GetFromId(iId));
 		list.Set(2, view_as<PerkList>(null));
+
 		return view_as<PerkContainerIter>(list);
 	}
 }
 
 /* Iterator pattern for perks list */
-methodmap PerkListIter < PerkIter{
-	public PerkListIter(PerkList list, int iId){
+methodmap PerkListIter < PerkIter
+{
+	public PerkListIter(PerkList list, int iId)
+	{
 		ArrayList data = new ArrayList(_, 3);
 		data.Set(0, iId);
 
 		int iLen = list.Length;
-		if(iId >= iLen || iId < 0)
+		if (iId >= iLen || iId < 0)
+		{
 			data.Set(1, view_as<Perk>(null));
-		else data.Set(1, list.Get(iId));
+		}
+		else
+		{
+			data.Set(1, list.Get(iId));
+		}
 
 		data.Set(2, list);
 		return view_as<PerkListIter>(data);

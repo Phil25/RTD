@@ -171,3 +171,95 @@ void SetupConVars()
 	HookConVarChange(g_hCvarTimerPosX,			ConVarChange_Timer	);	g_fCvarTimerPosX			= GetConVarFloat(g_hCvarTimerPosX);
 	HookConVarChange(g_hCvarTimerPosY,			ConVarChange_Timer	);	g_fCvarTimerPosY			= GetConVarFloat(g_hCvarTimerPosY);
 }
+
+public void ConVarChange_Plugin(Handle hCvar, const char[] sOld, const char[] sNew)
+{
+	if (hCvar == g_hCvarPluginEnabled)
+		g_bCvarPluginEnabled = StringToInt(sNew) > 0 ? true : false;
+
+	else if (hCvar == g_hCvarAutoUpdate)
+		g_bCvarAutoUpdate = StringToInt(sNew) > 0 ? true : false;
+
+	else if (hCvar == g_hCvarReloadUpdate)
+		g_bCvarReloadUpdate = StringToInt(sNew) > 0 ? true : false;
+
+	else if (hCvar == g_hCvarLog)
+		g_bCvarLog = StringToInt(sNew) > 0 ? true : false;
+
+	else if (hCvar == g_hCvarChat)
+		g_iCvarChat = StringToInt(sNew);
+}
+
+public void ConVarChange_Perks(Handle hCvar, const char[] sOld, const char[] sNew){
+	if(hCvar == g_hCvarPerkDuration)
+		g_iCvarPerkDuration = StringToInt(sNew);
+
+	else if(hCvar == g_hCvarRollInterval)
+		g_iCvarRollInterval = StringToInt(sNew);
+
+	else if(hCvar == g_hCvarDisabledPerks)
+		ParseDisabledPerks();
+}
+
+public void ConVarChange_Usage(Handle hCvar, const char[] sOld, const char[] sNew){
+	if(hCvar == g_hCvarAllowed)
+		g_iCvarAllowed = ReadFlagString(sNew);
+
+	else if(hCvar == g_hCvarInSetup)
+		g_bCvarInSetup = StringToInt(sNew) > 0 ? true : false;
+
+	else if(hCvar == g_hCvarTriggers)
+		ParseTriggers();
+
+	else if(hCvar == g_hCvarShowTriggers)
+		g_bCvarShowTriggers = StringToInt(sNew) > 0 ? true : false;
+
+	else if(hCvar == g_hCvarShowTime)
+		g_bCvarShowTime = StringToInt(sNew) > 0 ? true : false;
+}
+
+public void ConVarChange_Rtd(Handle hCvar, const char[] sOld, const char[] sNew){
+	if(hCvar == g_hCvarRtdTeam)
+		g_iCvarRtdTeam = StringToInt(sNew);
+
+	else if(hCvar == g_hCvarRtdMode)
+		g_iCvarRtdMode = StringToInt(sNew);
+
+	else if(hCvar == g_hCvarClientLimit)
+		g_iCvarClientLimit = StringToInt(sNew);
+
+	else if(hCvar == g_hCvarTeamLimit)
+		g_iCvarTeamLimit = StringToInt(sNew);
+
+	else if(hCvar == g_hCvarRespawnStuck)
+		g_bCvarRespawnStuck = StringToInt(sNew) > 0 ? true : false;
+}
+
+public void ConVarChange_Repeat(Handle hCvar, const char[] sOld, const char[] sNew){
+	if(hCvar == g_hCvarRepeatPlayer){
+		g_iCvarRepeatPlayer = StringToInt(sNew);
+		g_hRollers.ResetPerkHisories();
+	}else if(hCvar == g_hCvarRepeatPerk){
+		g_iCvarRepeatPerk = StringToInt(sNew);
+		g_hPerkHistory.Clear();
+	}
+}
+
+public void ConVarChange_Good(Handle hCvar, const char[] sOld, const char[] sNew){
+	if(hCvar == g_hCvarGoodChance)
+		g_fCvarGoodChance = StringToFloat(sNew);
+
+	else if(hCvar == g_hCvarGoodDonatorChance)
+		g_fCvarGoodDonatorChance = StringToFloat(sNew);
+
+	else if(hCvar == g_hCvarDonatorFlag)
+		g_iCvarDonatorFlag = ReadFlagString(sNew);
+}
+
+public void ConVarChange_Timer(Handle hCvar, const char[] sOld, const char[] sNew){
+	if(hCvar == g_hCvarTimerPosX)
+		g_fCvarTimerPosX = StringToFloat(sNew);
+
+	else if(hCvar == g_hCvarTimerPosY)
+		g_fCvarTimerPosY = StringToFloat(sNew);
+}
