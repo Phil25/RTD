@@ -50,7 +50,7 @@ public void SpawnDispenser_OnVoice(const int client)
 	if (!GetClientLookPosition(client, fPos))
 		return;
 
-	if (!CanBuildAtPos(fPos, false))
+	if (!FindBuildPosition(fPos, false))
 		return;
 
 	float fAng[3];

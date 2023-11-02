@@ -53,6 +53,7 @@
 *
 * TRACE
 * - CanBuildAtPos
+* - FindBuildPosition
 * - IsEntityStuck
 * - CanEntitySeeTarget
 * - GetClientLookPosition
@@ -470,7 +471,7 @@ stock void TakeDamage(int client, int iInflictor, int iAttacker, float fDamage, 
 * TRACE
 */
 
-stock bool CanBuildAtPos(float fPos[3], bool bSentry)
+stock bool CanBuildAtPos(const float fPos[3], bool bSentry)
 {
 	//TODO: Figure out a neat way of checking nobuild areas. I've spent 5h non stop trying to do it, help pls.
 	float fMins[3], fMaxs[3];
@@ -498,6 +499,19 @@ stock bool CanBuildAtPos(float fPos[3], bool bSentry)
 
 	TR_TraceHull(fPos, fPos, fMins, fMaxs, MASK_SOLID);
 	return !TR_DidHit();
+}
+
+stock bool FindBuildPosition(float fPos[3], bool bSentry, int iBuildCheckLimit=10, const float fOffset=1.0)
+{
+	while (iBuildCheckLimit-- > 0)
+	{
+		if (CanBuildAtPos(fPos, bSentry))
+			return true;
+
+		fPos[2] += fOffset;
+	}
+
+	return false;
 }
 
 stock bool IsEntityStuck(int iEntity)

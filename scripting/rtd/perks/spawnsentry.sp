@@ -50,7 +50,7 @@ void SpawnSentry_OnVoice(const int client)
 	if (!GetClientLookPosition(client, fPos))
 		return;
 
-	if (!CanBuildAtPos(fPos, true))
+	if (!FindBuildPosition(fPos, true))
 		return;
 
 	float fAng[3];
