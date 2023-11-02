@@ -748,8 +748,6 @@ stock int CreateRagdoll(int client, bool bFrozen=false)
 	GetClientAbsAngles(client, fAng);
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVel);
 
-	TeleportEntity(iRag, fPos, fAng, fVel);
-
 	SetEntPropEnt(iRag, Prop_Send, "m_hPlayer", client);
 	SetEntProp(iRag, Prop_Send, "m_bIceRagdoll", bFrozen);
 	SetEntProp(iRag, Prop_Send, "m_iTeam", GetClientTeam(client));
@@ -767,6 +765,8 @@ stock int CreateRagdoll(int client, bool bFrozen=false)
 
 	DispatchSpawn(iRag);
 	ActivateEntity(iRag);
+
+	TeleportEntity(iRag, fPos, fAng, fVel);
 
 	return iRag;
 }
