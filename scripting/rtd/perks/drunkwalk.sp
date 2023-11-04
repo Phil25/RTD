@@ -16,6 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define IsDemoman Int[0]
 #define BaseSpeed Float[0]
 #define MinSpeed Float[1]
 #define MaxSpeed Float[2]
@@ -30,10 +31,14 @@ public void DrunkWalk_Init(const Perk perk)
 
 public void DrunkWalk_ApplyPerk(const int client, const Perk perk)
 {
+	Cache[client].IsDemoman = TF2_GetPlayerClass(client) == TFClass_DemoMan;
 	Cache[client].BaseSpeed = GetBaseSpeed(client);
 	Cache[client].MinSpeed = perk.GetPrefFloat("minspeed", 0.35);
 	Cache[client].MaxSpeed = perk.GetPrefFloat("maxspeed", 1.8);
 	Cache[client].TurnAngle = perk.GetPrefFloat("turnangle", 15.0);
+
+	if (Cache[client].IsDemoman)
+		Cache[client].Repeat(3.5, DrunkWalk_DemomanDeny);
 }
 
 void DrunkWalk_RemovePerk(const int client)
@@ -41,8 +46,17 @@ void DrunkWalk_RemovePerk(const int client)
 	SetSpeed(client, Cache[client].BaseSpeed);
 }
 
+public Action DrunkWalk_DemomanDeny(const int client)
+{
+	EmitSoundToAll("vo/demoman_no02.mp3", client, SNDCHAN_VOICE);
+	return Plugin_Stop;
+}
+
 bool DrunkWalk_OnSound(const int client, const char[] sSound)
 {
+	if (Cache[client].IsDemoman)
+		return true;
+
 	if (IsFootstepSound(sSound))
 		DrunkWalk_Tick(client);
 
@@ -57,6 +71,7 @@ void DrunkWalk_Tick(const int client)
 	SetSpeed(client, Cache[client].BaseSpeed, fSpeed);
 }
 
+#undef IsDemoman
 #undef BaseSpeed
 #undef MinSpeed
 #undef MaxSpeed
