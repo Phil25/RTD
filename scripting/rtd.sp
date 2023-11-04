@@ -80,6 +80,7 @@ ArrayList g_hPerkHistory = null;
 int g_iCorePerks = 0;
 
 bool g_bIsGameArena = false;
+bool g_bIsGameMedieval = false;
 int g_iLastPerkTime = -1;
 
 Rollers g_hRollers = null;
@@ -232,7 +233,13 @@ public void OnMapStart()
 	Events.Init();
 	InitPerks();
 
-	g_bIsGameArena = (FindEntityByClassname(MaxClients +1, "tf_logic_arena") > MaxClients);
+	g_bIsGameArena = (FindEntityByClassname(MaxClients + 1, "tf_logic_arena") > MaxClients);
+
+	ConVar cvMedieval = FindConVar("tf_medieval");
+	if (cvMedieval != null)
+		g_bIsGameMedieval = cvMedieval.BoolValue;
+
+	g_bIsGameMedieval |= (FindEntityByClassname(MaxClients + 1, "tf_logic_medieval") > MaxClients);
 }
 
 public void OnMapEnd()
@@ -922,6 +929,7 @@ void RollPerkForClient(int client)
 	{
 		Call_StartForward(g_hFwdCanRoll);
 		Call_PushCell(client);
+
 		Action result = Plugin_Continue;
 		Call_Finish(result);
 

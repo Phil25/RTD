@@ -173,8 +173,12 @@ methodmap PerkContainer < StringMap
 		}
 
 		READ_STRING("tags",Tags)
+
 		READ_STRING("call",InternalCall)
 		READ_IF_EXISTS_STRING("init",InternalInit)
+
+		READ_IF_EXISTS_BOOL("nomedieval",NoMedieval)
+
 		iStats[view_as<int>(perk.Good)]++;
 
 #if defined DEBUG
@@ -211,6 +215,8 @@ methodmap PerkContainer < StringMap
 
 		READ_IF_EXISTS_STRING("tags",Tags)
 		READ_IF_EXISTS_STRING("call",InternalCall)
+
+		READ_IF_EXISTS_BOOL("nomedieval",NoMedieval)
 
 		return true;
 	}

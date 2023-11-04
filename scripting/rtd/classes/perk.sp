@@ -192,6 +192,12 @@ methodmap Perk < StringMap
 	GET_STRING(InternalInit)
 	SET_STRING(InternalInit)
 
+	property bool NoMedieval
+	{
+		GET_PROP(bool,NoMedieval)
+		SET_PROP(bool,NoMedieval)
+	}
+
 	public void CallInternal(int client, bool bEnable)
 	{
 		char sFuncName[64];
@@ -276,7 +282,11 @@ methodmap Perk < StringMap
 				case 'd': return Type_Int; // m_Id
 				case 'n': return Type_String; // m_InternalCall & m_InternalInit
 			}
-			case 'N': return Type_String; // m_Name
+			case 'N': switch(sProp[3])
+			{
+				case 'a': return Type_String; // m_Name
+				case 'o': return Type_Bool; // m_NoMedieval
+			}
 			case 'G': return Type_Bool; // m_Good
 			case 'S': switch(sProp[3])
 			{
@@ -527,7 +537,13 @@ methodmap Perk < StringMap
 	public bool IsAptFor(int client, int iRollFlags)
 	{
 		if (!(iRollFlags & ROLLFLAG_OVERRIDE_DISABLED))
-			if (!this.Enabled) return false;
+		{
+			if (!this.Enabled)
+				return false;
+
+			if (g_bIsGameMedieval && this.NoMedieval)
+				return false;
+		}
 
 		if (client != 0)
 		{

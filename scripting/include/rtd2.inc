@@ -94,6 +94,7 @@ enum RTDPerkProp{
 	RTDPerk_Tags,
 	RTDPerk_InternalCall,
 	RTDPerk_InternalInit,
+	RTDPerk_NoMedieval,
 	RTDPerk_Enabled,
 	RTDPerk_External
 }
@@ -550,10 +551,28 @@ methodmap RTDPerk{
 	public RTDPerk SetCall(RTDCall func){
 		return RTD2_SetPerkCall(this, func);}
 
+	// Sets whether the perk is disabled in Medieval mode.
+	//
+	// @note Prefer the property if not chaining methods.
+	//
+	// @param bVal		Value to determine whether the perk is disabled in Medieval mode
+	//
+	// @return			Same RTDPerk object
+	public RTDPerk SetNoMedieval(bool bVal){
+		return RTD2_SetPerkAny(this, RTDPerk_NoMedieval, bVal);}
+
+	// Retrieves or sets whether the perk is disabled in Medieval mode.
+	property bool NoMedieval{
+		public get(){
+			return view_as<bool>(RTD2_GetPerkAny(this, RTDPerk_NoMedieval));}
+		public set(bool bVal){
+			RTD2_SetPerkAny(this, RTDPerk_NoMedieval, bVal);}
+	}
+
 	// Format specific perk properties into a buffer.
 	// Available specifiers: $Id$, $Name, $Good$,
 	// $Sound$, $Token$, $Time$, $Tags$, $Class$,
-	// $WeaponClass$, $Pref$
+	// $WeaponClass$, $Settings$, $NoMedieval$
 	//
 	// @note Format example: "Perk: $Id$ - $Name$"
 	// @note Mind the capitalization.
