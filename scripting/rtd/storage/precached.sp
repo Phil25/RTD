@@ -204,6 +204,7 @@ enum struct AttributesCache
 	int MeleeRange;
 	int JumpHeight;
 	int PreventJump;
+	int NoFallDamage;
 	int ForceDamageTaken;
 	int OverhealBonus;
 
@@ -217,6 +218,7 @@ enum struct AttributesCache
 		this.MeleeRange = 264;
 		this.JumpHeight = 326;
 		this.PreventJump = 819;
+		this.NoFallDamage = 275;
 		this.ForceDamageTaken = 535;
 		this.OverhealBonus = 11;
 	}
