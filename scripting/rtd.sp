@@ -1180,11 +1180,15 @@ void ManagePerk(const int client, const Perk perk, const bool bEnable, const RTD
 
 	if (bEnable)
 	{
+		perk.IncrementActiveCount(client);
+
 		g_iActiveEntitySpawnedSubscribers += iSubscribesToEntitySpawned;
 	}
 	else
 	{
 		Cache[client].Cleanup();
+		perk.DecrementActiveCount(client);
+
 		RemovedPerk(client, reason, sReason);
 
 		g_iActiveEntitySpawnedSubscribers -= iSubscribesToEntitySpawned;

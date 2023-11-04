@@ -72,6 +72,8 @@ public void __pl_rtd2_SetNTVOptional(){
 #define ROLLFLAG_OVERRIDE_LOADOUT		(1 << 2)	/* Ignore whether the client has irrelevant loadout */
 #define ROLLFLAG_IGNORE_PERK_REPEATS	(1 << 3)	/* Ignore whether the perk was rolled recently */
 #define ROLLFLAG_IGNORE_PLAYER_REPEATS	(1 << 4)	/* Ignore whether the client has rolled the perk recently */
+#define ROLLFLAG_IGNORE_GLOBAL_LIMIT	(1 << 5)	/* Ignore whether the perk is globally limited */
+#define ROLLFLAG_IGNORE_TEAM_LIMIT		(1 << 6)	/* Ignore whether the perk is team limited */
 
 #define RTD2_MAX_PERK_NAME_LENGTH	128
 
@@ -95,6 +97,8 @@ enum RTDPerkProp{
 	RTDPerk_InternalCall,
 	RTDPerk_InternalInit,
 	RTDPerk_NoMedieval,
+	RTDPerk_LimitGlobal,
+	RTDPerk_LimitTeam,
 	RTDPerk_Enabled,
 	RTDPerk_External
 }
@@ -569,10 +573,47 @@ methodmap RTDPerk{
 			RTD2_SetPerkAny(this, RTDPerk_NoMedieval, bVal);}
 	}
 
+	// Sets the active use limit of the perk, globally.
+	//
+	// @note Prefer the property if not chaining methods.
+	//
+	// @param bVal		Value to set the limit to
+	//
+	// @return			Same RTDPerk object
+	public RTDPerk SetLimitGlobal(int iVal){
+		return RTD2_SetPerkAny(this, RTDPerk_LimitGlobal, iVal);}
+
+	// Retrieves or sets the active use limit of the perk, globally.
+	property int LimitGlobal{
+		public get(){
+			return view_as<int>(RTD2_GetPerkAny(this, RTDPerk_LimitGlobal));}
+		public set(int iVal){
+			RTD2_SetPerkAny(this, RTDPerk_LimitGlobal, iVal);}
+	}
+
+	// Sets the active use limit of the perk, per team.
+	//
+	// @note Prefer the property if not chaining methods.
+	//
+	// @param bVal		Value to set the limit to
+	//
+	// @return			Same RTDPerk object
+	public RTDPerk SetLimitTeam(int iVal){
+		return RTD2_SetPerkAny(this, RTDPerk_LimitTeam, iVal);}
+
+	// Retrieves or sets the active use limit of the perk, per team.
+	property int LimitTeam{
+		public get(){
+			return view_as<int>(RTD2_GetPerkAny(this, RTDPerk_LimitTeam));}
+		public set(int iVal){
+			RTD2_SetPerkAny(this, RTDPerk_LimitTeam, iVal);}
+	}
+
 	// Format specific perk properties into a buffer.
 	// Available specifiers: $Id$, $Name, $Good$,
 	// $Sound$, $Token$, $Time$, $Tags$, $Class$,
-	// $WeaponClass$, $Settings$, $NoMedieval$
+	// $WeaponClass$, $Settings$, $NoMedieval$,
+	// $LimitGlobal$, $LimitTeam$.
 	//
 	// @note Format example: "Perk: $Id$ - $Name$"
 	// @note Mind the capitalization.
@@ -699,7 +740,7 @@ forward void RTD2_Removed(int client, RTDPerk perk, RTDRemoveReason reason);
  *
  * @return				Perk index if client is using RTD, -1 otherwise.
  */
-#pragma deprecated Use RTD_GetClientPerk instead
+#pragma deprecated Use RTD2_GetClientPerk instead
 native int RTD2_GetClientPerkId(int client);
 
 

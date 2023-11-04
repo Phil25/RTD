@@ -177,7 +177,9 @@ methodmap PerkContainer < StringMap
 		READ_STRING("call",InternalCall)
 		READ_IF_EXISTS_STRING("init",InternalInit)
 
-		READ_IF_EXISTS_BOOL("nomedieval",NoMedieval)
+		READ_IF_EXISTS_BOOL("no_medieval",NoMedieval)
+		READ_IF_EXISTS_NUM("limit_global",LimitGlobal)
+		READ_IF_EXISTS_NUM("limit_team",LimitTeam)
 
 		iStats[view_as<int>(perk.Good)]++;
 
@@ -216,7 +218,9 @@ methodmap PerkContainer < StringMap
 		READ_IF_EXISTS_STRING("tags",Tags)
 		READ_IF_EXISTS_STRING("call",InternalCall)
 
-		READ_IF_EXISTS_BOOL("nomedieval",NoMedieval)
+		READ_IF_EXISTS_BOOL("no_medieval",NoMedieval)
+		READ_IF_EXISTS_NUM("limit_global",LimitGlobal)
+		READ_IF_EXISTS_NUM("limit_team",LimitTeam)
 
 		return true;
 	}

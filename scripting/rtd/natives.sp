@@ -79,6 +79,8 @@ public int Native_GetPerkAny(Handle hPlugin, int iParams)
 		case RTDPerk_Enabled: return perk.Enabled;
 		case RTDPerk_External: return perk.External;
 		case RTDPerk_NoMedieval: return perk.NoMedieval;
+		case RTDPerk_LimitGlobal: return perk.LimitGlobal;
+		case RTDPerk_LimitTeam: return perk.LimitTeam;
 	}
 
 	ThrowNativeError(0, "Property %d is not of type cell.", prop);
@@ -98,6 +100,8 @@ public int Native_SetPerkAny(Handle hPlugin, int iParams)
 		case RTDPerk_Enabled: perk.Enabled = view_as<bool>(aVal);
 		case RTDPerk_External: perk.External = view_as<bool>(aVal);
 		case RTDPerk_NoMedieval: perk.NoMedieval = view_as<bool>(aVal);
+		case RTDPerk_LimitGlobal: perk.LimitGlobal = view_as<int>(aVal);
+		case RTDPerk_LimitTeam: perk.LimitTeam = view_as<int>(aVal);
 		default: ThrowNativeError(0, "Property %d is not of type cell.", prop);
 	}
 

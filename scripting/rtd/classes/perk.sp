@@ -66,15 +66,26 @@ methodmap Perk < StringMap
 		StringMap map = new StringMap();
 		map.SetValue("m_WeaponClass", new ArrayList(127));
 		map.SetValue("m_Tags", new ArrayList(32));
+		map.SetValue("m_ActiveCount", new ArrayList(1, 4));
 		map.SetValue("m_Class", 511);
 
-		return view_as<Perk>(map);
+		Perk perk = view_as<Perk>(map);
+		perk.ActiveCount.Set(0, 0);
+		perk.ActiveCount.Set(1, 0);
+		perk.ActiveCount.Set(2, 0);
+		perk.ActiveCount.Set(3, 0);
+
+		perk.LimitGlobal = 9999;
+		perk.LimitTeam = 9999;
+
+		return perk;
 	}
 
 	public void Dispose()
 	{
 		DISPOSE_MEMBER(WeaponClass)
 		DISPOSE_MEMBER(Tags)
+		DISPOSE_MEMBER(ActiveCount)
 		DISPOSE_MEMBER(Call)
 
 		this.Clear();
@@ -198,6 +209,48 @@ methodmap Perk < StringMap
 		SET_PROP(bool,NoMedieval)
 	}
 
+	property int LimitGlobal
+	{
+		GET_PROP(int,LimitGlobal)
+		SET_PROP(int,LimitGlobal)
+	}
+
+	property int LimitTeam
+	{
+		GET_PROP(int,LimitTeam)
+		SET_PROP(int,LimitTeam)
+	}
+
+	property ArrayList ActiveCount
+	{
+		GET_PROP(ArrayList,ActiveCount)
+	}
+
+	public void IncrementActiveCount(const int client)
+	{
+		int iTeam = view_as<int>(TF2_GetClientTeam(client));
+		this.ActiveCount.Set(iTeam, this.ActiveCount.Get(iTeam) + 1);
+	}
+
+	public void DecrementActiveCount(const int client)
+	{
+		int iTeam = view_as<int>(TF2_GetClientTeam(client));
+		this.ActiveCount.Set(iTeam, this.ActiveCount.Get(iTeam) - 1);
+	}
+
+	public int GetActiveCountGlobal()
+	{
+		return this.ActiveCount.Get(0)
+			+ this.ActiveCount.Get(1)
+			+ this.ActiveCount.Get(2)
+			+ this.ActiveCount.Get(3);
+	}
+
+	public int GetActiveCountTeam(const TFTeam eTeam)
+	{
+		return this.ActiveCount.Get(view_as<int>(eTeam));
+	}
+
 	public void CallInternal(int client, bool bEnable)
 	{
 		char sFuncName[64];
@@ -282,6 +335,7 @@ methodmap Perk < StringMap
 				case 'd': return Type_Int; // m_Id
 				case 'n': return Type_String; // m_InternalCall & m_InternalInit
 			}
+			case 'L': return Type_Int; // m_LimitGlobal & m_LimitTeam
 			case 'N': switch(sProp[3])
 			{
 				case 'a': return Type_String; // m_Name
@@ -554,7 +608,15 @@ methodmap Perk < StringMap
 			if (!(iRollFlags & ROLLFLAG_IGNORE_PERK_REPEATS))
 				if (IsInPerkHistory(this))
 					return false;
+
+			if (!(iRollFlags & ROLLFLAG_IGNORE_TEAM_LIMIT))
+				if (this.GetActiveCountTeam(TF2_GetClientTeam(client)) >= this.LimitTeam)
+					return false;
 		}
+
+		if (!(iRollFlags & ROLLFLAG_IGNORE_GLOBAL_LIMIT))
+			if (this.GetActiveCountGlobal() >= this.LimitGlobal)
+				return false;
 
 		return this.IsAptForSetupOf(client, iRollFlags);
 	}

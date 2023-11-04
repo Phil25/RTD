@@ -153,7 +153,7 @@ public Action Frozen_ApplyPost(const int client)
 	// It's very unlikely that 3 or more players are frozen at the same time unless the perk was
 	// forced. In this case let's optimize things and not recreate their wearables onto the
 	// statue. This will also mean they do not have to be resupplied after the perk ends.
-	if (Frozen_GetCurrentRollerCount() > 3)
+	if (g_ePerkFrozen.GetActiveCountGlobal() > 3)
 		return Plugin_Stop;
 
 	Frozen_TransferWearables(client, iStatue);
@@ -631,17 +631,6 @@ void Frozen_GetIceTransformCorrected(int client, float fPos[3], float fAng[3])
 			fAng[1] -= 105.0;
 		}
 	}
-}
-
-int Frozen_GetCurrentRollerCount()
-{
-	int iCount = 0;
-
-	for (int client = 1; client <= MaxClients; ++client)
-		if (IsClientInGame(client) && g_hRollers.GetInRoll(client))
-			iCount += view_as<int>(g_hRollers.GetPerk(client) == g_ePerkFrozen);
-
-	return iCount;
 }
 
 bool Frozen_IsPostFrozen(const int client)
