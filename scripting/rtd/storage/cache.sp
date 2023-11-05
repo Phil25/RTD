@@ -90,7 +90,6 @@ enum struct PlayerCache
 	EntCleanup _EntCleanup[EntSlot_SIZE];
 	ClientFlags Flags;
 
-	int _TimerCount;
 	Handle _Timers[2];
 
 	void Init(const int client)
@@ -122,7 +121,7 @@ enum struct PlayerCache
 
 	void Repeat(const float fInterval, PerkRepeater hFunc)
 	{
-		int iIndex = this._TimerCount++;
+		int iIndex = this._FindTimerIndex();
 		DataPack hData = new DataPack();
 
 		hData.WriteFunction(hFunc);
@@ -138,9 +137,20 @@ enum struct PlayerCache
 #endif
 	}
 
-	void NullifyTimer(const iIndex)
+	void _NullifyTimer(const iIndex)
 	{
 		this._Timers[iIndex] = null;
+	}
+
+	int _FindTimerIndex()
+	{
+		for (int i = 0; i < sizeof(this._Timers); ++i)
+			if (this._Timers[i] == null)
+				return i;
+
+		// This should never happen
+		LogError("Could not find available timer index.");
+		return -1;
 	}
 
 	void Cleanup()
@@ -169,7 +179,6 @@ enum struct PlayerCache
 
 		delete this._Timers[0];
 		delete this._Timers[1];
-		this._TimerCount = 0;
 	}
 }
 
@@ -189,7 +198,7 @@ public Action Timer_PerkTimer(Handle hTimer, DataPack hData)
 	switch (view_as<Action>(iResult))
 	{
 		case Plugin_Stop, Plugin_Handled:
-			Cache[client].NullifyTimer(hData.ReadCell());
+			Cache[client]._NullifyTimer(hData.ReadCell());
 	}
 
 	return view_as<Action>(iResult);

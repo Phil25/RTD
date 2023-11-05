@@ -50,6 +50,7 @@ void Invisibility_ApplyPerk(const int client, const Perk perk)
 	Cache[client].LastBlink = 0.0;
 	Cache[client].BlinkRate = perk.GetPrefFloat("blink_rate", 0.5);
 
+	Invisibility_SetOverlay(client);
 	Invisibility_Set(client, iAlpha);
 	TF2_AddCondition(client, TFCond_DisguisedAsDispenser);
 	ApplyPreventCapture(client);
@@ -73,6 +74,7 @@ void Invisibility_RemovePerk(const int client)
 	SDKUnhook(client, SDKHook_StartTouchPost, Invisibility_OnStartTouchAny);
 	SDKUnhook(client, SDKHook_OnTakeDamagePost, Invisibility_OnTakeDamage);
 
+	Invisibility_UnsetOverlay(client);
 	Invisibility_Set(client, Cache[client].BaseAlpha);
 	TF2_RemoveCondition(client, TFCond_DisguisedAsDispenser);
 	RemovePreventCapture(client);
@@ -135,6 +137,9 @@ void Invisibility_Blink(const int client)
 	}
 
 	EmitSoundToAll(SOUND_PING, client);
+
+	Invisibility_UnsetOverlay(client);
+	Cache[client].Repeat(Cache[client].BlinkRate / 2, Invisibility_SetOverlay);
 }
 
 void Invisibility_Set(const int client, const int iValue)
@@ -167,6 +172,20 @@ void Invisibility_Set(const int client, const int iValue)
 
 		SetEntityAlpha(i, iValue);
 	}
+}
+
+public Action Invisibility_SetOverlay(const int client)
+{
+	SetVariantString("effects/stealth_overlay");
+	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
+
+	return Plugin_Stop;
+}
+
+public void Invisibility_UnsetOverlay(const int client)
+{
+	SetVariantString("");
+	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
 }
 
 public void Invisibility_OnResupply(const int client)
