@@ -18,6 +18,7 @@
 
 #define SCARYBULLETS_PARTICLE "ghost_glow"
 
+#define MinDamage Int[0]
 #define Duration Float[0]
 #define Particle EntSlot_1
 
@@ -30,6 +31,7 @@ public void ScaryBullets_Init(const Perk perk)
 
 void ScaryBullets_ApplyPerk(const int client, const Perk perk)
 {
+	Cache[client].MinDamage = perk.GetPrefCell("min_damage", 5);
 	Cache[client].Duration = perk.GetPrefFloat("duration", 3.0);
 	Cache[client].SetEnt(Particle, CreateParticle(client, SCARYBULLETS_PARTICLE));
 }
@@ -42,11 +44,15 @@ public void ScaryBullets_OnPlayerAttacked(const int client, const int iVictim, c
 	if (iRemainingHealth <= 0)
 		return;
 
+	if (iDamage < Cache[client].MinDamage)
+		return;
+
 	if (!TF2_IsPlayerInCondition(iVictim, TFCond_Dazed))
 		TF2_StunPlayer(iVictim, Cache[client].Duration, _, TF_STUNFLAGS_GHOSTSCARE, client);
 }
 
 #undef SCARYBULLETS_PARTICLE
 
+#undef MinDamage
 #undef Duration
 #undef Particle

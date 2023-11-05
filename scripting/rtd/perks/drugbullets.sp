@@ -16,6 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define MinDamage Int[0]
 #define NextStun Float[0]
 
 DEFINE_CALL_APPLY(DrugBullets)
@@ -27,6 +28,7 @@ public void DrugBullets_Init(const Perk perk)
 
 public void DrugBullets_ApplyPerk(const int client, const Perk perk)
 {
+	Cache[client].MinDamage = perk.GetPrefCell("min_damage", 5);
 	Cache[client].NextStun = GetEngineTime() + 1.0;
 }
 
@@ -35,8 +37,11 @@ public void DrugBullets_OnPlayerAttacked(const int client, const int iVictim, co
 	if (iRemainingHealth <= 0)
 		return
 
+	if (iDamage < Cache[client].MinDamage)
+		return;
+
 	float fTime = GetEngineTime();
-	if(Cache[client].NextStun > fTime)
+	if (Cache[client].NextStun > fTime)
 	{
 		ViewPunchRand(iVictim, 15.0);
 		return;
@@ -48,4 +53,5 @@ public void DrugBullets_OnPlayerAttacked(const int client, const int iVictim, co
 	Cache[client].NextStun = fTime + 1.0;
 }
 
+#undef MinDamage
 #undef NextStun
