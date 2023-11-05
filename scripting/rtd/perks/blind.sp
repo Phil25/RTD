@@ -28,7 +28,7 @@ public void Blind_Init(const Perk perk)
 
 void Blind_ApplyPerk(const int client, const Perk perk)
 {
-	int iAlpha = perk.GetPrefCell("alpha", 255);
+	int iAlpha = perk.GetPrefCell("alpha", 254);
 	Cache[client].Alpha = iAlpha;
 	Cache[client].AnnotationLifetime = GetPerkTimeFloat(perk);
 	Cache[client].Flags.Reset();
@@ -36,11 +36,17 @@ void Blind_ApplyPerk(const int client, const Perk perk)
 	Blind_SendFade(client, iAlpha);
 	Blind_UpdateAnnotations(client);
 
+	SetVariantString("effects/stealth_overlay");
+	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
+
 	Cache[client].Repeat(1.0, Blind_UpdateAnnotationsCheck);
 }
 
 void Blind_RemovePerk(const int client)
 {
+	SetVariantString("");
+	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
+
 	Blind_SendFade(client, 0);
 	Blind_UpdateAnnotations(client, true);
 }
