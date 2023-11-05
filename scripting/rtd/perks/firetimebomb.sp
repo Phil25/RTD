@@ -18,17 +18,25 @@
 
 #define MODEL_BOMB "models/props_lakeside_event/bomb_temp_hat.mdl"
 
-#define SOUND_TIMEBOMB_TICK "buttons/button17.wav"
+#define SOUND_TIMEBOMB_TICK "player/taunt_fire.wav"
 #define SOUND_TIMEBOMB_GOFF "weapons/cguard/charging.wav"
 #define SOUND_EXPLODE "misc/halloween/spell_fireball_impact.wav"
 
 #define TICKS_SLOW 0.75
 #define TICKS_FAST 0.35
 
-#define RadiusSquared Float[0]
-#define PrimeThreshold Float[1]
-#define DetonateThreshold Float[2]
+#define Resistance Float[0]
+#define RadiusSquared Float[1]
+#define PrimeThreshold Float[2]
+#define DetonateThreshold Float[3]
 #define Bomb EntSlot_1
+
+static char g_sResistanceMedium[][] = {
+	"player/resistance_medium1.wav",
+	"player/resistance_medium2.wav",
+	"player/resistance_medium3.wav",
+	"player/resistance_medium4.wav",
+}
 
 DEFINE_CALL_APPLY_REMOVE(FireTimebomb)
 
@@ -38,6 +46,11 @@ public void FireTimebomb_Init(const Perk perk)
 	PrecacheSound(SOUND_EXPLODE);
 	PrecacheSound(SOUND_TIMEBOMB_TICK);
 	PrecacheSound(SOUND_TIMEBOMB_GOFF);
+
+	PrecacheSound(g_sResistanceMedium[0]);
+	PrecacheSound(g_sResistanceMedium[1]);
+	PrecacheSound(g_sResistanceMedium[2]);
+	PrecacheSound(g_sResistanceMedium[3]);
 }
 
 void FireTimebomb_ApplyPerk(const int client, const Perk perk)
@@ -45,10 +58,14 @@ void FireTimebomb_ApplyPerk(const int client, const Perk perk)
 	float fExplodeTime = GetEngineTime() + GetPerkTime(perk);
 	float fRadius = perk.GetPrefFloat("radius", 512.0);
 
+	Cache[client].Resistance = perk.GetPrefFloat("resistance", 0.75);
 	Cache[client].RadiusSquared = fRadius * fRadius;
 	Cache[client].PrimeThreshold = fExplodeTime - 3.0;
 	Cache[client].DetonateThreshold = fExplodeTime - 1.0;
 	Cache[client].SetEnt(Bomb, FireTimebomb_SpawnBombHead(client));
+
+	TF2Attrib_SetByDefIndex(client, Attribs.NoHeadshotDeath, 1.0);
+	SDKHook(client, SDKHook_OnTakeDamage, FireTimebomb_OnTakeDamage);
 
 	SetVariantInt(1);
 	AcceptEntityInput(client, "SetForcedTauntCam");
@@ -60,6 +77,9 @@ void FireTimebomb_RemovePerk(const int client)
 {
 	SetVariantInt(0);
 	AcceptEntityInput(client, "SetForcedTauntCam");
+
+	TF2Attrib_RemoveByDefIndex(client, Attribs.NoHeadshotDeath);
+	SDKUnhook(client, SDKHook_OnTakeDamage, FireTimebomb_OnTakeDamage);
 
 	if (GetEngineTime() < Cache[client].DetonateThreshold)
 		return;
@@ -96,6 +116,16 @@ void FireTimebomb_RemovePerk(const int client)
 
 	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Timebomb_Ignite", LANG_SERVER, 0x03, iPlayersIgnited, 0x01);
 	EmitSoundToAll(SOUND_EXPLODE, client);
+
+	TF2_IgnitePlayer(client, client);
+}
+
+public Action FireTimebomb_OnTakeDamage(int client, int& iAttacker, int& iInflictor, float& fDamage, int& iType)
+{
+	fDamage *= Cache[client].Resistance;
+	EmitSoundToAll(g_sResistanceMedium[GetRandomInt(0, sizeof(g_sResistanceMedium) - 1)], client);
+
+	return Plugin_Changed;
 }
 
 public Action FireTimebomb_TickSlow(const int client)
@@ -176,6 +206,7 @@ int FireTimebomb_SpawnBombHead(const int client)
 #undef TICKS_SLOW
 #undef TICKS_FAST
 
+#undef Resistance
 #undef RadiusSquared
 #undef PrimeThreshold
 #undef DetonateThreshold

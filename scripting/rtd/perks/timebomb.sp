@@ -25,11 +25,19 @@
 #define TICKS_SLOW 0.75
 #define TICKS_FAST 0.35
 
+#define Resistance Int[0]
 #define Damage Float[0]
 #define RadiusSquared Float[1]
 #define PrimeThreshold Float[2]
 #define DetonateThreshold Float[3]
 #define Bomb EntSlot_1
+
+static char g_sResistanceMedium[][] = {
+	"player/resistance_medium1.wav",
+	"player/resistance_medium2.wav",
+	"player/resistance_medium3.wav",
+	"player/resistance_medium4.wav",
+}
 
 DEFINE_CALL_APPLY_REMOVE(Timebomb)
 
@@ -39,6 +47,11 @@ public void Timebomb_Init(const Perk perk)
 	PrecacheSound(SOUND_EXPLODE);
 	PrecacheSound(SOUND_TIMEBOMB_TICK);
 	PrecacheSound(SOUND_TIMEBOMB_GOFF);
+
+	PrecacheSound(g_sResistanceMedium[0]);
+	PrecacheSound(g_sResistanceMedium[1]);
+	PrecacheSound(g_sResistanceMedium[2]);
+	PrecacheSound(g_sResistanceMedium[3]);
 }
 
 void Timebomb_ApplyPerk(const int client, const Perk perk)
@@ -46,6 +59,7 @@ void Timebomb_ApplyPerk(const int client, const Perk perk)
 	float fExplodeTime = GetEngineTime() + GetPerkTime(perk);
 	float fRadius = perk.GetPrefFloat("radius", 512.0);
 
+	Cache[client].Resistance = RoundFloat(perk.GetPrefFloat("resistance", 0.75) * 100);
 	Cache[client].Damage = perk.GetPrefFloat("damage", 270.0);
 	Cache[client].RadiusSquared = fRadius * fRadius;
 	Cache[client].PrimeThreshold = fExplodeTime - 3.0;
@@ -55,6 +69,9 @@ void Timebomb_ApplyPerk(const int client, const Perk perk)
 	SetVariantInt(1);
 	AcceptEntityInput(client, "SetForcedTauntCam");
 
+	TF2Attrib_SetByDefIndex(client, Attribs.NoHeadshotDeath, 1.0);
+	SDKHook(client, SDKHook_OnTakeDamage, Timebomb_OnTakeDamage);
+
 	Cache[client].Repeat(TICKS_SLOW, Timebomb_TickSlow);
 }
 
@@ -62,6 +79,9 @@ void Timebomb_RemovePerk(const int client)
 {
 	SetVariantInt(0);
 	AcceptEntityInput(client, "SetForcedTauntCam");
+
+	TF2Attrib_RemoveByDefIndex(client, Attribs.NoHeadshotDeath);
+	SDKUnhook(client, SDKHook_OnTakeDamage, Timebomb_OnTakeDamage);
 
 	if (GetEngineTime() < Cache[client].DetonateThreshold)
 		return;
@@ -104,6 +124,14 @@ void Timebomb_RemovePerk(const int client)
 	EmitSoundToAll(SOUND_EXPLODE, client);
 
 	FakeClientCommandEx(client, "explode");
+}
+
+public Action Timebomb_OnTakeDamage(int client, int& iAttacker, int& iInflictor, float& fDamage, int& iType)
+{
+	fDamage *= float(Cache[client].Resistance) / 100.0;
+	EmitSoundToAll(g_sResistanceMedium[GetRandomInt(0, sizeof(g_sResistanceMedium) - 1)], client);
+
+	return Plugin_Changed;
 }
 
 public Action Timebomb_TickSlow(const int client)
@@ -184,6 +212,7 @@ int Timebomb_SpawnBombHead(const int client)
 #undef TICKS_SLOW
 #undef TICKS_FAST
 
+#undef Resistance
 #undef Damage
 #undef RadiusSquared
 #undef PrimeThreshold
