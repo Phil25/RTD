@@ -788,4 +788,13 @@
 		"pt"	"Bônus de sobrecura para a sua Arma Médica."
 	}
 
+	"RTD2_Desc_sunlightspear"
+	{
+		"en"	"Hurl a spear of lightning, damaging enemies or boosting allies."
+		"pl"	""
+		"chi"	""
+		"ru"	""
+		"pt"	""
+	}
+
 }

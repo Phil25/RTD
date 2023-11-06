@@ -92,3 +92,4 @@
 #include "rtd/perks/acallbeyond.sp"         // 71
 #include "rtd/perks/smite.sp"               // 72
 #include "rtd/perks/overhealbonus.sp"       // 73
+#include "rtd/perks/sunlightspear.sp"       // 74

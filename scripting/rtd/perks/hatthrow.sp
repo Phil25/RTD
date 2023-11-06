@@ -129,7 +129,7 @@ void HatThrow_Launch(const int client, const int iHat)
 
 	float fVel[3];
 	GetAngleVectors(fAng, fVel, NULL_VECTOR, NULL_VECTOR);
-	ScaleVector(fVel, Cache[client].Speed)
+	ScaleVector(fVel, Cache[client].Speed);
 
 	SetEntPropEnt(iCarrier, Prop_Send, "m_hOwnerEntity", client);
 	DispatchKeyValue(iCarrier, "model", MODEL_HAT);
@@ -150,7 +150,7 @@ public Action Event_HatThrow_OnHatTouch(int iHat, int client)
 	if (1 <= client <= MaxClients)
 	{
 		int iAttacker = GetEntPropEnt(iHat, Prop_Send, "m_hOwnerEntity");
-		if (CanPlayerBeHurt(client, iAttacker))
+		if (iAttacker && CanPlayerBeHurt(client, iAttacker))
 			SDKHooks_TakeDamage(client, iHat, iAttacker, Cache[iAttacker].Damage, DMG_CLUB);
 
 		EmitSoundToAll(g_sSoundHatHit[GetRandomInt(0, 2)], iHat);
@@ -162,7 +162,7 @@ public Action Event_HatThrow_OnHatTouch(int iHat, int client)
 	GetEntPropVector(iHat, Prop_Send, "m_vecOrigin", fPos);
 	HatThrow_SpawnCorpse(fPos);
 
-	AcceptEntityInput(iHat, "Kill");
+	AcceptEntityInput(iHat, "KillHierarchy");
 
 	return Plugin_Handled;
 }

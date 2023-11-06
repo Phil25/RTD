@@ -59,7 +59,7 @@ void Explode_ApplyPerk(const int client, const Perk perk)
 	Cache[client].RadiusSquared = fBombRange * fBombRange;
 
 	int iBomb = CreateEntityByName("prop_physics_override");
-	if( iBomb <= MaxClients)
+	if (iBomb <= MaxClients)
 		return;
 
 	float fPos[3];

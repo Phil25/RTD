@@ -34,6 +34,7 @@
 * - MinInt
 * - Max
 * - MaxInt
+* - ClampInt
 * - GetPointOnSphere
 * - GetRandomFloatLimit
 *
@@ -122,6 +123,7 @@
 
 #define LASERBEAM "sprites/laserbeam.vmt"
 #define EMPTY_MODEL "models/empty.mdl"
+#define MODEL_PROJECTILE "models/weapons/w_models/w_rocket.mdl"
 
 // Homing target flags
 #define HOMING_NONE 0
@@ -150,6 +152,7 @@ void Stocks_OnMapStart()
 {
 	PrecacheModel(LASERBEAM);
 	PrecacheModel(EMPTY_MODEL);
+	PrecacheModel(MODEL_PROJECTILE);
 
 	g_hHoming = new ArrayList(3);
 	HookEvent("teamplay_round_start", Event_Homing_RoundStart);
@@ -300,6 +303,11 @@ stock float Max(const float f1, const float f2)
 stock int MaxInt(const int i1, const int i2)
 {
 	return i1 > i2 ? i1 : i2;
+}
+
+stock int ClampInt(const int i, const int iMin, const int iMax)
+{
+	return MaxInt(iMin, MinInt(iMax, i));
 }
 
 stock void GetPointOnSphere(const float fOrigin[3], const float fDirectionRads[2], float fRadius, float fOut[3])
@@ -813,18 +821,18 @@ stock int CreateTesla(float fPos[3])
 
 	TeleportEntity(iTesla, fPos, NULL_VECTOR, NULL_VECTOR);
 
-	DispatchKeyValue(iTesla, "m_flRadius", "150.0");
+	DispatchKeyValue(iTesla, "m_flRadius", "40.0");
 	DispatchKeyValue(iTesla, "m_SoundName", "DoSpark");
-	DispatchKeyValue(iTesla, "beamcount_min", "2");
-	DispatchKeyValue(iTesla, "beamcount_max", "4");
+	DispatchKeyValue(iTesla, "beamcount_min", "1");
+	DispatchKeyValue(iTesla, "beamcount_max", "1");
 	DispatchKeyValue(iTesla, "texture", "sprites/physbeam.vmt");
-	DispatchKeyValue(iTesla, "m_Color", "255 255 255");
-	DispatchKeyValue(iTesla, "thick_min", "5.0");
-	DispatchKeyValue(iTesla, "thick_max", "11.0");
-	DispatchKeyValue(iTesla, "lifetime_min", "0.3");
-	DispatchKeyValue(iTesla, "lifetime_max", "2");
-	DispatchKeyValue(iTesla, "interval_min", "0.1");
-	DispatchKeyValue(iTesla, "interval_max", "0.2");
+	DispatchKeyValue(iTesla, "m_Color", "255 128 0");
+	DispatchKeyValue(iTesla, "thick_min", "2.0");
+	DispatchKeyValue(iTesla, "thick_max", "8.0");
+	DispatchKeyValue(iTesla, "lifetime_min", "0.1");
+	DispatchKeyValue(iTesla, "lifetime_max", "0.4");
+	DispatchKeyValue(iTesla, "interval_min", "0.01");
+	DispatchKeyValue(iTesla, "interval_max", "0.03");
 
 	ActivateEntity(iTesla);
 	DispatchSpawn(iTesla);
