@@ -90,7 +90,7 @@ enum struct PlayerCache
 	EntCleanup _EntCleanup[EntSlot_SIZE];
 	ClientFlags Flags;
 
-	Handle _Timers[2];
+	DataPack _TimerData[2];
 
 	void Init(const int client)
 	{
@@ -121,31 +121,42 @@ enum struct PlayerCache
 
 	void Repeat(const float fInterval, PerkRepeater hFunc)
 	{
-		int iIndex = this._FindTimerIndex();
-		DataPack hData = new DataPack();
+		int i = this._FindTimerDataIndex();
+		this._TimerData[i] = new DataPack();
 
-		hData.WriteFunction(hFunc);
-		hData.WriteCell(this._ClientIndex);
-		hData.WriteCell(iIndex);
+		this._TimerData[i].WriteCell(i);
+		this._TimerData[i].WriteFunction(hFunc);
+		this._TimerData[i].WriteCell(this._ClientIndex);
 
-		this._Timers[iIndex] = CreateTimer(fInterval, Timer_PerkTimer, hData, TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
+		CreateTimer(fInterval, Timer_PerkTimer, this._TimerData[i], TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
 
 #if defined DEBUG
 		char sCaller[64];
 		GetCallerName(sCaller, sizeof(sCaller));
-		LogError("[%s] Created timer for %N<%d>: %x", sCaller, this._ClientIndex, this._ClientIndex, this._Timers[iIndex]);
+		LogError("[%s] Created timer for %N<%d>: %x", sCaller, this._ClientIndex, this._ClientIndex, this._TimerData[i]);
 #endif
 	}
 
-	void _NullifyTimer(const iIndex)
+	void _NullifyTimerData(const int iIndex)
 	{
-		this._Timers[iIndex] = null;
+		// If already nullified the timer was either not used in the first place, or somehow was
+		// nullified before its corresponding perk ended but after having been marked for stopping.
+		if (this._TimerData[iIndex] == null)
+			return;
+
+		this._TimerData[iIndex].Reset();
+		this._TimerData[iIndex].WriteCell(-1);
+
+		// Purposefully leak the timer and its DataPack handles. Deleting a timer manually here
+		// sometimes errors out as if it were destroyed inside the callback, which is illegal. This
+		// way, the first cell of the DataPack will instruct the timer to kill itself lazily.
+		this._TimerData[iIndex] = null;
 	}
 
-	int _FindTimerIndex()
+	int _FindTimerDataIndex()
 	{
-		for (int i = 0; i < sizeof(this._Timers); ++i)
-			if (this._Timers[i] == null)
+		for (int i = 0; i < sizeof(this._TimerData); ++i)
+			if (this._TimerData[i] == null)
 				return i;
 
 		// This should never happen
@@ -174,11 +185,11 @@ enum struct PlayerCache
 		}
 
 #if defined DEBUG
-		LogError("Cleaning up timers for %N<%d>: %x, %x", this._ClientIndex, this._ClientIndex, this._Timers[0], this._Timers[1]);
+		LogError("Cleaning up timers for %N<%d>: %x, %x", this._ClientIndex, this._ClientIndex, this._TimerData[0], this._TimerData[1]);
 #endif
 
-		delete this._Timers[0];
-		delete this._Timers[1];
+		this._NullifyTimerData(0);
+		this._NullifyTimerData(1);
 	}
 }
 
@@ -187,6 +198,12 @@ PlayerCache Cache[MAXPLAYERS + 1];
 public Action Timer_PerkTimer(Handle hTimer, DataPack hData)
 {
 	hData.Reset();
+	int iIndex = hData.ReadCell();
+
+	// timer marked for deletion
+	if (iIndex == -1)
+		return Plugin_Stop;
+
 	Call_StartFunction(INVALID_HANDLE, hData.ReadFunction());
 
 	int client = hData.ReadCell();
@@ -198,7 +215,7 @@ public Action Timer_PerkTimer(Handle hTimer, DataPack hData)
 	switch (view_as<Action>(iResult))
 	{
 		case Plugin_Stop, Plugin_Handled:
-			Cache[client]._NullifyTimer(hData.ReadCell());
+			Cache[client]._NullifyTimerData(iIndex);
 	}
 
 	return view_as<Action>(iResult);
