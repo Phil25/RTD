@@ -76,17 +76,19 @@ public Action StripToMelee_ApplyPerkPost(const int client)
 
 public Action StripToMelee_Ping(const int client)
 {
+	TFTeam eTeam = TF2_GetClientTeam(client);
+
 	for (int i = 0; i < 3; ++i)
 	{
 		int iBox = Cache[client].GetEnt(view_as<EntSlot>(i)).Index;
 		if (iBox > MaxClients)
-			StripToMelee_PingBox(iBox, i);
+			StripToMelee_PingBox(iBox, i, eTeam);
 	}
 
 	return Plugin_Continue;
 }
 
-void StripToMelee_PingBox(const int iBox, const int iSlot)
+void StripToMelee_PingBox(const int iBox, const int iSlot, const TFTeam eTeam)
 {
 	float fPos[3];
 	GetEntPropVector(iBox, Prop_Send, "m_vecOrigin", fPos);
@@ -95,7 +97,15 @@ void StripToMelee_PingBox(const int iBox, const int iSlot)
 	float fLifetime = 0.5 * (3 - iSlot); // lifetime by importance
 
 	TE_SetupBeamRingPoint(fPos, 80.0, 192.0, Materials.Laser, Materials.Halo, 0, 15, fLifetime, 5.0, 1.0, iColor, 10, 0);
-	TE_SendToAll();
+
+	int iTotal = 0;
+	int[] clients = new int[MaxClients];
+
+	for (int i = 1; i <= MaxClients; ++i)
+		if (IsClientInGame(i) && TF2_GetClientTeam(i) == eTeam)
+			clients[iTotal++] = i;
+
+	TE_Send(clients, iTotal);
 }
 
 public void StripToMelee_OnResupply(const int client)
@@ -229,7 +239,7 @@ int StripToMelee_SpawnBox(const int client, const int iSlot, const int iHealth, 
 	return iBox;
 }
 
-public Action StripToMelee_OnBoxTakeDamage(int iBox, int &iAtk, int &iInflictor, float &fDamage, int &iType, int &iWeapon, float fForce[3], float fPos[3])
+public Action StripToMelee_OnBoxTakeDamage(int iBox, int& iAtk, int& iInflictor, float& fDamage, int& iType, int& iWeapon, float fForce[3], float fPos[3])
 {
 	if (!(1 <= iAtk <= MaxClients))
 		return Plugin_Continue; // prop_physics_override can get hurt by world
@@ -238,7 +248,13 @@ public Action StripToMelee_OnBoxTakeDamage(int iBox, int &iAtk, int &iInflictor,
 	int client = iClientAndSlot >> 3;
 
 	if (TF2_GetClientTeam(client) != TF2_GetClientTeam(iAtk))
-		return Plugin_Continue;
+	{
+		fForce[0] *= 80;
+		fForce[1] *= 80;
+		fForce[2] *= 120;
+		fDamage = 0.0;
+		return Plugin_Changed;
+	}
 
 	int iHealth = GetEntProp(iBox, Prop_Data, "m_iHealth") - RoundFloat(fDamage);
 	if (iHealth > 0)
