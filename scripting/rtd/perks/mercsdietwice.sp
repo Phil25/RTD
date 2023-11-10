@@ -106,10 +106,14 @@ void MercsDieTwice_FakeDeath(const int client, const int iAttacker, const int iI
 
 	DisarmWeapons(client, true);
 	SetEntityMoveType(client, MOVETYPE_NONE);
-	SetVariantInt(1);
-	AcceptEntityInput(client, "SetForcedTauntCam");
 	TF2_AddCondition(client, TFCond_DisguisedAsDispenser);
 	ApplyPreventCapture(client);
+
+	SetVariantString("effects/stealth_overlay");
+	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
+
+	SetVariantInt(1);
+	AcceptEntityInput(client, "SetForcedTauntCam");
 
 	PrintCenterText(client, "%T", "RTD2_Perk_Resurrect", LANG_SERVER, 0x03, 0x01);
 
@@ -133,6 +137,9 @@ void MercsDieTwice_Resurrect(const int client)
 	SetEntityMoveType(client, MOVETYPE_WALK);
 	TF2_RemoveCondition(client, TFCond_DisguisedAsDispenser);
 	RemovePreventCapture(client);
+
+	SetVariantString("");
+	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
 
 	SetVariantInt(0);
 	AcceptEntityInput(client, "SetForcedTauntCam");
