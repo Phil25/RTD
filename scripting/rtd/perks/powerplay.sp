@@ -67,6 +67,8 @@ public void PowerPlay_ApplyPerk(const int client, const Perk perk)
 	TF2_AddCondition(client, TFCond_UberFireResist);
 	TF2_AddCondition(client, TFCond_SpeedBuffAlly);
 
+	TF2Attrib_SetByDefIndex(client, Attribs.AirblastVulnerability, 0.2);
+
 	int iMelee = GetPlayerWeaponSlot(client, 2);
 	if (iMelee > MaxClients && IsValidEntity(iMelee))
 		TF2Attrib_SetByDefIndex(iMelee, Attribs.MeleeRange, 1.1);
@@ -146,6 +148,8 @@ void PowerPlay_RemovePerk(const int client)
 	TF2_RemoveCondition(client, TFCond_UberBlastResist);
 	TF2_RemoveCondition(client, TFCond_UberFireResist);
 	TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);
+
+	TF2Attrib_RemoveByDefIndex(client, Attribs.AirblastVulnerability);
 }
 
 public void PowerPlay_OnGlowUpdate(const int client)
