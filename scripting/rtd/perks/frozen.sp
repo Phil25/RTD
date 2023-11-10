@@ -163,6 +163,7 @@ public Action Frozen_ApplyPost(const int client)
 	GetClientAbsOrigin(client, fPos);
 
 	TFClassType c = TF2_GetPlayerClass(client);
+	SendTEParticleLingeringAttached(TEParticlesLingering.IciclesBody, iStatue, fPos, Attachments[c].Root);
 	SendTEParticleLingeringAttached(TEParticlesLingering.IceBodyGlow, iStatue, fPos, Attachments[c].Root);
 	SendTEParticleLingeringAttached(TEParticlesLingering.SnowFlakes, iStatue, fPos, Attachments[c].Root);
 	SendTEParticleLingeringAttached(TEParticlesLingering.Frostbite, iStatue, fPos, Attachments[c].HandL);

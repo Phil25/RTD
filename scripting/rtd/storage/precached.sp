@@ -331,6 +331,7 @@ enum struct TEParticlesLingeringCache
 	TEParticleLingeringId RisingSparklesYellow;
 	TEParticleLingeringId WhiteBodyHaze;
 	TEParticleLingeringId WhiteBodyLights;
+	TEParticleLingeringId IciclesBody;
 
 	TEParticleLingeringId AsId(const char[] sEffectName)
 	{
@@ -354,6 +355,7 @@ enum struct TEParticlesLingeringCache
 		this.RisingSparklesYellow = this.AsId("utaunt_arcane_yellow_sparkle");
 		this.WhiteBodyHaze = this.AsId("utaunt_prismatichaze_haze");
 		this.WhiteBodyLights = this.AsId("burningplayer_rainbow_glow_white");
+		this.IciclesBody = this.AsId("utaunt_ice_icicles");
 	}
 }
 
