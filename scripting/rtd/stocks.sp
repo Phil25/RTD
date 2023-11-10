@@ -452,6 +452,7 @@ enum ClientOverlay
 	ClientOverlay_Stealth,
 	ClientOverlay_Burning,
 	ClientOverlay_Dodge,
+	ClientOverlay_Beams,
 }
 
 stock void SetOverlay(const int client, const ClientOverlay eOverlay)
@@ -478,6 +479,9 @@ stock void SetOverlay(const int client, const ClientOverlay eOverlay)
 
 		case ClientOverlay_Dodge:
 			SetVariantString("effects/dodge_overlay");
+
+		case ClientOverlay_Beams:
+			SetVariantString("effects/beam_neutral");
 	}
 
 	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);

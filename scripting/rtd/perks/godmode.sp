@@ -16,8 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define GODMODE_PARTICLE "powerup_supernova_ready"
-
 #define GODMODE_DOWN_TEXT "(⋆⭒˚｡⋆) ⬇"
 #define GODMODE_DOWN_SOUND "misc/doomsday_cap_close_start.wav"
 #define GODMODE_WARN_TEXT "<!>"
@@ -30,7 +28,7 @@
 #define Resistance Float[0]
 #define LastDeflect Float[1]
 #define AnnotationLifetime Float[2]
-#define GodmodeParticle EntSlot_1
+#define Effect EntSlot_1
 
 ClientFlags g_eInGodmode;
 
@@ -145,8 +143,13 @@ void Godmode_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Resistance = perk.GetPrefFloat("resistance", 0.3);
 	Cache[client].AnnotationLifetime = GetPerkTimeFloat(perk);
 
-	static float fParticleOffset[3] = {0.0, 0.0, 12.0};
-	Cache[client].SetEnt(GodmodeParticle, CreateParticle(client, GODMODE_PARTICLE, _, _, fParticleOffset));
+	SetOverlay(client, ClientOverlay_Beams);
+
+	int iEffect = CreateProxy(client);
+	Cache[client].SetEnt(Effect, iEffect);
+
+	SendTEParticleLingeringAttachedProxyExcept(TEParticlesLingering.WhiteBodyHaze, iEffect, client);
+	SendTEParticleLingeringAttachedProxyExcept(TEParticlesLingering.WhiteBodyLights, iEffect, client);
 
 	switch (perk.GetPrefCell("mode", 0))
 	{
@@ -166,9 +169,6 @@ void Godmode_ApplyPerk(const int client, const Perk perk)
 	}
 	else
 	{
-		TF2_AddCondition(client, TFCond_UberBulletResist);
-		TF2_AddCondition(client, TFCond_UberBlastResist);
-		TF2_AddCondition(client, TFCond_UberFireResist);
 		ApplyPreventCapture(client);
 	}
 
@@ -179,6 +179,8 @@ void Godmode_ApplyPerk(const int client, const Perk perk)
 void Godmode_RemovePerk(const int client)
 {
 	g_eInGodmode.Unset(client);
+
+	SetOverlay(client, ClientOverlay_None);
 
 	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_NoSelf);
 	SDKUnhook(client, SDKHook_OnTakeDamage, Godmode_OnTakeDamage_Pushback);
@@ -286,8 +288,6 @@ public void Godmode_OnPlayerDiedOrDisconnected_Any(const int client)
 	GodmodeFlags().RemoveForAll(client);
 }
 
-#undef GODMODE_PARTICLE
-
 #undef GODMODE_DOWN_TEXT
 #undef GODMODE_DOWN_SOUND
 #undef GODMODE_WARN_TEXT
@@ -300,4 +300,4 @@ public void Godmode_OnPlayerDiedOrDisconnected_Any(const int client)
 #undef Resistance
 #undef LastDeflect
 #undef AnnotationLifetime
-#undef GodmodeParticle
+#undef Effect
