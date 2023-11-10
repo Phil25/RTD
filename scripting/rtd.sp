@@ -999,7 +999,7 @@ void RollPerkForClient(int client)
 
 	Perk perk = RollPerk(client);
 
-	if(perk == null) // this should not happen unless everything is disabled or not applicable to player
+	if (perk == null) // should not happen unless everything is disabled or not applicable to player
 	{
 		PrintToServer("[RTD] WARNING: Perk not found for player when they attempted a roll.");
 

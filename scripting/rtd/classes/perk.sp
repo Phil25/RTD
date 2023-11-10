@@ -294,7 +294,8 @@ methodmap Perk < StringMap
 		Call_Finish();
 	}
 
-	public Handle GetCall(){
+	public Handle GetCall()
+	{
 		Handle hFwd = null;
 		this.GetValue("m_Call", hFwd);
 		return hFwd;

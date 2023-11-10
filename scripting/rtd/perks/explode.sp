@@ -93,6 +93,8 @@ void Explode_ApplyPerk(const int client, const Perk perk)
 
 void Explode_RemovePerk(int client)
 {
+	StopSound(client, SNDCHAN_AUTO, BOMB_BEAM_DRAG);
+
 	int iBomb = Cache[client].GetEnt(Bomb).Index;
 	if (iBomb <= MaxClients)
 		return;
