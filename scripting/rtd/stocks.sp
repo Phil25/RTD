@@ -47,6 +47,7 @@
 * - GetUniqueId
 * - SwitchToFirstValidWeapon
 * - ForceResupplyCrude
+* - SetOverlay
 *
 * DAMAGE
 * - DamageRadius
@@ -92,11 +93,15 @@
 *
 * TEMPORARY ENTITIES
 * - GetEffectIndex
-* - SetupTEParticle
+* - _SetupTEParticle
 * - SendTEParticle
 * - SendTEParticleWithPriority
+* - SendTEParticleWithPriorityTo
+* - _SetupTEPartilceAttached
 * - SendTEParticleAttached
 * - SendTEParticleLingeringAttached
+* - SendTEParticleLingeringAttachedProxy
+* - SendTEParticleLingeringAttachedProxyExcept
 *
 * SPEED MANIPULATION
 * - GetBaseSpeed
@@ -436,6 +441,46 @@ public Action Stocks_ForceResupplyTouch(int iResupply, int iOther)
 {
 	int iOwner = GetEntPropEnt(iResupply, Prop_Send, "m_hOwnerEntity");
 	return iOther == iOwner ? Plugin_Continue : Plugin_Handled;
+}
+
+enum ClientOverlay
+{
+	ClientOverlay_None,
+	ClientOverlay_Monochrome,
+	ClientOverlay_InvulnerableRed,
+	ClientOverlay_InvulnerableBlue,
+	ClientOverlay_Stealth,
+	ClientOverlay_Burning,
+	ClientOverlay_Dodge,
+}
+
+stock void SetOverlay(const int client, const ClientOverlay eOverlay)
+{
+	switch (eOverlay)
+	{
+		case ClientOverlay_None:
+			SetVariantString("");
+
+		case ClientOverlay_Monochrome:
+			SetVariantString("debug/yuv");
+
+		case ClientOverlay_InvulnerableRed:
+			SetVariantString("effects/invuln_overlay_red");
+
+		case ClientOverlay_InvulnerableBlue:
+			SetVariantString("effects/invuln_overlay_blue");
+
+		case ClientOverlay_Stealth:
+			SetVariantString("effects/stealth_overlay");
+
+		case ClientOverlay_Burning:
+			SetVariantString("effects/imcookin");
+
+		case ClientOverlay_Dodge:
+			SetVariantString("effects/dodge_overlay");
+	}
+
+	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
 }
 
 
@@ -868,6 +913,10 @@ stock int CreateProxy(int iEnt)
 
 	Parent(iProxy, iEnt);
 
+	// Prevent entity not transmitting sometimes when far away, so attached tempents wouldn't break.
+	// NOTE: Adding this flag must happen LAST when creating iProxy.
+	SetEdictFlags(iProxy, GetEdictFlags(iProxy) | FL_EDICT_ALWAYS);
+
 	return iProxy;
 }
 
@@ -1004,7 +1053,7 @@ stock int GetEffectIndex(const char[] sEffectName)
 	return FindStringIndex(iTable, sEffectName);
 }
 
-stock void SetupTEParticle(const TEParticleId eParticleId, const float fPos[3])
+void _SetupTEParticle(const TEParticleId eParticleId, const float fPos[3])
 {
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecOrigin[0]", fPos[0]);
@@ -1019,52 +1068,70 @@ stock void SetupTEParticle(const TEParticleId eParticleId, const float fPos[3])
 
 stock void SendTEParticle(const TEParticleId eParticleId, const float fPos[3])
 {
-	SetupTEParticle(eParticleId, fPos);
+	_SetupTEParticle(eParticleId, fPos);
 	TE_SendToAll();
 }
 
 stock void SendTEParticleWithPriority(const TEParticleId eParticleId, const float fPos[3])
 {
-	SetupTEParticle(eParticleId, fPos);
+	_SetupTEParticle(eParticleId, fPos);
 	TE_SendToAll(-1.0); // negative values attempt to send the TE on the same tick
 }
 
 stock void SendTEParticleWithPriorityTo(const int client, const TEParticleId eParticleId, const float fPos[3])
 {
-	SetupTEParticle(eParticleId, fPos);
+	_SetupTEParticle(eParticleId, fPos);
 	TE_SendToClient(client, -1.0);
 }
 
-stock void SendTEParticleAttached(const TEParticleId eParticleId, const int iEnt, const int iAttachPoint=0)
+void _SetupParticleAttached(const int iParticleId, const int iEnt, const int iAttachPoint)
 {
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecStart[0]", 0.0);
 	TE_WriteFloat("m_vecStart[1]", 0.0);
 	TE_WriteFloat("m_vecStart[2]", 0.0);
-	TE_WriteNum("m_iParticleSystemIndex", view_as<int>(eParticleId));
+	TE_WriteNum("m_iParticleSystemIndex", iParticleId);
 	TE_WriteNum("entindex", iEnt);
 	TE_WriteNum("m_iAttachType", iAttachPoint > 0 ? 4 : 1); // follow point or just follow
 
 	if (iAttachPoint > 0)
 		TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);
+}
 
+stock void SendTEParticleAttached(const TEParticleId eParticleId, const int iEnt, const int iAttachPoint=0)
+{
+	_SetupParticleAttached(view_as<int>(eParticleId), iEnt, iAttachPoint);
 	TE_SendToAll(-1.0);
 }
 
 stock void SendTEParticleLingeringAttached(const TEParticleLingeringId eParticleId, const int iEnt, float fPos[3], const int iAttachPoint=0)
 {
-	TE_Start("TFParticleEffect");
-	TE_WriteFloat("m_vecStart[0]", 0.0);
-	TE_WriteFloat("m_vecStart[1]", 0.0);
-	TE_WriteFloat("m_vecStart[2]", 0.0);
-	TE_WriteNum("m_iParticleSystemIndex", view_as<int>(eParticleId));
-	TE_WriteNum("entindex", iEnt);
-	TE_WriteNum("m_iAttachType", iAttachPoint > 0 ? 4 : 1); // follow point or just follow
-
-	if (iAttachPoint > 0)
-		TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);
-
+	_SetupParticleAttached(view_as<int>(eParticleId), iEnt, iAttachPoint);
 	TE_SendToAllInRange(fPos, RangeType_Visibility, -1.0);
+}
+
+stock void SendTEParticleLingeringAttachedProxy(const TEParticleLingeringId eParticleId, const int iProxy, const int iAttachPoint=0)
+{
+	_SetupParticleAttached(view_as<int>(eParticleId), iProxy, iAttachPoint);
+	TE_SendToAll(-1.0);
+}
+
+stock void SendTEParticleLingeringAttachedProxyExcept(const TEParticleLingeringId eParticleId, const int iProxy, int client, const int iAttachPoint=0)
+{
+	_SetupParticleAttached(view_as<int>(eParticleId), iProxy, iAttachPoint);
+
+	int iTotal = 0, i = 0;
+	int[] clients = new int[MaxClients];
+
+	while (++i < client)
+		if (IsClientInGame(i))
+			clients[iTotal++] = i;
+
+	while (++i <= MaxClients)
+		if (IsClientInGame(i))
+			clients[iTotal++] = i;
+
+	TE_Send(clients, iTotal, -1.0);
 }
 
 

@@ -319,6 +319,14 @@ enum struct TEParticlesLingeringCache
 	TEParticleLingeringId Frostbite;
 	TEParticleLingeringId ElectricMist;
 	TEParticleLingeringId LightningSwirl;
+	TEParticleLingeringId BurningBody;
+	TEParticleLingeringId GlowRed;
+	TEParticleLingeringId GlowBlue;
+	TEParticleLingeringId VortexRed;
+	TEParticleLingeringId VortexBlue;
+	TEParticleLingeringId ElectricDischargePurple;
+	TEParticleLingeringId ElectricDischargeYellow;
+	TEParticleLingeringId RisingSparklesYellow;
 
 	TEParticleLingeringId AsId(const char[] sEffectName)
 	{
@@ -332,6 +340,14 @@ enum struct TEParticlesLingeringCache
 		this.Frostbite = this.AsId("unusual_eotl_frostbite");
 		this.ElectricMist = this.AsId("utaunt_electric_mist");
 		this.LightningSwirl = this.AsId("utaunt_elebound_yellow_parent");
+		this.BurningBody = this.AsId("burningplayer_red");
+		this.GlowRed = this.AsId("utaunt_tarotcard_red_glow");
+		this.GlowBlue = this.AsId("utaunt_tarotcard_blue_glow");
+		this.VortexRed = this.AsId("utaunt_tarotcard_red_wind");
+		this.VortexBlue = this.AsId("utaunt_tarotcard_blue_wind");
+		this.ElectricDischargePurple = this.AsId("utaunt_electricity_purple_discharge");
+		this.ElectricDischargeYellow = this.AsId("utaunt_electricity_discharge");
+		this.RisingSparklesYellow = this.AsId("utaunt_arcane_yellow_sparkle");
 	}
 }
 

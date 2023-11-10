@@ -73,18 +73,27 @@ public void PowerPlay_ApplyPerk(const int client, const Perk perk)
 
 	ApplyPreventCapture(client);
 
+	int iEffect = CreateProxy(client);
+	SendTEParticleLingeringAttachedProxy(TEParticlesLingering.BurningBody, iEffect);
+	SendTEParticleLingeringAttachedProxy(TEParticlesLingering.RisingSparklesYellow, iEffect);
+	Cache[client].SetEnt(Effect, iEffect);
+
+	SetOverlay(client, ClientOverlay_Burning);
+
 	switch (TF2_GetClientTeam(client))
 	{
 		case TFTeam_Red:
 		{
-			Cache[client].SetEnt(Effect, CreateParticle(client, "eyeboss_team_red", true));
+			SendTEParticleLingeringAttachedProxyExcept(TEParticlesLingering.GlowRed, iEffect, client);
+
 			Cache[client].ColorRed = 255;
 			Cache[client].ColorBlue = 150;
 		}
 
 		case TFTeam_Blue:
 		{
-			Cache[client].SetEnt(Effect, CreateParticle(client, "eyeboss_team_blue", true));
+			SendTEParticleLingeringAttachedProxyExcept(TEParticlesLingering.GlowBlue, iEffect, client);
+
 			Cache[client].ColorRed = 150;
 			Cache[client].ColorBlue = 255;
 		}
@@ -129,6 +138,8 @@ void PowerPlay_RemovePerk(const int client)
 		TF2Attrib_RemoveByDefIndex(iMelee, Attribs.MeleeRange);
 
 	RemovePreventCapture(client);
+
+	SetOverlay(client, ClientOverlay_None);
 
 	TF2_RemoveCondition(client, TFCond_CritOnFirstBlood);
 	TF2_RemoveCondition(client, TFCond_UberBulletResist);

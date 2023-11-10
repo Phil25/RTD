@@ -176,16 +176,13 @@ void Invisibility_Set(const int client, const int iValue)
 
 public Action Invisibility_SetOverlay(const int client)
 {
-	SetVariantString("effects/stealth_overlay");
-	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
-
+	SetOverlay(client, ClientOverlay_Stealth);
 	return Plugin_Stop;
 }
 
 public void Invisibility_UnsetOverlay(const int client)
 {
-	SetVariantString("");
-	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
+	SetOverlay(client, ClientOverlay_None);
 }
 
 public void Invisibility_OnResupply(const int client)

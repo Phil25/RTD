@@ -109,8 +109,7 @@ void MercsDieTwice_FakeDeath(const int client, const int iAttacker, const int iI
 	TF2_AddCondition(client, TFCond_DisguisedAsDispenser);
 	ApplyPreventCapture(client);
 
-	SetVariantString("effects/stealth_overlay");
-	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
+	SetOverlay(client, ClientOverlay_Stealth);
 
 	SetVariantInt(1);
 	AcceptEntityInput(client, "SetForcedTauntCam");
@@ -138,8 +137,7 @@ void MercsDieTwice_Resurrect(const int client)
 	TF2_RemoveCondition(client, TFCond_DisguisedAsDispenser);
 	RemovePreventCapture(client);
 
-	SetVariantString("");
-	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
+	SetOverlay(client, ClientOverlay_None);
 
 	SetVariantInt(0);
 	AcceptEntityInput(client, "SetForcedTauntCam");
@@ -165,11 +163,8 @@ void MercsDieTwice_SpawnEffect(const int client)
 	if (iProxy <= MaxClients)
 		return;
 
-	float fPos[3];
-	GetClientAbsOrigin(client, fPos);
-
 	KILL_ENT_IN(iProxy,0.7); // adjusted specifically for utaunt_elebound_yellow_parent
-	SendTEParticleLingeringAttached(TEParticlesLingering.LightningSwirl, iProxy, fPos);
+	SendTEParticleLingeringAttachedProxy(TEParticlesLingering.LightningSwirl, iProxy);
 }
 
 void MercsDieTwice_SendDeathEvent(const int client, const int iAttacker, const int iInflictor, const int iWeapon)

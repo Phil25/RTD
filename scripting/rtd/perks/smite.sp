@@ -112,7 +112,7 @@ void Smite_ApplyPerk(const int client, const Perk perk)
 	if (iProxy > MaxClients)
 	{
 		Cache[client].SetEnt(Proxy, iProxy);
-		SendTEParticleLingeringAttached(TEParticlesLingering.ElectricMist, iProxy, fPos);
+		SendTEParticleLingeringAttachedProxy(TEParticlesLingering.ElectricMist, iProxy);
 		EmitSoundToAll(SOUND_ELECTRIC_MIST, client, _, _, _, _, 150);
 	}
 

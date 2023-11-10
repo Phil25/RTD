@@ -35,20 +35,16 @@ void Blind_ApplyPerk(const int client, const Perk perk)
 
 	Blind_SendFade(client, iAlpha);
 	Blind_UpdateAnnotations(client);
-
-	SetVariantString("effects/stealth_overlay");
-	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
+	SetOverlay(client, ClientOverlay_Stealth);
 
 	Cache[client].Repeat(1.0, Blind_UpdateAnnotationsCheck);
 }
 
 void Blind_RemovePerk(const int client)
 {
-	SetVariantString("");
-	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
-
 	Blind_SendFade(client, 0);
 	Blind_UpdateAnnotations(client, true);
+	SetOverlay(client, ClientOverlay_None);
 }
 
 public Action Blind_UpdateAnnotationsCheck(const int client)

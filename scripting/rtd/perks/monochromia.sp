@@ -20,12 +20,10 @@ DEFINE_CALL_APPLY_REMOVE(Monochromia)
 
 public void Monochromia_ApplyPerk(const int client, const Perk perk)
 {
-	SetVariantString("debug/yuv");
-	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
+	SetOverlay(client, ClientOverlay_Monochrome);
 }
 
 void Monochromia_RemovePerk(const int client)
 {
-	SetVariantString("");
-	AcceptEntityInput(client, "SetScriptOverlayMaterial", client, client);
+	SetOverlay(client, ClientOverlay_None);
 }
