@@ -806,4 +806,13 @@
 		"pt"	""
 	}
 
+	"RTD2_Desc_frog"
+	{
+		"en"	"Can move only by jumping."
+		"pl"	""
+		"chi"	""
+		"ru"	""
+		"pt"	""
+	}
+
 }
