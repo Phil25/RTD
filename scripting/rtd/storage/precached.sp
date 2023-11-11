@@ -332,6 +332,12 @@ enum struct TEParticlesLingeringCache
 	TEParticleLingeringId WhiteBodyHaze;
 	TEParticleLingeringId WhiteBodyLights;
 	TEParticleLingeringId IciclesBody;
+	TEParticleLingeringId WarmBodyGlow;
+	TEParticleLingeringId GoldenTwinkles;
+	TEParticleLingeringId GoldenGlow;
+	TEParticleLingeringId GodRays;
+	TEParticleLingeringId FireballGlowRed;
+	TEParticleLingeringId FireballGlowBlue;
 
 	TEParticleLingeringId AsId(const char[] sEffectName)
 	{
@@ -356,6 +362,12 @@ enum struct TEParticlesLingeringCache
 		this.WhiteBodyHaze = this.AsId("utaunt_prismatichaze_haze");
 		this.WhiteBodyLights = this.AsId("burningplayer_rainbow_glow_white");
 		this.IciclesBody = this.AsId("utaunt_ice_icicles");
+		this.WarmBodyGlow = this.AsId("utaunt_leaftaunt_bodyglow");
+		this.GoldenTwinkles = this.AsId("utaunt_twinkling_goldsilver_glow01");
+		this.GoldenGlow = this.AsId("australium_bar_glow");
+		this.GodRays = this.AsId("underworld_skull_eye_glow");
+		this.FireballGlowRed = this.AsId("spell_fireball_small_glow_red");
+		this.FireballGlowBlue = this.AsId("spell_fireball_small_glow_blue");
 	}
 }
 

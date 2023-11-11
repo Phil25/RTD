@@ -1088,13 +1088,14 @@ stock void SendTEParticleWithPriorityTo(const int client, const TEParticleId ePa
 	TE_SendToClient(client, -1.0);
 }
 
-void _SetupParticleAttached(const int iParticleId, const int iEnt, const int iAttachPoint)
+void _SetupParticleAttached(const int iParticleId, const int iEnt, const int iAttachPoint, const bool bResetPrevious)
 {
 	TE_Start("TFParticleEffect");
 	TE_WriteFloat("m_vecStart[0]", 0.0);
 	TE_WriteFloat("m_vecStart[1]", 0.0);
 	TE_WriteFloat("m_vecStart[2]", 0.0);
 	TE_WriteNum("m_iParticleSystemIndex", iParticleId);
+	TE_WriteNum("m_bResetParticles", view_as<int>(bResetPrevious));
 	TE_WriteNum("entindex", iEnt);
 	TE_WriteNum("m_iAttachType", iAttachPoint > 0 ? 4 : 1); // follow point or just follow
 
@@ -1102,27 +1103,27 @@ void _SetupParticleAttached(const int iParticleId, const int iEnt, const int iAt
 		TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);
 }
 
-stock void SendTEParticleAttached(const TEParticleId eParticleId, const int iEnt, const int iAttachPoint=0)
+stock void SendTEParticleAttached(const TEParticleId eParticleId, const int iEnt, const int iAttachPoint=0, const bool bResetPrevious=false)
 {
-	_SetupParticleAttached(view_as<int>(eParticleId), iEnt, iAttachPoint);
+	_SetupParticleAttached(view_as<int>(eParticleId), iEnt, iAttachPoint, bResetPrevious);
 	TE_SendToAll(-1.0);
 }
 
-stock void SendTEParticleLingeringAttached(const TEParticleLingeringId eParticleId, const int iEnt, float fPos[3], const int iAttachPoint=0)
+stock void SendTEParticleLingeringAttached(const TEParticleLingeringId eParticleId, const int iEnt, float fPos[3], const int iAttachPoint=0, const bool bResetPrevious=false)
 {
-	_SetupParticleAttached(view_as<int>(eParticleId), iEnt, iAttachPoint);
+	_SetupParticleAttached(view_as<int>(eParticleId), iEnt, iAttachPoint, bResetPrevious);
 	TE_SendToAllInRange(fPos, RangeType_Visibility, -1.0);
 }
 
-stock void SendTEParticleLingeringAttachedProxy(const TEParticleLingeringId eParticleId, const int iProxy, const int iAttachPoint=0)
+stock void SendTEParticleLingeringAttachedProxy(const TEParticleLingeringId eParticleId, const int iProxy, const int iAttachPoint=0, const bool bResetPrevious=false)
 {
-	_SetupParticleAttached(view_as<int>(eParticleId), iProxy, iAttachPoint);
+	_SetupParticleAttached(view_as<int>(eParticleId), iProxy, iAttachPoint, bResetPrevious);
 	TE_SendToAll(-1.0);
 }
 
-stock void SendTEParticleLingeringAttachedProxyExcept(const TEParticleLingeringId eParticleId, const int iProxy, int client, const int iAttachPoint=0)
+stock void SendTEParticleLingeringAttachedProxyExcept(const TEParticleLingeringId eParticleId, const int iProxy, int client, const int iAttachPoint=0, const bool bResetPrevious=false)
 {
-	_SetupParticleAttached(view_as<int>(eParticleId), iProxy, iAttachPoint);
+	_SetupParticleAttached(view_as<int>(eParticleId), iProxy, iAttachPoint, bResetPrevious);
 
 	int iTotal = 0, i = 0;
 	int[] clients = new int[MaxClients];

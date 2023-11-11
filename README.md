@@ -11,11 +11,11 @@
 
 # Roll The Dice Revamped
 
-Roll The Dice mod for Team Fortress 2. It allows players to "roll the dice" for one of 75 random effects, some good, some bad. The effect will be applied for its custom time to the player and removed afterwards.
+Roll The Dice mod for Team Fortress 2. It allows players to "roll the dice" for one of 76 random effects, some good, some bad. The effect will be applied for its custom time to the player and removed afterwards.
 
 Roll The Dice Revamped is a rewrite of [pheadxdll's Roll The Dice](https://forums.alliedmods.net/showthread.php?p=666222) with numerous features added, most notable of which are listed here:
 * **[Requires SourceMod 1.9 or higher](http://www.sourcemod.net/downloads.php?branch=stable)**.
-* 40 new perks added, making up a total of 75 perks.
+* 40 new perks added, making up a total of 76 perks.
 * (for devs) An easy way of adding completely custom perks.
 * Fixed some overpowered/broken effects.
 * Highly customizable config, with different settings for nearly each effect.

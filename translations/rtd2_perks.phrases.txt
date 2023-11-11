@@ -797,4 +797,13 @@
 		"pt"	""
 	}
 
+	"RTD2_Desc_eldenstars"
+	{
+		"en"	"Conjure a stream of shooting stars that assail the area."
+		"pl"	""
+		"chi"	""
+		"ru"	""
+		"pt"	""
+	}
+
 }
