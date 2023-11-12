@@ -815,4 +815,13 @@
 		"pt"	""
 	}
 
+	"RTD2_Desc_paranoia"
+	{
+		"en"	"Spy is gonna get you! Or is he?"
+		"pl"	""
+		"chi"	""
+		"ru"	""
+		"pt"	""
+	}
+
 }

@@ -101,6 +101,7 @@
 * - SendTEParticleAttached
 * - SendTEParticleLingeringAttached
 * - SendTEParticleLingeringAttachedProxy
+* - SendTEParticleLingeringAttachedProxyOnly
 * - SendTEParticleLingeringAttachedProxyExcept
 *
 * SPEED MANIPULATION
@@ -1121,7 +1122,13 @@ stock void SendTEParticleLingeringAttachedProxy(const TEParticleLingeringId ePar
 	TE_SendToAll(-1.0);
 }
 
-stock void SendTEParticleLingeringAttachedProxyExcept(const TEParticleLingeringId eParticleId, const int iProxy, int client, const int iAttachPoint=0, const bool bResetPrevious=false)
+stock void SendTEParticleLingeringAttachedProxyOnly(const TEParticleLingeringId eParticleId, const int iProxy, const int client, const int iAttachPoint=0, const bool bResetPrevious=false)
+{
+	_SetupParticleAttached(view_as<int>(eParticleId), iProxy, iAttachPoint, bResetPrevious);
+	TE_SendToClient(client, -1.0);
+}
+
+stock void SendTEParticleLingeringAttachedProxyExcept(const TEParticleLingeringId eParticleId, const int iProxy, const int client, const int iAttachPoint=0, const bool bResetPrevious=false)
 {
 	_SetupParticleAttached(view_as<int>(eParticleId), iProxy, iAttachPoint, bResetPrevious);
 

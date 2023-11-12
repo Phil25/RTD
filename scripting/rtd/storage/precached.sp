@@ -338,6 +338,8 @@ enum struct TEParticlesLingeringCache
 	TEParticleLingeringId GodRays;
 	TEParticleLingeringId FireballGlowRed;
 	TEParticleLingeringId FireballGlowBlue;
+	TEParticleLingeringId SpyBodyDisguiseRed;
+	TEParticleLingeringId SpyBodyDisguiseBlue;
 
 	TEParticleLingeringId AsId(const char[] sEffectName)
 	{
@@ -368,6 +370,8 @@ enum struct TEParticlesLingeringCache
 		this.GodRays = this.AsId("underworld_skull_eye_glow");
 		this.FireballGlowRed = this.AsId("spell_fireball_small_glow_red");
 		this.FireballGlowBlue = this.AsId("spell_fireball_small_glow_blue");
+		this.SpyBodyDisguiseRed = this.AsId("spy_start_disguise_red");
+		this.SpyBodyDisguiseBlue = this.AsId("spy_start_disguise_blue");
 	}
 }
 
