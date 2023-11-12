@@ -826,7 +826,7 @@
 
 	"RTD2_Desc_heavyrockets"
 	{
-		"en"	"Your rockets fall to the ground."
+		"en"	"Your rockets fall to the ground as they should."
 		"pl"	""
 		"chi"	""
 		"ru"	""
@@ -835,7 +835,7 @@
 
 	"RTD2_Desc_weaponmixup"
 	{
-		"en"	"Mixes up attack patterns so even you won't predict them."
+		"en"	"Mixes up attack patterns so even you won't know what's coming."
 		"pl"	""
 		"chi"	""
 		"ru"	""
@@ -853,7 +853,7 @@
 
 	"RTD2_Desc_teamautoheal"
 	{
-		"en"	"Rapid healing of self and nearby teammates."
+		"en"	"Healing of self and nearby teammates."
 		"pl"	""
 		"chi"	""
 		"ru"	""
