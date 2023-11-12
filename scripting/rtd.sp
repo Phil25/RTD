@@ -676,7 +676,7 @@ public void OnEntityCreated(int iEnt, const char[] sClassname)
 
 public void OnEntitySpawned(const int iEnt)
 {
-	int iSpawnTime = RoundToNearest(GetEngineTime() * 100000);
+	int iSpawnTime = RoundToNearest(GetEngineTime() * 1000);
 
 	// For certain entities Spawn hook fires twice for some reason
 	if (iSpawnTime == g_iLastEntitySpawnTime)
@@ -1102,11 +1102,23 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 	PerkList list = new PerkList();
 	PerkIter iter = new PerkListIter(candidates, -1);
 
+#if defined DEBUG
+	PrintToServer("Perk pool for %N<%d>:", client, client);
+#endif
+
 	if (bFilter)
 	{
 		while ((perk = (++iter).Perk()))
 			if (perk.IsAptForSetupOf(client, iRollFlags))
+			{
 				list.Push(perk);
+
+#if defined DEBUG
+				char sName[64];
+				perk.GetName(sName, sizeof(sName));
+				PrintToServer("> %s", sName);
+#endif
+			}
 	}
 	else
 	{
@@ -1114,7 +1126,15 @@ Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="
 
 		while ((perk = (++iter).Perk()))
 			if (perk.Good == bBeGood && perk.IsAptFor(client, iRollFlags))
+			{
 				list.Push(perk);
+
+#if defined DEBUG
+				char sName[64];
+				perk.GetName(sName, sizeof(sName));
+				PrintToServer("> %s", sName);
+#endif
+			}
 	}
 
 	delete iter;

@@ -96,3 +96,4 @@
 #include "rtd/perks/eldenstars.sp"          // 75
 #include "rtd/perks/frog.sp"                // 76
 #include "rtd/perks/paranoia.sp"            // 77
+#include "rtd/perks/heavyrockets.sp"        // 78

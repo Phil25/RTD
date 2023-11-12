@@ -137,7 +137,6 @@
 #define HOMING_SELF_ORIG (1 << 1) // original launcher's owner
 #define HOMING_ENEMIES (1 << 2) // enemies of owner
 #define HOMING_FRIENDLIES (1 << 3) // friendlies of owner
-#define HOMING_SMOOTH (1 << 4) // smooths the turning
 
 #define HOMING_SPEED_MULTIPLIER 0.5
 #define HOMING_AIRBLAST_MULTIPLIER 1.1
@@ -160,7 +159,7 @@ void Stocks_OnMapStart()
 	PrecacheModel(EMPTY_MODEL);
 	PrecacheModel(MODEL_PROJECTILE);
 
-	g_hHoming = new ArrayList(3);
+	g_hHoming = new ArrayList(4);
 	HookEvent("teamplay_round_start", Event_Homing_RoundStart);
 }
 
@@ -1275,17 +1274,18 @@ stock bool IsVoicelineSound(const char[] sSound)
 * HOMING
 */
 
-stock void Homing_Push(int iProjectile, int iFlags=HOMING_ENEMIES)
+stock void Homing_Push(int iProjectile, int iFlags=HOMING_ENEMIES, const int iSharpness=0)
 {
-	int iData[3];
+	int iData[4];
 	iData[0] = EntIndexToEntRef(iProjectile);
 	iData[2] = iFlags;
+	iData[3] = iSharpness;
 	g_hHoming.PushArray(iData);
 }
 
 stock void Homing_OnGameFrame()
 {
-	int iData[3];
+	int iData[4];
 	int iProjectile, i = g_hHoming.Length;
 
 	while (--i >= 0)
@@ -1301,7 +1301,7 @@ stock void Homing_OnGameFrame()
 
 		if (iProjectile > MaxClients)
 		{
-			Homing_Think(iProjectile, iData[0], i, iData[1], iData[2]);
+			Homing_Think(iProjectile, iData[0], i, iData[1], iData[2], iData[3]);
 		}
 		else
 		{
@@ -1310,15 +1310,15 @@ stock void Homing_OnGameFrame()
 	}
 }
 
-stock void Homing_Think(int iProjectile, int iRefProjectile, int iArrayIndex, int iCurrentTarget, int iFlags)
+stock void Homing_Think(int iProjectile, int iRefProjectile, int iArrayIndex, int iCurrentTarget, int iFlags, int iSharpness)
 {
 	if (!Homing_IsValidTarget(iCurrentTarget, iProjectile, iFlags))
 	{
-		Homing_FindTarget(iProjectile, iRefProjectile, iArrayIndex, iFlags);
+		Homing_FindTarget(iProjectile, iRefProjectile, iArrayIndex, iFlags, iSharpness);
 	}
 	else
 	{
-		Homing_TurnToTarget(iCurrentTarget, iProjectile, view_as<bool>(iFlags & HOMING_SMOOTH));
+		Homing_TurnToClient(iCurrentTarget, iProjectile, iSharpness);
 	}
 }
 
@@ -1361,7 +1361,7 @@ stock bool Homing_IsValidTarget(int client, int iProjectile, int iFlags)
 	return CanEntitySeeTarget(iProjectile, client);
 }
 
-stock void Homing_FindTarget(int iProjectile, int iRefProjectile, int iArrayIndex, int iFlags)
+stock void Homing_FindTarget(int iProjectile, int iRefProjectile, int iArrayIndex, int iFlags, int iSharpness)
 {
 	float fPos[3], fPosOther[3];
 	GetEntPropVector(iProjectile, Prop_Send, "m_vecOrigin", fPos);
@@ -1383,42 +1383,50 @@ stock void Homing_FindTarget(int iProjectile, int iRefProjectile, int iArrayInde
 		fBestDist = fDistance;
 	}
 
-	int iData[3];
+	int iData[4];
 	iData[0] = iRefProjectile;
 	iData[1] = iBestTarget;
 	iData[2] = iFlags;
+	iData[3] = iSharpness;
 	g_hHoming.SetArray(iArrayIndex, iData);
 
 	if (iBestTarget)
-		Homing_TurnToTarget(iBestTarget, iProjectile, view_as<bool>(iFlags & HOMING_SMOOTH));
+		Homing_TurnToClient(iBestTarget, iProjectile, iSharpness);
 }
 
-stock void Homing_TurnToTarget(int client, int iProjectile, bool bSmooth=false)
+stock void Homing_TurnToClient(int client, int iProjectile, int iSharpness)
 {
-	float fTargetPos[3], fRocketPos[3], fInitialVelocity[3];
+	float fTargetPos[3];
 	GetClientAbsOrigin(client, fTargetPos);
+	Homing_TurnToTarget(fTargetPos, iProjectile, iSharpness);
+}
+
+stock void Homing_TurnToTarget(float fTargetPos[3], int iProjectile, int iSharpness)
+{
+	float fRocketPos[3], fInitialVelocity[3];
 	GetEntPropVector(iProjectile, Prop_Send, "m_vecOrigin", fRocketPos);
 	GetEntPropVector(iProjectile, Prop_Send, "m_vInitialVelocity", fInitialVelocity);
 
 	float fSpeedInit = GetVectorLength(fInitialVelocity);
-	float fSpeedBase = fSpeedInit *HOMING_SPEED_MULTIPLIER;
+	float fSpeedBase = fSpeedInit * HOMING_SPEED_MULTIPLIER;
 
-	fTargetPos[2] += 30 +Pow(GetVectorDistance(fTargetPos, fRocketPos), 2.0) /10000;
-	if (bSmooth)
-		Homing_SmoothTurn(fTargetPos, fRocketPos, iProjectile);
+	fTargetPos[2] += 30 + Pow(GetVectorDistance(fTargetPos, fRocketPos), 2.0) / 10000;
+
+	if (iSharpness > 0)
+		Homing_SmoothTurn(fTargetPos, fRocketPos, iProjectile, iSharpness);
 
 	float fNewVec[3], fAng[3];
 	SubtractVectors(fTargetPos, fRocketPos, fNewVec);
 	NormalizeVector(fNewVec, fNewVec);
 	GetVectorAngles(fNewVec, fAng);
 
-	float fSpeedNew = fSpeedBase +GetEntProp(iProjectile, Prop_Send, "m_iDeflected") *fSpeedBase *HOMING_AIRBLAST_MULTIPLIER;
+	float fSpeedNew = fSpeedBase + GetEntProp(iProjectile, Prop_Send, "m_iDeflected") * fSpeedBase * HOMING_AIRBLAST_MULTIPLIER;
 
 	ScaleVector(fNewVec, fSpeedNew);
 	TeleportEntity(iProjectile, NULL_VECTOR, fAng, fNewVec);
 }
 
-stock void Homing_SmoothTurn(float fTargetPos[3], float fRocketPos[3], int iProjectile)
+stock void Homing_SmoothTurn(float fTargetPos[3], float fRocketPos[3], int iProjectile, int iSharpness)
 {
 	float fDist = GetVectorDistance(fRocketPos, fTargetPos);
 
@@ -1427,10 +1435,12 @@ stock void Homing_SmoothTurn(float fTargetPos[3], float fRocketPos[3], int iProj
 	GetAngleVectors(fAng, fFwd, NULL_VECTOR, NULL_VECTOR);
 
 	float fNewTargetPos[3];
-	for(int i = 0; i < 3; ++i)
+	float fSmoothFactor = 1.0 - float(iSharpness) / 100.0;
+
+	for (int i = 0; i < 3; ++i)
 	{
-		fNewTargetPos[i] = fRocketPos[i] + fDist *fFwd[i];
-		fTargetPos[i] += (fNewTargetPos[i] -fTargetPos[i]) *0.96;
+		fNewTargetPos[i] = fRocketPos[i] + fDist * fFwd[i];
+		fTargetPos[i] += (fNewTargetPos[i] - fTargetPos[i]) * fSmoothFactor;
 	}
 }
 

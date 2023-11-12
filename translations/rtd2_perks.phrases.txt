@@ -817,7 +817,16 @@
 
 	"RTD2_Desc_paranoia"
 	{
-		"en"	"Spy is gonna get you! Or is he?"
+		"en"	"Spy is gonna get you! Or will he?"
+		"pl"	""
+		"chi"	""
+		"ru"	""
+		"pt"	""
+	}
+
+	"RTD2_Desc_heavyrockets"
+	{
+		"en"	"Your rockets fall to the ground."
 		"pl"	""
 		"chi"	""
 		"ru"	""

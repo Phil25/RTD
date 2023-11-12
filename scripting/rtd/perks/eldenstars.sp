@@ -152,7 +152,7 @@ public Action Timer_EldenStars_Chip(Handle hTimer, const int iRef)
 
 	int iLastChip = EntRefToEntIndex(Cache[client].LastChip);
 	if (iLastChip > MaxClients)
-		Homing_Push(iLastChip, HOMING_ENEMIES | HOMING_SMOOTH);
+		Homing_Push(iLastChip, _, 4);
 
 	int iChip = CreateEntityByName("tf_projectile_energy_ball");
 	if (iChip <= MaxClients)
