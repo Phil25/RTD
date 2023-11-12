@@ -842,4 +842,22 @@
 		"pt"	""
 	}
 
+	"RTD2_Desc_autoheal"
+	{
+		"en"	"Rapid self healing."
+		"pl"	""
+		"chi"	""
+		"ru"	""
+		"pt"	""
+	}
+
+	"RTD2_Desc_teamautoheal"
+	{
+		"en"	"Rapid healing of self and nearby teammates."
+		"pl"	""
+		"chi"	""
+		"ru"	""
+		"pt"	""
+	}
+
 }

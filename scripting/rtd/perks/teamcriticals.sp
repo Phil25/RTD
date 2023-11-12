@@ -153,6 +153,9 @@ bool TeamCriticals_IsValidTarget(int client, int iTarget, TFTeam eClientTeam, fl
 	if (!IsClientInGame(iTarget))
 		return false;
 
+	if (TF2_IsPlayerInCondition(iTarget, TFCond_Cloaked))
+		return false;
+
 	float fPos[3], fEndPos[3];
 	GetClientAbsOrigin(client, fPos);
 	GetClientAbsOrigin(iTarget, fEndPos);
@@ -160,13 +163,10 @@ bool TeamCriticals_IsValidTarget(int client, int iTarget, TFTeam eClientTeam, fl
 	if (GetVectorDistance(fPos, fEndPos, true) > fRangeSquared)
 		return false;
 
-	if (TF2_IsPlayerInCondition(iTarget, TFCond_Cloaked))
-		return false;
-
 	bool bDisguised = TF2_IsPlayerInCondition(iTarget, TFCond_Disguised);
 	bool bSameTeam = eClientTeam == TF2_GetClientTeam(iTarget);
 
-	// Do not draw beam if:
+	// Do not give crits if:
 	// - our friendly Spy is disguised, or
 	// - an enemy Spy is NOT disguised.
 	// This does not account for being able to disguise as the same team.

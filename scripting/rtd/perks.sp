@@ -98,3 +98,5 @@
 #include "rtd/perks/paranoia.sp"            // 77
 #include "rtd/perks/heavyrockets.sp"        // 78
 #include "rtd/perks/weaponmixup.sp"         // 79
+#include "rtd/perks/autoheal.sp"            // 80
+#include "rtd/perks/teamautoheal.sp"        // 81
