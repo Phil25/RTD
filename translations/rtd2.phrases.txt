@@ -9,7 +9,7 @@
 		"sv"				"Skriv {1}rtd{2} för en slumpmässig effekt."
 		"de"				"Tippe {1}rtd{2} ein um einen zufälligen Effekt zu würfeln."
 		"chi"				"输入 {1}rtd{2} 抽取随机效果."
-		"ru"				"Напишите {1}rtd{2} чтобы попытать удачу с случайными эффектами."
+		"ru"				"Напишите {1}rtd{2}, чтобы попытать удачу с случайными эффектами."
 		"pt"				"Digite {1}rtd{2} para sortear efeitos aleatórios."
 	}
 
@@ -32,7 +32,7 @@
 		"sv"			"Du fick {1}{2}{3}."
 		"de"			"Gewürfelt {1}{2}{3}."
 		"chi"			"抽得 {1}{2}{3}."
-		"ru"			"Получил {1}{2}{3}."
+		"ru"			"Получает {1}{2}{3}."
 		"pt"			"Você sorteou {1}{2}{3}."
 	}
 
@@ -44,7 +44,7 @@
 		"sv"			"Du fick {1}{2}{3} i {4}{5}{6} sekund(er)."
 		"de"			"Du hast {1}{2}{3} für {4}{5}{6} Sekunde(n) gewürfelt"
 		"chi"			"抽得 {1}{2}{3} 持续 {4}{5}{6} 秒."
-		"ru"			"Получил {1}{2}{3} на {4}{5}{6} секунд(ы)."
+		"ru"			"Получает {1}{2}{3} на {4}{5}{6} сек."
 		"pt"			"Você sorteou {1}{2}{3} por {4}{5}{6} segundo(s)."
 	}
 
@@ -56,7 +56,7 @@
 		"sv"			"{1}{2}{3} fick {4}{5}{6}."
 		"de"			"{1}{2}{3} hat {4}{5}{6} gewürfelt."
 		"chi"			"{1}{2}{3} 抽得 {4}{5}{6}."
-		"ru"			"{1}{2}{3} получил {4}{5}{6}."
+		"ru"			"{1}{2}{3} получает {4}{5}{6}."
 		"pt"			"{1}{2}{3} sorteou {4}{5}{6}."
 	}
 
@@ -68,7 +68,7 @@
 		"sv"			"{1}{2}{3} fick {4}{5}{6} i {7}{8}{9} sekund(er)."
 		"de"			"{1}{2}{3} hat {4}{5}{6} für {7}{8}{9} Sekunde(n) gewürfelt."
 		"chi"			"{1}{2}{3} 抽得 {4}{5}{6} 持续 {7}{8}{9} 秒."
-		"ru"			"{1}{2}{3} получил {4}{5}{6} на {7}{8}{9} секунд(ы)."
+		"ru"			"{1}{2}{3} получает {4}{5}{6} на {7}{8}{9} сек."
 		"pt"			"{1}{2}{3} sorteou {4}{5}{6} por {7}{8}{9} segundo(s)."
 	}
 
@@ -96,7 +96,7 @@
 		"sv"			"{1} spelare fick {2}{3}{4} i {5}{6}{7} sekund(er)."
 		"de"			"{1} Spieler haben {2}{3}{4} für {5}{6}{7} Sekunde(n) gewürfelt."
 		"chi"			"{1} 玩家抽得 {2}{3}{4} 持续 {5}{6}{7} 秒."
-		"ru"			"{1} игроки получили {2}{3}{4} на {5}{6}{7} секунд(ы)."
+		"ru"			"{1} игроки получили {2}{3}{4} на {5}{6}{7} сек."
 		"pt"			"{1} jogadores sortearam {2}{3}{4} por {5}{6}{7} segundo(s)."
 	}
 
@@ -137,7 +137,7 @@
 		"sv"			"Du måste vänta {1}{2}{3} sekund(er)."
 		"de"			"Du musst {1}{2}{3} Sekunde(n) warten."
 		"chi"			"你必须等待 {1}{2}{3} 秒."
-		"ru"			"Вы должны подождать {1}{2}{3} секунд(ы)."
+		"ru"			"Вы должны подождать {1}{2}{3} сек."
 		"pt"			"Você deve esperar {1}{2}{3} segundo(s)."
 	}
 
@@ -173,7 +173,7 @@
 		"sv"			"RTD är inte tillgängligt just nu."
 		"de"			"RTD ist momentan deaktiviert."
 		"chi"			"抽奖此时已禁用."
-		"ru"			"RTD отключен."
+		"ru"			"RTD отключён."
 		"pt"			"O RTD está desativado no momento."
 	}
 
@@ -238,7 +238,7 @@
 		"sv"			"Du har dött under din RTD."
 		"de"			"Du bist während des Würfelns gestorben."
 		"chi"			"你在特殊效果作用时死亡."
-		"ru"			"Вы умерли во время RTD."
+		"ru"			"Вы умерли во время эффекта RTD."
 		"pt"			"Você morreu enquanto usava o RTD."
 	}
 
@@ -251,7 +251,7 @@
 		"sv"			"{1}{2}{3} har dött under sin RTD."
 		"de"			"{1}{2}{3} ist während des Würfelns gestorben."
 		"chi"			"{1}{2}{3} 在特殊效果作用时死亡."
-		"ru"			"{1}{2}{3} умер во время его действия RTD."
+		"ru"			"{1}{2}{3} погибает во время действия своего эффекта RTD."
 		"pt"			"{1}{2}{3} morreu enquanto usava o RTD."
 	}
 
@@ -263,7 +263,7 @@
 		"sv"			"Du har bytt karaktär under din RTD."
 		"de"			"Du hast während des Würfelns die Klasse gewechselt."
 		"chi"			"你在特殊效果作用时更改了职业."
-		"ru"			"Вы вы сменили класс во время RTD."
+		"ru"			"Вы сменили класс во время действия эффекта RTD."
 		"pt"			"Você mudou de classe enquanto usava o RTD."
 	}
 
@@ -276,7 +276,7 @@
 		"sv"			"{1}{2}{3} har bytt karaktär under sin RTD."
 		"de"			"{1}{2}{3} hat während des Würfelns die Klasse gewechselt."
 		"chi"			"{1}{2}{3} 在特殊效果作用时更改了职业."
-		"ru"			"{1}{2}{3} сменил класс во время его действия RTD."
+		"ru"			"{1}{2}{3} меняет класс во время действия эффекта RTD."
 		"pt"			"{1}{2}{3} mudou de classe enquanto usava o RTD."
 	}
 
@@ -288,7 +288,7 @@
 		"sv"			"Pluginet har stängts av under din effekt."
 		"de"			"Das Plugin wurde während deines Würfelns beendet."
 		"chi"			"插件在你的特殊效果作用时重载了."
-		"ru"			"Плагин был отключен во время вашего RTD."
+		"ru"			"Плагин был отключён во время действия эффекта RTD."
 		"pt"			"O plugin foi descarregado durante o seu RTD."
 	}
 
@@ -301,7 +301,7 @@
 		"sv"			"Pluginet har stängts av under {1}{2}{3}'s effekt."
 		"de"			"Das Plugin wurde während {1}{2}{3}'s Würfelns beendet."
 		"chi"			"插件在 {1}{2}{3} 的特殊效果作用时重载了."
-		"ru"			"Плагин был отключен во время RTD игрока {1}{2}{3}."
+		"ru"			"Плагин отключён: действие эффекта RTD игрока {1}{2}{3} прервано."
 		"pt"			"O plugin foi descarregado durante o RTD de {1}{2}{3}."
 	}
 
@@ -314,7 +314,7 @@
 		"sv"			"{1}{2}{3} har lämnat under sin RTD."
 		"de"			"{1}{2}{3} hat während des rollens den Server verlassen."
 		"chi"			"{1}{2}{3} 在特殊效果作用时断开了连接."
-		"ru"			"{1}{2}{3} вышел из игры во время его RTD."
+		"ru"			"{1}{2}{3} отключается во время действия эффекта RTD."
 		"pt"			"{1}{2}{3} desconectou-se enquanto usava o RTD."
 	}
 
@@ -327,7 +327,7 @@
 		"sv"			"Effekt togs bort, anledning: {1}."
 		"de"			"Der Bonus wurde aus folgenden Grund entfernt: {1}."
 		"chi"			"特殊效果已删除, 原因: {1}."
-		"ru"			"Перк удален, причина: {1}."
+		"ru"			"Перк удалён, причина: {1}."
 		"pt"			"RTD removido, motivo: {1}."
 	}
 
@@ -340,7 +340,7 @@
 		"sv"			"{1}{2}{3}'s effekt togs bort, anledning: {4}."
 		"de"			"{1}{2}{3}'s Bonus wurde aus folgenden Grund entfernt: {4}."
 		"chi"			"{1}{2}{3} 的特殊效果已删除, 原因: {4}."
-		"ru"			"Перк игрока {1}{2}{3} был удален по причине: {4}."
+		"ru"			"Перк игрока {1}{2}{3} был удалён по причине: {4}."
 		"pt"			"O RTD de {1}{2}{3} foi removido, motivo: {4}."
 	}
 
@@ -381,7 +381,7 @@
 		"sv"			"Ropa {1}\"MEDIC!\"{2} för att attackera."
 		"de"			"Rufe nach einen {1}Medic{2} um zu attackieren."
 		"chi"			"呼叫 {1}\"医生!\"{2} 以攻击."
-		"ru"			"Крикните {1}\"МЕДИК!\"{2} чтобы атаковать."
+		"ru"			"Крикните {1}\"МЕДИК!\"{2}, чтобы атаковать."
 		"pt"			"Grite {1}\"MEDIC!\"{2} para atacar."
 	}
 
@@ -391,7 +391,7 @@
 		"en"			"Shout {1}\"MEDIC!\"{2} to resurrect."
 		"pl"			"Krzyknij {1}\"MEDYK!\"{2} aby się wskrzesić."
 		"chi"			"呼叫 {1}\"医生!\"{2} 复活."
-		"ru"			"Крикните {1}\"МЕДИК!\"{2} чтобы воскресить."
+		"ru"			"Крикните {1}\"МЕДИК!\"{2}, чтобы воскреснуть."
 		"pt"			"Grite {1}\"MEDIC!\"{2} para ressuscitar."
 	}
 
@@ -403,7 +403,7 @@
 		"sv"			"Ropa {1}\"MEDIC!\"{2} för att lägga ner en dispenser."
 		"de"			"Rufe nach einen {1}Medic{2} um einen Dispenser zu spawnen."
 		"chi"			"呼叫 {1}\"医生!\"{2} 生成一个补给器."
-		"ru"			"Крикните {1}\"МЕДИК!\"{2} чтобы создать Раздатчик."
+		"ru"			"Крикните {1}\"МЕДИК!\"{2}, чтобы создать раздатчик."
 		"pt"			"Grite {1}\"MEDIC!\"{2} para invocar um Fornecedor."
 	}
 
@@ -415,7 +415,7 @@
 		"sv"			"Använt {1}{2}/{3}{4} Dispensers."
 		"de"			"Dispenser {1}{2}/{3}{4} wurde gespawnt."
 		"chi"			"已生成 {1}{2}/{3}{4} 个补给器."
-		"ru"			"Создано {1}{2}/{3}{4} Раздатчиков."
+		"ru"			"Создано {1}{2}/{3}{4} раздатчиков."
 		"pt"			"Invocou {1}{2}/{3}{4} Fornecedores."
 	}
 
@@ -427,7 +427,7 @@
 		"sv"			"Ropa {1}\"MEDIC!\"{2} för att lägga ner en Sentry."
 		"de"			"Rufe nach einen {1}Medic{2} um eine Sentry zu spawnen."
 		"chi"			"呼叫 {1}\"医生!\"{2} 生成一个步哨枪."
-		"ru"			"Крикните {1}\"МЕДИК!\"{2} чтобы создать Турель."
+		"ru"			"Крикните {1}\"МЕДИК!\"{2}, чтобы создать турель."
 		"pt"			"Grite {1}\"MEDIC!\"{2} para invocar uma Sentinela."
 	}
 
@@ -439,7 +439,7 @@
 		"sv"			"Använt {1}{2}/{3}{4} Sentries."
 		"de"			"Sentry {1}{2}/{3}{4} wurde gespawnt."
 		"chi"			"已生成 {1}{2}/{3}{4} 个步哨枪."
-		"ru"			"Создано {1}{2}/{3}{4} Турелей."
+		"ru"			"Создано {1}{2}/{3}{4} турелей."
 		"pt"			"Invocou {1}{2}/{3}{4} Sentinelas."
 	}
 
@@ -451,7 +451,7 @@
 		"sv"			"Gjorde {1}{2}{3} skada."
 		"de"			"Es wurden {1}{2}{3} Schaden zugeteilt."
 		"chi"			"已造成 {1}{2}{3} 伤害."
-		"ru"			"Нанес {1}{2}{3} урона."
+		"ru"			"Нанесено {1}{2}{3} ед. урона."
 		"pt"			"Você causou {1}{2}{3} de dano."
 	}
 
@@ -463,7 +463,7 @@
 		"sv"			"Fattade eld på {1}{2}{3} spelare."
 		"de"			"Es wurden {1}{2}{3} Spieler in Flammen gesetzt."
 		"chi"			"已点燃 {1}{2}{3} 人."
-		"ru"			"Зажег {1}{2}{3} игроков."
+		"ru"			"Подожжено {1}{2}{3} игроков."
 		"pt"			"Você incendiou {1}{2}{3} jogadores."
 	}
 
