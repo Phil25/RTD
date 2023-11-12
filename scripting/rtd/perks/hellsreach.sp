@@ -1,6 +1,6 @@
 /**
 * Hell's Reach perk
-* Copyright (C) 2018 Filip Tomaszewski
+* Copyright (C) 2023 Filip Tomaszewski
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #define HELL_GHOSTS "utaunt_hellpit_parent"
 
 #define SOUND_SLOWDOWN "ambient/halloween/windgust_12.wav"
-#define SOUND_LAUNCH "vo/halloween_boss/knight_attack01.mp3"
 #define SOUND_HELL_DAMAGE "player/fall_damage_dealt.wav"
 
 #define BaseSpeed Float[0]
@@ -34,14 +33,13 @@ DEFINE_CALL_APPLY_REMOVE(HellsReach)
 public void HellsReach_Init(const Perk perk)
 {
 	PrecacheSound(SOUND_SLOWDOWN);
-	PrecacheSound(SOUND_LAUNCH);
 	PrecacheSound(SOUND_HELL_DAMAGE);
 }
 
 void HellsReach_ApplyPerk(const int client, const Perk perk)
 {
 	Cache[client].BaseSpeed = GetBaseSpeed(client);
-	Cache[client].CurrentSpeed = 1.0;
+	Cache[client].CurrentSpeed = 2.0;
 	Cache[client].MinDamage = perk.GetPrefFloat("mindamage", 5.0);
 	Cache[client].MaxDamage = perk.GetPrefFloat("maxdamage", 10.0);
 
@@ -54,23 +52,30 @@ void HellsReach_ApplyPerk(const int client, const Perk perk)
 
 void HellsReach_RemovePerk(int client)
 {
-	HellsReach_Launch(client);
 	SetSpeed(client, Cache[client].BaseSpeed);
 }
 
-public Action HellsReach_Slowdown(const int client)
+Action HellsReach_Slowdown(const int client)
 {
 	Cache[client].CurrentSpeed *= 0.8;
-	SetSpeed(client, Cache[client].BaseSpeed, Cache[client].CurrentSpeed);
 
-	if (Cache[client].CurrentSpeed > 0.1)
+	if (Cache[client].CurrentSpeed > 1.0)
 		return Plugin_Continue;
 
-	Cache[client].Repeat(1.0, HellsReach_Hurt);
-	return Plugin_Stop;
+	SetSpeed(client, Cache[client].BaseSpeed, Cache[client].CurrentSpeed);
+
+	if (Cache[client].CurrentSpeed > 0.6)
+		return Plugin_Continue;
+
+	HellsReach_Hurt(client);
+
+	Cache[client].CurrentSpeed = 2.0;
+	SetSpeed(client, Cache[client].BaseSpeed);
+
+	return Plugin_Continue;
 }
 
-public Action HellsReach_Hurt(const int client)
+void HellsReach_Hurt(const int client)
 {
 	int iEnt = CreateParticle(client, HELL_HURT);
 	KILL_ENT_IN(iEnt,1.0);
@@ -78,30 +83,14 @@ public Action HellsReach_Hurt(const int client)
 	float fDamage = GetRandomFloat(Cache[client].MinDamage, Cache[client].MaxDamage);
 	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_PREVENT_PHYSICS_FORCE);
 
-	ViewPunchRand(client, 100.0);
+	ViewPunchRand(client, 70.0);
 	EmitSoundToAll(SOUND_HELL_DAMAGE, client);
-
-	return Plugin_Continue;
-}
-
-void HellsReach_Launch(const int client)
-{
-	float fVel[3];
-	GetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", fVel);
-	fVel[2] += 2048.0;
-	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVel);
-
-	EmitSoundToAll(SOUND_LAUNCH, client, _, _, _, _, 50);
-	EmitSoundToAll(SOUND_HELL_DAMAGE, client);
-
-	TF2_IgnitePlayer(client, client);
 }
 
 #undef HELL_HURT
 #undef HELL_GHOSTS
 
 #undef SOUND_SLOWDOWN
-#undef SOUND_LAUNCH
 #undef SOUND_HELL_DAMAGE
 
 #undef BaseSpeed
