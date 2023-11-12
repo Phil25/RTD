@@ -16,8 +16,9 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define ColorRed Int[0]
-#define ColorBlue Int[1]
+#define InEffect Int[0]
+#define ColorRed Int[1]
+#define ColorBlue Int[2]
 #define BaseSpeed Float[0]
 #define SpeedRegainTime Float[1]
 #define Effect EntSlot_1
@@ -33,12 +34,35 @@ public void PowerPlay_Init(const Perk perk)
 public void PowerPlay_ApplyPerk(const int client, const Perk perk)
 {
 	Cache[client].BaseSpeed = GetBaseSpeed(client);
+	Cache[client].InEffect = false;
 
+	if (TF2_IsPlayerInCondition(client, TFCond_Slowed))
+	{
+		// Minigun revved up sound lingers and is annoying. Coincidentally this also covers Sniper
+		// Rifle zoom, which can be removed manually without waiting, but whatever.
+		Cache[client].Repeat(0.1, PowerPlay_ApplyPerkDelayCheck);
+	}
+	else
+	{
+		PowerPlay_ApplyPerkActual(client);
+	}
+}
+
+Action PowerPlay_ApplyPerkDelayCheck(const int client)
+{
+	if (TF2_IsPlayerInCondition(client, TFCond_Slowed))
+		return Plugin_Continue;
+
+	PowerPlay_ApplyPerkActual(client);
+	return Plugin_Stop;
+}
+
+void PowerPlay_ApplyPerkActual(const int client)
+{
+	Cache[client].InEffect = true;
 	SDKHook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
 
-	int iMeleeWeapon = GetPlayerWeaponSlot(client, 2);
-	if (iMeleeWeapon > MaxClients && IsValidEntity(iMeleeWeapon))
-		SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", iMeleeWeapon);
+	ForceSwitchSlot(client, 2);
 
 	switch (TF2_GetPlayerClass(client))
 	{
@@ -111,6 +135,9 @@ public void PowerPlay_ApplyPerk(const int client, const Perk perk)
 
 void PowerPlay_RemovePerk(const int client)
 {
+	if (!Cache[client].InEffect)
+		return;
+
 	SDKUnhook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
 	SDKUnhook(client, SDKHook_PostThinkPost, PowerPlay_OnGlowUpdate);
 
@@ -224,6 +251,7 @@ public Action PowerPlay_SlowDownCheck(const int client)
 	return Plugin_Continue;
 }
 
+#undef InEffect
 #undef ColorRed
 #undef ColorBlue
 #undef BaseSpeed

@@ -833,4 +833,13 @@
 		"pt"	""
 	}
 
+	"RTD2_Desc_weaponmixup"
+	{
+		"en"	"Mixes up attack patterns so even you won't predict them."
+		"pl"	""
+		"chi"	""
+		"ru"	""
+		"pt"	""
+	}
+
 }

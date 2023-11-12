@@ -209,6 +209,8 @@ enum struct AttributesCache
 	int OverhealBonus;
 	int NoHeadshotDeath;
 	int AirblastVulnerability;
+	int DeploySpeed;
+	int SilentRev;
 
 	void Init()
 	{
@@ -225,6 +227,8 @@ enum struct AttributesCache
 		this.OverhealBonus = 11;
 		this.NoHeadshotDeath = 176;
 		this.AirblastVulnerability = 329;
+		this.DeploySpeed = 178;
+		this.SilentRev = 238;
 	}
 }
 

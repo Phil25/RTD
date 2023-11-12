@@ -45,7 +45,6 @@
 * - ApplyPreventCapture
 * - RemovePreventCapture
 * - GetUniqueId
-* - SwitchToFirstValidWeapon
 * - ForceResupplyCrude
 * - SetOverlay
 *
@@ -73,6 +72,9 @@
 * LOADOUT
 * - IsWearable
 * - DisarmWeapons
+* - SwitchSlot
+* - ForceSwitchSlot
+* - SwitchToFirstValidWeapon
 * - GetAmmo
 * - SetAmmo
 * - GetClip
@@ -391,19 +393,6 @@ stock int GetUniqueId(const int client, const int iOther)
 	// MAXPLAYERS * 2 -- add more than MAXPLAYERS in case iOther is negative
 	// 91 -- bit of randomness to discern it from other plugins, on the off chance that algos are similar
 	return client * (iOther + MAXPLAYERS * 2) * 91
-}
-
-stock void SwitchToFirstValidWeapon(int client)
-{
-	if (GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") > MaxClients)
-		return; // already holding an valid weapon
-
-	for (int iSlot = 0; iSlot < 5; ++iSlot)
-	{
-		int iWeapon = GetPlayerWeaponSlot(client, 2);
-		if (iWeapon > MaxClients && IsValidEntity(iWeapon))
-			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", iWeapon);
-	}
 }
 
 stock void ForceResupplyCrude(const int client, const float fPos[3])
@@ -732,6 +721,57 @@ stock void DisarmWeapons(int client, bool bDisarm)
 		SetEntPropFloat(iWeapon, Prop_Data, "m_flNextPrimaryAttack", fNextAttack);
 		SetEntPropFloat(iWeapon, Prop_Data, "m_flNextSecondaryAttack", fNextAttack);
 	}
+}
+
+stock bool SwitchSlot(const int client, const int iSlot)
+{
+	int iLastWeapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+	if (iLastWeapon == GetPlayerWeaponSlot(client, iSlot))
+		return true;
+
+	switch (iSlot)
+	{
+		case 0: ClientCommand(client, "slot1");
+		case 1: ClientCommand(client, "slot2");
+		case 2: ClientCommand(client, "slot3");
+		case 3: ClientCommand(client, "slot4");
+		case 4: ClientCommand(client, "slot5");
+	}
+
+	return GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") != iLastWeapon;
+}
+
+stock bool ForceSwitchSlot(const int client, const int iSlot)
+{
+	int iWeapon = GetPlayerWeaponSlot(client, iSlot);
+	if (iWeapon <= MaxClients || !IsValidEntity(iWeapon))
+		return false;
+
+	if (TF2_IsPlayerInCondition(client, TFCond_Zoomed))
+	{
+		// Switching away while zoomed in crashes clients
+		TF2_RemoveCondition(client, TFCond_Zoomed);
+	}
+
+	if (TF2_IsPlayerInCondition(client, TFCond_Slowed))
+	{
+		// Unset weapon slowdown effect (minigun, sniper rifle)
+		TF2_RemoveCondition(client, TFCond_Slowed);
+		TF2_StunPlayer(client, 0.0, 0.0, TF_STUNFLAG_SLOWDOWN);
+	}
+
+	SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", iWeapon);
+	return true;
+}
+
+stock void SwitchToFirstValidWeapon(const int client)
+{
+	if (GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") > MaxClients)
+		return; // already holding an valid weapon
+
+	for (int iSlot = 0; iSlot < 5; ++iSlot)
+		if (ForceSwitchSlot(client, iSlot))
+			break;
 }
 
 stock int GetAmmo(const int client, const int iWeapon)
