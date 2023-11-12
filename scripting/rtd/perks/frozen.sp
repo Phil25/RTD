@@ -112,6 +112,9 @@ void Frozen_ApplyPerk(const int client, const Perk perk)
 	AcceptEntityInput(iStatue, "SetPlaybackRate");
 	CreateTimer(1.0, Timer_FrozenFreezeAnimation, EntIndexToEntRef(iStatue));
 
+	// Ensure statue is always transmitted, otherwise animations break to players who are far away.
+	SetEdictFlags(iStatue, GetEdictFlags(iStatue) | FL_EDICT_ALWAYS);
+
 	int iIce = CreateEntityByName("prop_physics_override");
 	if(iIce <= MaxClients)
 		return;
