@@ -510,6 +510,9 @@ void Frozen_OnTakeDamage(int client, int iAttacker, int iInflictor, float fDamag
 
 public Action Frozen_OnTakeDamageClient(int client, int &iAttacker, int &iInflictor, float &fDamage, int &iType, int &iWeapon, float fForce[3], float fPos[3], int iCustom)
 {
+	if (!(1 <= iAttacker <= MaxClients))
+		return Plugin_Handled;
+
 	if (iType & DMG_BLAST) // explosions can hit bot ice and client, make sure it's handled by ice only
 		return Plugin_Handled;
 
@@ -523,6 +526,9 @@ public Action Frozen_OnTakeDamageClient(int client, int &iAttacker, int &iInflic
 
 public Action Frozen_OnTakeDamageIce(int iIce, int &iAttacker, int &iInflictor, float &fDamage, int &iType, int &iWeapon, float fForce[3], float fPos[3], int iCustom)
 {
+	if (!(1 <= iAttacker <= MaxClients))
+		return Plugin_Handled;
+
 	int client = GetEntProp(iIce, Prop_Data, "m_iMaxHealth");
 	bool bFriendly = TF2_GetClientTeam(client) == TF2_GetClientTeam(iAttacker);
 
