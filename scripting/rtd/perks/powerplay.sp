@@ -40,24 +40,24 @@ public void PowerPlay_ApplyPerk(const int client, const Perk perk)
 	{
 		// Minigun revved up sound lingers and is annoying. Coincidentally this also covers Sniper
 		// Rifle zoom, which can be removed manually without waiting, but whatever.
-		Cache[client].Repeat(0.1, PowerPlay_ApplyPerkDelayCheck);
+		Cache[client].Repeat(0.1, PowerPlay_ApplyCheck);
 	}
 	else
 	{
-		PowerPlay_ApplyPerkActual(client);
+		PowerPlay_Apply(client);
 	}
 }
 
-Action PowerPlay_ApplyPerkDelayCheck(const int client)
+Action PowerPlay_ApplyCheck(const int client)
 {
 	if (TF2_IsPlayerInCondition(client, TFCond_Slowed))
 		return Plugin_Continue;
 
-	PowerPlay_ApplyPerkActual(client);
+	PowerPlay_Apply(client);
 	return Plugin_Stop;
 }
 
-void PowerPlay_ApplyPerkActual(const int client)
+void PowerPlay_Apply(const int client)
 {
 	Cache[client].InEffect = true;
 	SDKHook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
@@ -131,12 +131,16 @@ void PowerPlay_ApplyPerkActual(const int client)
 
 	Cache[client].SetEnt(Glow, iGlow);
 	SDKHook(client, SDKHook_PostThinkPost, PowerPlay_OnGlowUpdate);
+
+	g_eInGodmode.Set(client);
 }
 
 void PowerPlay_RemovePerk(const int client)
 {
 	if (!Cache[client].InEffect)
 		return;
+
+	g_eInGodmode.Unset(client);
 
 	SDKUnhook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
 	SDKUnhook(client, SDKHook_PostThinkPost, PowerPlay_OnGlowUpdate);
