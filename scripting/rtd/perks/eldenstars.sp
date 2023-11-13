@@ -105,6 +105,9 @@ void EldenStars_OnVoice(const int client)
 
 	SetEntityModel(iOrb, EMPTY_MODEL);
 
+	// Ensure orb is always transmitted, otherwise particles might linger
+	SetEdictFlags(iOrb, GetEdictFlags(iOrb) | FL_EDICT_ALWAYS);
+
 	SendTEParticleLingeringAttachedProxy(TEParticlesLingering.GodRays, iOrb, _, true);
 	SendTEParticleLingeringAttachedProxy(TEParticlesLingering.GoldenTwinkles, iOrb);
 
@@ -193,7 +196,10 @@ public Action Timer_EldenStars_Chip(Handle hTimer, const int iRef)
 
 	SetEntityModel(iChip, EMPTY_MODEL);
 
-	SendTEParticleLingeringAttachedProxy(TEParticlesLingering.GoldenTwinkles, iChip, _, true);
+	// Ensure chip is always transmitted, otherwise particles might linger
+	SetEdictFlags(iChip, GetEdictFlags(iChip) | FL_EDICT_ALWAYS);
+
+	SendTEParticleLingeringAttached(TEParticlesLingering.GoldenTwinkles, iChip, fPos, _, true);
 
 	static int iColorRed[4] = {255, 50, 50, 255};
 	static int iColorBlue[4] = {50, 50, 255, 255};
