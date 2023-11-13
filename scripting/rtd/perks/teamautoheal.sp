@@ -124,14 +124,13 @@ Action TeamAutoheal_TeamTick(const int client)
 void TeamAutoheal_Tick(const int client, const int iTarget)
 {
 	int iMaxHealth = GetEntProp(iTarget, Prop_Data, "m_iMaxHealth");
-	int iResulting = MinInt(GetClientHealth(iTarget) + Cache[client].Health, iMaxHealth);
+	int iCurHealth = GetClientHealth(iTarget);
 
-	SetEntityHealth(iTarget, iResulting);
+	bool bShouldHeal = iCurHealth < iMaxHealth;
 
-	bool bHealed = iResulting != iMaxHealth;
-
-	if (bHealed)
+	if (bShouldHeal)
 	{
+		SetEntityHealth(iTarget, MinInt(iCurHealth + Cache[client].Health, iMaxHealth));
 		SendTEParticleAttached(view_as<TEParticleId>(Cache[client].Particle), iTarget, GetRandomInt(0, 22));
 
 		if (!Cache[client].Healing.Test(iTarget))

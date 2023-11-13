@@ -56,14 +56,13 @@ public void Autoheal_RemovePerk(const int client)
 Action Autoheal_Tick(const int client)
 {
 	int iMaxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
-	int iResulting = MinInt(GetClientHealth(client) + Cache[client].Health, iMaxHealth);
+	int iCurHealth = GetClientHealth(client);
 
-	SetEntityHealth(client, iResulting);
+	bool bShouldHeal = iCurHealth < iMaxHealth;
 
-	bool bHealed = iResulting != iMaxHealth;
-
-	if (bHealed)
+	if (bShouldHeal)
 	{
+		SetEntityHealth(client, MinInt(iCurHealth + Cache[client].Health, iMaxHealth));
 		SendTEParticleAttached(view_as<TEParticleId>(Cache[client].Particle), client, GetRandomInt(0, 22));
 
 		if (!Cache[client].Healing)
@@ -78,7 +77,7 @@ Action Autoheal_Tick(const int client)
 		}
 	}
 
-	Cache[client].Healing = bHealed;
+	Cache[client].Healing = bShouldHeal;
 
 	return Plugin_Continue;
 }
