@@ -19,14 +19,12 @@
 #define SOUND_BUFF "ambient/energy/zap7.wav"
 #define TICK_INTERVAL 0.25
 
-#define CritCond Int[0]
+#define Boost Int[0]
 #define Red Int[1]
 #define Blue Int[2]
 #define Diameter Float[0]
 #define RingStart Float[1]
 #define RangeSquared Float[2]
-
-int g_iTeamCriticalsBoostSourceCount[MAXPLAYERS + 1] = {0, ...};
 
 DEFINE_CALL_APPLY_REMOVE(TeamCriticals)
 
@@ -39,10 +37,10 @@ public void TeamCriticals_Init(const Perk perk)
 
 public void TeamCriticals_ApplyPerk(const int client, const Perk perk)
 {
-	TFCond eCritType = perk.GetPrefCell("crits", 1) ? TFCond_CritOnFirstBlood : TFCond_Buffed;
+	CritBoost eCritBoost = perk.GetPrefCell("crits", 1) ? CritBoost_Full : CritBoost_Mini;
 	float fRange = perk.GetPrefFloat("range", 270.0);
 
-	Cache[client].CritCond = view_as<int>(eCritType);
+	Cache[client].Boost = view_as<int>(eCritBoost);
 	Cache[client].Diameter = fRange * 2;
 	Cache[client].RingStart = fRange / 2;
 	Cache[client].RangeSquared = fRange * fRange;
@@ -63,8 +61,7 @@ public void TeamCriticals_ApplyPerk(const int client, const Perk perk)
 		}
 	}
 
-	++g_iTeamCriticalsBoostSourceCount[client];
-	TF2_AddCondition(client, eCritType);
+	Shared[client].AddCritBoost(client, eCritBoost);
 	TF2_AddCondition(client, TFCond_MarkedForDeath);
 
 	Cache[client].Repeat(TICK_INTERVAL, TeamCriticals_SetTargets);
@@ -72,8 +69,7 @@ public void TeamCriticals_ApplyPerk(const int client, const Perk perk)
 
 void TeamCriticals_RemovePerk(const int client)
 {
-	--g_iTeamCriticalsBoostSourceCount[client];
-	TF2_RemoveCondition(client, view_as<TFCond>(Cache[client].CritCond));
+	Shared[client].RemoveCritBoost(client, view_as<CritBoost>(Cache[client].Boost));
 	TF2_RemoveCondition(client, TFCond_MarkedForDeath);
 
 	for (int i = 1; i <= MaxClients; ++i)
@@ -124,8 +120,7 @@ void TeamCriticals_SetCritBoost(int client, int iTarget)
 		return;
 
 	Cache[client].Flags.Set(iTarget);
-	++g_iTeamCriticalsBoostSourceCount[iTarget];
-	TF2_AddCondition(iTarget, view_as<TFCond>(Cache[client].CritCond));
+	Shared[iTarget].AddCritBoost(iTarget, view_as<CritBoost>(Cache[client].Boost));
 
 	EmitSoundToAll(SOUND_BUFF, iTarget);
 	int iBeam = ConnectWithBeam(client, iTarget, Cache[client].Red, 150, Cache[client].Blue, 1.3, 1.3, 10.0);
@@ -141,8 +136,7 @@ void TeamCriticals_UnsetCritBoost(int client, int iTarget)
 		return;
 
 	Cache[client].Flags.Unset(iTarget);
-	if (--g_iTeamCriticalsBoostSourceCount[iTarget] <= 0)
-		TF2_RemoveCondition(iTarget, view_as<TFCond>(Cache[client].CritCond));
+	Shared[iTarget].RemoveCritBoost(iTarget, view_as<CritBoost>(Cache[client].Boost));
 }
 
 bool TeamCriticals_IsValidTarget(int client, int iTarget, TFTeam eClientTeam, float fRangeSquared)
@@ -186,7 +180,7 @@ void TeamCriticals_OnConditionRemoved(const int client, const TFCond eCondition)
 #undef SOUND_BUFF
 #undef TICK_INTERVAL
 
-#undef CritCond
+#undef Boost
 #undef Red
 #undef Blue
 #undef Diameter

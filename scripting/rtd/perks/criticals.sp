@@ -16,21 +16,21 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define Condition Int[0]
+#define Boost Int[0]
 
 DEFINE_CALL_APPLY_REMOVE(Criticals)
 
 public void Criticals_ApplyPerk(const int client, const Perk perk)
 {
-	TFCond eCond = perk.GetPrefCell("full", 1) > 0 ? TFCond_CritOnFirstBlood : TFCond_Buffed;
+	CritBoost eCritBoost = perk.GetPrefCell("full", 1) > 0 ? CritBoost_Full : CritBoost_Mini;
 
-	Cache[client].Condition = view_as<int>(eCond);
-	TF2_AddCondition(client, eCond);
+	Cache[client].Boost = view_as<int>(eCritBoost);
+	Shared[client].AddCritBoost(client, eCritBoost);
 }
 
 void Criticals_RemovePerk(int client)
 {
-	TF2_RemoveCondition(client, view_as<TFCond>(Cache[client].Condition));
+	Shared[client].RemoveCritBoost(client, view_as<CritBoost>(Cache[client].Boost));
 }
 
-#undef Condition
+#undef Boost

@@ -193,7 +193,61 @@ enum struct PlayerCache
 	}
 }
 
+enum CritBoost
+{
+	CritBoost_Mini = 1,
+	CritBoost_Full = 2,
+}
+
+enum struct SharedCache
+{
+	int _CritBoosted;
+
+	void AddCritBoost(const int client, const CritBoost eCritBoost)
+	{
+		this._CritBoosted += view_as<int>(eCritBoost);
+
+		if (this._CritBoosted == 1)
+		{
+			TF2_AddCondition(client, TFCond_Buffed);
+			return;
+		}
+
+		if (eCritBoost == CritBoost_Mini)
+			TF2_RemoveCondition(client, TFCond_Buffed);
+
+		TF2_AddCondition(client, TFCond_CritOnFirstBlood);
+	}
+
+	void RemoveCritBoost(const int client, const CritBoost eCritBoost)
+	{
+		this._CritBoosted -= view_as<int>(eCritBoost);
+
+		if (this._CritBoosted < 0)
+		{
+			this._CritBoosted = 0;
+			return;
+		}
+
+		switch (this._CritBoosted)
+		{
+			case 0:
+			{
+				TF2_RemoveCondition(client, TFCond_CritOnFirstBlood);
+				TF2_RemoveCondition(client, TFCond_Buffed);
+			}
+
+			case 1:
+			{
+				TF2_RemoveCondition(client, TFCond_CritOnFirstBlood);
+				TF2_AddCondition(client, TFCond_Buffed);
+			}
+		}
+	}
+}
+
 PlayerCache Cache[MAXPLAYERS + 1];
+SharedCache Shared[MAXPLAYERS + 1];
 
 public Action Timer_PerkTimer(Handle hTimer, DataPack hData)
 {
