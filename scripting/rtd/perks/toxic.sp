@@ -45,7 +45,7 @@ void Toxic_ApplyPerk(const int client, const Perk perk)
 			Cache[client].SplatIndex = view_as<int>(TEParticles.GasPasserImpactRed);
 	}
 
-	EmitSoundToAll(SOUND_TOXIC, client, _, _, _, _, 250);
+	EmitSoundToAll(SOUND_TOXIC, client, _, _, _, 0.5, 250);
 
 	Cache[client].Repeat(perk.GetPrefFloat("interval", 0.2), Toxic_ApplyDamage);
 	Cache[client].Repeat(0.1, Toxic_SpawnParticles);
