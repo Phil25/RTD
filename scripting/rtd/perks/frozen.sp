@@ -542,7 +542,8 @@ public Action Frozen_OnTouchIce(int iIce, int iOther)
 	char sClassname[32];
 	GetEntityClassname(iOther, sClassname, sizeof(sClassname));
 
-	if (!StrEqual(sClassname, "tf_flame_manager"))
+	bool bIsDragonsFuryBurst = StrEqual(sClassname, "tf_projectile_balloffire");
+	if (!(StrEqual(sClassname, "tf_flame_manager") || bIsDragonsFuryBurst))
 		return Plugin_Continue;
 
 	int client = GetEntProp(iIce, Prop_Data, "m_iMaxHealth");
@@ -558,7 +559,7 @@ public Action Frozen_OnTouchIce(int iIce, int iOther)
 
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);
-	Frozen_OnTakeDamage(client, 0, 0, 6.0, DMG_BURN, fPos, true);
+	Frozen_OnTakeDamage(client, 0, 0, 6.0 + 20.0 * view_as<int>(bIsDragonsFuryBurst), DMG_BURN, fPos, true);
 
 	return Plugin_Continue;
 }
