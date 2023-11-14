@@ -49,7 +49,7 @@ public void Smite_Init(const Perk perk)
 
 void Smite_ApplyPerk(const int client, const Perk perk)
 {
-	int iMaxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
+	int iMaxHealth = Shared[client].MaxHealth;
 	int iElectrocutionTics = perk.GetPrefCell("damage_ticks", 3);
 	float fInitialDamageMultiplier = perk.GetPrefFloat("initial_damage", 0.2);
 	float fTickDamageMultiplier = perk.GetPrefFloat("tick_damage", 0.04);

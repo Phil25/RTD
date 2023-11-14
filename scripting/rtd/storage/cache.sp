@@ -201,7 +201,13 @@ enum CritBoost
 
 enum struct SharedCache
 {
+	int MaxHealth;
 	int _CritBoosted;
+
+	float MaxHealthFloat()
+	{
+		return float(this.MaxHealth);
+	}
 
 	void AddCritBoost(const int client, const CritBoost eCritBoost)
 	{

@@ -149,8 +149,7 @@ void MercsDieTwice_Resurrect(const int client)
 	EmitSoundToAll(SOUND_RESURRECT, client);
 
 	float fMulti = float(Cache[client].HealthPercentage) / 100.0;
-	float fMaxHealth = float(GetEntProp(client, Prop_Data, "m_iMaxHealth"));
-	SetEntityHealth(client, RoundFloat(fMaxHealth * fMulti));
+	SetEntityHealth(client, RoundFloat(Shared[client].MaxHealthFloat() * fMulti));
 
 	Cache[client].HealthPercentage = MaxInt(10, RoundFloat(Cache[client].HealthPercentage * 0.75));
 

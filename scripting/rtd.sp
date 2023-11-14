@@ -264,6 +264,8 @@ public void OnClientPutInServer(int client)
 
 	if (g_hRollers.GetHud(client) == null)
 		g_hRollers.SetHud(client, CreateHudSynchronizer());
+
+	SDKHook(client, SDKHook_GetMaxHealth, OnGetMaxHealth);
 }
 
 public void OnClientDisconnect(int client)
@@ -274,6 +276,13 @@ public void OnClientDisconnect(int client)
 		ForceRemovePerk(client, RTDRemove_Disconnect);
 
 	g_hRollers.Reset(client);
+	SDKUnhook(client, SDKHook_GetMaxHealth, OnGetMaxHealth);
+}
+
+public Action OnGetMaxHealth(int client, int& iMaxHealh)
+{
+	Shared[client].MaxHealth = iMaxHealh;
+	return Plugin_Continue;
 }
 
 public void OnAllPluginsLoaded()
@@ -630,7 +639,8 @@ public Action Event_RoundActive(Handle hEvent, const char[] sEventName, bool don
 public Action Event_Resupply(Handle hEvent, const char[] sEventName, bool bDontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	if (client)
+
+	if (1 <= client <= MaxClients)
 		Events.Resupply(client);
 
 	return Plugin_Continue;

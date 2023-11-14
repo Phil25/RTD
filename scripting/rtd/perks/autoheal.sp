@@ -55,14 +55,12 @@ public void Autoheal_RemovePerk(const int client)
 
 Action Autoheal_Tick(const int client)
 {
-	int iMaxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
 	int iCurHealth = GetClientHealth(client);
-
-	bool bShouldHeal = iCurHealth < iMaxHealth;
+	bool bShouldHeal = iCurHealth < Shared[client].MaxHealth;
 
 	if (bShouldHeal)
 	{
-		SetEntityHealth(client, MinInt(iCurHealth + Cache[client].Health, iMaxHealth));
+		SetEntityHealth(client, MinInt(iCurHealth + Cache[client].Health, Shared[client].MaxHealth));
 		SendTEParticleAttached(view_as<TEParticleId>(Cache[client].Particle), client, GetRandomInt(0, 22));
 
 		if (!Cache[client].Healing)
