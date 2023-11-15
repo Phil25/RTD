@@ -826,7 +826,7 @@
 
 	"RTD2_Desc_heavyrockets"
 	{
-		"en"	"Your rockets fall to the ground as they should."
+		"en"	"Your rockets fall to the ground, as they should."
 		"pl"	""
 		"chi"	""
 		"ru"	""
