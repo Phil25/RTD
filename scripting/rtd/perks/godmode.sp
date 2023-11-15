@@ -32,6 +32,13 @@
 
 ClientFlags g_eInGodmode;
 
+static char g_sResistanceHeavy[][] = {
+	"player/resistance_heavy1.wav",
+	"player/resistance_heavy2.wav",
+	"player/resistance_heavy3.wav",
+	"player/resistance_heavy4.wav",
+}
+
 methodmap GodmodeFlags
 {
 	public GodmodeFlags(const int client=0)
@@ -127,6 +134,9 @@ DEFINE_CALL_APPLY_REMOVE(Godmode)
 
 public void Godmode_Init(const Perk perk)
 {
+	for (int i = 0; i < sizeof(g_sResistanceHeavy); ++i)
+		PrecacheSound(g_sResistanceHeavy[i]);
+
 	Events.OnConditionAdded(perk, Godmode_OnConditionAdded_Any, SubscriptionType_Any);
 	Events.OnConditionRemoved(perk, Godmode_OnConditionRemoved_Any, SubscriptionType_Any);
 	Events.OnPlayerAttacked(perk, Godmode_OnPlayerAttacked);
@@ -201,7 +211,8 @@ void Godmode_RemovePerk(const int client)
 			mGodmodeFlags.RemoveAnnotation(i);
 }
 
-void Godmode_SpawnDeflectEffect(const int client, const int iType, const float fPos[3]){
+void Godmode_SpawnDeflectEffect(const int client, const int iType, const float fPos[3])
+{
 	float fTime = GetEngineTime();
 	if (fTime < Cache[client].LastDeflect + 0.1)
 		return;
@@ -232,6 +243,8 @@ Action Godmode_OnTakeDamage_Common(const int client, const int iAttacker, float 
 	if (1 <= iAttacker <= MaxClients && GodmodeFlags(client).Contains(iAttacker))
 	{
 		fDamage *= Cache[client].Resistance;
+		EmitSoundToAll(g_sResistanceHeavy[GetRandomInt(0, sizeof(g_sResistanceHeavy) - 1)], client);
+
 		return Plugin_Changed;
 	}
 
