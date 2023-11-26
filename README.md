@@ -1,5 +1,5 @@
 > # [DOWNLOAD](https://github.com/Phil25/RTD/releases/latest)
-> * [Updating from before v2.0.0](https://github.com/Phil25/RTD/wiki/updating-from-before-v2.0.0)
+> * [Discord](https://discord.gg/sUgJE278QS)
 > * [AlliedModders Thread](https://forums.alliedmods.net/showthread.php?t=278579)
 > * [Balance Spreadsheet](https://docs.google.com/spreadsheets/d/1LH_-Lk5Uho-i_rpefjpn4mBGlLWrel_5rsBtLC-RVvs/edit?usp=sharing)
 > * [Perk List](https://github.com/Phil25/RTD/wiki/perk-list)
