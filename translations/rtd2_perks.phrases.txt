@@ -29,7 +29,7 @@
 		"sv"	"Din hemska andedräkt skadar nära fiender."
 		"de"	"Dein schrecklicher Atem schädigt Feinde in einem Umkreis."
 		"chi"	"你嘴臭到可以熏晕附近的敌人."
-		"ru"	"Твое ужасное дыхание ранит ближайших врагов."
+		"ru"	"Ваше зловонное дыхание ранит ближайших врагов."
 		"pt"	"O seu hálito terrível causa dano a inimigos próximos."
 	}
 
@@ -73,7 +73,7 @@
 		"sv"	"Du får låg gravitation."
 		"de"	"Deine Anziehungskraft wurde zu einer niedriegen Schwerkraft gesetzt."
 		"chi"	"你的重力降低."
-		"ru"	"Ваша гравитация является нулевой."
+		"ru"	"Ваша гравитация на нуле!"
 		"pt"	"Sua gravidade ficou baixa."
 	}
 
@@ -84,7 +84,7 @@
 		"sv"	"Du får full Übercharge."
 		"de"	"Dein Übercharge wurde aufgeladen."
 		"chi"	"你的 Uber 能量被蓄满."
-		"ru"	"Ваш Убер-заряд был заряжен на полную."
+		"ru"	"Ваш убер-заряд был заряжен на полную."
 		"pt"	"Sua ÜberCarga foi preenchida completamente."
 	}
 
@@ -95,7 +95,7 @@
 		"sv"	"Du är osynlig."
 		"de"	"Du bist unsichtbar."
 		"chi"	"你已隐身."
-		"ru"	"Ты невидимка."
+		"ru"	"Вы невидимка."
 		"pt"	"Você está invisível."
 	}
 
@@ -117,7 +117,7 @@
 		"sv"	"Dina attacker gör kritisk skada."
 		"de"	"Deine Schüsse sind kritische Schüsse."
 		"chi"	"你的攻击是暴击."
-		"ru"	"Ваши атаки криты."
+		"ru"	"Все ваши атаки наносят криты."
 		"pt"	"Seus ataques são críticos garantidos."
 	}
 
@@ -128,7 +128,7 @@
 		"sv"	"Du får aldrig slut på ammunition."
 		"de"	"Deine Munition geht niemals leer."
 		"chi"	"你获得无限弹药."
-		"ru"	"У тебя никогда не кончатся патроны."
+		"ru"	"У вас никогда не кончатся патроны."
 		"pt"	"Sua munição nunca acaba."
 	}
 
@@ -150,7 +150,7 @@
 		"sv"	"Du kan lägga ner en Sentry Gun."
 		"de"	"Du kannst eine Sentry spawnen."
 		"chi"	"你可以生成步哨枪."
-		"ru"	"Вы можете создать Турель."
+		"ru"	"Вы можете создать турель."
 		"pt"	"Você pode invocar uma Sentinela."
 	}
 
@@ -172,7 +172,7 @@
 		"sv"	"Skyttegeväret eller Pilbågen är alltid fullt utdraget."
 		"de"	"Deine Sniper Rifle oder Huntsman sind immer voll aufgeladen."
 		"chi"	"你的狙击步枪或弓箭始终充满能量."
-		"ru"	"Снайперская винтовка или Охотник постоянно заряженные."
+		"ru"	"Снайперская винтовка или Охотник — постоянно заряженные."
 		"pt"	"O Rifle de Sniper ou o Caçador são carregados constantemente."
 	}
 
@@ -194,7 +194,7 @@
 		"sv"	"Du blir väldigt långsam."
 		"de"	"Du bist echt langsam."
 		"chi"	"你现在慢得一逼."
-		"ru"	"Ты очень медленный."
+		"ru"	"Вы очень медленны."
 		"pt"	"Você está realmente lento."
 	}
 
@@ -216,7 +216,7 @@
 		"sv"	"Ditt huvud är en bomb nu, döda någon med det."
 		"de"	"Dein Kopf ist jetzt eine Bombe, jetzt töte jemanden."
 		"chi"	"你的头变成了炸弹, 适合用来杀一些人."
-		"ru"	"Твоя голова бомба сейчас, иди убить кого-то с этим."
+		"ru"	"Теперь ваша голова — бомба, идите и убейте ею кого-нибудь."
 		"pt"	"A sua cabeça virou uma bomba! Corra atrás de alguém e o exploda!"
 	}
 
@@ -227,7 +227,7 @@
 		"sv"	"Brinn till döds."
 		"de"	"Sterb in ein Feuer."
 		"chi"	"欲火焚身."
-		"ru"	"Иди умри в огне."
+		"ru"	"Идите сгорите в огне."
 		"pt"	"Morra em chamas!"
 	}
 
@@ -238,7 +238,7 @@
 		"sv"	"Din hälsa är väldigt låg nu."
 		"de"	"Dein Leben ist nun niedrig."
 		"chi"	"你濒临死亡."
-		"ru"	"Ваше здоровье сейчас низкое."
+		"ru"	"Ваш уровень здоровья упал вниз."
 		"pt"	"A sua vida está baixa."
 	}
 
@@ -260,7 +260,7 @@
 		"sv"	"Vart tog alla vägen?"
 		"de"	"Wo ist jeder hin gegangen?"
 		"chi"	"人都哪去了?"
-		"ru"	"Куда все пропали?"
+		"ru"	"Куда все подевались?"
 		"pt"	"Para onde foi todo mundo?"
 	}
 
@@ -282,7 +282,7 @@
 		"sv"	"Låt dina fiender veta vart du är, du är inte rädd för dem."
 		"de"	"Lass dein Feind wissen wo du bist, du hast keine Angst vor den."
 		"chi"	"敌人现在知道你的位置, 反正你也不怕他们."
-		"ru"	"Пусть враги знают, где ты, ты их не боишься."
+		"ru"	"Пусть враги знают, где вы, вы их не боитесь."
 		"pt"	"Deixe os inimigos saberem onde você está, você não tem medo deles."
 	}
 
@@ -293,7 +293,7 @@
 		"sv"	"Kan... inte... sluta... visa min överlägsenhet!"
 		"de"	"Kann...nicht...aufhören...meine Überlegenheit zu zeigen!"
 		"chi"	"老子...就是要嘲讽...根本停不下来!"
-		"ru"	"Не могу... перестать... показывать свое превосходство!"
+		"ru"	"Не могу... перестать... показывать своё превосходство!"
 		"pt"	"Não... consigo... parar... de... exibir minha superioridade!"
 	}
 
@@ -304,7 +304,7 @@
 		"sv"	"Du ser i svart och vitt."
 		"de"	"Deine Sicht ist Schwarz und Weiß."
 		"chi"	"你的视觉是黑白的."
-		"ru"	"Ваше зрение черно-белое."
+		"ru"	"Теперь вы видите всё в чёрно-белом цвете."
 		"pt"	"Sua visão está preta e branca."
 	}
 
@@ -315,7 +315,7 @@
 		"sv"	"Marken skakar!"
 		"de"	"Der Boden wackelt!"
 		"chi"	"你遭遇了地震!"
-		"ru"	"Земля трясется!"
+		"ru"	"Земля трясётся!"
 		"pt"	"O chão está tremendo!"
 	}
 
@@ -326,7 +326,7 @@
 		"sv"	"Vad som händer när du drar bak dina ögonlock."
 		"de"	"Das passiert wenn du deine Augenlieder zurück ziehst."
 		"chi"	"你的眼睛发生了一些神秘变化."
-		"ru"	"Что происходет, если вы оттяните веки назад."
+		"ru"	"Что произойдёт, если вы оттянете веки назад."
 		"pt"	"Isto é o que acontece quando você puxa as suas pálpebras para trás."
 	}
 
@@ -348,7 +348,7 @@
 		"sv"	"Du kan lägga ner en Dispenser."
 		"de"	"Du kannst einen Dispenser spawnen."
 		"chi"	"你可以生成补给器."
-		"ru"	"Вы можете создать Раздатчик."
+		"ru"	"Вы можете создать раздатчик."
 		"pt" 	"Você pode invocar um Fornecedor."
 	}
 
@@ -381,7 +381,7 @@
 		"sv"	"Nu skrattar andra åt dig bakom ryggen."
 		"de"	"Andere Soldaten lachen dich hinter deinen Rücken aus."
 		"chi"	"其他人正在背后笑你."
-		"ru"	"Другие наемники теперь шутят за вашей спиной."
+		"ru"	"Другие наёмники теперь подшучивают над вами за вашей спиной."
 		"pt"	"Sua cabeça está gigante!"
 	}
 
@@ -392,7 +392,7 @@
 		"sv"	"Du har krympt, creepa på vem du vill!"
 		"de"	"Du bist geschrumpt, schleich dich an die jede an die du willst!"
 		"chi"	"你被缩小了, 可以方便地站在巨人的肩膀上!"
-		"ru"	"Вы уменьшились, подкрадывайтесь к кому хотите!"
+		"ru"	"Вы уменьшились! Подкрадывайтесь к кому хотите!"
 		"pt"	"Você encolheu, rasteje por onde quiser!"
 	}
 
@@ -403,7 +403,7 @@
 		"sv"	"Du flyger upp i luften och exploderar."
 		"de"	"Steig hoch und geh mit einen awe runter."
 		"chi"	"一炮把你轰上天, 你与太阳肩并肩."
-		"ru"	"Поднимись высоко и опустись с восхищением."
+		"ru"	"Вы стали фейерверком."
 		"pt"	"Erga-se e desça com estilo."
 	}
 
@@ -425,7 +425,7 @@
 		"sv"	"Ramla inte, annars bryter du benet... eller båda."
 		"de"	"Fall nicht hin oder du brichst dir dein Bein... oder beide."
 		"chi"	"不要走动, 否则你会伤到腿......或两者兼得."
-		"ru"	"Не споткнись, иначе сломаешь ногу... или обе."
+		"ru"	"Не споткнитесь, иначе сломаете ногу... или обе."
 		"pt"	"Não tropece ou você vai quebrar sua perna... ou ambas."
 	}
 
@@ -457,7 +457,7 @@
 		"pl"	"Ten hełm ci nie pomoże."
 		"de"	"Dieser Helm wird dich nich' beschützen."
 		"chi"	"头盔也救不了你."
-		"ru"	"Этот шлем не спасет тебя."
+		"ru"	"Этот шлем не спасёт вас."
 		"pt"	"Um capacete não vai te salvar."
 	}
 
@@ -468,7 +468,7 @@
 		"sv"	"Mer ammo, mer skill."
 		"de"	"Mehr Munition, mehr Skill."
 		"chi"	"子弹越多越牛逼."
-		"ru"	"Больше боеприпасов, больше навыков."
+		"ru"	"Больше боеприпасов, больше мастерства."
 		"pt"	"Mais munição, mais habilidade."
 	}
 
@@ -490,7 +490,7 @@
 		"sv"	"Nu är du en skicklig soldat."
 		"de"	"Du bist jetzt ein schneller Soldat."
 		"chi"	"你现在是职业玩家."
-		"ru"	"Вы теперь умелый наемник."
+		"ru"	"Вы теперь умелый наёмник."
 		"pt"	"Você agora é um mercenário habilidoso."
 	}
 
@@ -501,7 +501,7 @@
 		"sv"	"Din awesomeness glöder genom väggar. Fienden märker dig."
 		"de"	"Dein schönes Aussehen scheint durch die Wände. Und alarmiert Feinde."
 		"chi"	"你浑身发光, 所有人都看得见你."
-		"ru"	"Твоя крутость светится сквозь стены. И светит врагам тоже."
+		"ru"	"Ваша крутость светится сквозь стены. И светит врагам тоже."
 		"pt"	"Sua magnificência brilha através das paredes. E informa seus inimigos."
 	}
 
@@ -512,7 +512,7 @@
 		"sv"	"Din maxhälsa är ökad."
 		"de"	"Dein Maximales Leben wurde erhöht."
 		"chi"	"你的生命值上限提升."
-		"ru"	"Ваше максимальное здоровье увеличено."
+		"ru"	"Ваш максимальный уровень здоровья увеличен."
 		"pt"	"Sua vida máxima é aumentada."
 	}
 
@@ -523,7 +523,7 @@
 		"sv"	"Hoppa till månen och bli dödad på vägen."
 		"de"	"Springe zum Mond und werde auf den weg dahin getötet."
 		"chi"	"月球挨揍之旅愉快."
-		"ru"	"Прыгни на Луну и убейся тем временем."
+		"ru"	"Прыгните на Луну, а вас тем временем убьют."
 		"pt"	"Pule em direção à lua e seja morto no meio do caminho."
 	}
 
@@ -534,7 +534,7 @@
 		"sv"	"Stå nära en lagkamrat för att ge dem kritisk skada."
 		"de"	"Stehe in der nähe eines Teammitglieds und gebe ihn kritische Schüsse."
 		"chi"	"给附近的队友暴击加成."
-		"ru"	"Встаньте рядом с товарищами по команде, чтобы дать им криты."
+		"ru"	"Стойте рядом с союзниками, чтобы дать им криты."
 		"pt"	"Fique perto dos seus aliados e garanta críticos para eles."
 	}
 
@@ -545,7 +545,7 @@
 		"sv"	"Du exploderar inte, men tänder fyr på alla andra runtomkring."
 		"de"	"Du explodierst nicht, setzt aber jeden in einem Umkreis in Flammen."
 		"chi"	"你不会瞬间爆炸, 但是会点燃附近的人."
-		"ru"	"Вы не взорветесь, но зажжете всех вокруг."
+		"ru"	"Вы не взорвётесь, но подожжёте всех вокруг."
 		"pt"	"Você não explode, mas incendeia todos ao seu redor."
 	}
 
@@ -567,7 +567,7 @@
 		"sv"	"Dina vapenfärdigheter är borta."
 		"de"	"Deine Schuss Fähigkeiten sind weg."
 		"chi"	"你的瞄准技巧不见了."
-		"ru"	"Ваши навыки стрельбы из огнестрельного оружия пропали."
+		"ru"	"Вы разучились стрелять из огнестрельного оружия."
 		"pt"	"Suas habilidades com armas de fogo sumiram."
 	}
 
@@ -578,7 +578,7 @@
 		"sv"	"Går du till vänster och upp eller  bak och höger eller neråt?"
 		"de"	"Du gehts nach links und nach oben und nach rechts oder nach unten?"
 		"chi"	"你失去了方向感...?"
-		"ru"	"Вы идете налево и вы идете вверх или назад и вправо или вниз...?"
+		"ru"	"Вы идёте налево, вверх или назад и направо или вниз...?"
 		"pt" 	"Você vai para a esquerda e você vai para cima ou para trás e para a direita ou para baixo...?"
 	}
 
@@ -589,7 +589,7 @@
 		"sv"	"Du inser att du faktiskt kan ta flera av dessa med dig."
 		"de"	"Du hast realisiert das du mehrere davon mitnehmen kannst."
 		"chi"	"你现在有了更多垃圾可以乱扔."
-		"ru"	"Вы поняли, что можете взять больше с собой."
+		"ru"	"Вы осознали, что вам нужно взять побольше боезапаса с собой."
 		"pt"	"Você percebe que você pode carregar mais destes com você."
 	}
 
@@ -631,7 +631,7 @@
 		"en"	"Cannot stop jumping."
 		"pl"	"Nie możesz przestać skakać."
 		"chi"	"跳来跳去."
-		"ru"	"Не могу перестать прыгать."
+		"ru"	"Невозможно перестать прыгать."
 		"pt"	"Não consegue parar de pular."
 	}
 
@@ -640,7 +640,7 @@
 		"en"	"Must be the busy hour."
 		"pl"	"Musi być godzina szczytu."
 		"chi"	"卡死老子了..."
-		"ru"	"Должно быть занятой час."
+		"ru"	"И вдруг все работяги вернулись сыграть в одну игру..."
 		"pt"	"E de repente, todo mundo começou a usar a internet..."
 	}
 
@@ -658,7 +658,7 @@
 		"en"	"Extends arms."
 		"pl"	"Wydłuża ramiona."
 		"chi"	"寡人手长."
-		"ru"	"Продлевает руки."
+		"ru"	"Длинные руки."
 		"pt"	"Braços estendidos."
 	}
 
@@ -667,7 +667,7 @@
 		"en"	"Finally, a proper use for those."
 		"pl"	"Nareszcie, dobry z nich pożytek."
 		"chi"	"真正的帽子模拟器可以扔出帽子砸人."
-		"ru"	"Наконец, правильное использование для них."
+		"ru"	"Наконец-то, хоть сейчас эта штука пригодилась."
 		"pt"	"Finalmente, um uso correto dos chapéus."
 	}
 
@@ -685,7 +685,7 @@
 		"en"	"Calling for medic won't help you."
 		"pl"	"Medyk ci nie pomoże."
 		"chi"	"这次叫医生也没用."
-		"ru"	"Вызов медика не поможет вам."
+		"ru"	"Медик не поможет вам."
 		"pt"	"Chamar por um médico não vai te ajudar."
 	}
 
@@ -703,7 +703,7 @@
 		"en"	"Resurrect yourself on death."
 		"pl"	"Wskrześ się po śmierci."
 		"chi"	"佣兵不朽!"
-		"ru"	"Воскресить себя при смерти."
+		"ru"	"Воскрешение при смерти."
 		"pt"	"Ressuscite ao morrer."
 	}
 
@@ -712,7 +712,7 @@
 		"en"	"Don't drink and fight."
 		"pl"	"Nigdy nie pij i walcz."
 		"chi"	"酒后玩游戏, 亲人两行泪."
-		"ru"	"Не пей и сражайся."
+		"ru"	"Хватит бухать и сражайся."
 		"pt"	"Não lute após beber."
 	}
 
@@ -730,7 +730,7 @@
 		"en"	"Cannot trust your own weapons."
 		"pl"	"Nie zaufasz swoim broniom."
 		"chi"	"不要相信自己的武器."
-		"ru"	"Не могу доверять собственному оружию."
+		"ru"	"Не доверяйте даже собственному оружию."
 		"pt"	"Você não pode confiar em suas próprias armas."
 	}
 
@@ -739,7 +739,7 @@
 		"en"	"Loose health when not damaging enemies."
 		"pl"	"Tracisz zdrowie nie zadając obrażeń przeciwnikom."
 		"chi"	"要么输出, 要么死."
-		"ru"	"Потеря здоровья, если не наносишь вред врагу."
+		"ru"	"Вы теряете здоровье, если не наносите вред врагу."
 		"pt"	"Perca vida quando não estiver causando dano a inimigos."
 	}
 
@@ -748,7 +748,7 @@
 		"en"	"Swarmed with bats defending you."
 		"pl"	"Nietoperze cię obraniają."
 		"chi"	"蝙蝠竟在你身边."
-		"ru"	"Рой летучих мышей защищает тебя."
+		"ru"	"Рой летучих мышей оберегает вас."
 		"pt"	"Uma revoada de morcegos está te protegendo."
 	}
 
@@ -766,7 +766,7 @@
 		"en"	"Unleash hell from the nightmares."
 		"pl"	"Rozpętaj piekło z koszmarów."
 		"chi"	"释放来自梦靥的地狱."
-		"ru"	"Выпусти ад из ночных кошмаров."
+		"ru"	"Выпуск ада из ночных кошмаров."
 		"pt"	"Liberte o terror de seus pesadelos."
 	}
 
@@ -775,7 +775,7 @@
 		"en"	"Get struck down by God."
 		"pl"	"Zostań proażony z niebios."
 		"chi"	"雷神天降."
-		"ru"	"Повержен Богом."
+		"ru"	"Бог решил забрать вас."
 		"pt"	"Seja eliminado por Deus."
 	}
 
@@ -784,7 +784,7 @@
 		"en"	"Overheal boost for your Medi Gun."
 		"pl"	"Ulepszony overheal."
 		"chi"	"提升医疗枪的超量治疗."
-		"ru"	"Увеличенние сверх-лечения для вашей Лечебной пушки."
+		"ru"	"Увеличенное сверхлечение для вашей лечебной пушки."
 		"pt"	"Bônus de sobrecura para a sua Arma Médica."
 	}
 
@@ -793,7 +793,7 @@
 		"en"	"Hurl a spear of lightning, damaging enemies or boosting allies."
 		"pl"	""
 		"chi"	""
-		"ru"	""
+		"ru"	"Бросьте копьё молнии, наносящее урон врагам или усиливающее союзников."
 		"pt"	""
 	}
 
@@ -802,7 +802,7 @@
 		"en"	"Conjure a stream of shooting stars that assail the area."
 		"pl"	""
 		"chi"	""
-		"ru"	""
+		"ru"	"Сотворите поток падающих звёзд, которые обрушиваются на область."
 		"pt"	""
 	}
 
@@ -811,7 +811,7 @@
 		"en"	"Can move only by jumping."
 		"pl"	""
 		"chi"	""
-		"ru"	""
+		"ru"	"Можно перемещаться только прыжками."
 		"pt"	""
 	}
 
@@ -820,7 +820,7 @@
 		"en"	"Spy is gonna get you! Or will he?"
 		"pl"	""
 		"chi"	""
-		"ru"	""
+		"ru"	"Шпион доберется до вас! Хм... или же вам кажется?"
 		"pt"	""
 	}
 
@@ -829,7 +829,7 @@
 		"en"	"Your rockets fall to the ground, as they should."
 		"pl"	""
 		"chi"	""
-		"ru"	""
+		"ru"	"Ваши ракеты падают на землю, как и должны."
 		"pt"	""
 	}
 
@@ -838,7 +838,7 @@
 		"en"	"Mixes up attack patterns so even you won't know what's coming."
 		"pl"	""
 		"chi"	""
-		"ru"	""
+		"ru"	"Смешивает схемы атак так, что даже вы не будете знать, что вас ожидает."
 		"pt"	""
 	}
 
@@ -847,7 +847,7 @@
 		"en"	"Rapid self healing."
 		"pl"	""
 		"chi"	""
-		"ru"	""
+		"ru"	"Быстрое самолечение."
 		"pt"	""
 	}
 
@@ -856,7 +856,7 @@
 		"en"	"Healing of self and nearby teammates."
 		"pl"	""
 		"chi"	""
-		"ru"	""
+		"ru"	"Лечение себя и ближайших союзников."
 		"pt"	""
 	}
 
