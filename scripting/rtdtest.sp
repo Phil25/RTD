@@ -64,13 +64,17 @@ public void OnPluginStart()
 	HookEvent("teamplay_round_start", Event_RoundStart);
 	HookEvent("arena_round_start", Event_RoundStart);
 	HookEvent("mvm_begin_wave", Event_RoundStart);
-	RemoveObjectives();
 
 	RegAdminCmd("sm_rtdstress", Command_Stress, ADMFLAG_ROOT, "Run RTD stress test.");
 
 	for (int i = 1; i <= MaxClients; ++i)
 		if (IsClientInGame(i))
 			OnClientPutInServer(i);
+}
+
+public void OnMapStart()
+{
+	RemoveObjectives();
 }
 
 public void TF2_OnWaitingForPlayersStart()

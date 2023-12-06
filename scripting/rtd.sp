@@ -151,7 +151,6 @@ public void OnPluginStart()
 	g_hFwdRemoved = CreateGlobalForward("RTD2_Removed", ET_Event, Param_Cell, Param_Cell, Param_Cell);
 	g_hFwdOnRegOpen = CreateGlobalForward("RTD2_OnRegOpen", ET_Ignore);
 
-
 	// Commands
 	RegAdminCmd("sm_rtd", Command_RTD, 0, "Roll a perk.");
 	RegAdminCmd("sm_perks", Command_DescMenu, 0, "Display a description menu of RTD perks.");
