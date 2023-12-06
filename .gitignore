@@ -12,3 +12,4 @@ compile.sh
 *.zip
 .exrc
 .vscode
+venv
