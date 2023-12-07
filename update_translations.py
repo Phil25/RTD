@@ -17,6 +17,7 @@ def to_sm_code(lang: str) -> str:
         "es-es": "es", # Spanish
         "fi": "fi", # Finnish
         "fr": "fr", # French
+        "hu": "hu", # Hungarian
         "pl": "pl", # Polish
         "pt-br": "pt", # Brazilian Portuguese
         "ru": "ru", # Russian
