@@ -139,7 +139,7 @@ void Invisibility_Blink(const int client)
 	EmitSoundToAll(SOUND_PING, client);
 
 	Invisibility_UnsetOverlay(client);
-	Cache[client].Repeat(Cache[client].BlinkRate / 2, Invisibility_SetOverlay);
+	Cache[client].Delay(Cache[client].BlinkRate / 2, Invisibility_SetOverlay);
 }
 
 void Invisibility_Set(const int client, const int iValue)
@@ -174,10 +174,9 @@ void Invisibility_Set(const int client, const int iValue)
 	}
 }
 
-public Action Invisibility_SetOverlay(const int client)
+public void Invisibility_SetOverlay(const int client)
 {
 	SetOverlay(client, ClientOverlay_Stealth);
-	return Plugin_Stop;
 }
 
 public void Invisibility_UnsetOverlay(const int client)

@@ -26,22 +26,18 @@ public void Suffocation_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Rate = perk.GetPrefFloat("rate", 1.0);
 	Cache[client].Damage = perk.GetPrefFloat("damage", 5.0);
 
-	Cache[client].Repeat(perk.GetPrefFloat("delay", 12.0), Suffocation_Begin);
+	Cache[client].Delay(perk.GetPrefFloat("delay", 12.0), Suffocation_Begin);
 }
 
-public Action Suffocation_Begin(const int client)
+public void Suffocation_Begin(const int client)
 {
 	SDKHooks_TakeDamage(client, 0, 0, Cache[client].Damage, DMG_DROWN);
-
 	Cache[client].Repeat(Cache[client].Rate, Suffocation_Tick);
-
-	return Plugin_Stop;
 }
 
 public Action Suffocation_Tick(const int client)
 {
 	SDKHooks_TakeDamage(client, 0, 0, Cache[client].Damage, DMG_DROWN);
-
 	return Plugin_Continue;
 }
 

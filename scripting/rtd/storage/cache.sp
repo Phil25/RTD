@@ -79,6 +79,7 @@ enum EntCleanup
 }
 
 typedef PerkRepeater = function Action(const int client);
+typedef PerkDelay = function void(const int client);
 typedef PlayerHurt = function void(const int client, const int iAttacker);
 
 enum struct PlayerCache
@@ -121,19 +122,39 @@ enum struct PlayerCache
 
 	void Repeat(const float fInterval, PerkRepeater hFunc)
 	{
-		int i = this._FindTimerDataIndex();
-		this._TimerData[i] = new DataPack();
+		int iDataIndex = this._PreparePerkTimerDataPack();
+		this._TimerData[iDataIndex].WriteFunction(hFunc);
 
+		this._CreatePerkTimer(fInterval, Timer_PerkTimer, iDataIndex, TIMER_REPEAT);
+	}
+
+	void Delay(const float fDelay, PerkDelay hFunc)
+	{
+		int iDataIndex = this._PreparePerkTimerDataPack();
+		this._TimerData[iDataIndex].WriteFunction(hFunc);
+
+		this._CreatePerkTimer(fDelay, Timer_PerkDelay, iDataIndex);
+	}
+
+	int _PreparePerkTimerDataPack()
+	{
+		int i = this._FindTimerDataIndex();
+
+		this._TimerData[i] = new DataPack();
 		this._TimerData[i].WriteCell(i);
-		this._TimerData[i].WriteFunction(hFunc);
 		this._TimerData[i].WriteCell(this._ClientIndex);
 
-		CreateTimer(fInterval, Timer_PerkTimer, this._TimerData[i], TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
+		return i;
+	}
+
+	void _CreatePerkTimer(const float fTime, Timer hFunc, const int iDataIndex, const int iFlags=0)
+	{
+		CreateTimer(fTime, hFunc, this._TimerData[iDataIndex], iFlags | TIMER_DATA_HNDL_CLOSE);
 
 #if defined DEBUG
 		char sCaller[64];
-		GetCallerName(sCaller, sizeof(sCaller));
-		LogError("[%s] Created timer for %N<%d>: %x", sCaller, this._ClientIndex, this._ClientIndex, this._TimerData[i]);
+		GetCallerName(sCaller, sizeof(sCaller), 2);
+		LogError("[%s] Created timer for %N<%d>: %x", sCaller, this._ClientIndex, this._ClientIndex, this._TimerData[iDataIndex]);
 #endif
 	}
 
@@ -160,7 +181,7 @@ enum struct PlayerCache
 				return i;
 
 		// This should never happen
-		LogError("Could not find available timer index.");
+		LogError("Internal error: could not find available timer index.");
 		return -1;
 	}
 
@@ -256,6 +277,16 @@ enum struct SharedCache
 PlayerCache Cache[MAXPLAYERS + 1];
 SharedCache Shared[MAXPLAYERS + 1];
 
+// should not be necessary but acts as extra failsafe in case an error happens elsewhere
+bool ValidatePerkTimerClient(const int client)
+{
+	if (IsClientInGame(client) && IsPlayerAlive(client))
+		return true;
+
+	LogError("Internal error: client %L is not in game or not alive.", client);
+	return false;
+}
+
 public Action Timer_PerkTimer(Handle hTimer, DataPack hData)
 {
 	hData.Reset();
@@ -265,9 +296,14 @@ public Action Timer_PerkTimer(Handle hTimer, DataPack hData)
 	if (iIndex == -1)
 		return Plugin_Stop;
 
-	Call_StartFunction(INVALID_HANDLE, hData.ReadFunction());
-
 	int client = hData.ReadCell();
+	if (!ValidatePerkTimerClient(client))
+	{
+		Cache[client]._NullifyTimerData(iIndex);
+		return Plugin_Stop;
+	}
+
+	Call_StartFunction(INVALID_HANDLE, hData.ReadFunction());
 	Call_PushCell(client);
 
 	int iResult;
@@ -280,4 +316,28 @@ public Action Timer_PerkTimer(Handle hTimer, DataPack hData)
 	}
 
 	return view_as<Action>(iResult);
+}
+
+public Action Timer_PerkDelay(Handle hTimer, DataPack hData)
+{
+	hData.Reset();
+	int iIndex = hData.ReadCell();
+
+	// timer marked for deletion
+	if (iIndex == -1)
+		return Plugin_Stop;
+
+	int client = hData.ReadCell();
+	if (!ValidatePerkTimerClient(client))
+	{
+		Cache[client]._NullifyTimerData(iIndex);
+		return Plugin_Stop;
+	}
+
+	Call_StartFunction(INVALID_HANDLE, hData.ReadFunction());
+	Call_PushCell(client);
+	Call_Finish();
+
+	Cache[client]._NullifyTimerData(iIndex);
+	return Plugin_Stop;
 }

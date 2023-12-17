@@ -38,7 +38,7 @@ public void DrunkWalk_ApplyPerk(const int client, const Perk perk)
 	Cache[client].TurnAngle = perk.GetPrefFloat("turnangle", 15.0);
 
 	if (Cache[client].IsDemoman)
-		Cache[client].Repeat(3.5, DrunkWalk_DemomanDeny);
+		Cache[client].Delay(3.5, DrunkWalk_DemomanDeny);
 }
 
 void DrunkWalk_RemovePerk(const int client)
@@ -46,10 +46,9 @@ void DrunkWalk_RemovePerk(const int client)
 	ResetSpeed(client);
 }
 
-public Action DrunkWalk_DemomanDeny(const int client)
+public void DrunkWalk_DemomanDeny(const int client)
 {
 	EmitSoundToAll("vo/demoman_no02.mp3", client, SNDCHAN_VOICE);
-	return Plugin_Stop;
 }
 
 bool DrunkWalk_OnSound(const int client, const char[] sSound)

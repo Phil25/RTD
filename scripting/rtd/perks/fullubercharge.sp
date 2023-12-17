@@ -121,9 +121,7 @@ public Action Timer_FullUbercharge_ExtendCharge(Handle hTimer, DataPack hData)
 
 	int iMedigun = EntRefToEntIndex(hData.ReadCell());
 	if (iMedigun > MaxClients && GetEntPropFloat(iMedigun, Prop_Send, "m_flChargeLevel") > 0.05)
-	{
 		return Plugin_Continue;
-	}
 
 	switch (view_as<TFCond>(hData.ReadCell()))
 	{

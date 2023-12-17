@@ -186,13 +186,16 @@ public Action Event_Homing_RoundStart(Handle hEvent, const char[] sName, bool bD
 * GENERAL
 */
 
-stock void GetCallerName(char[] sBuffer, const int iBufferLenght)
+stock void GetCallerName(char[] sBuffer, const int iBufferLenght, const int iOffset=1)
 {
 	FrameIterator eFrameIter = new FrameIterator();
 
 	eFrameIter.Next(); // exit FrameIterator ctor
 	eFrameIter.Next(); // exit GetCallerName
-	eFrameIter.Next(); // exit the function GetCallerName is called from
+
+	// exit the function GetCallerName is called from, or any custom offset
+	for (int i = 0; i < iOffset; ++i)
+		eFrameIter.Next();
 
 	eFrameIter.GetFunctionName(sBuffer, iBufferLenght);
 	delete eFrameIter;

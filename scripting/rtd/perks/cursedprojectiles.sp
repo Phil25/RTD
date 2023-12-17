@@ -37,8 +37,7 @@ void CursedProjectiles_ApplyPerk(const int client, const Perk perk)
 
 public void CursedProjectiles_OnProjectileSpawn(const int client, const int iProjectile)
 {
-	// 0.1 -- must match the delay between entity creation and spawn, hardcoded in main plugin part
-	CreateTimer(Cache[client].Delay - 0.1, Timer_CursedProjectiles_Turn, EntIndexToEntRef(iProjectile));
+	CreateTimer(Cache[client].Delay, Timer_CursedProjectiles_Turn, EntIndexToEntRef(iProjectile));
 }
 
 public Action Timer_CursedProjectiles_Turn(Handle hTimer, int iRef)

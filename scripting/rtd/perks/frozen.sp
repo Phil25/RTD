@@ -81,7 +81,7 @@ void Frozen_ApplyPerk(const int client, const Perk perk)
 
 	// Statue animation starts in a very awkward position, we can spawn it hidden, then switch to it
 	// on a better frame. 0.2s from initialization seems like a good time.
-	Cache[client].Repeat(0.2, Frozen_ApplyPost);
+	Cache[client].Delay(0.2, Frozen_ApplyPost);
 
 	char sClientModel[64], sValueBuffer[8];
 	float fPos[3], fAng[3];
@@ -144,11 +144,11 @@ void Frozen_ApplyPerk(const int client, const Perk perk)
 	SDKHook(iIce, SDKHook_Touch, Frozen_OnTouchIce);
 }
 
-public Action Frozen_ApplyPost(const int client)
+public void Frozen_ApplyPost(const int client)
 {
 	int iStatue = Cache[client].GetEnt(Statue).Index;
 	if (iStatue <= MaxClients)
-		return Plugin_Stop;
+		return;
 
 	Frozen_Set(client, 0);
 	Frozen_SetEntityAlpha(iStatue, Cache[client].OriginalAlpha);
@@ -157,7 +157,7 @@ public Action Frozen_ApplyPost(const int client)
 	// forced. In this case let's optimize things and not recreate their wearables onto the
 	// statue. This will also mean they do not have to be resupplied after the perk ends.
 	if (g_ePerkFrozen.GetActiveCountGlobal() > 3)
-		return Plugin_Stop;
+		return;
 
 	Frozen_TransferWearables(client, iStatue);
 	Cache[client].NeedsResupply = true;
@@ -174,8 +174,6 @@ public Action Frozen_ApplyPost(const int client)
 	SendTEParticleLingeringAttached(TEParticlesLingering.Frostbite, iStatue, fPos, Attachments[c].Back);
 	SendTEParticleLingeringAttached(TEParticlesLingering.Frostbite, iStatue, fPos, Attachments[c].FootL);
 	SendTEParticleLingeringAttached(TEParticlesLingering.Frostbite, iStatue, fPos, Attachments[c].FootR);
-
-	return Plugin_Stop;
 }
 
 public Action Timer_FrozenFreezeAnimation(Handle hTimer, const int iEntRef)

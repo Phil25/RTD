@@ -51,12 +51,12 @@ void StripToMelee_ApplyPerk(const int client, const Perk perk)
 	Cache[client].FlingSpeed = perk.GetPrefFloat("flingspeed", 2000.0);
 	Cache[client].BoxHealth = perk.GetPrefFloat("boxhealth", 100.0); // will be round to int
 
-	// Client isn't in roll during *_ApplyPerk functions. Let's wait a frame for that to happen.
+	// Client isn't in roll during *_ApplyPerk functions. Let's wait a bit for that to happen.
 	// We need to do this because we trigger a resupply, event of which won't run this early.
-	Cache[client].Repeat(0.0, StripToMelee_ApplyPerkPost);
+	Cache[client].Delay(0.1, StripToMelee_ApplyPerkPost);
 }
 
-public Action StripToMelee_ApplyPerkPost(const int client)
+public void StripToMelee_ApplyPerkPost(const int client)
 {
 	StripToMelee_ForceResupply(client, Cache[client].RefillHealth > 0); // sets LastWeaponsRemoved
 
@@ -71,7 +71,6 @@ public Action StripToMelee_ApplyPerkPost(const int client)
 	}
 
 	Cache[client].Repeat(0.5, StripToMelee_Ping);
-	return Plugin_Stop;
 }
 
 public Action StripToMelee_Ping(const int client)

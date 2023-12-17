@@ -607,7 +607,7 @@ public Action Event_ClassChange(Handle hEvent, const char[] sEventName, bool don
 	DataPack hData = new DataPack();
 	hData.WriteCell(iUserId);
 	hData.WriteCell(iClass);
-	CreateTimer(0.0, Timer_ClassChangePost, hData, TIMER_DATA_HNDL_CLOSE);
+	CreateTimer(0.1, Timer_ClassChangePost, hData, TIMER_DATA_HNDL_CLOSE);
 
 	return Plugin_Continue;
 }
