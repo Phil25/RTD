@@ -1672,7 +1672,8 @@ bool IsRollerDonator(int client)
 	return false;
 }
 
-bool IsPlayerFriendly(int client)
+// `stock` to suppress unused parameter when neither Friendly or FriendlySimple are present.
+stock bool IsPlayerFriendly(const int client)
 {
 #if defined _friendly_included
 	if (g_bPluginFriendly)
