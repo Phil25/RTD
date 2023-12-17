@@ -2,6 +2,7 @@
 Handle g_hCvarPluginEnabled;
 bool g_bCvarPluginEnabled = true;
 
+#if defined _updater_included
 #define DESC_AUTO_UPDATE "0/1 - Enable or disable automatic updating of the plugin when Updater is installed."
 Handle g_hCvarAutoUpdate;
 bool g_bCvarAutoUpdate = true;
@@ -9,6 +10,7 @@ bool g_bCvarAutoUpdate = true;
 #define DESC_RELOAD_UPDATE "0/1 - Enable or disable automatic plugin reloading when a new version has been downloaded."
 Handle g_hCvarReloadUpdate;
 bool g_bCvarReloadUpdate = true;
+#endif
 
 #define DESC_LOG "0/1 - Log RTD actions to SourceMod logs?"
 Handle g_hCvarLog;
@@ -104,8 +106,10 @@ ConVar g_hCvarShowDesc;
 void SetupConVars()
 {
 	g_hCvarPluginEnabled		= CreateConVar("sm_rtd2_enabled",		"1",		DESC_PLUGIN_ENABLED,		FLAGS_CVARS);
+#if defined _updater_included
 	g_hCvarAutoUpdate			= CreateConVar("sm_rtd2_autoupdate",	"1",		DESC_AUTO_UPDATE,			FLAGS_CVARS);
 	g_hCvarReloadUpdate			= CreateConVar("sm_rtd2_reloadupdate",	"1",		DESC_RELOAD_UPDATE,			FLAGS_CVARS);
+#endif
 	g_hCvarLog					= CreateConVar("sm_rtd2_log",			"0",		DESC_LOG,					FLAGS_CVARS);
 	g_hCvarChat					= CreateConVar("sm_rtd2_chat",			"63",		DESC_CHAT,					FLAGS_CVARS);
 
@@ -140,8 +144,10 @@ void SetupConVars()
 
 		//-----[ ConVars Hooking & Setting ]-----//
 	HookConVarChange(g_hCvarPluginEnabled,		ConVarChange_Plugin	);	g_bCvarPluginEnabled		= GetConVarInt(g_hCvarPluginEnabled) > 0 ? true : false;
+#if defined _updater_included
 	HookConVarChange(g_hCvarAutoUpdate,			ConVarChange_Plugin	);	g_bCvarAutoUpdate			= GetConVarInt(g_hCvarAutoUpdate) > 0 ? true : false;
 	HookConVarChange(g_hCvarReloadUpdate,		ConVarChange_Plugin	);	g_bCvarReloadUpdate			= GetConVarInt(g_hCvarReloadUpdate) > 0 ? true : false;
+#endif
 	HookConVarChange(g_hCvarLog,				ConVarChange_Plugin	);	g_bCvarLog					= GetConVarInt(g_hCvarLog) > 0 ? true : false;
 	HookConVarChange(g_hCvarChat,				ConVarChange_Plugin	);	g_iCvarChat					= GetConVarInt(g_hCvarChat);
 
@@ -177,11 +183,13 @@ public void ConVarChange_Plugin(Handle hCvar, const char[] sOld, const char[] sN
 	if (hCvar == g_hCvarPluginEnabled)
 		g_bCvarPluginEnabled = StringToInt(sNew) > 0 ? true : false;
 
+#if defined _updater_included
 	else if (hCvar == g_hCvarAutoUpdate)
 		g_bCvarAutoUpdate = StringToInt(sNew) > 0 ? true : false;
 
 	else if (hCvar == g_hCvarReloadUpdate)
 		g_bCvarReloadUpdate = StringToInt(sNew) > 0 ? true : false;
+#endif
 
 	else if (hCvar == g_hCvarLog)
 		g_bCvarLog = StringToInt(sNew) > 0 ? true : false;

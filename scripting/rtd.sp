@@ -64,6 +64,7 @@ static char g_sTeamColors[][] = {"\x07B2B2B2", "\x07B2B2B2", "\x07FF4040", "\x07
 
 #if defined _updater_included
 bool g_bPluginUpdater = false;
+bool g_bIsUpdateForced = false;
 #endif
 #if defined _friendly_included
 bool g_bPluginFriendly = false;
@@ -73,7 +74,6 @@ bool g_bPluginFriendlySimple = false;
 #endif
 
 bool g_bIsRegisteringOpen = false;
-bool g_bIsUpdateForced = false;
 
 Menu g_hDescriptionMenu = null;
 ArrayList g_hPerkHistory = null;
