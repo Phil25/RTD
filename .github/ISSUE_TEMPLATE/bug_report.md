@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report something working incorrectly or not at all.
+about: Report something working incorrectly or not at all
 title: ''
 labels: bug
 assignees: ''
