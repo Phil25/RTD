@@ -31,7 +31,7 @@ public void InfiniteAmmo_ApplyPerk(const int client, const Perk perk)
 
 public Action InfiniteAmmo_ResupplyAmmo(const int client)
 {
-	switch (TF2_GetPlayerClass(client))
+	switch (Shared[client].ClassForPerk)
 	{
 		case TFClass_Engineer:
 			SetEntProp(client, Prop_Data, "m_iAmmo", 200, 4, 3);

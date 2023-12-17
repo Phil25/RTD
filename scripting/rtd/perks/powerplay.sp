@@ -64,7 +64,7 @@ void PowerPlay_Apply(const int client)
 
 	ForceSwitchSlot(client, 2);
 
-	switch (TF2_GetPlayerClass(client))
+	switch (Shared[client].ClassForPerk)
 	{
 		case TFClass_Scout:
 		{
@@ -145,13 +145,14 @@ void PowerPlay_RemovePerk(const int client)
 	SDKUnhook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
 	SDKUnhook(client, SDKHook_PostThinkPost, PowerPlay_OnGlowUpdate);
 
-	switch (TF2_GetPlayerClass(client))
+	ResetSpeed(client);
+
+	switch (Shared[client].ClassForPerk)
 	{
 		case TFClass_Scout:
 		{
 			SDKUnhook(client, SDKHook_OnTakeDamage, PowerPlay_ResistanceAndSlowdown);
 			TF2Attrib_RemoveByDefIndex(client, Attribs.JumpHeight);
-			SetSpeed(client, Cache[client].BaseSpeed);
 		}
 
 		case TFClass_Heavy:

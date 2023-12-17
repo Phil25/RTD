@@ -165,7 +165,7 @@ public Action Frozen_ApplyPost(const int client)
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);
 
-	TFClassType c = TF2_GetPlayerClass(client);
+	TFClassType c = Shared[client].ClassForPerk;
 	SendTEParticleLingeringAttached(TEParticlesLingering.IciclesBody, iStatue, fPos, Attachments[c].Root);
 	SendTEParticleLingeringAttached(TEParticlesLingering.IceBodyGlow, iStatue, fPos, Attachments[c].Root);
 	SendTEParticleLingeringAttached(TEParticlesLingering.SnowFlakes, iStatue, fPos, Attachments[c].Root);
@@ -288,7 +288,7 @@ bool Frozen_OnSound(const int client, const char[] sSound)
 	float fVolume = 0.5;
 	int iPitch = 100;
 
-	switch (TF2_GetPlayerClass(client))
+	switch (Shared[client].ClassForPerk)
 	{
 		case TFClass_Scout:
 		{
@@ -585,7 +585,7 @@ void Frozen_GetIceTransformCorrected(int client, float fPos[3], float fAng[3])
 {
 	fPos[2] += 46.0;
 
-	switch (TF2_GetPlayerClass(client))
+	switch (Shared[client].ClassForPerk)
 	{
 		case TFClass_Scout:
 		{

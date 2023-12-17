@@ -31,7 +31,7 @@ public void DrunkWalk_Init(const Perk perk)
 
 public void DrunkWalk_ApplyPerk(const int client, const Perk perk)
 {
-	Cache[client].IsDemoman = TF2_GetPlayerClass(client) == TFClass_DemoMan;
+	Cache[client].IsDemoman = Shared[client].ClassForPerk == TFClass_DemoMan;
 	Cache[client].BaseSpeed = GetBaseSpeed(client);
 	Cache[client].MinSpeed = perk.GetPrefFloat("minspeed", 0.35);
 	Cache[client].MaxSpeed = perk.GetPrefFloat("maxspeed", 1.8);
@@ -43,7 +43,7 @@ public void DrunkWalk_ApplyPerk(const int client, const Perk perk)
 
 void DrunkWalk_RemovePerk(const int client)
 {
-	SetSpeed(client, Cache[client].BaseSpeed);
+	ResetSpeed(client);
 }
 
 public Action DrunkWalk_DemomanDeny(const int client)

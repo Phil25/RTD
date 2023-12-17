@@ -1190,7 +1190,7 @@ stock void SendTEParticleLingeringAttachedProxyExcept(const TEParticleLingeringI
 * SPEED MANIPULATION
 */
 
-stock float GetBaseSpeed(int client)
+stock float GetBaseSpeed(const int client)
 {
 	switch (TF2_GetPlayerClass(client))
 	{
@@ -1214,6 +1214,11 @@ stock float GetBaseSpeed(int client)
 	}
 
 	return 300.0;
+}
+
+stock void ResetSpeed(const int client)
+{
+	SetSpeed(client, GetBaseSpeed(client));
 }
 
 stock void SetSpeed(int client, float fBase, float fMul=1.0)

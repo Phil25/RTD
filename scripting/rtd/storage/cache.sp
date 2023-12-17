@@ -202,6 +202,7 @@ enum CritBoost
 enum struct SharedCache
 {
 	int MaxHealth;
+	TFClassType ClassForPerk;
 	int _CritBoosted;
 
 	float MaxHealthFloat()

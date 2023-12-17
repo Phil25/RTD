@@ -182,7 +182,7 @@ int FireTimebomb_SpawnBombHead(const int client)
 	SetVariantString("!activator");
 	AcceptEntityInput(iBomb, "SetParent", client, -1, 0);
 
-	switch (TF2_GetPlayerClass(client))
+	switch (Shared[client].ClassForPerk)
 	{
 		case TFClass_Pyro, TFClass_Engineer:
 			SetVariantString("OnUser1 !self,SetParentAttachment,head,0.0,-1");

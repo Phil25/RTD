@@ -131,7 +131,7 @@ void Smite_RemovePerk(const int client)
 {
 	SDKUnhook(client, SDKHook_OnTakeDamagePost, Smite_OnTakeDamage);
 
-	SetSpeed(client, Cache[client].BaseSpeed);
+	ResetSpeed(client);
 	StopSound(client, SNDCHAN_AUTO, SOUND_ELECTRIC_MIST);
 }
 
