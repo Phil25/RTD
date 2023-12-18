@@ -4,8 +4,8 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.4.0"
-			"Previous"	"2.3.5"
+			"Latest"	"2.4.1"
+			"Previous"	"2.4.0"
 		}
 
 		"Notes"	"View changelog at https://github.com/Phil25/RTD/wiki/changelog"
@@ -13,6 +13,31 @@
 
 	"Files"
 	{
+		"Patch"
+		{
+			"Plugin"	"Path_SM/plugins/rtd.smx"
+			"Plugin"	"Path_SM/translations/rtd2.phrases.txt"
+			"Plugin"	"Path_SM/translations/rtd2_perks.phrases.txt"
+
+			"Source"	"Path_SM/scripting/rtd.sp"
+			"Source"	"Path_SM/scripting/rtd/convars.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/cursedprojectiles.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/drunkwalk.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/firetimebomb.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/frozen.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/fullubercharge.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/hellsreach.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/infiniteammo.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/invisibility.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/powerplay.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/smite.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/striptomelee.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/suffocation.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/timebomb.sp"
+			"Source"	"Path_SM/scripting/rtd/stocks.sp"
+			"Source"	"Path_SM/scripting/rtd/storage/cache.sp"
+		}
+
 		"Plugin"	"Path_SM/plugins/rtd.smx"
 		"Plugin"	"Path_SM/translations/rtd2.phrases.txt"
 		"Plugin"	"Path_SM/translations/rtd2_perks.phrases.txt"
