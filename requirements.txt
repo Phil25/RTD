@@ -1,2 +1,3 @@
 crowdin-api-client==1.13.0
+vdf==3.4
 requests==2.31.0
