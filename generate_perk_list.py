@@ -1,3 +1,4 @@
+from operator import attrgetter
 import vdf
 from io import TextIOWrapper
 from itertools import starmap
@@ -31,41 +32,58 @@ class PerkDocs(NamedTuple):
     settings: list[_Setting]
     notes: list[str]
 
+    @property
+    def circle(self):
+        return "🟢" if self.is_good else "🟣"
+
+    @property
+    def square(self):
+        return "🟩" if self.is_good else "🟪"
+
+    @property
+    def filepath(self):
+        return f"../../blob/master/scripting/rtd/perks/{self.token}.sp"
+
+    @property
+    def header(self):
+        return f"# {self.square} {self.name} [^](#perk-briefs)"
+
+    @property
+    def anchor(self):
+        escaped = self.name.replace(" ", "-").lower()
+        return f"#-{escaped}-"
+
     def write_brief(self, out: TextIOWrapper):
-        h = "**" if self.is_good else "_"
-        anchor = self.name.replace(" ", "-").lower()
-        filepath = f"../../blob/master/scripting/rtd/perks/{self.token}.sp"
-        out.write(f"{self.index} | {h}[{self.name}](#{anchor}-){h} | {self.brief} | [⧉]({filepath})\n")
+        out.write(f'{self.index} | **[{self.name}]({self.anchor} "Navigate to {self.name}")** | {self.circle} | {self.brief}\n')
 
     def write_full(self, out: TextIOWrapper):
-        sign = "+" if self.is_good else "-"
-
         run_time = {
             "-1": "Perk is **instant**, no timer is run.",
             "0": "Perk runs for the **default time**.",
         }.get(self.time, f"Perk runs for custom time of **{self.time} seconds**.")
 
+        settings_brief = "_none_"
+        if len(self.settings) > 0:
+            settings_brief = "{`" + "`, `".join(set(map(attrgetter("name"), self.settings))) + "`}"
+
+        tags = "{`" + self.tags.replace(", ", "`, `") + "`}"
+
         out.writelines([
-            f"# {self.name} [^](#perk-briefs)\n",
-            "```diff\n",
-            f"{sign} {self.index}. {self.token}\n",
-            "```\n",
+            f"{self.header}\n",
+            "**ID** | **TOKEN** | **SETTINGS** | **TAGS** | **SOURCE**\n-:|:-:|:-:|:-:|:-:\n",
+            f'{self.index} | `{self.token}` | {settings_brief} | {tags} | [{self.token}.sp]({self.filepath} "View source code of {self.name}")\n',
             "### Description\n",
             self.description.replace(". ", ".\n") + "\n",
             f"### Time\n{run_time}\n",
             self._get_settings(),
             self._get_notes(),
-            f"### Tags\n",
-            "{`" + self.tags.replace(", ", "`, `") + "`}\n"
         ])
 
     def _get_settings(self) -> str:
-        effective = self.settings
+        if len(self.settings) == 0:
+            return ""
 
-        if len(effective) == 0:
-            effective = ["Perk has **no settings**."]
-
-        return "\n".join(["### Settings"] + [*map(str, effective)]) + "\n"
+        return "\n".join(["### Settings"] + [*map(str, self.settings)]) + "\n"
 
     def _get_notes(self) -> str:
         if len(self.notes) == 0:
@@ -119,8 +137,8 @@ def main(output: Path):
     with open(output, "w", encoding="utf-8") as out:
         out.writelines([
             "# Perk Briefs\n",
-            "**ID** | **NAME** | **SHORT DESCRIPTION** | **SOURCE**\n",
-            "-:|-:|-|:-:\n",
+            "**ID** | **NAME** | | **SHORT DESCRIPTION**\n",
+            "-:|-:|-|-\n",
         ])
 
         for doc in perks_docs:
