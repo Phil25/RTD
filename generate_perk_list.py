@@ -5,6 +5,9 @@ from itertools import starmap
 from typing import Mapping, NamedTuple
 from pathlib import Path
 
+# relative paths do not work on GitLab well (leading slash after URL makes a difference)
+REPO_ROOT = "https://github.com/Phil25/RTD/blob/master"
+
 class PerkDocs(NamedTuple):
     class _Setting(NamedTuple):
         name: str
@@ -42,7 +45,7 @@ class PerkDocs(NamedTuple):
 
     @property
     def filepath(self):
-        return f"../../blob/master/scripting/rtd/perks/{self.token}.sp"
+        return f"{REPO_ROOT}/scripting/rtd/perks/{self.token}.sp"
 
     @property
     def header(self):
@@ -136,7 +139,7 @@ def main(output: Path):
 
     with open(output, "w", encoding="utf-8") as out:
         out.writelines([
-            "> Automatically generated from [rtd2_perks.default.cfg](../../blob/master/configs/rtd2_perks.default.cfg). Please edit that file for any updates.\n",
+            f"> Automatically generated from [rtd2_perks.default.cfg]({REPO_ROOT}/configs/rtd2_perks.default.cfg). Please edit that file for any updates.\n",
             "# Perk Briefs\n",
             "**ID** | **NAME** | | **SHORT DESCRIPTION**\n",
             "-:|-:|-|-\n",
