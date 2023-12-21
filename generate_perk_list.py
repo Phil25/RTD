@@ -136,6 +136,7 @@ def main(output: Path):
 
     with open(output, "w", encoding="utf-8") as out:
         out.writelines([
+            "> Automatically generated from [rtd2_perks.default.cfg](../../blob/master/configs/rtd2_perks.default.cfg). Please edit that file for any updates.\n",
             "# Perk Briefs\n",
             "**ID** | **NAME** | | **SHORT DESCRIPTION**\n",
             "-:|-:|-|-\n",
