@@ -393,7 +393,7 @@ public Action Command_ForceRTD(int client, int args)
 {
 	if (args < 1)
 	{
-		ReplyToCommand(client, "[SM] Usage: sm_forcertd <player> <perk id>* <time>* <override class restriction (0 / 1)>*");
+		ReplyToCommand(client, "[SM] Usage: sm_forcertd <target> [perk ID] [time in seconds] [override class restriction (0/1)]");
 		return Plugin_Handled;
 	}
 
