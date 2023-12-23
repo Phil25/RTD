@@ -503,7 +503,7 @@ void Frozen_OnTakeDamage(int client, int iAttacker, int iInflictor, float fDamag
 
 	SendTEParticleWithPriority(TEParticles.SnowBurst, fPos);
 	EmitSoundToAll(SOUND_ICE_BREAK, client, _, _, _, _, 120);
-	ForceRemovePerk(client);
+	RemovePerk(client);
 }
 
 public Action Frozen_OnTakeDamageClient(int client, int &iAttacker, int &iInflictor, float &fDamage, int &iType, int &iWeapon, float fForce[3], float fPos[3], int iCustom)

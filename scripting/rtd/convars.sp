@@ -12,11 +12,32 @@ Handle g_hCvarReloadUpdate;
 bool g_bCvarReloadUpdate = true;
 #endif
 
-#define DESC_LOG "0/1 - Log RTD actions to SourceMod logs?"
-Handle g_hCvarLog;
-bool g_bCvarLog = false;
+enum ChatFlag
+{
+	ChatFlag_Ad = 1 << 0,
+	ChatFlag_AppRoller = 1 << 1,
+	ChatFlag_AppOther = 1 << 2,
+	ChatFlag_RemRoller = 1 << 3,
+	ChatFlag_RemOther = 1 << 4,
+	ChatFlag_Reasons = 1 << 5,
+}
 
-#define DESC_CHAT "Add/substract these values to control messages:\n1 - RTD ad (round start)\n2 - Perk applic. for rollers\n4 - P. applic. for others\n8 - P. removal for rollers\n16 - P. removal for others\n32 - Can't-roll reasons\nEXAMPLE: \"6\" - show applications only (2 + 4)"
+enum LogFlag
+{
+	LogFlag_System = 1 << 0,
+	LogFlag_Action = 1 << 1,
+	LogFlag_PerkApply = 1 << 2,
+	LogFlag_PerkRemove = 1 << 3,
+}
+
+#define DESC_LOG "0/1 - Log RTD actions to SourceMod logs? !DEPRECATED! Use \"sm_rtd2_logging\" instead."
+Handle g_hCvarLog;
+
+#define DESC_LOGGING "Add/substract these values to control logs:\n1 - general inner-RTD logs\n2 - command actions\n4 - perk applications\n8 - perk removals\nEx.: \"3\" - show general logs and admin command usage only (1 + 2)"
+Handle g_hCvarLogging;
+int g_iCvarLogging = 3;
+
+#define DESC_CHAT "Add/substract these values to control chat messages:\n1 - RTD ad (round start)\n2 - Perk applic. for rollers\n4 - P. applic. for others\n8 - P. removal for rollers\n16 - P. removal for others\n32 - Can't-roll reasons\nEx.: \"6\" - applications only (2 + 4)"
 Handle g_hCvarChat;
 int g_iCvarChat = 63;
 
@@ -110,7 +131,8 @@ void SetupConVars()
 	g_hCvarAutoUpdate			= CreateConVar("sm_rtd2_autoupdate",	"1",		DESC_AUTO_UPDATE,			FLAGS_CVARS);
 	g_hCvarReloadUpdate			= CreateConVar("sm_rtd2_reloadupdate",	"1",		DESC_RELOAD_UPDATE,			FLAGS_CVARS);
 #endif
-	g_hCvarLog					= CreateConVar("sm_rtd2_log",			"0",		DESC_LOG,					FLAGS_CVARS);
+	g_hCvarLog					= CreateConVar("sm_rtd2_log",			"0",		DESC_LOG,					FLAGS_CVARS|FCVAR_DONTRECORD);
+	g_hCvarLogging				= CreateConVar("sm_rtd2_logging",		"3",		DESC_LOGGING,				FLAGS_CVARS);
 	g_hCvarChat					= CreateConVar("sm_rtd2_chat",			"63",		DESC_CHAT,					FLAGS_CVARS);
 
 	g_hCvarPerkDuration			= CreateConVar("sm_rtd2_duration",		"25",		DESC_PERK_DURATION,			FLAGS_CVARS);
@@ -143,12 +165,13 @@ void SetupConVars()
 
 
 		//-----[ ConVars Hooking & Setting ]-----//
-	HookConVarChange(g_hCvarPluginEnabled,		ConVarChange_Plugin	);	g_bCvarPluginEnabled		= GetConVarInt(g_hCvarPluginEnabled) > 0 ? true : false;
+	HookConVarChange(g_hCvarPluginEnabled,		ConVarChange_Plugin	);	g_bCvarPluginEnabled		= GetConVarInt(g_hCvarPluginEnabled) > 0;
 #if defined _updater_included
-	HookConVarChange(g_hCvarAutoUpdate,			ConVarChange_Plugin	);	g_bCvarAutoUpdate			= GetConVarInt(g_hCvarAutoUpdate) > 0 ? true : false;
-	HookConVarChange(g_hCvarReloadUpdate,		ConVarChange_Plugin	);	g_bCvarReloadUpdate			= GetConVarInt(g_hCvarReloadUpdate) > 0 ? true : false;
+	HookConVarChange(g_hCvarAutoUpdate,			ConVarChange_Plugin	);	g_bCvarAutoUpdate			= GetConVarInt(g_hCvarAutoUpdate) > 0;
+	HookConVarChange(g_hCvarReloadUpdate,		ConVarChange_Plugin	);	g_bCvarReloadUpdate			= GetConVarInt(g_hCvarReloadUpdate) > 0;
 #endif
-	HookConVarChange(g_hCvarLog,				ConVarChange_Plugin	);	g_bCvarLog					= GetConVarInt(g_hCvarLog) > 0 ? true : false;
+	HookConVarChange(g_hCvarLog,				ConVarChange_Plugin	);
+	HookConVarChange(g_hCvarLogging,			ConVarChange_Plugin	);	g_iCvarLogging				= GetConVarInt(g_hCvarLogging);
 	HookConVarChange(g_hCvarChat,				ConVarChange_Plugin	);	g_iCvarChat					= GetConVarInt(g_hCvarChat);
 
 	HookConVarChange(g_hCvarPerkDuration,		ConVarChange_Perks	);	g_iCvarPerkDuration			= GetConVarInt(g_hCvarPerkDuration);
@@ -156,16 +179,16 @@ void SetupConVars()
 	HookConVarChange(g_hCvarDisabledPerks,		ConVarChange_Perks	);
 
 	HookConVarChange(g_hCvarAllowed,			ConVarChange_Usage	);	g_iCvarAllowed				= ReadFlagFromConVar(g_hCvarAllowed);
-	HookConVarChange(g_hCvarInSetup,			ConVarChange_Usage	);	g_bCvarInSetup				= GetConVarInt(g_hCvarInSetup) > 0 ? true : false;
+	HookConVarChange(g_hCvarInSetup,			ConVarChange_Usage	);	g_bCvarInSetup				= GetConVarInt(g_hCvarInSetup) > 0;
 	HookConVarChange(g_hCvarTriggers,			ConVarChange_Usage	);	ParseTriggers();
-	HookConVarChange(g_hCvarShowTriggers,		ConVarChange_Usage	);	g_bCvarShowTriggers			= GetConVarInt(g_hCvarShowTriggers) > 0 ? true : false;
-	HookConVarChange(g_hCvarShowTime,			ConVarChange_Usage	);	g_bCvarShowTime				= GetConVarInt(g_hCvarShowTime) > 0 ? true : false;
+	HookConVarChange(g_hCvarShowTriggers,		ConVarChange_Usage	);	g_bCvarShowTriggers			= GetConVarInt(g_hCvarShowTriggers) > 0;
+	HookConVarChange(g_hCvarShowTime,			ConVarChange_Usage	);	g_bCvarShowTime				= GetConVarInt(g_hCvarShowTime) > 0;
 
 	HookConVarChange(g_hCvarRtdTeam,			ConVarChange_Rtd	);	g_iCvarRtdTeam				= GetConVarInt(g_hCvarRtdTeam);
 	HookConVarChange(g_hCvarRtdMode,			ConVarChange_Rtd	);	g_iCvarRtdMode				= GetConVarInt(g_hCvarRtdMode);
 	HookConVarChange(g_hCvarClientLimit,		ConVarChange_Rtd	);	g_iCvarClientLimit			= GetConVarInt(g_hCvarClientLimit);
 	HookConVarChange(g_hCvarTeamLimit,			ConVarChange_Rtd	);	g_iCvarTeamLimit			= GetConVarInt(g_hCvarTeamLimit);
-	HookConVarChange(g_hCvarRespawnStuck,		ConVarChange_Rtd	);	g_bCvarRespawnStuck			= GetConVarInt(g_hCvarRespawnStuck) > 0 ? true : false;
+	HookConVarChange(g_hCvarRespawnStuck,		ConVarChange_Rtd	);	g_bCvarRespawnStuck			= GetConVarInt(g_hCvarRespawnStuck) > 0;
 
 	HookConVarChange(g_hCvarRepeatPlayer,		ConVarChange_Repeat	);	g_iCvarRepeatPlayer			= GetConVarInt(g_hCvarRepeatPlayer);
 	HookConVarChange(g_hCvarRepeatPerk,			ConVarChange_Repeat	);	g_iCvarRepeatPerk			= GetConVarInt(g_hCvarRepeatPerk);
@@ -181,93 +204,141 @@ void SetupConVars()
 public void ConVarChange_Plugin(Handle hCvar, const char[] sOld, const char[] sNew)
 {
 	if (hCvar == g_hCvarPluginEnabled)
-		g_bCvarPluginEnabled = StringToInt(sNew) > 0 ? true : false;
-
+	{
+		g_bCvarPluginEnabled = StringToInt(sNew) > 0;
+	}
 #if defined _updater_included
 	else if (hCvar == g_hCvarAutoUpdate)
-		g_bCvarAutoUpdate = StringToInt(sNew) > 0 ? true : false;
-
+	{
+		g_bCvarAutoUpdate = StringToInt(sNew) > 0;
+	}
 	else if (hCvar == g_hCvarReloadUpdate)
-		g_bCvarReloadUpdate = StringToInt(sNew) > 0 ? true : false;
+	{
+		g_bCvarReloadUpdate = StringToInt(sNew) > 0;
+	}
 #endif
-
 	else if (hCvar == g_hCvarLog)
-		g_bCvarLog = StringToInt(sNew) > 0 ? true : false;
-
+	{
+		LogError(
+			"ConVar \"sm_rtd2_log\" is deprecated, use \"sm_rtd2_logging\" instead. Please make "
+			... "sure to remove it from \"/tf/cfg/sourcemod/plugin.rtd.cfg\" or any custom configs "
+			... "where it might be defined for this error to clear. You may safely delete "
+			... "\"/tf/cfg/sourcemod/plugin.rtd.cfg\" and it will be recreated with default values "
+			... "and documentation."
+		);
+	}
+	else if (hCvar == g_hCvarLogging)
+	{
+		g_iCvarLogging = StringToInt(sNew);
+	}
 	else if (hCvar == g_hCvarChat)
+	{
 		g_iCvarChat = StringToInt(sNew);
+	}
 }
 
-public void ConVarChange_Perks(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarPerkDuration)
+public void ConVarChange_Perks(Handle hCvar, const char[] sOld, const char[] sNew)
+{
+	if (hCvar == g_hCvarPerkDuration)
+	{
 		g_iCvarPerkDuration = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarRollInterval)
+	}
+	else if (hCvar == g_hCvarRollInterval)
+	{
 		g_iCvarRollInterval = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarDisabledPerks)
+	}
+	else if (hCvar == g_hCvarDisabledPerks)
+	{
 		ParseDisabledPerks();
+	}
 }
 
-public void ConVarChange_Usage(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarAllowed)
+public void ConVarChange_Usage(Handle hCvar, const char[] sOld, const char[] sNew)
+{
+	if (hCvar == g_hCvarAllowed)
+	{
 		g_iCvarAllowed = ReadFlagString(sNew);
-
-	else if(hCvar == g_hCvarInSetup)
-		g_bCvarInSetup = StringToInt(sNew) > 0 ? true : false;
-
-	else if(hCvar == g_hCvarTriggers)
+	}
+	else if (hCvar == g_hCvarInSetup)
+	{
+		g_bCvarInSetup = StringToInt(sNew) > 0;
+	}
+	else if (hCvar == g_hCvarTriggers)
+	{
 		ParseTriggers();
-
-	else if(hCvar == g_hCvarShowTriggers)
-		g_bCvarShowTriggers = StringToInt(sNew) > 0 ? true : false;
-
-	else if(hCvar == g_hCvarShowTime)
-		g_bCvarShowTime = StringToInt(sNew) > 0 ? true : false;
+	}
+	else if (hCvar == g_hCvarShowTriggers)
+	{
+		g_bCvarShowTriggers = StringToInt(sNew) > 0;
+	}
+	else if (hCvar == g_hCvarShowTime)
+	{
+		g_bCvarShowTime = StringToInt(sNew) > 0;
+	}
 }
 
-public void ConVarChange_Rtd(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarRtdTeam)
+public void ConVarChange_Rtd(Handle hCvar, const char[] sOld, const char[] sNew)
+{
+	if (hCvar == g_hCvarRtdTeam)
+	{
 		g_iCvarRtdTeam = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarRtdMode)
+	}
+	else if (hCvar == g_hCvarRtdMode)
+	{
 		g_iCvarRtdMode = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarClientLimit)
+	}
+	else if (hCvar == g_hCvarClientLimit)
+	{
 		g_iCvarClientLimit = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarTeamLimit)
+	}
+	else if (hCvar == g_hCvarTeamLimit)
+	{
 		g_iCvarTeamLimit = StringToInt(sNew);
-
-	else if(hCvar == g_hCvarRespawnStuck)
-		g_bCvarRespawnStuck = StringToInt(sNew) > 0 ? true : false;
+	}
+	else if (hCvar == g_hCvarRespawnStuck)
+	{
+		g_bCvarRespawnStuck = StringToInt(sNew) > 0;
+	}
 }
 
-public void ConVarChange_Repeat(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarRepeatPlayer){
+public void ConVarChange_Repeat(Handle hCvar, const char[] sOld, const char[] sNew)
+{
+	if (hCvar == g_hCvarRepeatPlayer)
+	{
 		g_iCvarRepeatPlayer = StringToInt(sNew);
 		g_hRollers.ResetPerkHisories();
-	}else if(hCvar == g_hCvarRepeatPerk){
+	}
+	else if (hCvar == g_hCvarRepeatPerk)
+	{
 		g_iCvarRepeatPerk = StringToInt(sNew);
 		g_hPerkHistory.Clear();
 	}
 }
 
-public void ConVarChange_Good(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarGoodChance)
+public void ConVarChange_Good(Handle hCvar, const char[] sOld, const char[] sNew)
+{
+	if (hCvar == g_hCvarGoodChance)
+	{
 		g_fCvarGoodChance = StringToFloat(sNew);
-
-	else if(hCvar == g_hCvarGoodDonatorChance)
+	}
+	else if (hCvar == g_hCvarGoodDonatorChance)
+	{
 		g_fCvarGoodDonatorChance = StringToFloat(sNew);
-
-	else if(hCvar == g_hCvarDonatorFlag)
+	}
+	else if (hCvar == g_hCvarDonatorFlag)
+	{
 		g_iCvarDonatorFlag = ReadFlagString(sNew);
+	}
 }
 
-public void ConVarChange_Timer(Handle hCvar, const char[] sOld, const char[] sNew){
-	if(hCvar == g_hCvarTimerPosX)
+public void ConVarChange_Timer(Handle hCvar, const char[] sOld, const char[] sNew)
+{
+	if (hCvar == g_hCvarTimerPosX)
+	{
 		g_fCvarTimerPosX = StringToFloat(sNew);
-
-	else if(hCvar == g_hCvarTimerPosY)
+	}
+	else if (hCvar == g_hCvarTimerPosY)
+	{
 		g_fCvarTimerPosY = StringToFloat(sNew);
+	}
 }

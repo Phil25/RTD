@@ -51,7 +51,7 @@ void EldenStars_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Lifetime = perk.GetPrefFloat("lifetime", 3.5);
 	Cache[client].Damage = perk.GetPrefFloat("damage", 15.0);
 
-	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
+	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
 }
 
 void EldenStars_RemovePerk(const int client)

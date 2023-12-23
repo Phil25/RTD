@@ -45,7 +45,7 @@ void DeadlyVoice_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Range = perk.GetPrefFloat("range", 196.0);
 	Cache[client].Damage = perk.GetPrefFloat("damage", 72.0);
 
-	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
+	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
 }
 
 void DeadlyVoice_OnVoice(const int client)

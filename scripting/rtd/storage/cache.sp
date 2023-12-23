@@ -181,7 +181,7 @@ enum struct PlayerCache
 				return i;
 
 		// This should never happen
-		LogError("Internal error: could not find available timer index.");
+		LogError("Internal error: could not find available timer index");
 		return -1;
 	}
 
@@ -283,7 +283,7 @@ bool ValidatePerkTimerClient(const int client)
 	if (IsClientInGame(client) && IsPlayerAlive(client))
 		return true;
 
-	LogError("Internal error: client %L is not in game or not alive.", client);
+	LogError("Internal error: client \"%L\" is not in game or not alive", client);
 	return false;
 }
 

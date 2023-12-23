@@ -254,14 +254,14 @@ methodmap Perk < StringMap
 	public void CallInternal(int client, bool bEnable)
 	{
 		char sFuncName[64];
-		this.GetInternalCall(sFuncName, 64);
+		this.GetInternalCall(sFuncName, sizeof(sFuncName));
 		Function func = GetFunctionByName(INVALID_HANDLE, sFuncName);
 
 		if (func == INVALID_FUNCTION)
 		{
 			char sToken[32];
-			this.GetToken(sToken, 32);
-			LogError("Invalid function name: \"%s\", for perk %s.", sFuncName, sToken);
+			this.GetToken(sToken, sizeof(sToken));
+			LogError("Invalid function name: \"%s\", for perk \"%s\"", sFuncName, sToken);
 			return;
 		}
 
@@ -275,7 +275,7 @@ methodmap Perk < StringMap
 	public void InitInternal()
 	{
 		char sFuncName[64];
-		this.GetInternalInit(sFuncName, 64);
+		this.GetInternalInit(sFuncName, sizeof(sFuncName));
 		if (sFuncName[0] == '\0')
 			return;
 
@@ -284,8 +284,8 @@ methodmap Perk < StringMap
 		if (func == INVALID_FUNCTION)
 		{
 			char sToken[32];
-			this.GetToken(sToken, 32);
-			LogError("Invalid function name: \"%s\", for perk %s.", sFuncName, sToken);
+			this.GetToken(sToken, sizeof(sToken));
+			LogError("Invalid function name: \"%s\", for perk \"%s\"", sFuncName, sToken);
 			return;
 		}
 

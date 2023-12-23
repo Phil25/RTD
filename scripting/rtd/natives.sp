@@ -330,7 +330,7 @@ public int Native_RegisterPerk(Handle hPlugin, int iParams) // deprecated
 	{
 		char sPluginName[32];
 		GetPluginFilename(hPlugin, sPluginName, sizeof(sPluginName));
-		ThrowNativeError(SP_ERROR_NATIVE, "%s Plugin \"%s\" is trying to register perks before it's possible.\nPlease use the forward RTD2_OnRegOpen() and native RTD2_IsRegOpen() to determine.", CONS_PREFIX, sPluginName);
+		ThrowNativeError(SP_ERROR_NATIVE, CONS_PREFIX ... " Plugin \"%s\" is trying to register perks before it's possible.\nPlease use the forward RTD2_OnRegOpen() and native RTD2_IsRegOpen() to determine.", sPluginName);
 		return -1;
 	}
 
@@ -382,7 +382,7 @@ public int Native_ObtainPerk(Handle hPlugin, int iParams)
 	{
 		char sPluginName[32];
 		GetPluginFilename(hPlugin, sPluginName, sizeof(sPluginName));
-		ThrowNativeError(SP_ERROR_NATIVE, "%s Plugin \"%s\" is trying to register perks before it's possible.\nPlease use the forward RTD2_OnRegOpen() and native RTD2_IsRegOpen() to determine.", CONS_PREFIX, sPluginName);
+		ThrowNativeError(SP_ERROR_NATIVE, CONS_PREFIX ... " Plugin \"%s\" is trying to register perks before it's possible.\nPlease use the forward RTD2_OnRegOpen() and native RTD2_IsRegOpen() to determine.", sPluginName);
 		return -1;
 	}
 

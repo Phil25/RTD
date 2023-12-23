@@ -151,7 +151,7 @@ int StripToMelee_StripWeapons(const int client)
 	{
 		// Can do nothing on full Demoknight, who only has melee. The perk will either run its time
 		// or be removed once a resupply cabinet is touched.
-		ForceRemovePerk(client);
+		RemovePerk(client);
 		return 0;
 	}
 

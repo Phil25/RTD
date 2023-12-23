@@ -20,7 +20,7 @@ DEFINE_CALL_APPLY(BadSauce)
 
 public void BadSauce_Init(const Perk perk)
 {
-	Events.OnResupply(perk, BaseSauce_OnResupply);
+	Events.OnResupply(perk, BadSauce_OnResupply);
 }
 
 public void BadSauce_ApplyPerk(const int client, const Perk perk)
@@ -40,7 +40,7 @@ public void BadSauce_ApplyPerk(const int client, const Perk perk)
 		TF2_MakeBleed(client, client, fBleedDuration > 0.0 ? fBleedDuration : fPerkDuration);
 }
 
-public void BaseSauce_OnResupply(const int client)
+public void BadSauce_OnResupply(const int client)
 {
-	ForceRemovePerk(client);
+	RemovePerk(client);
 }

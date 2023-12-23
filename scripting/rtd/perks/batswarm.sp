@@ -101,7 +101,7 @@ void BatSwarm_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Lifetime = perk.GetPrefFloat("lifetime", 1.0);
 	Cache[client].Speed = perk.GetPrefFloat("speed", 0.25);
 
-	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
+	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
 
 	Cache[client].Repeat(perk.GetPrefFloat("rate", 0.35), BatSwarm_Tick);
 }

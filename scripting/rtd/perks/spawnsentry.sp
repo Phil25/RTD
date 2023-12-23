@@ -35,7 +35,7 @@ public void SpawnSentry_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Max = MinInt(perk.GetPrefCell("amount", 1), view_as<int>(EntSlot_SIZE));
 	Cache[client].Spawned = 0;
 
-	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Sentry_Initialization", LANG_SERVER, 0x03, 0x01);
+	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Sentry_Initialization", LANG_SERVER, 0x03, 0x01);
 }
 
 void SpawnSentry_OnVoice(const int client)
@@ -64,7 +64,7 @@ void SpawnSentry_OnVoice(const int client)
 	Cache[client].SetEnt(view_as<EntSlot>(iSpawned++), iSentry, view_as<EntCleanup>(Cache[client].Cleanup))
 	Cache[client].Spawned = iSpawned;
 
-	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Sentry_Spawned", LANG_SERVER, 0x03, iSpawned, iMax, 0x01);
+	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Sentry_Spawned", LANG_SERVER, 0x03, iSpawned, iMax, 0x01);
 
 	if (iSpawned < iMax)
 		return;
@@ -72,7 +72,7 @@ void SpawnSentry_OnVoice(const int client)
 	if (view_as<EntCleanup>(Cache[client].Cleanup) == EntCleanup_None)
 	{
 		// We can remove the perk early if Sentries are to be kept
-		ForceRemovePerk(client);
+		RemovePerk(client);
 	}
 }
 

@@ -218,7 +218,7 @@ void Explode_CompleteSuccess(const int iBomb, const float fPos[3])
 	SendTEParticle(TEParticles.GreenFog, fPos);
 	EmitSoundToAll(BOMB_DESTROY_SOUND, iBomb);
 
-	ForceRemovePerk(client);
+	RemovePerk(client);
 }
 
 int Explode_FindOwningClient(int iBomb)

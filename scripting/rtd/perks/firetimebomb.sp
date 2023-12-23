@@ -114,7 +114,7 @@ void FireTimebomb_RemovePerk(const int client)
 	int iExplosion = CreateParticle(client, "bombinomicon_burningdebris");
 	KILL_ENT_IN(iExplosion,1.0);
 
-	PrintToChat(client, "%s %T", CHAT_PREFIX, "RTD2_Perk_Timebomb_Ignite", LANG_SERVER, 0x03, iPlayersIgnited, 0x01);
+	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Timebomb_Ignite", LANG_SERVER, 0x03, iPlayersIgnited, 0x01);
 	EmitSoundToAll(SOUND_EXPLODE, client);
 
 	TF2_IgnitePlayer(client, client);

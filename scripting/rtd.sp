@@ -33,13 +33,6 @@
 #define CHAT_PREFIX 	"\x07FFD700[RTD]\x01"
 #define CONS_PREFIX 	"[RTD]"
 
-#define CHAT_AD			1
-#define CHAT_APPROLLER	2
-#define CHAT_APPOTHER	4
-#define CHAT_REMROLLER	8
-#define CHAT_REMOTHER	16
-#define CHAT_REASONS	32
-
 #define PERK_COLOR_GOOD	"\x0732CD32"
 #define PERK_COLOR_BAD	"\x078650AC"
 
@@ -132,16 +125,17 @@ public void OnPluginStart()
 	LoadTranslations("rtd2_perks.phrases.txt");
 	LoadTranslations("common.phrases.txt");
 
-	InitClientCache();
-
-	if (ParseEffects())
-		ParseCustomEffects();
-
 	// ConVars
 	CreateConVar("sm_rtd2_version", PLUGIN_VERSION, "Current RTD2 Version", FLAGS_CVARS|FCVAR_DONTRECORD|FCVAR_SPONLY);
 	SetupConVars();
 
 	AutoExecConfig(true);
+
+	// cache and perks
+	InitClientCache();
+
+	if (ParseEffects())
+		ParseCustomEffects();
 
 	// Forwards
 	g_hFwdCanRoll = CreateGlobalForward("RTD2_CanRollDice", ET_Event, Param_Cell);
@@ -272,7 +266,7 @@ public void OnClientDisconnect(int client)
 	Events.PlayerDisconnected(client);
 
 	if (g_hRollers.GetInRoll(client))
-		ForceRemovePerk(client, RTDRemove_Disconnect);
+		ForceRemovePerk(client, RTDRemove_Disconnect, _, client);
 
 	g_hRollers.Reset(client);
 	SDKUnhook(client, SDKHook_GetMaxHealth, OnGetMaxHealth);
@@ -469,7 +463,7 @@ public Action Command_RemoveRTD(int client, int args)
 		}
 
 		if (g_hRollers.GetInRoll(aTrgList[i]))
-			ForceRemovePerk(aTrgList[i], args > 1 ? RTDRemove_Custom : RTDRemove_WearOff, sReason);
+			ForceRemovePerk(aTrgList[i], args > 1 ? RTDRemove_Custom : RTDRemove_WearOff, sReason, client);
 	}
 
 	return Plugin_Handled;
@@ -503,6 +497,9 @@ public Action Command_PerkSearchup(int client, int args)
 
 public Action Command_Reload(int client, int args)
 {
+	if (g_iCvarLogging & view_as<int>(LogFlag_Action))
+		LogAction(client, -1, "\"%L\" triggered configs and perks reload", client);
+
 	ResetAllClients();
 
 	ParseEffects();
@@ -515,12 +512,17 @@ public Action Command_Reload(int client, int args)
 
 	Forward_OnRegOpen();
 
+	ReplyToCommand(client, CONS_PREFIX ... " Configs and perks reloaded successfully.");
+
 	return Plugin_Handled;
 }
 
 #if defined _updater_included
 public Action Command_Update(int client, int args)
 {
+	if (g_iCvarLogging & view_as<int>(LogFlag_Action))
+		LogAction(client, -1, "\"%L\" triggered plugin update", client);
+
 	if (!g_bPluginUpdater)
 	{
 		ReplyToCommand(client, CONS_PREFIX ... " Updater is not installed.");
@@ -622,14 +624,14 @@ public Action Timer_ClassChangePost(Handle hTimer, DataPack hData)
 
 	int iDesiredClass = hData.ReadCell();
 	if (view_as<int>(TF2_GetPlayerClass(client)) == iDesiredClass)
-		ForceRemovePerk(client, RTDRemove_ClassChange);
+		ForceRemovePerk(client, RTDRemove_ClassChange, _, client);
 
 	return Plugin_Stop;
 }
 
 public Action Event_RoundActive(Handle hEvent, const char[] sEventName, bool dontBroadcast)
 {
-	if (g_bCvarPluginEnabled && (g_iCvarChat & CHAT_AD) && IsRTDInRound())
+	if (g_bCvarPluginEnabled && (g_iCvarChat & view_as<int>(ChatFlag_Ad)) && IsRTDInRound())
 		RTDPrintAll("%T", "RTD2_Ad", LANG_SERVER, 0x03, 0x01);
 
 	return Plugin_Continue;
@@ -761,8 +763,8 @@ bool ParseEffects()
 
 	if (!FileExists(sPath))
 	{
-		LogError("Failed to find rtd2_perks.default.cfg in configs/ folder!");
-		SetFailState("Failed to find rtd2_perks.default.cfg in configs/ folder!");
+		LogError("Failed to find rtd2_perks.default.cfg in configs/ folder");
+		SetFailState("Failed to find rtd2_perks.default.cfg in configs/ folder");
 		return false;
 	}
 
@@ -776,12 +778,14 @@ bool ParseEffects()
 
 	if (g_iCorePerks == -1)
 	{
-		LogError("Parsing rtd2_perks.default.cfg failed!");
-		SetFailState("Parsing rtd2_perks.default.cfg failed!");
+		LogError("Parsing rtd2_perks.default.cfg failed");
+		SetFailState("Parsing rtd2_perks.default.cfg failed");
 		return false;
 	}
 
-	PrintToServer(CONS_PREFIX ... " Loaded %d perk%s (%d good, %d bad).", g_iCorePerks, g_iCorePerks == 1 ? "" : "s", iStatus[1], iStatus[0]);
+	if (g_iCvarLogging & view_as<int>(LogFlag_System))
+		LogMessage("Loaded %d perk%s (%d good, %d bad)", g_iCorePerks, g_iCorePerks == 1 ? "" : "s", iStatus[1], iStatus[0]);
+
 	return true;
 }
 
@@ -790,13 +794,17 @@ void ParseCustomEffects()
 	char sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.custom.cfg");
 
-	if (!FileExists(sPath)){
+	if (!FileExists(sPath))
+	{
 		PrecachePerkSounds();
 		return;
 	}
 
 	int iPerksCustomized = g_hPerkContainer.ParseCustomFile(sPath);
-	PrintToServer(CONS_PREFIX ... " Customized %d perk%s.", iPerksCustomized, iPerksCustomized == 1 ? "" : "s");
+
+	if (g_iCvarLogging & view_as<int>(LogFlag_System))
+		LogMessage("Customized %d perk%s", iPerksCustomized, iPerksCustomized == 1 ? "" : "s");
+
 	PrecachePerkSounds();
 }
 
@@ -836,21 +844,19 @@ void ParseDisabledPerks()
 	delete iter;
 
 	char sDisabledPre[255], sDisabled[255];
-	GetConVarString(g_hCvarDisabledPerks, sDisabledPre, 255);
-	EscapeString(sDisabledPre, ' ', '\0', sDisabled, 255);
-	if(strlen(sDisabled) == 0)
+	GetConVarString(g_hCvarDisabledPerks, sDisabledPre, sizeof(sDisabledPre));
+	EscapeString(sDisabledPre, ' ', '\0', sDisabled, sizeof(sDisabled));
+	if (strlen(sDisabled) == 0)
 		return;
 
-	int iDisabledCount = CountCharInString(sDisabled, ',') +1;
+	int iDisabledCount = CountCharInString(sDisabled, ',') + 1;
 	char[][] sDisabledPieces = new char[iDisabledCount][32];
 	ExplodeString(sDisabled, ",", sDisabledPieces, iDisabledCount, 32);
 
-	Perk perk = null;
 	PerkList hDisabledPerks = new PerkList();
-
 	for (int i = 0; i < iDisabledCount; ++i)
 	{
-		perk = g_hPerkContainer.FindPerk(sDisabledPieces[i]);
+		Perk perk = g_hPerkContainer.FindPerk(sDisabledPieces[i]);
 		if (perk == null)
 			continue;
 
@@ -858,41 +864,30 @@ void ParseDisabledPerks()
 		hDisabledPerks.Push(perk);
 	}
 
+	if (!(g_iCvarLogging & view_as<int>(LogFlag_System)))
+	{
+		delete hDisabledPerks;
+		return;
+	}
+
 	char sNameBuffer[64];
 	int iLen = hDisabledPerks.Length;
 	switch (iLen)
 	{
-		case 0:
-		{
-		}
-
 		case 1:
 		{
-			hDisabledPerks.Get(0).GetName(sNameBuffer, 64);
-
-			if (g_bCvarLog)
-				LogMessage(CONS_PREFIX ... " Perk disabled: %s.", sNameBuffer);
-
-			PrintToServer(CONS_PREFIX ... " Perk disabled: %s.", sNameBuffer);
+			hDisabledPerks.Get(0).GetName(sNameBuffer, sizeof(sNameBuffer));
+			LogMessage(CONS_PREFIX ... " Perk disabled: %s", sNameBuffer);
 		}
 
 		default:
 		{
-			hDisabledPerks.Get(0).GetName(sNameBuffer, 64);
-
-			if (g_bCvarLog)
-				LogMessage(CONS_PREFIX ... " %d perks disabled:", iLen);
-
-			PrintToServer(CONS_PREFIX ... " %d perks disabled:", iLen);
+			LogMessage(CONS_PREFIX ... " %d perks disabled:", iLen);
 
 			for (int i = 0; i < iLen; ++i)
 			{
-				hDisabledPerks.Get(i).GetName(sNameBuffer, 64);
-
-				if (g_bCvarLog)
-					LogMessage("  • %s", sNameBuffer);
-
-				PrintToServer("  > %s", sNameBuffer);
+				hDisabledPerks.Get(i).GetName(sNameBuffer, sizeof(sNameBuffer));
+				LogMessage("  > %s", sNameBuffer);
 			}
 		}
 	}
@@ -904,7 +899,7 @@ void RollPerkForClient(int client)
 {
 	if (!g_bCvarPluginEnabled)
 	{
-		if (g_iCvarChat & CHAT_REASONS)
+		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_Disabled", LANG_SERVER);
 
 		return;
@@ -912,7 +907,7 @@ void RollPerkForClient(int client)
 
 	if (!IsRollerAllowed(client))
 	{
-		if (g_iCvarChat & CHAT_REASONS)
+		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_No_Access", LANG_SERVER);
 
 		return;
@@ -920,7 +915,7 @@ void RollPerkForClient(int client)
 
 	if (!IsRTDInRound())
 	{
-		if (g_iCvarChat & CHAT_REASONS)
+		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
 			RTDPrint(client, "%T", "RTD2_Not_In_Round", LANG_SERVER);
 
 		return;
@@ -928,7 +923,7 @@ void RollPerkForClient(int client)
 
 	if (g_iCvarRtdTeam > 0 && g_iCvarRtdTeam == GetClientTeam(client) - 1)
 	{
-		if (g_iCvarChat & CHAT_REASONS)
+		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_Team", LANG_SERVER);
 
 		return;
@@ -948,7 +943,7 @@ void RollPerkForClient(int client)
 
 	if (!IsPlayerAlive(client))
 	{
-		if (g_iCvarChat & CHAT_REASONS)
+		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_Alive", LANG_SERVER);
 
 		return;
@@ -956,7 +951,7 @@ void RollPerkForClient(int client)
 
 	if (g_hRollers.GetInRoll(client))
 	{
-		if (g_iCvarChat & CHAT_REASONS)
+		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_Using", LANG_SERVER);
 
 		return;
@@ -965,7 +960,7 @@ void RollPerkForClient(int client)
 	int iTimeLeft = g_hRollers.GetLastRollTime(client) + g_iCvarRollInterval;
 	if (GetTime() < iTimeLeft)
 	{
-		if (g_iCvarChat & CHAT_REASONS)
+		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_Wait", LANG_SERVER, 0x04, iTimeLeft -GetTime(), 0x01);
 
 		return;
@@ -982,7 +977,7 @@ void RollPerkForClient(int client)
 
 			if (iCount >= g_iCvarClientLimit)
 			{
-				if (g_iCvarChat & CHAT_REASONS)
+				if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
 					RTDPrint(client, "%T", "RTD2_Cant_Roll_Mode1", LANG_SERVER);
 
 				return;
@@ -998,7 +993,7 @@ void RollPerkForClient(int client)
 
 			if (iCount >= g_iCvarTeamLimit)
 			{
-				if (g_iCvarChat & CHAT_REASONS)
+				if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
 					RTDPrint(client, "%T", "RTD2_Cant_Roll_Mode2", LANG_SERVER);
 
 				return;
@@ -1010,9 +1005,9 @@ void RollPerkForClient(int client)
 
 	if (perk == null) // should not happen unless everything is disabled or not applicable to player
 	{
-		PrintToServer("[RTD] WARNING: Perk not found for player when they attempted a roll.");
+		LogMessage("WARNING: Perk not found for player when they attempted a roll");
 
-		if (g_iCvarChat & CHAT_REASONS)
+		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
 			RTDPrint(client, "%T", "RTD2_Cant_Roll_No_Access", LANG_SERVER);
 
 		return;
@@ -1020,40 +1015,40 @@ void RollPerkForClient(int client)
 
 	ApplyPerk(client, perk);
 
-	if (g_bCvarLog)
+	if (g_iCvarLogging & view_as<int>(LogFlag_PerkApply))
 	{
 		char sBuffer[64];
 		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
-		LogMessage("%L rolled %s.", client, sBuffer);
+		LogMessage("%L rolled %s", client, sBuffer);
 	}
 }
 
-RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, int initiator=0)
+RTDForceResult ForcePerk(const int client, const char[] sQuery, const int iPerkTime=-1, const int iInitiator=0)
 {
 	if (!IsValidClient(client))
 		return RTDForce_ClientInvalid;
 
-	bool bIsValidInitiator = IsValidClient(initiator);
+	bool bIsValidInitiator = IsValidClient(iInitiator);
 	if (g_hRollers.GetInRoll(client))
 	{
-		RTDPrint(initiator, "%N is already using RTD.", client);
+		RTDPrint(iInitiator, "%N is already using RTD.", client);
 		return RTDForce_ClientInRoll;
 	}
 
 	if (!IsPlayerAlive(client))
 	{
-		RTDPrint(initiator, "%N is dead.", client);
+		RTDPrint(iInitiator, "%N is dead.", client);
 		return RTDForce_ClientDead;
 	}
 
 	Perk perk = g_hPerkContainer.FindPerk(sQuery);
 	if (!perk)
 	{
-		RTDPrint(initiator, "Perk not found or invalid info, forcing a roll.");
+		RTDPrint(iInitiator, "Perk not found or invalid info, forcing a roll.");
 		perk = RollPerk(client, _, sQuery);
 		if (!perk)
 		{
-			RTDPrint(initiator, "No perks available for %N.", client);
+			RTDPrint(iInitiator, "No perks available for %N.", client);
 			return RTDForce_NullPerk;
 		}
 	}
@@ -1061,7 +1056,7 @@ RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, int 
 	if (bIsValidInitiator && GetForwardFunctionCount(g_hFwdCanForce) > 0)
 	{
 		Call_StartForward(g_hFwdCanForce);
-		Call_PushCell(initiator);
+		Call_PushCell(iInitiator);
 		Call_PushCell(client);
 		Call_PushCell(perk.Id);
 		Action result = Plugin_Continue;
@@ -1075,25 +1070,29 @@ RTDForceResult ForcePerk(int client, const char[] sQuery, int iPerkTime=-1, int 
 	ApplyPerk(client, perk, iPerkTime);
 	g_iLastPerkTime = -1; // Set back to default
 
-	if (g_bCvarLog)
-	{
-		char sBuffer[64];
-		perk.Format(sBuffer, 64, "$Name$ ($Token$)");
+	if (!(g_iCvarLogging & view_as<int>(LogFlag_Action)))
+		return RTDForce_Success;
 
-		if (bIsValidInitiator)
-		{
-			LogMessage("A perk %s has been forced on %L for %d seconds by %L.", sBuffer, client, iPerkTime, initiator);
-		}
-		else
-		{
-			LogMessage("A perk %s has been forced on %L for %d seconds.", sBuffer, client, iPerkTime);
-		}
+	char sPerk[64];
+	perk.Format(sPerk, sizeof(sPerk), "$Name$ ($Token$)");
+
+	char sDuration[32];
+	if (perk.Time != -1) // not instant
+		Format(sDuration, sizeof(sDuration), "for %d seconds ", GetPerkTimeEx(perk, iPerkTime));
+
+	if (bIsValidInitiator)
+	{
+		LogAction(iInitiator, client, "\"%L\" forced %s on \"%L\" %s(query: %s)", iInitiator, sPerk, client, sDuration, sQuery);
+	}
+	else
+	{
+		LogAction(-1, client, "%s was forced on \"%L\" %s(query: %s)", sPerk, client, sDuration, sQuery);
 	}
 
 	return RTDForce_Success;
 }
 
-bool GoodRoll(int client)
+bool GoodRoll(const int client)
 {
 	float fGoodChance = g_fCvarGoodChance;
 
@@ -1103,7 +1102,7 @@ bool GoodRoll(int client)
 	return fGoodChance > GetURandomFloat();
 }
 
-Perk RollPerk(int client=0, int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="")
+Perk RollPerk(const int client=0, const int iRollFlags=ROLLFLAG_NONE, const char[] sFilter="")
 {
 	bool bFilter = strlen(sFilter) > 0;
 	Perk perk = null;
@@ -1304,36 +1303,100 @@ public Action Timer_RemovePerk(Handle hTimer, int iSerial)
 	if (client == 0)
 		return Plugin_Stop;
 
-	if (g_bCvarLog)
-	{
-		char sBuffer[64];
-		g_hRollers.GetPerk(client).Format(sBuffer, 64, "$Name$ ($Token$)");
-		LogMessage("Perk %s ended on %L.", sBuffer, client);
-	}
-
 	ManagePerk(client, g_hRollers.GetPerk(client), false);
 	return Plugin_Handled;
 }
 
-Perk ForceRemovePerk(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason="")
+void FormatRemoveReasonLog(char[] sBuffer, const int iBufferLen, const RTDRemoveReason reason, const char[] sReason)
+{
+	int iWritten = 0;
+
+	switch (reason)
+	{
+	case RTDRemove_PluginUnload:
+		iWritten = strcopy(sBuffer, iBufferLen, "(plugin unloaded)");
+
+	case RTDRemove_Death:
+		iWritten = strcopy(sBuffer, iBufferLen, "(client died)");
+
+	case RTDRemove_ClassChange:
+		iWritten = strcopy(sBuffer, iBufferLen, "(client changed class)");
+
+	case RTDRemove_WearOff:
+		iWritten = strcopy(sBuffer, iBufferLen, "(perk has worn off)");
+
+	case RTDRemove_Disconnect:
+		iWritten = strcopy(sBuffer, iBufferLen, "(client disconnected)");
+
+	case RTDRemove_Custom:
+		iWritten = strcopy(sBuffer, iBufferLen, "(custom reason)");
+
+	case RTDRemove_NoPrint:
+		iWritten = strcopy(sBuffer, iBufferLen, "(internal reason)");
+
+	default: // should never happen
+		iWritten = strcopy(sBuffer, iBufferLen, "(unknown reason)");
+	}
+
+	if (StrEqual(sReason, ""))
+		return;
+
+	// `-1` to overwrite the closing bracket
+	Format(sBuffer[iWritten - 1], iBufferLen, ": %s)", sReason);
+}
+
+Perk RemovePerk(const int client, const RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason="")
+{
+	Perk perk = g_hRollers.GetPerk(client);
+	if (perk != null)
+		ManagePerk(client, perk, false, reason, sReason);
+
+	return perk;
+}
+
+Perk ForceRemovePerk(const int client, const RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason="", const int iInitiator=0)
 {
 	if (!IsValidClient(client))
 		return null;
 
-	Perk perk = g_hRollers.GetPerk(client);
+	Perk perk = RemovePerk(client, reason, sReason);
 
-	if (perk)
-		ManagePerk(client, perk, false, reason, sReason);
+	if (!(g_iCvarLogging & view_as<int>(LogFlag_Action)))
+		return perk;
+
+	char sBuffer[64];
+	perk.Format(sBuffer, sizeof(sBuffer), "$Name$ ($Token$)");
+
+	char sReasonLog[128];
+	FormatRemoveReasonLog(sReasonLog, sizeof(sReasonLog), reason, sReason);
+
+	if (IsValidClient(iInitiator))
+	{
+		LogAction(iInitiator, client, "\"%L\" removed %s from \"%L\" %s", iInitiator, sBuffer, client, sReasonLog);
+	}
+	else
+	{
+		LogAction(-1, client, "%s was removed from \"%L\" %s", sBuffer, client, sReasonLog);
+	}
 
 	return perk;
 }
 
 void RemovedPerk(int client, RTDRemoveReason reason, const char[] sReason="")
 {
+	Perk perk = g_hRollers.GetPerk(client);
+
+	if (g_iCvarLogging & view_as<int>(LogFlag_PerkRemove))
+	{
+		char sBuffer[64];
+		perk.Format(sBuffer, sizeof(sBuffer), "$Name$ ($Token$)");
+		LogMessage("Perk %s ended on %L", sBuffer, client);
+	}
+
 	g_hRollers.SetInRoll(client, false);
 	g_hRollers.SetLastRollTime(client, GetTime());
 
-	Forward_PerkRemoved(client, g_hRollers.GetPerk(client), reason);
+	Forward_PerkRemoved(client, perk, reason);
 	g_hRollers.SetPerk(client, null);
 
 	if (reason != RTDRemove_NoPrint)
@@ -1345,7 +1408,7 @@ void RemovedPerk(int client, RTDRemoveReason reason, const char[] sReason="")
 
 void PrintToRoller(int client, Perk perk, int iDuration)
 {
-	if (!(g_iCvarChat & CHAT_APPROLLER))
+	if (!(g_iCvarChat & view_as<int>(ChatFlag_AppRoller)))
 		return;
 
 	char sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
@@ -1361,12 +1424,11 @@ void PrintToRoller(int client, Perk perk, int iDuration)
 	}
 	else
 	{
-		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		RTDPrint(client, "%T",
 			"RTD2_Rolled_Perk_Roller_Time", LANG_SERVER,
 			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
-			0x01, 0x03, iTrueDuration, 0x01);
+			0x01, 0x03, GetPerkTimeEx(perk, iDuration), 0x01);
 	}
 
 	if (g_hCvarShowDesc.BoolValue)
@@ -1380,7 +1442,7 @@ void PrintToRoller(int client, Perk perk, int iDuration)
 
 void PrintToNonRollers(int client, Perk perk, int iDuration)
 {
-	if (!(g_iCvarChat & CHAT_APPOTHER))
+	if (!(g_iCvarChat & view_as<int>(ChatFlag_AppOther)))
 		return;
 
 	char sRollerName[MAX_NAME_LENGTH], sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
@@ -1399,14 +1461,13 @@ void PrintToNonRollers(int client, Perk perk, int iDuration)
 	}
 	else
 	{
-		int iTrueDuration = (iDuration > -1) ? iDuration : (perk.Time > 0) ? perk.Time : g_iCvarPerkDuration;
 		RTDPrintAllExcept(client, "%T",
 			"RTD2_Rolled_Perk_Others_Time", LANG_SERVER,
 			g_sTeamColors[GetClientTeam(client)],
 			sRollerName,
 			0x01,
 			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
-			sPerkName, 0x01, 0x03, iTrueDuration, 0x01);
+			sPerkName, 0x01, 0x03, GetPerkTimeEx(perk, iDuration), 0x01);
 	}
 }
 
@@ -1452,10 +1513,10 @@ void PrintPerkEndReason(int client, RTDRemoveReason reason=RTDRemove_WearOff, co
 		}
 	}
 
-	if (sReasonSelf[0] != '0' && (g_iCvarChat & CHAT_REMROLLER))
+	if (sReasonSelf[0] != '0' && (g_iCvarChat & view_as<int>(ChatFlag_RemRoller)))
 		RTDPrint(client, "%T", sReasonSelf, LANG_SERVER, reason == RTDRemove_Custom ? sCustomReason : "");
 
-	if (g_iCvarChat & CHAT_REMOTHER)
+	if (g_iCvarChat & view_as<int>(ChatFlag_RemOther))
 		RTDPrintAllExcept(client, "%T", sReasonOthers, LANG_SERVER, g_sTeamColors[GetClientTeam(client)], client, 0x01, reason == RTDRemove_Custom ? sCustomReason : "");
 }
 
@@ -1505,35 +1566,41 @@ bool IsInClientHistory(int client, Perk perk)
 void RTDPrint(int to, const char[] sFormat, any ...)
 {
 	char sMsg[255];
-	VFormat(sMsg, 255, sFormat, 3);
-	if(IsValidClient(to))
-		PrintToChat(to, "%s %s", CHAT_PREFIX, sMsg);
-	else PrintToServer("%s %s", CONS_PREFIX, sMsg);
+	VFormat(sMsg, sizeof(sMsg), sFormat, 3);
+
+	if (IsValidClient(to))
+	{
+		PrintToChat(to, CHAT_PREFIX ... " %s", sMsg);
+	}
+	else
+	{
+		PrintToServer(CONS_PREFIX ... " %s", sMsg);
+	}
 }
 
 void RTDPrintAll(const char[] sFormat, any ...)
 {
 	char sMsg[255];
-	VFormat(sMsg, 255, sFormat, 2);
-	PrintToChatAll("%s %s", CHAT_PREFIX, sMsg);
+	VFormat(sMsg, sizeof(sMsg), sFormat, 2);
+	PrintToChatAll(CHAT_PREFIX ... " %s", sMsg);
 }
 
 void RTDPrintAllExcept(int client, char[] sFormat, any ...)
 {
 	char sMsg[255];
-	VFormat(sMsg, 255, sFormat, 3);
+	VFormat(sMsg, sizeof(sMsg), sFormat, 3);
 	int i = 0;
 
 	while (++i < client)
 	{
 		if (IsClientInGame(i))
-			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
+			PrintToChat(i, CHAT_PREFIX ... " %s", sMsg);
 	}
 
 	while (++i <= MaxClients)
 	{
 		if (IsClientInGame(i))
-			PrintToChat(i, "%s %s", CHAT_PREFIX, sMsg);
+			PrintToChat(i, CHAT_PREFIX ... " %s", sMsg);
 	}
 }
 
@@ -1549,13 +1616,18 @@ void DisplayPerkTimeFrame(int client)
 	ShowSyncHudText(client, g_hRollers.GetHud(client), "%s: %d", sPerkName, g_hRollers.GetEndRollTime(client) -GetTime());
 }
 
-int GetPerkTime(Perk perk)
+int GetPerkTimeEx(Perk perk, const int iCustomTime)
 {
-	if (g_iLastPerkTime != -1)
-		return g_iLastPerkTime;
+	if (iCustomTime != -1)
+		return iCustomTime;
 
 	int iTime = perk.Time;
 	return (iTime > 0) ? iTime : g_iCvarPerkDuration;
+}
+
+int GetPerkTime(Perk perk)
+{
+	return GetPerkTimeEx(perk, g_iLastPerkTime);
 }
 
 float GetPerkTimeFloat(Perk perk)
