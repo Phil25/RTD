@@ -40,7 +40,7 @@ void SpringShoes_RemovePerk(const int client)
 
 public Action SpringShoes_ForceJump(const int client)
 {
-	if (GetEntPropEnt(client, Prop_Send, "m_hGroundEntity") == -1)
+	if (!IsGrounded(client))
 		return Plugin_Continue;
 
 	float fVec[3];

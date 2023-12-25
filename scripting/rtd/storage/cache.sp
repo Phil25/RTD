@@ -225,10 +225,16 @@ enum struct SharedCache
 	int MaxHealth;
 	TFClassType ClassForPerk;
 	int _CritBoosted;
+	float TempPowerPlayTimePoint;
 
 	float MaxHealthFloat()
 	{
 		return float(this.MaxHealth);
+	}
+
+	bool IsCritBoosted(const int client)
+	{
+		return this._CritBoosted > 0;
 	}
 
 	void AddCritBoost(const int client, const CritBoost eCritBoost)

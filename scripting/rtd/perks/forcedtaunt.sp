@@ -50,7 +50,7 @@ public Action ForcedTaunt_Perform(const int client)
 	if (GetEngineTime() < Cache[client].NextTaunt)
 		return Plugin_Continue;
 
-	if (GetEntProp(client, Prop_Send, "m_hGroundEntity") == -1)
+	if (!IsGrounded(client))
 		return Plugin_Continue;
 
 	FakeClientCommand(client, "taunt");

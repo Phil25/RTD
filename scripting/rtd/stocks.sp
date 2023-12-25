@@ -36,10 +36,13 @@
 * - MaxInt
 * - ClampInt
 * - GetPointOnSphere
-* - GetRandomFloatLimit
+* - GetRandomDeviationAddition
+* - GetRandomSign
+* - IsolateLastBit
 *
 * CLIENT
 * - IsValidClient
+* - IsGrounded
 * - GetOppositeTeamOf
 * - GetCaptureValue
 * - ApplyPreventCapture
@@ -339,17 +342,28 @@ stock int GetRandomSign()
 	return iSign[GetRandomInt(0, 1)];
 }
 
+stock int IsolateLastSetBit(int iValue, const int iMask)
+{
+	iValue &= iMask; // keep only bits which are specified in the mask
+	return iValue & -iValue; // isolate lowest set bit
+}
+
 
 /*
 * CLIENT
 */
 
-stock bool IsValidClient(int client)
+stock bool IsValidClient(const int client)
 {
 	return (1 <= client <= MaxClients) && IsClientInGame(client);
 }
 
-stock int GetOppositeTeamOf(int client)
+stock bool IsGrounded(const int client)
+{
+	return GetEntPropEnt(client, Prop_Send, "m_hGroundEntity") > -1;
+}
+
+stock int GetOppositeTeamOf(const int client)
 {
 	int iTeam = GetClientTeam(client);
 	return GetOppositeTeam(iTeam);

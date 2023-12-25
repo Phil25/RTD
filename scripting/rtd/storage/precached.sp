@@ -278,6 +278,7 @@ enum struct TEParticlesCache
 	TEParticleId ElectricBurst;
 	TEParticleId HealJoltRed;
 	TEParticleId HealJoltBlue;
+	TEParticleId ImpactStars;
 
 	TEParticleId AsId(const char[] sEffectName)
 	{
@@ -319,6 +320,7 @@ enum struct TEParticlesCache
 		this.ElectricBurst = this.AsId("utaunt_lightning_impact_electric");
 		this.HealJoltRed = this.AsId("repair_claw_heal_red");
 		this.HealJoltBlue = this.AsId("repair_claw_heal_blue");
+		this.ImpactStars = this.AsId("taunt_headbutt_impact_stars");
 	}
 }
 

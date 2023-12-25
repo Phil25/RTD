@@ -43,7 +43,7 @@ public void Frog_Init(const Perk perk)
 
 public void Frog_ApplyPerk(const int client, const Perk perk)
 {
-	Cache[client].InJump = GetEntProp(client, Prop_Send, "m_hGroundEntity") == -1;
+	Cache[client].InJump = !IsGrounded(client);
 	Cache[client].NextJump = GetEngineTime();
 	Cache[client].Rate = perk.GetPrefFloat("rate", 0.5);
 	Cache[client].Vertical = perk.GetPrefFloat("vertical", 300.0);
@@ -63,7 +63,7 @@ public void Frog_RemovePerk(const int client)
 
 Action Frog_JumpCheck(const int client)
 {
-	if (Cache[client].InJump && GetEntProp(client, Prop_Send, "m_hGroundEntity") != -1)
+	if (Cache[client].InJump && IsGrounded(client))
 	{
 		// prevent slide
 		TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, {0.0, 0.0, 0.0});
@@ -80,7 +80,7 @@ bool Frog_OnPlayerRunCmd(const int client, int& iButtons, float fVel[3], float f
 	if (Cache[client].InJump)
 		return false;
 
-	if (GetEntProp(client, Prop_Send, "m_hGroundEntity") == -1)
+	if (!IsGrounded(client))
 	{
 		// client jumped on their own
 		Cache[client].InJump = true;

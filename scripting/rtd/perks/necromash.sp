@@ -39,7 +39,7 @@ public void NecroMash_Init(const Perk perk)
 
 public void NecroMash_ApplyPerk(const int client, const Perk perk)
 {
-	if (GetEntPropEnt(client, Prop_Send, "m_hGroundEntity") > -1)
+	if (IsGrounded(client))
 	{
 		NecroMash_SmashClient(client);
 	}
@@ -55,7 +55,7 @@ public Action Timer_NecroMash_Retry(Handle hTimer, const int iUserId)
 	if (!client)
 		return Plugin_Stop;
 
-	if (GetEntProp(client, Prop_Send, "m_hGroundEntity") < 0)
+	if (!IsGrounded(client))
 		return Plugin_Continue;
 
 	NecroMash_SmashClient(client);

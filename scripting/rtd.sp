@@ -44,6 +44,9 @@
 #endif
 
 //#define DEBUG // log extra messages
+#define DEBUG_VECTOR3(%1,%2) \
+	PrintToServer(%1 ... ": [%.2f, %.2f, %.2f]", %2[0], %2[1], %2[2]); \
+	PrintToChatAll(%1 ... ": [%.2f, %.2f, %.2f]", %2[0], %2[1], %2[2])
 
 public Plugin myinfo = {
 	name = "Roll The Dice (Revamped)",
