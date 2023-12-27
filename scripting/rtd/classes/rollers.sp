@@ -20,7 +20,7 @@ methodmap Rollers < ArrayList
 {
 	public Rollers()
 	{
-		ArrayList data = new ArrayList(7, MAXPLAYERS + 1);
+		ArrayList data = new ArrayList(8, MAXPLAYERS + 1);
 
 		for (int i = 1; i <= MaxClients; ++i)
 			for (int block = 0; block <= 6; ++block)
@@ -58,10 +58,19 @@ methodmap Rollers < ArrayList
 	GET_PROP(Handle,Hud,6)
 	SET_PROP(Handle,Hud,6)
 
+	GET_PROP(int,UnconsumedAddedTime,7)
+	SET_PROP(int,UnconsumedAddedTime,7)
+
 #undef SET_PROP
 #undef GET_PROP
 
-	public int PushToPerkHistory(int client, Perk perk)
+	public void AddRollTime(const int client, const int iTime)
+	{
+		this.SetEndRollTime(client, this.GetEndRollTime(client) + iTime);
+		this.SetUnconsumedAddedTime(client, this.GetUnconsumedAddedTime(client) + iTime);
+	}
+
+	public int PushToPerkHistory(const int client, Perk perk)
 	{
 		PerkList list = this.GetPerkHistory(client);
 		if (!list)
@@ -73,7 +82,7 @@ methodmap Rollers < ArrayList
 		return list.Push(perk);
 	}
 
-	public bool IsInPerkHistory(int client, Perk perk, int iLimit)
+	public bool IsInPerkHistory(const int client, Perk perk, int iLimit)
 	{
 		PerkList list = this.GetPerkHistory(client);
 		if (!list)
@@ -91,14 +100,14 @@ methodmap Rollers < ArrayList
 		return false;
 	}
 
-	public void ResetPerkHistory(int client)
+	public void ResetPerkHistory(const int client)
 	{
 		PerkList list = this.GetPerkHistory(client);
 		if (list)
 			list.Clear();
 	}
 
-	public void Reset(int client)
+	public void Reset(const int client)
 	{
 		this.SetInRoll(client, false);
 		this.SetLastRollTime(client, 0);

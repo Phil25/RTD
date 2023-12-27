@@ -31,6 +31,7 @@ public void __pl_rtd2_SetNTVOptional(){
 	MarkNativeAsOptional("RTD2_GetClientPerkId"); // deprecated
 	MarkNativeAsOptional("RTD2_GetClientPerk");
 	MarkNativeAsOptional("RTD2_GetClientPerkTime");
+	MarkNativeAsOptional("RTD2_AddClientPerkTime");
 
 	MarkNativeAsOptional("RTD2_ForcePerk"); // deprecated
 	MarkNativeAsOptional("RTD2_Force");
@@ -764,6 +765,17 @@ native RTDPerk RTD2_GetClientPerk(int client);
  * @return				Time in seconds if client is using RTD, -1 otherwise.
  */
 native int RTD2_GetClientPerkTime(int client);
+
+
+/**
+ * Adds time to current client's roll.
+ *
+ * @param client		Client Index.
+ * @param iAddedTime	Additional time in seconds, can be negative to subtract.
+ *
+ * @return				New remaining perk time, or non-positive if client was not in roll or perk is about to be removed because of this call.
+ */
+native int RTD2_AddClientPerkTime(int client, int iAddedTime);
 
 
 /**

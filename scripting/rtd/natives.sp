@@ -33,6 +33,7 @@ void CreateNatives(){
 	CreateNative("RTD2_GetClientPerkId", Native_GetClientPerkId); // deprecated
 	CreateNative("RTD2_GetClientPerk", Native_GetClientPerk);
 	CreateNative("RTD2_GetClientPerkTime", Native_GetClientPerkTime);
+	CreateNative("RTD2_AddClientPerkTime", Native_AddClientPerkTime);
 
 	CreateNative("RTD2_ForcePerk", Native_ForcePerk); // deprecated
 	CreateNative("RTD2_Force", Native_Force);
@@ -230,7 +231,19 @@ public int Native_GetClientPerkId(Handle hPlugin, int iParams) // deprecated
 public int Native_GetClientPerkTime(Handle hPlugin, int iParams)
 {
 	int client = GetNativeCell(1);
-	return g_hRollers.GetInRoll(client) ? g_hRollers.GetEndRollTime(client) -GetTime() : -1;
+	return g_hRollers.GetInRoll(client) ? g_hRollers.GetEndRollTime(client) - GetTime() : -1;
+}
+
+public int Native_AddClientPerkTime(Handle hPlugin, int iParams)
+{
+	int client = GetNativeCell(1);
+	if (!g_hRollers.GetInRoll(client))
+		return 0;
+
+	int iAddedTime = GetNativeCell(2);
+	g_hRollers.AddRollTime(client, iAddedTime);
+
+	return g_hRollers.GetEndRollTime(client) - GetTime();
 }
 
 public int Native_GetClientPerk(Handle hPlugin, int iParams)

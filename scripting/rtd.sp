@@ -152,6 +152,7 @@ public void OnPluginStart()
 	RegAdminCmd("sm_perks", Command_DescMenu, 0, "Display a description menu of RTD perks.");
 
 	RegAdminCmd("sm_forcertd", Command_ForceRTD, ADMFLAG_SLAY, "Applies perk to selected player(s).");
+	RegAdminCmd("sm_timertd", Command_TimeRTD, ADMFLAG_SLAY, "Check or add perk time to selected player(s).");
 	RegAdminCmd("sm_removertd", Command_RemoveRTD, ADMFLAG_SLAY, "Removes perk from selected player(s).");
 
 	RegAdminCmd("sm_rtds", Command_PerkSearchup, ADMFLAG_SLAY, "Displays customized perk list.");
@@ -367,7 +368,7 @@ public int Updater_OnPluginUpdated()
 }
 #endif
 
-public Action Command_RTD(int client, int args)
+public Action Command_RTD(const int client, const int args)
 {
 	if (client != 0)
 		RollPerkForClient(client);
@@ -375,7 +376,7 @@ public Action Command_RTD(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action Command_DescMenu(int client, int args)
+public Action Command_DescMenu(const int client, const int args)
 {
 	if (client != 0)
 		ShowDescriptionMenu(client);
@@ -383,7 +384,7 @@ public Action Command_DescMenu(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action Command_ForceRTD(int client, int args)
+public Action Command_ForceRTD(const int client, const int args)
 {
 	if (args < 1)
 	{
@@ -419,6 +420,79 @@ public Action Command_ForceRTD(int client, int args)
 
 	for (int i = 0; i < iTrgCount; ++i)
 		ForcePerk(aTrgList[i], sQuery, iPerkTime, client);
+
+	return Plugin_Handled;
+}
+
+public Action Command_TimeRTD(const int client, const int args)
+{
+	if (args < 1)
+	{
+		ReplyToCommand(client, "[SM] Usage: sm_addrtdtime <target> [time to add in seconds]");
+		return Plugin_Handled;
+	}
+
+	char sTrgName[MAX_TARGET_LENGTH], sTrg[32];
+	int aTrgList[MAXPLAYERS], iTrgCount;
+	bool bNameMultiLang;
+	GetCmdArg(1, sTrg, sizeof(sTrg));
+
+	if ((iTrgCount = ProcessTargetString(sTrg, client, aTrgList, MAXPLAYERS, COMMAND_FILTER_ALIVE, sTrgName, sizeof(sTrgName), bNameMultiLang)) <= 0)
+	{
+		ReplyToTargetError(client, iTrgCount);
+		return Plugin_Handled;
+	}
+
+	int iCurrentTime = GetTime();
+
+	if (args < 2)
+	{
+		for (int i = 0; i < iTrgCount; ++i)
+		{
+			int iTarget = aTrgList[i];
+
+			if (g_hRollers.GetInRoll(iTarget))
+			{
+				int iRemaining = g_hRollers.GetEndRollTime(iTarget) - iCurrentTime;
+				RTDPrint(client, "%N has %d seconds remaining.", iTarget, iRemaining);
+			}
+			else
+			{
+				RTDPrint(client, "%N is not in roll.", iTarget);
+			}
+		}
+
+		return Plugin_Handled;
+	}
+
+	char sAddTime[32] = "";
+	GetCmdArg(2, sAddTime, sizeof(sAddTime));
+
+	int iAddTime = StringToInt(sAddTime);
+	if (iAddTime == 0)
+	{
+		ReplyToCommand(client, "[SM] Provided 0 or invalid time: \"%s\"", sAddTime);
+		return Plugin_Handled;
+	}
+
+	for (int i = 0; i < iTrgCount; ++i)
+	{
+		int iTarget = aTrgList[i];
+
+		if (g_hRollers.GetInRoll(iTarget))
+		{
+			g_hRollers.AddRollTime(iTarget, iAddTime);
+			int iRemaining = g_hRollers.GetEndRollTime(iTarget) - iCurrentTime;
+			RTDPrint(client, "%N's perk time has been %s to %d seconds.", iTarget, iAddTime > 0 ? "increased" : "decreased", iRemaining);
+
+			if (g_iCvarLogging & view_as<int>(LogFlag_Action))
+				LogAction(client, iTarget, "\"%L\" %s perk time of \"%L\" to %d seconds", client, iAddTime > 0 ? "increased" : "decreased", iTarget, iRemaining);
+		}
+		else
+		{
+			RTDPrint(client, "%N is not in roll.", iTarget);
+		}
+	}
 
 	return Plugin_Handled;
 }
@@ -1154,7 +1228,7 @@ Perk RollPerk(const int client=0, const int iRollFlags=ROLLFLAG_NONE, const char
 	return perk;
 }
 
-void ApplyPerk(int client, Perk perk, int iPerkTime=-1)
+void ApplyPerk(const int client, Perk perk, const int iPerkTime=-1)
 {
 	if (!IsValidClient(client))
 		return;
@@ -1172,17 +1246,16 @@ void ApplyPerk(int client, Perk perk, int iPerkTime=-1)
 	if (iTime > -1)
 	{
 		iDuration = (iPerkTime > -1) ? iPerkTime : (iTime > 0) ? iTime : g_iCvarPerkDuration;
-		int iSerial = GetClientSerial(client);
 
 		g_hRollers.SetInRoll(client, true);
 		g_hRollers.SetPerk(client, perk);
-		g_hRollers.SetEndRollTime(client, GetTime() +iDuration);
+		g_hRollers.SetUnconsumedAddedTime(client, 0);
+		g_hRollers.SetEndRollTime(client, GetTime() + iDuration);
 
-		Handle hTimer = CreateTimer(float(iDuration), Timer_RemovePerk, iSerial);
+		Handle hTimer = CreateTimer(1.0, Timer_PerkRunTick, GetClientUserId(client), TIMER_REPEAT);
 		g_hRollers.SetTimer(client, hTimer);
 
 		DisplayPerkTimeFrame(client);
-		CreateTimer(1.0, Timer_Countdown, iSerial, TIMER_REPEAT);
 	}
 	else
 	{
@@ -1295,27 +1368,23 @@ public int ManagerDescriptionMenu(Menu hMenu, MenuAction maState, const int clie
 	return 1;
 }
 
-public Action Timer_Countdown(Handle hTimer, int iSerial)
+public Action Timer_PerkRunTick(Handle hTimer, const int iUserId)
 {
-	int client = GetClientFromSerial(iSerial);
-	if (client == 0)
+	int client = GetClientOfUserId(iUserId);
+	if (!client)
 		return Plugin_Stop;
 
 	if (!g_hRollers.GetInRoll(client))
 		return Plugin_Stop;
 
+	if (GetTime() >= g_hRollers.GetEndRollTime(client))
+	{
+		ManagePerk(client, g_hRollers.GetPerk(client), false);
+		return Plugin_Stop;
+	}
+
 	DisplayPerkTimeFrame(client);
 	return Plugin_Continue;
-}
-
-public Action Timer_RemovePerk(Handle hTimer, int iSerial)
-{
-	int client = GetClientFromSerial(iSerial);
-	if (client == 0)
-		return Plugin_Stop;
-
-	ManagePerk(client, g_hRollers.GetPerk(client), false);
-	return Plugin_Handled;
 }
 
 void FormatRemoveReasonLog(char[] sBuffer, const int iBufferLen, const RTDRemoveReason reason, const char[] sReason)
@@ -1412,9 +1481,6 @@ void RemovedPerk(int client, RTDRemoveReason reason, const char[] sReason="")
 
 	if (reason != RTDRemove_NoPrint)
 		PrintPerkEndReason(client, reason, sReason);
-
-	Handle hTimer = g_hRollers.GetTimer(client);
-	KillTimerSafe(hTimer);
 }
 
 void PrintToRoller(int client, Perk perk, int iDuration)
@@ -1641,10 +1707,27 @@ void DisplayPerkTimeFrame(const int client)
 	int iRed = (iTeam == 2) ? 255 : 32;
 	int iBlue = (iTeam == 3) ? 255 : 32;
 
-	SetHudTextParams(g_fCvarTimerPosX, g_fCvarTimerPosY, 1.0, iRed, 32, iBlue, 255);
+	int iRemainingTime = g_hRollers.GetEndRollTime(client) - GetTime();
+	int iAddedTime = g_hRollers.GetUnconsumedAddedTime(client);
+	g_hRollers.SetUnconsumedAddedTime(client, 0);
+
 	char sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
-	g_hRollers.GetPerk(client).GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
-	ShowSyncHudText(client, g_hRollers.GetHud(client), "%s: %d", sPerkName, g_hRollers.GetEndRollTime(client) -GetTime());
+	g_hRollers.GetPerk(client).GetName(sPerkName, sizeof(sPerkName));
+
+	SetHudTextParams(g_fCvarTimerPosX, g_fCvarTimerPosY, 1.0, iRed, 32, iBlue, 255);
+
+	if (iAddedTime == 0)
+	{
+		ShowSyncHudText(client, g_hRollers.GetHud(client), "%s: %d\n", sPerkName, iRemainingTime);
+	}
+	else if (iAddedTime > 0)
+	{
+		ShowSyncHudText(client, g_hRollers.GetHud(client), "%s: %d\n(+%d)", sPerkName, iRemainingTime, iAddedTime);
+	}
+	else
+	{
+		ShowSyncHudText(client, g_hRollers.GetHud(client), "%s: %d\n(-%d)", sPerkName, iRemainingTime, -iAddedTime);
+	}
 }
 
 int GetPerkTimeEx(Perk perk, const int iCustomTime)

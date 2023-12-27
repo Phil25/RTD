@@ -22,7 +22,6 @@
 * - GetCallerName
 * - EscapeString
 * - AccountIDToClient
-* - KillTimerSafe
 * - KillEntIn
 * - GetOppositeTeam
 * - GetLauncher
@@ -279,15 +278,6 @@ stock int AccountIDToClient(int iAccountID)
 				return i;
 
 	return 0;
-}
-
-stock void KillTimerSafe(Handle& hTimer)
-{
-	if(hTimer == INVALID_HANDLE)
-		return;
-
-	KillTimer(hTimer);
-	hTimer = INVALID_HANDLE;
 }
 
 stock void KillEntIn(int iEnt, float fTime)
