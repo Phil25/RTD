@@ -31,18 +31,30 @@ public void FunnyFeeling_ApplyPerk(const int client, const Perk perk)
 	Cache[client].FunnyFov = perk.GetPrefCell("fov", 160);
 	Cache[client].BaseFov = GetEntProp(client, Prop_Send, "m_iFOV");
 
-	SetEntProp(client, Prop_Send, "m_iFOV", Cache[client].FunnyFov);
+	FunnyFeeling_SetFov(client, Cache[client].FunnyFov);
 }
 
 void FunnyFeeling_RemovePerk(const int client)
 {
-	SetEntProp(client, Prop_Send, "m_iFOV", Cache[client].BaseFov);
+	FunnyFeeling_SetFov(client, Cache[client].BaseFov);
 }
 
-public void FunnyFeeling_OnConditionRemoved(const int client, const TFCond condition)
+public void FunnyFeeling_OnConditionRemoved(const int client, const TFCond eCond)
 {
-	if (condition == TFCond_Zoomed)
-		SetEntProp(client, Prop_Send, "m_iFOV", Cache[client].FunnyFov);
+	switch (eCond)
+	{
+		case TFCond_Zoomed, TFCond_Teleporting:
+			FunnyFeeling_SetFov(client, Cache[client].FunnyFov);
+	}
+}
+
+void FunnyFeeling_SetFov(const int client, const int iFov)
+{
+	// Taunting seems to save Fov value and reset it once the taunt ends. We can remove it manually
+	// to prevent effect not applying on perk's start, or staying on perk's end.
+	TF2_RemoveCondition(client, TFCond_Taunting);
+
+	SetEntProp(client, Prop_Send, "m_iFOV", iFov);
 }
 
 #undef FunnyFov
