@@ -103,7 +103,7 @@ void PowerPlay_Apply(const int client)
 	Cache[client].Repeat(0.1, PowerPlay_SlowDownCheck);
 
 	if (Shared[client].ClassForPerk != TFClass_Spy)
-		TF2_AddCondition(client, TFCond_CritOnFirstBlood);
+		Shared[client].AddCritBoost(client, CritBoost_Full);
 
 	TF2_AddCondition(client, TFCond_SpeedBuffAlly);
 	TF2Attrib_SetByDefIndex(client, Attribs.AirblastVulnerability, 0.2);
@@ -157,7 +157,9 @@ void PowerPlay_RemovePerk(const int client)
 
 	ResetSpeed(client);
 
-	TF2_RemoveCondition(client, TFCond_CritOnFirstBlood);
+	if (Shared[client].ClassForPerk != TFClass_Spy)
+		Shared[client].RemoveCritBoost(client, CritBoost_Full);
+
 	TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);
 	TF2Attrib_RemoveByDefIndex(client, Attribs.AirblastVulnerability);
 	RemovePreventCapture(client);
@@ -329,7 +331,7 @@ public Action PowerPlay_OnTakeDamage(int client, int& iAtk, int& iInflictor, flo
 
 			fKnockback[0] *= 5.0;
 			fKnockback[1] *= 5.0;
-			fKnockback[2] = 100.0 + 200.0 * PowerPlay_GetBounceMultiplier(client);
+			fKnockback[2] = 300.0;
 		}
 	}
 
@@ -419,7 +421,7 @@ float PowerPlay_GetKnockbackResistance(const int client)
 		case TFClass_Scout: return 1.2;
 		case TFClass_Soldier: return 0.8;
 		case TFClass_DemoMan: return 0.9;
-		case TFClass_Heavy: return 0.7;
+		case TFClass_Heavy: return 0.6;
 	}
 
 	return 1.0;
