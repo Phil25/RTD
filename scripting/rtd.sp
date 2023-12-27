@@ -71,7 +71,6 @@ bool g_bPluginFriendlySimple = false;
 
 bool g_bIsRegisteringOpen = false;
 
-Menu g_hDescriptionMenu = null;
 ArrayList g_hPerkHistory = null;
 int g_iCorePerks = 0;
 
@@ -179,8 +178,6 @@ public void OnPluginStart()
 
 public void OnConfigsExecuted()
 {
-	delete g_hDescriptionMenu;
-	g_hDescriptionMenu = BuildDescriptionMenu();
 	g_bIsRegisteringOpen = true;
 
 	Forward_OnRegOpen();
@@ -635,7 +632,7 @@ public Action Timer_ClassChangePost(Handle hTimer, DataPack hData)
 public Action Event_RoundActive(Handle hEvent, const char[] sEventName, bool dontBroadcast)
 {
 	if (g_bCvarPluginEnabled && (g_iCvarChat & view_as<int>(ChatFlag_Ad)) && IsRTDInRound())
-		RTDPrintAll("%T", "RTD2_Ad", LANG_SERVER, 0x03, 0x01);
+		RTDPrintAll("%t", "RTD2_Ad", 0x03, 0x01);
 
 	return Plugin_Continue;
 }
@@ -903,7 +900,7 @@ void RollPerkForClient(int client)
 	if (!g_bCvarPluginEnabled)
 	{
 		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
-			RTDPrint(client, "%T", "RTD2_Cant_Roll_Disabled", LANG_SERVER);
+			RTDPrint(client, "%t", "RTD2_Cant_Roll_Disabled");
 
 		return;
 	}
@@ -911,7 +908,7 @@ void RollPerkForClient(int client)
 	if (!IsRollerAllowed(client))
 	{
 		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
-			RTDPrint(client, "%T", "RTD2_Cant_Roll_No_Access", LANG_SERVER);
+			RTDPrint(client, "%t", "RTD2_Cant_Roll_No_Access");
 
 		return;
 	}
@@ -919,7 +916,7 @@ void RollPerkForClient(int client)
 	if (!IsRTDInRound())
 	{
 		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
-			RTDPrint(client, "%T", "RTD2_Not_In_Round", LANG_SERVER);
+			RTDPrint(client, "%t", "RTD2_Not_In_Round");
 
 		return;
 	}
@@ -927,7 +924,7 @@ void RollPerkForClient(int client)
 	if (g_iCvarRtdTeam > 0 && g_iCvarRtdTeam == GetClientTeam(client) - 1)
 	{
 		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
-			RTDPrint(client, "%T", "RTD2_Cant_Roll_Team", LANG_SERVER);
+			RTDPrint(client, "%t", "RTD2_Cant_Roll_Team");
 
 		return;
 	}
@@ -947,7 +944,7 @@ void RollPerkForClient(int client)
 	if (!IsPlayerAlive(client))
 	{
 		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
-			RTDPrint(client, "%T", "RTD2_Cant_Roll_Alive", LANG_SERVER);
+			RTDPrint(client, "%t", "RTD2_Cant_Roll_Alive");
 
 		return;
 	}
@@ -955,7 +952,7 @@ void RollPerkForClient(int client)
 	if (g_hRollers.GetInRoll(client))
 	{
 		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
-			RTDPrint(client, "%T", "RTD2_Cant_Roll_Using", LANG_SERVER);
+			RTDPrint(client, "%t", "RTD2_Cant_Roll_Using");
 
 		return;
 	}
@@ -964,7 +961,7 @@ void RollPerkForClient(int client)
 	if (GetTime() < iTimeLeft)
 	{
 		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
-			RTDPrint(client, "%T", "RTD2_Cant_Roll_Wait", LANG_SERVER, 0x04, iTimeLeft -GetTime(), 0x01);
+			RTDPrint(client, "%t", "RTD2_Cant_Roll_Wait", 0x04, iTimeLeft - GetTime(), 0x01);
 
 		return;
 	}
@@ -981,7 +978,7 @@ void RollPerkForClient(int client)
 			if (iCount >= g_iCvarClientLimit)
 			{
 				if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
-					RTDPrint(client, "%T", "RTD2_Cant_Roll_Mode1", LANG_SERVER);
+					RTDPrint(client, "%t", "RTD2_Cant_Roll_Mode1");
 
 				return;
 			}
@@ -997,7 +994,7 @@ void RollPerkForClient(int client)
 			if (iCount >= g_iCvarTeamLimit)
 			{
 				if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
-					RTDPrint(client, "%T", "RTD2_Cant_Roll_Mode2", LANG_SERVER);
+					RTDPrint(client, "%t", "RTD2_Cant_Roll_Mode2");
 
 				return;
 			}
@@ -1011,7 +1008,7 @@ void RollPerkForClient(int client)
 		LogMessage("WARNING: Perk not found for player when they attempted a roll");
 
 		if (g_iCvarChat & view_as<int>(ChatFlag_Reasons))
-			RTDPrint(client, "%T", "RTD2_Cant_Roll_No_Access", LANG_SERVER);
+			RTDPrint(client, "%t", "RTD2_Cant_Roll_No_Access");
 
 		return;
 	}
@@ -1229,10 +1226,10 @@ void ManagePerk(const int client, const Perk perk, const bool bEnable, const RTD
 	}
 }
 
-Menu BuildDescriptionMenu()
+Menu BuildDescriptionMenu(const int client)
 {
 	Menu hMenu = new Menu(ManagerDescriptionMenu);
-	hMenu.SetTitle("%T", "RTD2_Menu_Title", LANG_SERVER);
+	hMenu.SetTitle("%T", "RTD2_Menu_Title", client);
 
 	char sPerkName[RTD2_MAX_PERK_NAME_LENGTH], sPerkToken[32];
 	PerkIter iter = new PerkContainerIter(-1);
@@ -1240,8 +1237,8 @@ Menu BuildDescriptionMenu()
 
 	while ((perk = (++iter).Perk()))
 	{
-		perk.GetToken(sPerkToken, 32);
-		perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
+		perk.GetToken(sPerkToken, sizeof(sPerkToken));
+		perk.GetName(sPerkName, sizeof(sPerkName));
 		hMenu.AddItem(sPerkToken, sPerkName);
 	}
 
@@ -1253,35 +1250,46 @@ Menu BuildDescriptionMenu()
 	return hMenu;
 }
 
-void ShowDescriptionMenu(int client, int iPos=0)
+void ShowDescriptionMenu(const int client, const int iPos=0)
 {
 	if (iPos == 0)
 	{
-		g_hDescriptionMenu.Display(client, MENU_TIME_FOREVER);
+		BuildDescriptionMenu(client).Display(client, MENU_TIME_FOREVER);
 	}
 	else
 	{
-		g_hDescriptionMenu.DisplayAt(client, GetMenuSelectionPosition(), MENU_TIME_FOREVER);
+		BuildDescriptionMenu(client).DisplayAt(client, GetMenuSelectionPosition(), MENU_TIME_FOREVER);
 	}
 }
 
-public int ManagerDescriptionMenu(Menu hMenu, MenuAction maState, int client, int iPos)
+public int ManagerDescriptionMenu(Menu hMenu, MenuAction maState, const int client, const int iPos)
 {
-	if (maState != MenuAction_Select)
-		return 0;
+	switch (maState)
+	{
+		case MenuAction_Select: { /* fallthrough */ }
+
+		case MenuAction_End:
+		{
+			delete hMenu;
+			return 0;
+		}
+
+		default:
+			return 0;
+	}
 
 	Perk perk = null;
 	char sPerkToken[32], sPerkName[RTD2_MAX_PERK_NAME_LENGTH], sTranslate[64];
 
-	hMenu.GetItem(iPos, sPerkToken, 32);
+	hMenu.GetItem(iPos, sPerkToken, sizeof(sPerkToken));
 	perk = g_hPerkContainer.Get(sPerkToken);
-	perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
-	FormatEx(sTranslate, 64, "RTD2_Desc_%s", sPerkToken);
+	perk.GetName(sPerkName, sizeof(sPerkName));
+	FormatEx(sTranslate, sizeof(sTranslate), "RTD2_Desc_%s", sPerkToken);
 
-	RTDPrint(client, "%s%s%c: \x03%T\x01",
+	RTDPrint(client, "%s%s%c: \x03%t\x01",
 		perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 		sPerkName, 0x01,
-		sTranslate, LANG_SERVER);
+		sTranslate);
 
 	ShowDescriptionMenu(client, iPos);
 	return 1;
@@ -1415,20 +1423,20 @@ void PrintToRoller(int client, Perk perk, int iDuration)
 		return;
 
 	char sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
-	perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
+	perk.GetName(sPerkName, sizeof(sPerkName));
 
 	if (!g_bCvarShowTime || perk.Time == -1)
 	{
-		RTDPrint(client, "%T",
-			"RTD2_Rolled_Perk_Roller", LANG_SERVER,
+		RTDPrint(client, "%t",
+			"RTD2_Rolled_Perk_Roller",
 			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
 			0x01);
 	}
 	else
 	{
-		RTDPrint(client, "%T",
-			"RTD2_Rolled_Perk_Roller_Time", LANG_SERVER,
+		RTDPrint(client, "%t",
+			"RTD2_Rolled_Perk_Roller_Time",
 			perk.Good ? PERK_COLOR_GOOD : PERK_COLOR_BAD,
 			sPerkName,
 			0x01, 0x03, GetPerkTimeEx(perk, iDuration), 0x01);
@@ -1439,7 +1447,7 @@ void PrintToRoller(int client, Perk perk, int iDuration)
 		char sPerkToken[32], sPerkDesc[64];
 		perk.GetToken(sPerkToken, sizeof(sPerkToken));
 		FormatEx(sPerkDesc, sizeof(sPerkDesc), "RTD2_Desc_%s", sPerkToken);
-		RTDPrint(client, "\x03%T\x01", sPerkDesc, LANG_SERVER);
+		RTDPrint(client, "\x03%t\x01", sPerkDesc);
 	}
 }
 
@@ -1450,12 +1458,12 @@ void PrintToNonRollers(int client, Perk perk, int iDuration)
 
 	char sRollerName[MAX_NAME_LENGTH], sPerkName[RTD2_MAX_PERK_NAME_LENGTH];
 	GetClientName(client, sRollerName, sizeof(sRollerName));
-	perk.GetName(sPerkName, RTD2_MAX_PERK_NAME_LENGTH);
+	perk.GetName(sPerkName, sizeof(sPerkName));
 
 	if (!g_bCvarShowTime || perk.Time == -1)
 	{
-		RTDPrintAllExcept(client, "%T",
-			"RTD2_Rolled_Perk_Others", LANG_SERVER,
+		RTDPrintAllExcept(client, "%t",
+			"RTD2_Rolled_Perk_Others",
 			g_sTeamColors[GetClientTeam(client)],
 			sRollerName,
 			0x01,
@@ -1464,8 +1472,8 @@ void PrintToNonRollers(int client, Perk perk, int iDuration)
 	}
 	else
 	{
-		RTDPrintAllExcept(client, "%T",
-			"RTD2_Rolled_Perk_Others_Time", LANG_SERVER,
+		RTDPrintAllExcept(client, "%t",
+			"RTD2_Rolled_Perk_Others_Time",
 			g_sTeamColors[GetClientTeam(client)],
 			sRollerName,
 			0x01,
@@ -1517,10 +1525,10 @@ void PrintPerkEndReason(int client, RTDRemoveReason reason=RTDRemove_WearOff, co
 	}
 
 	if (sReasonSelf[0] != '0' && (g_iCvarChat & view_as<int>(ChatFlag_RemRoller)))
-		RTDPrint(client, "%T", sReasonSelf, LANG_SERVER, reason == RTDRemove_Custom ? sCustomReason : "");
+		RTDPrint(client, "%t", sReasonSelf, reason == RTDRemove_Custom ? sCustomReason : "");
 
 	if (g_iCvarChat & view_as<int>(ChatFlag_RemOther))
-		RTDPrintAllExcept(client, "%T", sReasonOthers, LANG_SERVER, g_sTeamColors[GetClientTeam(client)], client, 0x01, reason == RTDRemove_Custom ? sCustomReason : "");
+		RTDPrintAllExcept(client, "%t", sReasonOthers, g_sTeamColors[GetClientTeam(client)], client, 0x01, reason == RTDRemove_Custom ? sCustomReason : "");
 }
 
 void Forward_PerkApplied(int client, Perk perk, int iDuration)
@@ -1566,48 +1574,68 @@ bool IsInClientHistory(int client, Perk perk)
 	return g_hRollers.IsInPerkHistory(client, perk, g_iCvarRepeatPlayer);
 }
 
-void RTDPrint(int to, const char[] sFormat, any ...)
+void RTDPrint(const int client, const char[] sFormat, any ...)
 {
-	char sMsg[255];
-	VFormat(sMsg, sizeof(sMsg), sFormat, 3);
+	char sBuffer[254];
 
-	if (IsValidClient(to))
+	SetGlobalTransTarget(client);
+	VFormat(sBuffer, sizeof(sBuffer), sFormat, 3);
+
+	if (IsValidClient(client))
 	{
-		PrintToChat(to, CHAT_PREFIX ... " %s", sMsg);
+		PrintToChat(client, CHAT_PREFIX ... " %s", sBuffer);
 	}
 	else
 	{
-		PrintToServer(CONS_PREFIX ... " %s", sMsg);
+		PrintToServer(CONS_PREFIX ... " %s", sBuffer);
 	}
 }
 
 void RTDPrintAll(const char[] sFormat, any ...)
 {
-	char sMsg[255];
-	VFormat(sMsg, sizeof(sMsg), sFormat, 2);
-	PrintToChatAll(CHAT_PREFIX ... " %s", sMsg);
+	char sBuffer[254];
+
+	for (int i = 1; i <= MaxClients; ++i)
+	{
+		if (!IsClientInGame(i))
+			continue;
+
+		SetGlobalTransTarget(i);
+		VFormat(sBuffer, sizeof(sBuffer), sFormat, 2);
+
+		PrintToChat(i, CHAT_PREFIX ... " %s", sBuffer);
+	}
 }
 
-void RTDPrintAllExcept(int client, char[] sFormat, any ...)
+void RTDPrintAllExcept(const int client, const char[] sFormat, any ...)
 {
-	char sMsg[255];
-	VFormat(sMsg, sizeof(sMsg), sFormat, 3);
+	char sBuffer[254];
 	int i = 0;
 
 	while (++i < client)
 	{
-		if (IsClientInGame(i))
-			PrintToChat(i, CHAT_PREFIX ... " %s", sMsg);
+		if (!IsClientInGame(i))
+			continue;
+
+		SetGlobalTransTarget(i);
+		VFormat(sBuffer, sizeof(sBuffer), sFormat, 3);
+
+		PrintToChat(i, CHAT_PREFIX ... " %s", sBuffer);
 	}
 
 	while (++i <= MaxClients)
 	{
-		if (IsClientInGame(i))
-			PrintToChat(i, CHAT_PREFIX ... " %s", sMsg);
+		if (!IsClientInGame(i))
+			continue;
+
+		SetGlobalTransTarget(i);
+		VFormat(sBuffer, sizeof(sBuffer), sFormat, 3);
+
+		PrintToChat(i, CHAT_PREFIX ... " %s", sBuffer);
 	}
 }
 
-void DisplayPerkTimeFrame(int client)
+void DisplayPerkTimeFrame(const int client)
 {
 	int iTeam = GetClientTeam(client);
 	int iRed = (iTeam == 2) ? 255 : 32;
@@ -1712,7 +1740,7 @@ public Action Timer_FixStuck(Handle hTimer, int iUserId)
 	if (!IsEntityStuck(client))
 		return Plugin_Stop;
 
-	RTDPrint(client, "%T", "RTD2_Stuck_Respawn", LANG_SERVER);
+	RTDPrint(client, "%t", "RTD2_Stuck_Respawn");
 	TF2_RespawnPlayer(client);
 
 	return Plugin_Stop;

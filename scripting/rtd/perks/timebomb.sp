@@ -120,9 +120,9 @@ void Timebomb_RemovePerk(const int client)
 	int iExplosion = CreateParticle(client, "rd_robot_explosion");
 	KILL_ENT_IN(iExplosion,1.0);
 
-	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Timebomb_Damage", LANG_SERVER, 0x03, iPlayerDamage, 0x01);
-	EmitSoundToAll(SOUND_EXPLODE, client);
+	Notify.PlayerDamage(client, iPlayerDamage);
 
+	EmitSoundToAll(SOUND_EXPLODE, client);
 	FakeClientCommandEx(client, "explode");
 }
 

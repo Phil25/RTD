@@ -35,7 +35,7 @@ public void SpawnSentry_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Max = MinInt(perk.GetPrefCell("amount", 1), view_as<int>(EntSlot_SIZE));
 	Cache[client].Spawned = 0;
 
-	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Sentry_Initialization", LANG_SERVER, 0x03, 0x01);
+	Notify.Sentry(client);
 }
 
 void SpawnSentry_OnVoice(const int client)
@@ -64,7 +64,7 @@ void SpawnSentry_OnVoice(const int client)
 	Cache[client].SetEnt(view_as<EntSlot>(iSpawned++), iSentry, view_as<EntCleanup>(Cache[client].Cleanup))
 	Cache[client].Spawned = iSpawned;
 
-	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Sentry_Spawned", LANG_SERVER, 0x03, iSpawned, iMax, 0x01);
+	Notify.SentrySpawned(client, iSpawned, iMax);
 
 	if (iSpawned < iMax)
 		return;

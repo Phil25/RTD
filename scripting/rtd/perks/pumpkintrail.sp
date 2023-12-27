@@ -46,7 +46,7 @@ void PumpkinTrail_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Damage = perk.GetPrefFloat("damage", 80.0);
 	Cache[client].LastAttack = 0.0;
 
-	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
+	Notify.Attack(client);
 }
 
 void PumpkinTrail_OnVoice(const int client)

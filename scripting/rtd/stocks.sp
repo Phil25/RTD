@@ -146,6 +146,44 @@
 #define HOMING_SPEED_MULTIPLIER 0.5
 #define HOMING_AIRBLAST_MULTIPLIER 1.1
 
+methodmap NotifyMessages
+{
+	public void Attack(const int client)
+	{
+		RTDPrint(client, "%t", "RTD2_Perk_Attack", 0x03, 0x01);
+	}
+
+	public void PlayerDamage(const int client, const int iDamage)
+	{
+		RTDPrint(client, "%t", "RTD2_Perk_Timebomb_Damage", 0x03, iDamage, 0x01);
+	}
+
+	public void PlayersIgnited(const int client, const int iAmount)
+	{
+		RTDPrint(client, "%t", "RTD2_Perk_Timebomb_Ignite", 0x03, iAmount, 0x01);
+	}
+
+	public void Dispenser(const int client)
+	{
+		RTDPrint(client, "%t", "RTD2_Perk_Dispenser_Initialization", 0x03, 0x01);
+	}
+
+	public void DispenserSpawned(const int client, const int iSpawned, const int iMax)
+	{
+		RTDPrint(client, "%t", "RTD2_Perk_Dispenser_Spawned", 0x03, iSpawned, iMax, 0x01);
+	}
+
+	public void Sentry(const int client)
+	{
+		RTDPrint(client, "%t", "RTD2_Perk_Sentry_Initialization", 0x03, 0x01);
+	}
+
+	public void SentrySpawned(const int client, const int iSpawned, const int iMax)
+	{
+		RTDPrint(client, "%t", "RTD2_Perk_Sentry_Spawned", 0x03, iSpawned, iMax, 0x01);
+	}
+}
+
 /*
 * g_hHoming ArrayList is multidimensional:
 * - [0] -> Projectile index
@@ -157,6 +195,8 @@ ArrayList g_hHoming = null;
 
 int g_iWaterLevel[MAXPLAYERS +1] = {0, ...};
 ClientFlags g_eMuteNextResupply;
+
+NotifyMessages Notify;
 
 void Stocks_OnMapStart()
 {

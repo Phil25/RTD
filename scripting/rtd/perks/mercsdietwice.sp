@@ -114,7 +114,7 @@ void MercsDieTwice_FakeDeath(const int client, const int iAttacker, const int iI
 	SetVariantInt(1);
 	AcceptEntityInput(client, "SetForcedTauntCam");
 
-	PrintCenterText(client, "%T", "RTD2_Perk_Resurrect", LANG_SERVER, 0x03, 0x01);
+	PrintCenterText(client, "%t", "RTD2_Perk_Resurrect", 0x03, 0x01);
 
 	MercsDieTwice_SendDeathEvent(client, iAttacker, iInflictor, iWeapon);
 }

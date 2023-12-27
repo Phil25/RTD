@@ -37,7 +37,7 @@ void FireBreath_ApplyPerk(const int client, const Perk perk)
 	Cache[client].CritChance = perk.GetPrefFloat("crit", 0.05);
 	Cache[client].LastAttack = 0.0;
 
-	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Attack", LANG_SERVER, 0x03, 0x01);
+	Notify.Attack(client);
 }
 
 void FireBreath_OnVoice(const int client)

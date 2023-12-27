@@ -35,7 +35,7 @@ public void SpawnDispenser_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Max = MinInt(perk.GetPrefCell("amount", 1), view_as<int>(EntSlot_SIZE));
 	Cache[client].Spawned = 0;
 
-	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Dispenser_Initialization", LANG_SERVER, 0x03, 0x01);
+	Notify.Dispenser(client);
 }
 
 public void SpawnDispenser_OnVoice(const int client)
@@ -63,7 +63,7 @@ public void SpawnDispenser_OnVoice(const int client)
 	Cache[client].SetEnt(view_as<EntSlot>(iSpawned++), iDispenser, view_as<EntCleanup>(Cache[client].Cleanup))
 	Cache[client].Spawned = iSpawned;
 
-	PrintToChat(client, CHAT_PREFIX ... " %T", "RTD2_Perk_Dispenser_Spawned", LANG_SERVER, 0x03, iSpawned, iMax, 0x01);
+	Notify.DispenserSpawned(client, iSpawned, iMax);
 
 	if (iSpawned < iMax)
 		return;
