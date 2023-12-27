@@ -390,7 +390,7 @@ public Action Command_ForceRTD(int client, int args)
 {
 	if (args < 1)
 	{
-		ReplyToCommand(client, "[SM] Usage: sm_forcertd <target> [perk ID] [time in seconds] [override class restriction (0/1)]");
+		ReplyToCommand(client, "[SM] Usage: sm_forcertd <target> [perk query] [time in seconds]");
 		return Plugin_Handled;
 	}
 
@@ -430,7 +430,7 @@ public Action Command_RemoveRTD(int client, int args)
 {
 	if (args < 1)
 	{
-		ReplyToCommand(client, "[SM] Usage: sm_removertd <player> <\"reason\">*");
+		ReplyToCommand(client, "[SM] Usage: sm_removertd <player> [\"reason\"]");
 		return Plugin_Handled;
 	}
 
