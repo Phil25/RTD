@@ -83,7 +83,7 @@ public void Blind_OnPlayerAttacked(const int client, const int iVictim, const in
 
 bool Blind_IsValidTarget(const int client, const int iTarget, const int iTargetTeam)
 {
-	if (iTarget == client || !IsClientInGame(iTarget) || !IsPlayerAlive(iTarget))
+	if (iTarget == client || !IsClientInGame(iTarget) || !IsPlayerAlive(iTarget) || TF2_IsPlayerInCondition(iTarget, TFCond_Cloaked))
 		return false;
 
 	if (GetClientTeam(iTarget) != iTargetTeam)
