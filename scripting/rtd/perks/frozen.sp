@@ -25,6 +25,7 @@
 #define OriginalAlpha Int[0]
 #define NeedsResupply Int[1]
 #define ResultingHealth Int[2]
+#define Legacy Int[3]
 
 #define LastFireTouch Float[0]
 #define LastDamageTaken Float[1]
@@ -33,6 +34,7 @@
 
 #define Statue EntSlot_1
 #define Ice EntSlot_2
+#define Ragdoll EntSlot_2
 
 #define DETACH_GROUND_DISTANCE 5.0
 
@@ -58,10 +60,11 @@ void Frozen_ApplyPerk(const int client, const Perk perk)
 {
 	Cache[client].OriginalAlpha = Frozen_GetEntityAlpha(client);
 	Cache[client].NeedsResupply = false;
+	Cache[client].Legacy = perk.GetPrefCell("legacy", 0);
 	Cache[client].LastFireTouch = 0.0;
 	Cache[client].LastDamageTaken = 0.0;
-	Cache[client].Resistance = perk.GetPrefFloat("resistance", 0.1)
-	Cache[client].FlameBuff = perk.GetPrefFloat("flame_buff", 5.0)
+	Cache[client].Resistance = perk.GetPrefFloat("resistance", 0.1);
+	Cache[client].FlameBuff = perk.GetPrefFloat("flame_buff", 5.0);
 
 	DisarmWeapons(client, true);
 	ApplyPreventCapture(client);
@@ -70,6 +73,19 @@ void Frozen_ApplyPerk(const int client, const Perk perk)
 	SetEntityMoveType(client, MOVETYPE_NONE);
 	SetVariantInt(1);
 	AcceptEntityInput(client, "SetForcedTauntCam");
+
+	if (Cache[client].Legacy)
+	{
+		Frozen_Set(client, 0);
+
+		int iRagdoll = CreateRagdoll(client, true);
+		Cache[client].SetEnt(Ragdoll, iRagdoll);
+
+		if (iRagdoll > MaxClients)
+			SetClientViewEntity(client, iRagdoll);
+
+		return;
+	}
 
 	SDKHook(client, SDKHook_OnTakeDamage, Frozen_OnTakeDamageClient);
 
@@ -191,7 +207,18 @@ public Action Timer_FrozenFreezeAnimation(Handle hTimer, const int iEntRef)
 // TODO: needs remove reason to check whether client died, resupply is not needed
 void Frozen_RemovePerk(const int client)
 {
-	SetClientViewEntity(client, client);
+	Frozen_Set(client, Cache[client].OriginalAlpha);
+	DisarmWeapons(client, false);
+	RemovePreventCapture(client);
+	SetEntityMoveType(client, MOVETYPE_WALK);
+	SetVariantInt(0);
+	AcceptEntityInput(client, "SetForcedTauntCam");
+
+	if (Cache[client].Legacy)
+	{
+		SetClientViewEntity(client, client);
+		return;
+	}
 
 	SDKUnhook(client, SDKHook_OnTakeDamage, Frozen_OnTakeDamageClient);
 
@@ -200,13 +227,6 @@ void Frozen_RemovePerk(const int client)
 
 	fPos[2] -= DETACH_GROUND_DISTANCE; // teleport player back
 	TeleportEntity(client, fPos, NULL_VECTOR, NULL_VECTOR);
-
-	Frozen_Set(client, Cache[client].OriginalAlpha);
-	DisarmWeapons(client, false);
-	RemovePreventCapture(client);
-	SetEntityMoveType(client, MOVETYPE_WALK);
-	SetVariantInt(0);
-	AcceptEntityInput(client, "SetForcedTauntCam");
 
 	Cache[client].ResultingHealth = GetClientHealth(client);
 	if (Cache[client].NeedsResupply)
@@ -669,6 +689,7 @@ stock void Frozen_SetEntityAlpha(int iEntity, int iValue)
 #undef OriginalAlpha
 #undef NeedsResupply
 #undef ResultingHealth
+#undef Legacy
 
 #undef LastFireTouch
 #undef LastDamageTaken
@@ -677,5 +698,6 @@ stock void Frozen_SetEntityAlpha(int iEntity, int iValue)
 
 #undef Statue
 #undef Ice
+#undef Ragdoll
 
 #undef DETACH_GROUND_DISTANCE
