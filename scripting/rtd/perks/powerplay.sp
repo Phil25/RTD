@@ -28,6 +28,8 @@
 #define ColorBlue Int[2]
 #define BaseSpeed Int[3]
 #define CurrentSpeed Float[0]
+#define EnableLegacy Float[0] = -1.0
+#define IsLegacy Float[0] < 0.0
 #define SpeedRegainTime Float[1]
 #define KnockbackResistance Float[2]
 #define NextBounce Float[3]
@@ -68,6 +70,23 @@ public void PowerPlay_Init(const Perk perk)
 
 public void PowerPlay_ApplyPerk(const int client, const Perk perk)
 {
+	if (perk.GetPrefCell("legacy", 0))
+	{
+		Cache[client].EnableLegacy
+
+		// yuck
+		TF2_AddCondition(client, TFCond_UberchargedCanteen);
+		TF2_AddCondition(client, TFCond_UberBulletResist);
+		TF2_AddCondition(client, TFCond_UberBlastResist);
+		TF2_AddCondition(client, TFCond_UberFireResist);
+		TF2_AddCondition(client, TFCond_MegaHeal);
+		TF2_SetPlayerPowerPlay(client, true);
+
+		Shared[client].AddCritBoost(client, CritBoost_Full);
+
+		return;
+	}
+
 	Cache[client].MeleeFlags = view_as<int>(PowerPlay_MeleeFlags_None);
 	Cache[client].BaseSpeed = RoundFloat(GetBaseSpeed(client) * 1.3);
 	Cache[client].CurrentSpeed = 1.0;
@@ -166,6 +185,20 @@ void PowerPlay_Apply(const int client)
 
 void PowerPlay_RemovePerk(const int client)
 {
+	if (Cache[client].IsLegacy)
+	{
+		TF2_RemoveCondition(client, TFCond_UberchargedCanteen);
+		TF2_RemoveCondition(client, TFCond_UberBulletResist);
+		TF2_RemoveCondition(client, TFCond_UberBlastResist);
+		TF2_RemoveCondition(client, TFCond_UberFireResist);
+		TF2_RemoveCondition(client, TFCond_MegaHeal);
+		TF2_SetPlayerPowerPlay(client, false);
+
+		Shared[client].RemoveCritBoost(client, CritBoost_Full);
+
+		return;
+	}
+
 	// PowerPlay has not been set yet
 	if (!g_eInGodmode.Test(client))
 		return;
@@ -209,6 +242,9 @@ public void PowerPlay_OnGlowUpdate(const int client)
 
 bool PowerPlay_OnAttack(const int client, const int iWeapon)
 {
+	if (Cache[client].IsLegacy)
+		return false;
+
 	if (GetPlayerWeaponSlot(client, 2) != iWeapon)
 		return false; // should never happen -- PowerPlay is melee only
 
@@ -222,6 +258,9 @@ bool PowerPlay_OnAttack(const int client, const int iWeapon)
 
 public void PowerPlay_OnPlayerAttacked(const int client, const int iVictim, const int iDamage, const int iRemainingHealth)
 {
+	if (Cache[client].IsLegacy)
+		return;
+
 	if (Cache[client].MeleeFlags & view_as<int>(PowerPlay_MeleeFlags_Knife) && (1 <= iVictim <= MaxClients))
 		TF2_StunPlayer(iVictim, 1.0, _, TF_STUNFLAG_BONKSTUCK | TF_STUNFLAG_NOSOUNDOREFFECT | TF_STUNFLAG_THIRDPERSON, client);
 
@@ -230,6 +269,9 @@ public void PowerPlay_OnPlayerAttacked(const int client, const int iVictim, cons
 
 public void PowerPlay_OnConditionAdded(const int client, const TFCond eCond)
 {
+	if (Cache[client].IsLegacy)
+		return;
+
 	switch (eCond)
 	{
 		case TFCond_Jarated:
@@ -517,6 +559,8 @@ public Action PowerPlay_SlowDownCheck(const int client)
 #undef ColorBlue
 #undef BaseSpeed
 #undef CurrentSpeed
+#undef EnableLegacy
+#undef IsLegacy
 #undef SpeedRegainTime
 #undef KnockbackResistance
 #undef NextBounce
