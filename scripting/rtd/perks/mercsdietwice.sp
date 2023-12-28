@@ -34,7 +34,7 @@ public void MercsDieTwice_Init(const Perk perk)
 	PrecacheSound(SOUND_RESURRECT);
 	PrecacheSound(SOUND_RESURRECT_DENY);
 
-	Events.OnVoice(perk, MercsDieTwice_OnVoice)
+	Events.OnVoice(perk, MercsDieTwice_OnVoice);
 }
 
 void MercsDieTwice_ApplyPerk(const int client, const Perk perk)

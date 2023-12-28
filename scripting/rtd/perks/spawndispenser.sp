@@ -60,7 +60,7 @@ public void SpawnDispenser_OnVoice(const int client)
 
 	int iDispenser = SpawnDispenser(client, fPos, fAng, Cache[client].Level);
 
-	Cache[client].SetEnt(view_as<EntSlot>(iSpawned++), iDispenser, view_as<EntCleanup>(Cache[client].Cleanup))
+	Cache[client].SetEnt(view_as<EntSlot>(iSpawned++), iDispenser, view_as<EntCleanup>(Cache[client].Cleanup));
 	Cache[client].Spawned = iSpawned;
 
 	Notify.DispenserSpawned(client, iSpawned, iMax);

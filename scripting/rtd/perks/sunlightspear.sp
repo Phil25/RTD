@@ -33,7 +33,7 @@ static char g_sSoundZap[][] = {
 	"ambient/energy/zap1.wav",
 	"ambient/energy/zap2.wav",
 	"ambient/energy/zap3.wav",
-}
+};
 
 DEFINE_CALL_APPLY(SunlightSpear)
 
@@ -92,7 +92,7 @@ void SunlightSpear_OnVoice(const int client)
 	if (iTesla <= MaxClients)
 		return;
 
-	KILL_ENT_IN(iTesla,10.0)
+	KILL_ENT_IN(iTesla,10.0);
 
 	// prop_physics_override needs some sort of active func_* entity in its parent hierarchy in
 	// order to move with a "fly" movetype. An infinitely rotating func_door_rotating works well.

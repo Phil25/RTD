@@ -35,7 +35,7 @@ void Firework_ApplyPerk(const int client, const Perk perk)
 	int iParticle = CreateParticle(client, FIREWORK_PARTICLE);
 	KILL_ENT_IN(iParticle,0.5);
 
-	DataPack hData = new DataPack()
+	DataPack hData = new DataPack();
 	hData.WriteCell(GetClientUserId(client));
 	hData.WriteCell(perk.GetPrefCell("damage", 0));
 	hData.WriteCell(perk.GetPrefCell("ignite", 1));

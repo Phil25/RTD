@@ -32,7 +32,7 @@ methodmap BatSwarmFlags
 {
 	public BatSwarmFlags(const int client)
 	{
-		return view_as<BatSwarmFlags>(client)
+		return view_as<BatSwarmFlags>(client);
 	}
 
 	public void Reset()

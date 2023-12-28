@@ -72,7 +72,7 @@ public void PowerPlay_ApplyPerk(const int client, const Perk perk)
 {
 	if (perk.GetPrefCell("legacy", 0))
 	{
-		Cache[client].EnableLegacy
+		Cache[client].EnableLegacy;
 
 		// yuck
 		TF2_AddCondition(client, TFCond_UberchargedCanteen);
@@ -531,7 +531,7 @@ void PowerPlay_Slowdown(const int client, const float fValue, const float fDurat
 	if (fValue >= Cache[client].CurrentSpeed)
 		return;
 
-	Cache[client].CurrentSpeed = fValue
+	Cache[client].CurrentSpeed = fValue;
 	Cache[client].SpeedRegainTime = GetEngineTime() + Min(fDuration, 3.0);
 	SetSpeed(client, float(Cache[client].BaseSpeed), fValue);
 }

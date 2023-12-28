@@ -35,7 +35,7 @@ public void DrugBullets_ApplyPerk(const int client, const Perk perk)
 public void DrugBullets_OnPlayerAttacked(const int client, const int iVictim, const int iDamage, const int iRemainingHealth)
 {
 	if (iRemainingHealth <= 0)
-		return
+		return;
 
 	if (iDamage < Cache[client].MinDamage)
 		return;

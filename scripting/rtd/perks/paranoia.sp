@@ -49,7 +49,7 @@ static char g_sSpyVoices[][] = {
 	"vo/spy_laughshort04.mp3",
 	"vo/spy_laughshort05.mp3",
 	"vo/spy_laughshort06.mp3",
-}
+};
 
 static char g_sSpyNoises[][] = {
 	"player/spy_cloak.wav",
@@ -62,7 +62,7 @@ static char g_sSpyNoises[][] = {
 	"player/spy_uncloak_feigndeath.wav",
 	"player/spy_uncloak_feigndeath.wav",
 	"player/spy_uncloak_feigndeath.wav",
-}
+};
 
 static char g_sSpyAnimations[][] = {
 	"primary_death_burning",
@@ -82,7 +82,7 @@ static char g_sSpyAnimations[][] = {
 	"x_runSW_PDA",
 	"x_runSW_PDA",
 	"x_runSW_PDA",
-}
+};
 
 DEFINE_CALL_APPLY(Paranoia)
 

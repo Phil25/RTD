@@ -37,7 +37,7 @@ static char g_sResistanceMedium[][] = {
 	"player/resistance_medium2.wav",
 	"player/resistance_medium3.wav",
 	"player/resistance_medium4.wav",
-}
+};
 
 DEFINE_CALL_APPLY_REMOVE(Timebomb)
 

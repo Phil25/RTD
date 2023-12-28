@@ -61,7 +61,7 @@ void SpawnSentry_OnVoice(const int client)
 	int iLvl = Cache[client].Level;
 	int iSentry = SpawnSentry(client, fPos, fAng, iLvl > 0 ? iLvl : 1, iLvl == 0);
 
-	Cache[client].SetEnt(view_as<EntSlot>(iSpawned++), iSentry, view_as<EntCleanup>(Cache[client].Cleanup))
+	Cache[client].SetEnt(view_as<EntSlot>(iSpawned++), iSentry, view_as<EntCleanup>(Cache[client].Cleanup));
 	Cache[client].Spawned = iSpawned;
 
 	Notify.SentrySpawned(client, iSpawned, iMax);
@@ -83,7 +83,7 @@ void SpawnSentry_OnVoice(const int client)
 stock int SpawnSentry(int iBuilder, float Position[3], float Angle[3], int iLevel, bool bMini=false)
 {
 	static int iSentryFlags = 4;
-	static float fMinsMini[3] = {-15.0, -15.0, 0.0}
+	static float fMinsMini[3] = {-15.0, -15.0, 0.0};
 	static float fMaxsMini[3] = {15.0, 15.0, 49.5};
 
 	int iSentry = CreateEntityByName("obj_sentrygun");

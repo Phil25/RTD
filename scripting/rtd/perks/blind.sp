@@ -113,7 +113,7 @@ bool Blind_IsValidTarget(const int client, const int iTarget, const int iTargetT
 	* client knows their coordinates. This unfortunately ends up a bit too expensive than it needs
 	* be, but it works.
 	*/
-	return CanEntitySeeTarget(client, iTarget)
+	return CanEntitySeeTarget(client, iTarget);
 }
 
 void Blind_SendFade(const int client, const int iAlpha, const bool bFast=false)

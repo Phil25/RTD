@@ -38,7 +38,7 @@ static char g_sResistanceHeavy[][] = {
 	"player/resistance_heavy2.wav",
 	"player/resistance_heavy3.wav",
 	"player/resistance_heavy4.wav",
-}
+};
 
 methodmap GodmodeFlags
 {

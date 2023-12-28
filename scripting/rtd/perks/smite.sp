@@ -35,7 +35,7 @@ static char g_sSoundZap[][] = {
 	"ambient/energy/zap1.wav",
 	"ambient/energy/zap2.wav",
 	"ambient/energy/zap3.wav",
-}
+};
 
 DEFINE_CALL_APPLY_REMOVE(Smite)
 

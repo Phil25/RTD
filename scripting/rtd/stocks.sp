@@ -425,7 +425,7 @@ stock void ApplyPreventCapture(const int client)
 {
 	TF2Attrib_SetByDefIndex(client, 400, 1.0); // cannot pick up intel
 	TF2Attrib_SetByDefIndex(client, 68, -GetCaptureValue(client)); // balance capture value to 0
-	FakeClientCommandEx(client, "dropitem") // in case intel is already picked up
+	FakeClientCommandEx(client, "dropitem"); // in case intel is already picked up
 }
 
 stock void RemovePreventCapture(const int client)
@@ -439,7 +439,7 @@ stock int GetUniqueId(const int client, const int iOther)
 	// iOther + MAXPLAYERS -- reversing args should yield different IDs
 	// MAXPLAYERS * 2 -- add more than MAXPLAYERS in case iOther is negative
 	// 91 -- bit of randomness to discern it from other plugins, on the off chance that algos are similar
-	return client * (iOther + MAXPLAYERS * 2) * 91
+	return client * (iOther + MAXPLAYERS * 2) * 91;
 }
 
 stock void ForceResupplyCrude(const int client, const float fPos[3])

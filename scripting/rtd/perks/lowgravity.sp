@@ -35,7 +35,7 @@ public void LowGravity_ApplyPerk(int client, Perk perk)
 
 	Cache[client].JumpMode = perk.GetPrefCell("jump_mode", 1);
 	Cache[client].FallDamage = perk.GetPrefCell("fall_damage", 0);
-	Cache[client].Gravity = GetEntityGravity(client)
+	Cache[client].Gravity = GetEntityGravity(client);
 	Cache[client].MaxBoostSquared = fBaseSpeed * fBaseSpeed * 1.5;
 
 	if (Cache[client].JumpMode)
