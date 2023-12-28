@@ -17,6 +17,8 @@
 */
 
 #define Alpha Int[0]
+#define ShowAnnotations Int[1]
+#define TriggerUnblind Int[2]
 #define AnnotationLifetime Float[0]
 
 DEFINE_CALL_APPLY_REMOVE(Blind)
@@ -30,21 +32,28 @@ void Blind_ApplyPerk(const int client, const Perk perk)
 {
 	int iAlpha = perk.GetPrefCell("alpha", 254);
 	Cache[client].Alpha = iAlpha;
+	Cache[client].ShowAnnotations = perk.GetPrefCell("annotations", 1);
+	Cache[client].TriggerUnblind = perk.GetPrefCell("unblind", 1);
 	Cache[client].AnnotationLifetime = GetPerkTimeFloat(perk);
 	Cache[client].Flags.Reset();
 
 	Blind_SendFade(client, iAlpha);
-	Blind_UpdateAnnotations(client);
 	SetOverlay(client, ClientOverlay_Stealth);
 
-	Cache[client].Repeat(1.0, Blind_UpdateAnnotationsCheck);
+	if (Cache[client].ShowAnnotations)
+	{
+		Blind_UpdateAnnotations(client);
+		Cache[client].Repeat(1.0, Blind_UpdateAnnotationsCheck);
+	}
 }
 
 void Blind_RemovePerk(const int client)
 {
 	Blind_SendFade(client, 0);
-	Blind_UpdateAnnotations(client, true);
 	SetOverlay(client, ClientOverlay_None);
+
+	if (Cache[client].ShowAnnotations)
+		Blind_UpdateAnnotations(client, true);
 }
 
 public Action Blind_UpdateAnnotationsCheck(const int client)
@@ -77,6 +86,9 @@ void Blind_UpdateAnnotations(const int client, const bool bForceDisable=false)
 
 public void Blind_OnPlayerAttacked(const int client, const int iVictim, const int iDamage, const int iRemainingHealth)
 {
+	if(!Cache[client].TriggerUnblind)
+		return;
+
 	if (client == iVictim)
 		return;
 
@@ -124,4 +136,6 @@ void Blind_SendFade(const int client, const int iAlpha, const bool bFast=false)
 }
 
 #undef Alpha
+#undef ShowAnnotations
+#undef TriggerUnblind
 #undef AnnotationLifetime
