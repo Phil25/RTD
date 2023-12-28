@@ -22,7 +22,7 @@
 #define BAT_FLAG_ACTIVATING 2
 
 #define Count Int[0]
-#define Flags Int[1]
+#define BatFlags Int[1]
 #define ActivationTimer Int[2]
 #define Lifetime Float[0]
 #define Speed Float[1]
@@ -36,27 +36,27 @@ methodmap BatSwarmFlags
 
 	public void Reset()
 	{
-		Cache[view_as<int>(this)].Flags = 0;
+		Cache[view_as<int>(this)].BatFlags = 0;
 	}
 
 	property bool Activated
 	{
 		public get()
 		{
-			return view_as<bool>(Cache[view_as<int>(this)].Flags & BAT_FLAG_ACTIVATED);
+			return view_as<bool>(Cache[view_as<int>(this)].BatFlags & BAT_FLAG_ACTIVATED);
 		}
 
 		public set(bool bEnable)
 		{
-			int iFlags = Cache[view_as<int>(this)].Flags;
+			int iFlags = Cache[view_as<int>(this)].BatFlags;
 
 			if (bEnable)
 			{
-				Cache[view_as<int>(this)].Flags = iFlags | BAT_FLAG_ACTIVATED;
+				Cache[view_as<int>(this)].BatFlags = iFlags | BAT_FLAG_ACTIVATED;
 			}
 			else
 			{
-				Cache[view_as<int>(this)].Flags = iFlags & ~BAT_FLAG_ACTIVATED;
+				Cache[view_as<int>(this)].BatFlags = iFlags & ~BAT_FLAG_ACTIVATED;
 			}
 		}
 	}
@@ -65,20 +65,20 @@ methodmap BatSwarmFlags
 	{
 		public get()
 		{
-			return view_as<bool>(Cache[view_as<int>(this)].Flags & BAT_FLAG_ACTIVATING);
+			return view_as<bool>(Cache[view_as<int>(this)].BatFlags & BAT_FLAG_ACTIVATING);
 		}
 
 		public set(bool bEnable)
 		{
-			int iFlags = Cache[view_as<int>(this)].Flags;
+			int iFlags = Cache[view_as<int>(this)].BatFlags;
 
 			if (bEnable)
 			{
-				Cache[view_as<int>(this)].Flags = iFlags | BAT_FLAG_ACTIVATING;
+				Cache[view_as<int>(this)].BatFlags = iFlags | BAT_FLAG_ACTIVATING;
 			}
 			else
 			{
-				Cache[view_as<int>(this)].Flags = iFlags & ~BAT_FLAG_ACTIVATING;
+				Cache[view_as<int>(this)].BatFlags = iFlags & ~BAT_FLAG_ACTIVATING;
 			}
 		}
 	}
@@ -235,7 +235,7 @@ void BatSwarm_SpawnBats(const int client, float fLifetime, float fPos[3], float 
 #undef BAT_FLAG_ACTIVATING
 
 #undef Count
-#undef Flags
+#undef BatFlags
 #undef ActivationTimer
 #undef Lifetime
 #undef Speed

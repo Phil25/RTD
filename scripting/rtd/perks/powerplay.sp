@@ -23,7 +23,7 @@
 #define CRIT_MULTIPLIER 3.0
 #define BOUNCE_COOLDOWN 2.0
 
-#define InEffect Int[0]
+#define MeleeFlags Int[0]
 #define ColorRed Int[1]
 #define ColorBlue Int[2]
 #define BaseSpeed Int[3]
@@ -48,6 +48,13 @@ enum PowerPlay_AttackType
 	PowerPlay_AttackType_MeleeCrit, // incl. backstab
 }
 
+enum PowerPlay_MeleeFlags
+{
+	PowerPlay_MeleeFlags_None = 0,
+	PowerPlay_MeleeFlags_Knife = 1 << 0,
+	PowerPlay_MeleeFlags_SpyCicle = 1 << 1,
+}
+
 DEFINE_CALL_APPLY_REMOVE(PowerPlay)
 
 public void PowerPlay_Init(const Perk perk)
@@ -61,9 +68,9 @@ public void PowerPlay_Init(const Perk perk)
 
 public void PowerPlay_ApplyPerk(const int client, const Perk perk)
 {
+	Cache[client].MeleeFlags = view_as<int>(PowerPlay_MeleeFlags_None);
 	Cache[client].BaseSpeed = RoundFloat(GetBaseSpeed(client) * 1.3);
 	Cache[client].CurrentSpeed = 1.0;
-	Cache[client].InEffect = false;
 	Cache[client].KnockbackResistance = PowerPlay_GetKnockbackResistance(client);
 	Cache[client].NextBounce = GetEngineTime();
 
@@ -90,19 +97,32 @@ Action PowerPlay_ApplyCheck(const int client)
 
 void PowerPlay_Apply(const int client)
 {
-	Cache[client].InEffect = true;
 	SDKHook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
 
 	ForceSwitchSlot(client, 2);
 
 	int iMelee = GetPlayerWeaponSlot(client, 2);
 	if (iMelee > MaxClients && IsValidEntity(iMelee))
+	{
 		TF2Attrib_SetByDefIndex(iMelee, Attribs.MeleeRange, 1.1);
+
+		char sClassname[32];
+		GetEntityClassname(iMelee, sClassname, sizeof(sClassname));
+
+		if (StrEqual(sClassname, "tf_weapon_knife"))
+		{
+			Cache[client].MeleeFlags |= view_as<int>(PowerPlay_MeleeFlags_Knife);
+
+			if (GetEntProp(iMelee, Prop_Send, "m_iItemDefinitionIndex") == 649
+			|| TF2Attrib_GetByDefIndex(iMelee, Attribs.MeltsInFire) != Address_Null)
+				Cache[client].MeleeFlags |= view_as<int>(PowerPlay_MeleeFlags_SpyCicle);
+		}
+	}
 
 	SDKHook(client, SDKHook_OnTakeDamage, PowerPlay_OnTakeDamage);
 	Cache[client].Repeat(0.1, PowerPlay_SlowDownCheck);
 
-	if (Shared[client].ClassForPerk != TFClass_Spy)
+	if (!(Cache[client].MeleeFlags & view_as<int>(PowerPlay_MeleeFlags_Knife)))
 		Shared[client].AddCritBoost(client, CritBoost_Full);
 
 	TF2_AddCondition(client, TFCond_SpeedBuffAlly);
@@ -146,7 +166,8 @@ void PowerPlay_Apply(const int client)
 
 void PowerPlay_RemovePerk(const int client)
 {
-	if (!Cache[client].InEffect)
+	// PowerPlay has not been set yet
+	if (!g_eInGodmode.Test(client))
 		return;
 
 	g_eInGodmode.Unset(client);
@@ -157,7 +178,7 @@ void PowerPlay_RemovePerk(const int client)
 
 	ResetSpeed(client);
 
-	if (Shared[client].ClassForPerk != TFClass_Spy)
+	if (!(Cache[client].MeleeFlags & view_as<int>(PowerPlay_MeleeFlags_Knife)))
 		Shared[client].RemoveCritBoost(client, CritBoost_Full);
 
 	TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);
@@ -201,7 +222,7 @@ bool PowerPlay_OnAttack(const int client, const int iWeapon)
 
 public void PowerPlay_OnPlayerAttacked(const int client, const int iVictim, const int iDamage, const int iRemainingHealth)
 {
-	if (Shared[client].ClassForPerk == TFClass_Spy && (1 <= iVictim <= MaxClients))
+	if (Cache[client].MeleeFlags & view_as<int>(PowerPlay_MeleeFlags_Knife) && (1 <= iVictim <= MaxClients))
 		TF2_StunPlayer(iVictim, 1.0, _, TF_STUNFLAG_BONKSTUCK | TF_STUNFLAG_NOSOUNDOREFFECT | TF_STUNFLAG_THIRDPERSON, client);
 
 	TF2_RemoveCondition(client, TFCond_LostFooting);
@@ -289,12 +310,28 @@ public Action PowerPlay_OnTakeDamage(int client, int& iAtk, int& iInflictor, flo
 
 		case PowerPlay_AttackType_Flame:
 		{
-			PowerPlay_Slowdown(client, 0.9, 0.5);
+			if (Cache[client].MeleeFlags & view_as<int>(PowerPlay_MeleeFlags_SpyCicle))
+			{
+				TF2_AddCondition(client, TFCond_FireImmune, 0.5);
+				PowerPlay_Slowdown(client, 0.7, 0.5);
+			}
+			else
+			{
+				PowerPlay_Slowdown(client, 0.9, 0.5);
+			}
 		}
 
 		case PowerPlay_AttackType_FlameCrit:
 		{
-			PowerPlay_Slowdown(client, 0.75, 0.5);
+			if (Cache[client].MeleeFlags & view_as<int>(PowerPlay_MeleeFlags_SpyCicle))
+			{
+				TF2_AddCondition(client, TFCond_FireImmune, 0.5);
+				PowerPlay_Slowdown(client, 0.55, 0.5);
+			}
+			else
+			{
+				PowerPlay_Slowdown(client, 0.75, 0.5);
+			}
 
 			fDamage *= 5.0;
 			fOriginalDamage *= CRIT_MULTIPLIER;
@@ -475,7 +512,7 @@ public Action PowerPlay_SlowDownCheck(const int client)
 #undef CRIT_MULTIPLIER
 #undef BOUNCE_COOLDOWN
 
-#undef InEffect
+#undef MeleeFlags
 #undef ColorRed
 #undef ColorBlue
 #undef BaseSpeed

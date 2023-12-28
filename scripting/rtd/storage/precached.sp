@@ -211,6 +211,7 @@ enum struct AttributesCache
 	int AirblastVulnerability;
 	int DeploySpeed;
 	int SilentRev;
+	int MeltsInFire;
 
 	void Init()
 	{
@@ -229,6 +230,7 @@ enum struct AttributesCache
 		this.AirblastVulnerability = 329;
 		this.DeploySpeed = 178;
 		this.SilentRev = 238;
+		this.MeltsInFire = 359;
 	}
 }
 
