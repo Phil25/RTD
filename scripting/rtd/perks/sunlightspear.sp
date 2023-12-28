@@ -77,7 +77,7 @@ void SunlightSpear_OnVoice(const int client)
 
 	Cache[client].NextAttack = fTime + Cache[client].Rate;
 
-	EmitSoundToAll(SOUND_CONJURE, client, _, _, _, _, 160);
+	EmitSoundToAll(SOUND_CONJURE, client, _, _, _, 0.5, 160);
 	
 	float fAng[3], fPos[3], fVel[3];
 	GetClientEyeAngles(client, fAng);
