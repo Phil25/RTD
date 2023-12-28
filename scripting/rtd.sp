@@ -830,6 +830,42 @@ void ParseTriggers()
 		PushArrayString(g_arrCvarTriggers, sPieces[i]);
 }
 
+#define CHECK_PATH(%1) \
+	BuildPath(Path_SM, g_sCustomConfigPath, PLATFORM_MAX_PATH, %1, sCustomConfig); \
+	if (FileExists(g_sCustomConfigPath)) return true
+
+bool FindCustomConfigPath(const char[] sCustomConfig)
+{
+	CHECK_PATH("configs/%s");
+	CHECK_PATH("configs/%s.cfg");
+	CHECK_PATH("configs/rtd2_perks.%s.cfg");
+	CHECK_PATH("%s");
+	return false;
+}
+
+#undef CHECK_PATH
+
+bool ParseCustomConfig()
+{
+	char sCustomConfig[PLATFORM_MAX_PATH];
+	GetConVarString(g_hCvarCustomConfig, sCustomConfig, sizeof(sCustomConfig));
+
+	if (FindCustomConfigPath(sCustomConfig))
+		return true; // config found
+
+	if (StrEqual(sCustomConfig, "rtd2_perks.custom.cfg"))
+		return false; // config not found, but user did not specify it
+
+	LogError("Custom perk config is specified as \"%s\", but could find it under any path:\n"
+		... "> <Path_SM>/configs/%s\n"
+		... "> <Path_SM>/configs/%s.cfg\n"
+		... "> <Path_SM>/configs/rtd2_perks.%s.cfg\n"
+		... "> <Path_SM>/%s\n",
+		sCustomConfig, sCustomConfig, sCustomConfig, sCustomConfig, sCustomConfig);
+
+	return false;
+}
+
 bool ParseEffects()
 {
 	char sPath[PLATFORM_MAX_PATH];
@@ -865,16 +901,13 @@ bool ParseEffects()
 
 void ParseCustomEffects()
 {
-	char sPath[PLATFORM_MAX_PATH];
-	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/rtd2_perks.custom.cfg");
-
-	if (!FileExists(sPath))
+	if (!g_bCustomConfigFound)
 	{
 		PrecachePerkSounds();
 		return;
 	}
 
-	int iPerksCustomized = g_hPerkContainer.ParseCustomFile(sPath);
+	int iPerksCustomized = g_hPerkContainer.ParseCustomFile(g_sCustomConfigPath);
 
 	if (g_iCvarLogging & view_as<int>(LogFlag_System))
 		LogMessage("Customized %d perk%s", iPerksCustomized, iPerksCustomized == 1 ? "" : "s");

@@ -12,6 +12,11 @@ Handle g_hCvarReloadUpdate;
 bool g_bCvarReloadUpdate = true;
 #endif
 
+#define DESC_CUSTOM_CONFIG "Name of the custom config file for perk configuration."
+Handle g_hCvarCustomConfig;
+char g_sCustomConfigPath[PLATFORM_MAX_PATH];
+bool g_bCustomConfigFound = false;
+
 enum ChatFlag
 {
 	ChatFlag_Ad = 1 << 0,
@@ -131,6 +136,7 @@ void SetupConVars()
 	g_hCvarAutoUpdate			= CreateConVar("sm_rtd2_autoupdate",	"1",		DESC_AUTO_UPDATE,			FLAGS_CVARS);
 	g_hCvarReloadUpdate			= CreateConVar("sm_rtd2_reloadupdate",	"1",		DESC_RELOAD_UPDATE,			FLAGS_CVARS);
 #endif
+	g_hCvarCustomConfig			= CreateConVar("sm_rtd2_custom_config",	"rtd2_perks.custom.cfg",DESC_CUSTOM_CONFIG,FLAGS_CVARS);
 	g_hCvarLog					= CreateConVar("sm_rtd2_log",			"0",		DESC_LOG,					FLAGS_CVARS|FCVAR_DONTRECORD);
 	g_hCvarLogging				= CreateConVar("sm_rtd2_logging",		"3",		DESC_LOGGING,				FLAGS_CVARS);
 	g_hCvarChat					= CreateConVar("sm_rtd2_chat",			"63",		DESC_CHAT,					FLAGS_CVARS);
@@ -170,6 +176,7 @@ void SetupConVars()
 	HookConVarChange(g_hCvarAutoUpdate,			ConVarChange_Plugin	);	g_bCvarAutoUpdate			= GetConVarInt(g_hCvarAutoUpdate) > 0;
 	HookConVarChange(g_hCvarReloadUpdate,		ConVarChange_Plugin	);	g_bCvarReloadUpdate			= GetConVarInt(g_hCvarReloadUpdate) > 0;
 #endif
+	HookConVarChange(g_hCvarCustomConfig,		ConVarChange_Plugin	);	g_bCustomConfigFound		= ParseCustomConfig();
 	HookConVarChange(g_hCvarLog,				ConVarChange_Plugin	);
 	HookConVarChange(g_hCvarLogging,			ConVarChange_Plugin	);	g_iCvarLogging				= GetConVarInt(g_hCvarLogging);
 	HookConVarChange(g_hCvarChat,				ConVarChange_Plugin	);	g_iCvarChat					= GetConVarInt(g_hCvarChat);
@@ -217,6 +224,12 @@ public void ConVarChange_Plugin(Handle hCvar, const char[] sOld, const char[] sN
 		g_bCvarReloadUpdate = StringToInt(sNew) > 0;
 	}
 #endif
+	else if (hCvar == g_hCvarCustomConfig)
+	{
+		g_bCustomConfigFound = ParseCustomConfig();
+		if (g_bCustomConfigFound && !StrEqual(sOld, sNew))
+			PrintToServer(CONS_PREFIX ... " Custom config path changed, use \"sm_reloadrtd\" to reparse perks.");
+	}
 	else if (hCvar == g_hCvarLog)
 	{
 		LogError(
