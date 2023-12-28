@@ -25,6 +25,7 @@
 #define NO_ANNOTATION_COND_2 TFCond_Disguised
 
 #define UberMode Int[0]
+#define FightBack Int[1]
 #define Resistance Float[0]
 #define LastDeflect Float[1]
 #define AnnotationLifetime Float[2]
@@ -149,6 +150,7 @@ void Godmode_ApplyPerk(const int client, const Perk perk)
 	g_eInGodmode.Set(client);
 
 	Cache[client].UberMode = perk.GetPrefCell("uber", 0);
+	Cache[client].FightBack = perk.GetPrefCell("fight_back", 1);
 	Cache[client].LastDeflect = 0.0;
 	Cache[client].Resistance = perk.GetPrefFloat("resistance", 0.3);
 	Cache[client].AnnotationLifetime = GetPerkTimeFloat(perk);
@@ -293,7 +295,8 @@ public void Godmode_OnConditionRemoved_Any(const int client, const TFCond eCondi
 
 public void Godmode_OnPlayerAttacked(const int client, const int iVictim, const int iDamage, const int iRemainingHealth)
 {
-	GodmodeFlags(client).Add(iVictim);
+	if (Cache[client].FightBack)
+		GodmodeFlags(client).Add(iVictim);
 }
 
 public void Godmode_OnPlayerDiedOrDisconnected_Any(const int client)
@@ -310,6 +313,7 @@ public void Godmode_OnPlayerDiedOrDisconnected_Any(const int client)
 #undef NO_ANNOTATION_COND_2
 
 #undef UberMode
+#undef FightBack
 #undef Resistance
 #undef LastDeflect
 #undef AnnotationLifetime
