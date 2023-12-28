@@ -51,9 +51,16 @@ void StripToMelee_ApplyPerk(const int client, const Perk perk)
 	Cache[client].FlingSpeed = perk.GetPrefFloat("flingspeed", 2000.0);
 	Cache[client].BoxHealth = perk.GetPrefFloat("boxhealth", 100.0); // will be round to int
 
-	// Client isn't in roll during *_ApplyPerk functions. Let's wait a bit for that to happen.
-	// We need to do this because we trigger a resupply, event of which won't run this early.
-	Cache[client].Delay(0.1, StripToMelee_ApplyPerkPost);
+	if (perk.Time == -1)
+	{
+		StripToMelee_StripWeapons(client);
+	}
+	else
+	{
+		// Client isn't in roll during *_ApplyPerk functions. Let's wait a bit for that to happen.
+		// We need to do this because we trigger a resupply, event of which won't run this early.
+		Cache[client].Delay(0.1, StripToMelee_ApplyPerkPost);
+	}
 }
 
 public void StripToMelee_ApplyPerkPost(const int client)
@@ -149,8 +156,8 @@ int StripToMelee_StripWeapons(const int client)
 
 	if (iWeaponsRemoved == 0)
 	{
-		// Can do nothing on full Demoknight, who only has melee. The perk will either run its time
-		// or be removed once a resupply cabinet is touched.
+		// Cannot do anything on full Demoknight, who only has melee. The perk will either run its
+		// time or be removed once a resupply cabinet is touched.
 		RemovePerk(client);
 		return 0;
 	}
@@ -166,7 +173,7 @@ int StripToMelee_RemoveWeaponSlotIfExists(const int client, const int iSlot)
 	if (iWeap <= MaxClients)
 		return 0;
 
-	// Save Medigun/Gas Passer charge, but do not overwrite if it's already stored
+	// Save Medigun charge, but do not overwrite if it's already stored
 	if (iSlot == 1 && Cache[client].ChargeProgress < 0.0)
 	{
 		char sClassname[32];
