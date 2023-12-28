@@ -52,6 +52,12 @@ public void Explode_Init(const Perk perk)
 
 void Explode_ApplyPerk(const int client, const Perk perk)
 {
+	if (perk.Time == -1)
+	{
+		Explode_Boom(client, client);
+		return;
+	}
+
 	Cache[client].Destroyed = false;
 	Cache[client].InRadius = true;
 
@@ -103,16 +109,7 @@ void Explode_RemovePerk(int client)
 	bool bForcefullyRemoved = iTimeLeft > 1; // assumption
 
 	if (!Cache[client].Destroyed && !bForcefullyRemoved)
-	{
-		float fPos[3];
-		GetEntPropVector(iBomb, Prop_Send, "m_vecOrigin", fPos);
-
-		SendTEParticle(TEParticles.ExplosionLarge, fPos);
-		SendTEParticle(TEParticles.ExplosionLargeShockwave, fPos);
-		EmitSoundToAll(SOUND_EXPLODE, iBomb);
-
-		FakeClientCommandEx(client, "explode");
-	}
+		Explode_Boom(client, iBomb);
 
 	StopSound(iBomb, SNDCHAN_AUTO, BOMB_FUSE_SOUND);
 }
@@ -201,6 +198,18 @@ public void Explode_OnBombTakeDamagePost(int iBomb, int iAtk, int iInflictor, fl
 	fAng[2] += GetRandomDeviationAddition(fAng[2], 10.0);
 
 	TeleportEntity(iBomb, NULL_VECTOR, fAng, NULL_VECTOR);
+}
+
+void Explode_Boom(const int client, const int iEnt)
+{
+	float fPos[3];
+	GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", fPos);
+
+	SendTEParticle(TEParticles.ExplosionLarge, fPos);
+	SendTEParticle(TEParticles.ExplosionLargeShockwave, fPos);
+	EmitSoundToAll(SOUND_EXPLODE, iEnt);
+
+	FakeClientCommandEx(client, "explode");
 }
 
 void Explode_CompleteSuccess(const int iBomb, const float fPos[3])
