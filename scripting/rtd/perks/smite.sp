@@ -49,24 +49,29 @@ public void Smite_Init(const Perk perk)
 
 void Smite_ApplyPerk(const int client, const Perk perk)
 {
-	int iMaxHealth = Shared[client].MaxHealth;
-	int iElectrocutionTics = perk.GetPrefCell("damage_ticks", 3);
-	float fInitialDamageMultiplier = perk.GetPrefFloat("initial_damage", 0.2);
-	float fTickDamageMultiplier = perk.GetPrefFloat("tick_damage", 0.04);
+	float fDamage = 999.0;
 
-	Cache[client].ElectrocutionTicks = iElectrocutionTics;
-	Cache[client].IsElectrocuted = false;
-	Cache[client].TicksLeft = Smite_GenerateTicksLeft(client);
-	Cache[client].TickDamage = fTickDamageMultiplier * iMaxHealth;
-	Cache[client].BaseSpeed = GetBaseSpeed(client);
-	Cache[client].ElectrocutionTime = TICK_INTERVAL * iElectrocutionTics;
-	Cache[client].Slowdown = perk.GetPrefFloat("slowdown", 0.2);
+	if (perk.Time != -1)
+	{
+		int iMaxHealth = Shared[client].MaxHealth;
+		int iElectrocutionTics = perk.GetPrefCell("damage_ticks", 3);
+		float fInitialDamageMultiplier = perk.GetPrefFloat("initial_damage", 0.2);
+		float fTickDamageMultiplier = perk.GetPrefFloat("tick_damage", 0.04);
 
-	// Due to technical reasons, client cannot die on the same frame a timed perk is applied, make
-	// sure they are left with at least 1 health.
-	float fDamage = Min(fInitialDamageMultiplier * iMaxHealth, float(GetClientHealth(client) - 1));
+		Cache[client].ElectrocutionTicks = iElectrocutionTics;
+		Cache[client].IsElectrocuted = false;
+		Cache[client].TicksLeft = Smite_GenerateTicksLeft(client);
+		Cache[client].TickDamage = fTickDamageMultiplier * iMaxHealth;
+		Cache[client].BaseSpeed = GetBaseSpeed(client);
+		Cache[client].ElectrocutionTime = TICK_INTERVAL * iElectrocutionTics;
+		Cache[client].Slowdown = perk.GetPrefFloat("slowdown", 0.2);
 
-	SDKHook(client, SDKHook_OnTakeDamagePost, Smite_OnTakeDamage);
+		// Due to technical reasons, client cannot die on the same frame a timed perk is applied,
+		// make sure they are left with at least 1 health.
+		fDamage = Min(fInitialDamageMultiplier * iMaxHealth, float(GetClientHealth(client) - 1));
+		SDKHook(client, SDKHook_OnTakeDamagePost, Smite_OnTakeDamage);
+	}
+
 	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_SHOCK);
 
 	int iStrike[2];
@@ -106,14 +111,20 @@ void Smite_ApplyPerk(const int client, const Perk perk)
 	}
 
 	SendTEParticleWithPriority(TEParticles.ShockwaveFlat, fPos);
-	Smite_SendElectrocuteParticle(client);
 
-	int iProxy = CreateProxy(client);
-	if (iProxy > MaxClients)
+	if (perk.Time != -1)
 	{
-		Cache[client].SetEnt(Proxy, iProxy);
-		SendTEParticleLingeringAttachedProxy(TEParticlesLingering.ElectricMist, iProxy);
-		EmitSoundToAll(SOUND_ELECTRIC_MIST, client, _, _, _, _, 150);
+		Smite_SendElectrocuteParticle(client);
+
+		int iProxy = CreateProxy(client);
+		if (iProxy > MaxClients)
+		{
+			Cache[client].SetEnt(Proxy, iProxy);
+			SendTEParticleLingeringAttachedProxy(TEParticlesLingering.ElectricMist, iProxy);
+			EmitSoundToAll(SOUND_ELECTRIC_MIST, client, _, _, _, _, 150);
+		}
+
+		Cache[client].Repeat(TICK_INTERVAL, Smite_Tick);
 	}
 
 	fPos[2] += 32.0;
@@ -123,8 +134,6 @@ void Smite_ApplyPerk(const int client, const Perk perk)
 
 	int iBeam = ConnectWithBeam(iStrike[1], iStrike[0], iRed, 100, iBlue, 10.0, 4.0, 10.0);
 	KILL_ENT_IN(iBeam,0.1);
-
-	Cache[client].Repeat(TICK_INTERVAL, Smite_Tick);
 }
 
 void Smite_RemovePerk(const int client)
