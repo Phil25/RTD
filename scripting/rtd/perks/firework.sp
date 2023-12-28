@@ -19,8 +19,6 @@
 #define FIREWORK_EXPLOSION "weapons/flare_detonator_explode.wav"
 #define FIREWORK_PARTICLE "burningplayer_rainbow_flame"
 
-#define Particle EntSlot_1
-
 DEFINE_CALL_APPLY(Firework)
 
 public void Firework_Init(const Perk perk)
@@ -35,15 +33,20 @@ void Firework_ApplyPerk(const int client, const Perk perk)
 	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fPush);
 
 	int iParticle = CreateParticle(client, FIREWORK_PARTICLE);
-	Cache[client].SetEnt(Particle, iParticle);
 	KILL_ENT_IN(iParticle,0.5);
 
-	CreateTimer(0.5, Timer_Firework_Explode, GetClientUserId(client));
+	DataPack hData = new DataPack()
+	hData.WriteCell(GetClientUserId(client));
+	hData.WriteCell(perk.GetPrefCell("damage", 0));
+	hData.WriteCell(perk.GetPrefCell("ignite", 1));
+	CreateTimer(0.5, Timer_Firework_Explode, hData, TIMER_DATA_HNDL_CLOSE);
 }
 
-public Action Timer_Firework_Explode(Handle hTimer, const int iUserId)
+public Action Timer_Firework_Explode(Handle hTimer, DataPack hData)
 {
-	int client = GetClientOfUserId(iUserId);
+	hData.Reset();
+
+	int client = GetClientOfUserId(hData.ReadCell());
 	if (!client)
 		return Plugin_Stop;
 
@@ -53,7 +56,27 @@ public Action Timer_Firework_Explode(Handle hTimer, const int iUserId)
 	EmitSoundToAll(FIREWORK_EXPLOSION, _, _, _, _, _, _, _, fPos);
 	SendTEParticle(TEParticles.ExplosionWooden, fPos);
 	SendTEParticle(TEParticles.ShockwaveFlat, fPos);
-	TF2_IgnitePlayer(client, client);
+
+	int iDamage = hData.ReadCell();
+	switch (iDamage)
+	{
+		case -1:
+			FakeClientCommandEx(client, "explode");
+
+		case 0:
+		{
+			if (hData.ReadCell())
+				TF2_IgnitePlayer(client, client);
+		}
+
+		default:
+		{
+			if (hData.ReadCell())
+				TF2_IgnitePlayer(client, client);
+
+			SDKHooks_TakeDamage(client, 0, 0, float(iDamage), DMG_PREVENT_PHYSICS_FORCE | DMG_CRUSH | DMG_ALWAYSGIB | DMG_BLAST);
+		}
+	}
 
 	DataPack hFollowup = new DataPack();
 	hFollowup.WriteCell(3);
@@ -99,5 +122,3 @@ public Action Timer_Firework_Followup(Handle hTimer, DataPack hFollowup){
 
 #undef FIREWORK_EXPLOSION
 #undef FIREWORK_PARTICLE
-
-#undef Particle
