@@ -24,6 +24,7 @@
 #define Count Int[0]
 #define BatFlags Int[1]
 #define ActivationTimer Int[2]
+#define Legacy Int[3]
 #define Lifetime Float[0]
 #define Speed Float[1]
 
@@ -98,16 +99,27 @@ void BatSwarm_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Count = perk.GetPrefCell("amount", 2);
 	BatSwarmFlags(client).Reset();
 	Cache[client].ActivationTimer = view_as<int>(INVALID_HANDLE);
+	Cache[client].Legacy = perk.GetPrefCell("legacy", 0);
 	Cache[client].Lifetime = perk.GetPrefFloat("lifetime", 1.0);
 	Cache[client].Speed = perk.GetPrefFloat("speed", 0.25);
 
-	Notify.Attack(client);
+	if (Cache[client].Legacy)
+	{
+		BatSwarmFlags(client).Activated = true;
+	}
+	else
+	{
+		Notify.Attack(client);
+	}
 
 	Cache[client].Repeat(perk.GetPrefFloat("rate", 0.35), BatSwarm_Tick);
 }
 
 void BatSwarm_RemovePerk(const int client)
 {
+	if (Cache[client].Legacy)
+		return;
+
 	if (Cache[client].ActivationTimer != view_as<int>(INVALID_HANDLE))
 	{
 		CloseHandle(view_as<Handle>(Cache[client].ActivationTimer));
@@ -123,6 +135,9 @@ void BatSwarm_RemovePerk(const int client)
 
 void BatSwarm_OnVoice(const int client)
 {
+	if (Cache[client].Legacy)
+		return;
+
 	if (BatSwarmFlags(client).Activated)
 	{
 		BatSwarm_End(client);
@@ -237,5 +252,6 @@ void BatSwarm_SpawnBats(const int client, float fLifetime, float fPos[3], float 
 #undef Count
 #undef BatFlags
 #undef ActivationTimer
+#undef Legacy
 #undef Lifetime
 #undef Speed
