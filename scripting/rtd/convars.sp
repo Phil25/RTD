@@ -1,13 +1,13 @@
-#define DESC_PLUGIN_ENABLED "0/1 - Enable or disable the plugin."
+#define DESC_PLUGIN_ENABLED "0/1 - Enable or disable RTD."
 Handle g_hCvarPluginEnabled;
 bool g_bCvarPluginEnabled = true;
 
 #if defined _updater_included
-#define DESC_AUTO_UPDATE "0/1 - Enable or disable automatic updating of the plugin when Updater is installed."
+#define DESC_AUTO_UPDATE "0/1 - Enable or disable automatic updating of RTD when Updater is installed."
 Handle g_hCvarAutoUpdate;
 bool g_bCvarAutoUpdate = true;
 
-#define DESC_RELOAD_UPDATE "0/1 - Enable or disable automatic plugin reloading when a new version has been downloaded."
+#define DESC_RELOAD_UPDATE "0/1 - Enable or disable automatic RTD reloading when a new version has been downloaded."
 Handle g_hCvarReloadUpdate;
 bool g_bCvarReloadUpdate = true;
 #endif
@@ -35,10 +35,10 @@ enum LogFlag
 	LogFlag_PerkRemove = 1 << 3,
 }
 
-#define DESC_LOG "0/1 - Log RTD actions to SourceMod logs? !DEPRECATED! Use \"sm_rtd2_logging\" instead."
+#define DESC_LOG "0/1 - Enable or disable RTD action logging to SourceMod logs. **DEPRECATED** Use \"sm_rtd2_logging\" instead."
 Handle g_hCvarLog;
 
-#define DESC_LOGGING "Add/substract these values to control logs:\n1 - general inner-RTD logs\n2 - command actions\n4 - perk applications\n8 - perk removals\nEx.: \"3\" - show general logs and admin command usage only (1 + 2)"
+#define DESC_LOGGING "Add/substract these values to control logs:\n1 - general RTD-internal messages\n2 - command actions\n4 - perk applications\n8 - perk removals\nEx.: \"3\" - show general logs and admin command usage only (1 + 2)"
 Handle g_hCvarLogging;
 int g_iCvarLogging = 3;
 
@@ -54,7 +54,7 @@ int g_iCvarPerkDuration = 25;
 Handle g_hCvarRollInterval;
 int g_iCvarRollInterval = 60;
 
-#define DESC_DISABLED_PERKS "Enter the effects you'd like to disable, seperated by commas. You can use IDs, tokens or tags which occur in a single perk. ('0, toxic, sandvich' disables first 3)"
+#define DESC_DISABLED_PERKS "Enter the effects you'd like to disable, separated by commas. You can use IDs, tokens or tags which occur in a single perk (ex. \"0, toxic, sandvich\" disables first 3)."
 Handle g_hCvarDisabledPerks;
 
 #define DESC_ALLOWED "Admin flags which are required to use RTD. If blank, all is assumed."
@@ -65,7 +65,7 @@ int g_iCvarAllowed = 0;
 Handle g_hCvarInSetup;
 bool g_bCvarInSetup = true;
 
-#define DESC_TRIGGERS "Chat triggers which will initiate rolls, seperated by comma."
+#define DESC_TRIGGERS "Chat triggers which will initiate rolls, separated by comma."
 Handle g_hCvarTriggers;
 Handle g_arrCvarTriggers = INVALID_HANDLE;
 int g_iCvarTriggers = 2;
@@ -112,9 +112,9 @@ float g_fCvarGoodChance = 0.5;
 
 #define DESC_GOOD_DONATOR_CHANCE "0.0-1.0 - Chance of rolling a good perk if roller is a donator. If there are no good perks available, a bad one will be tried to roll instead."
 Handle g_hCvarGoodDonatorChance;
-float g_fCvarGoodDonatorChance = 0.5;
+float g_fCvarGoodDonatorChance = 0.75;
 
-#define DESC_DONATOR_FLAG "Admin flag required for donators."
+#define DESC_DONATOR_FLAG "Admin flag used by donators."
 Handle g_hCvarDonatorFlag;
 int g_iCvarDonatorFlag = 0;
 

@@ -128,7 +128,7 @@ public void OnPluginStart()
 	LoadTranslations("common.phrases.txt");
 
 	// ConVars
-	CreateConVar("sm_rtd2_version", PLUGIN_VERSION, "Current RTD2 Version", FLAGS_CVARS|FCVAR_DONTRECORD|FCVAR_SPONLY);
+	CreateConVar("sm_rtd2_version", PLUGIN_VERSION, "Current RTD version, do not change.", FLAGS_CVARS|FCVAR_DONTRECORD|FCVAR_SPONLY);
 	SetupConVars();
 
 	AutoExecConfig(true);

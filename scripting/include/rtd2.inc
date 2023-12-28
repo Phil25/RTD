@@ -768,7 +768,7 @@ native int RTD2_GetClientPerkTime(int client);
 
 
 /**
- * Adds time to current client's roll.
+ * Adds time to client's current roll.
  *
  * @param client		Client Index.
  * @param iAddedTime	Additional time in seconds, can be negative to subtract.
