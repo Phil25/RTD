@@ -22,6 +22,7 @@
 #define Boost Int[0]
 #define Red Int[1]
 #define Blue Int[2]
+#define MarkForDeath Int[3]
 #define Diameter Float[0]
 #define RingStart Float[1]
 #define RangeSquared Float[2]
@@ -41,6 +42,7 @@ public void TeamCriticals_ApplyPerk(const int client, const Perk perk)
 	float fRange = perk.GetPrefFloat("range", 270.0);
 
 	Cache[client].Boost = view_as<int>(eCritBoost);
+	Cache[client].MarkForDeath = perk.GetPrefCell("mark_death", 1);
 	Cache[client].Diameter = fRange * 2;
 	Cache[client].RingStart = fRange / 2;
 	Cache[client].RangeSquared = fRange * fRange;
@@ -62,7 +64,9 @@ public void TeamCriticals_ApplyPerk(const int client, const Perk perk)
 	}
 
 	Shared[client].AddCritBoost(client, eCritBoost);
-	TF2_AddCondition(client, TFCond_MarkedForDeath);
+
+	if (Cache[client].MarkForDeath)
+		TF2_AddCondition(client, TFCond_MarkedForDeath);
 
 	Cache[client].Repeat(TICK_INTERVAL, TeamCriticals_SetTargets);
 }
@@ -70,7 +74,9 @@ public void TeamCriticals_ApplyPerk(const int client, const Perk perk)
 void TeamCriticals_RemovePerk(const int client)
 {
 	Shared[client].RemoveCritBoost(client, view_as<CritBoost>(Cache[client].Boost));
-	TF2_RemoveCondition(client, TFCond_MarkedForDeath);
+
+	if (Cache[client].MarkForDeath)
+		TF2_RemoveCondition(client, TFCond_MarkedForDeath);
 
 	for (int i = 1; i <= MaxClients; ++i)
 		if (IsClientInGame(i))
@@ -173,7 +179,7 @@ bool TeamCriticals_IsValidTarget(int client, int iTarget, TFTeam eClientTeam, fl
 
 void TeamCriticals_OnConditionRemoved(const int client, const TFCond eCondition)
 {
-	if (eCondition == TFCond_MarkedForDeath)
+	if (eCondition == TFCond_MarkedForDeath && Cache[client].MarkForDeath)
 		TF2_AddCondition(client, TFCond_MarkedForDeath);
 }
 
@@ -183,6 +189,7 @@ void TeamCriticals_OnConditionRemoved(const int client, const TFCond eCondition)
 #undef Boost
 #undef Red
 #undef Blue
+#undef MarkForDeath
 #undef Diameter
 #undef RingStart
 #undef RangeSquared
