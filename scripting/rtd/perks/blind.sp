@@ -77,6 +77,9 @@ void Blind_UpdateAnnotations(const int client, const bool bForceDisable=false)
 
 public void Blind_OnPlayerAttacked(const int client, const int iVictim, const int iDamage, const int iRemainingHealth)
 {
+	if (client == iVictim)
+		return;
+
 	Blind_SendFade(client, 0);
 	Blind_SendFade(client, Cache[client].Alpha, true);
 }
