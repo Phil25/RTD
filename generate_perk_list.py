@@ -123,12 +123,12 @@ class PerkDocs(NamedTuple):
             perk["good"] == "1",
             perk["name"],
             perk["token"],
-            docs["brief"],
-            docs["description"],
+            docs["brief"].replace("''", "\""),
+            docs["description"].replace("''", "\""),
             perk["time"],
             perk["tags"],
             settings,
-            extra_notes + docs["notes"].split(";") if "notes" in docs else []
+            extra_notes + docs["notes"].replace("''", "\"").split(";") if "notes" in docs else []
         )
 
 def main(output: Path):
