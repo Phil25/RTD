@@ -4,8 +4,8 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.5.0"
-			"Previous"	"2.4.1"
+			"Latest"	"2.5.1"
+			"Previous"	"2.5.0"
 		}
 
 		"Notes"	"View changelog at https://github.com/Phil25/RTD/wiki/changelog"
@@ -19,51 +19,6 @@
 			"Plugin"	"Path_SM/configs/rtd2_perks.default.cfg"
 
 			"Source"	"Path_SM/scripting/rtd.sp"
-
-			"Source"	"Path_SM/scripting/include/rtd2.inc"
-
-			"Source"	"Path_SM/scripting/rtd/classes/perk.sp"
-			"Source"	"Path_SM/scripting/rtd/classes/rollers.sp"
-
-			"Source"	"Path_SM/scripting/rtd/convars.sp"
-			"Source"	"Path_SM/scripting/rtd/natives.sp"
-			"Source"	"Path_SM/scripting/rtd/stocks.sp"
-
-			"Source"	"Path_SM/scripting/rtd/perks/acallbeyond.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/badsauce.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/batswarm.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/blind.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/deadlyvoice.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/drugbullets.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/eldenstars.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/explode.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/firebreath.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/firetimebomb.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/firework.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/forcedtaunt.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/frog.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/frozen.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/funnyfeeling.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/godmode.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/hatthrow.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/lowgravity.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/madaraswhistle.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/mercsdietwice.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/necromash.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/paranoia.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/powerplay.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/pumpkintrail.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/smite.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/spawndispenser.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/spawnsentry.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/springshoes.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/striptomelee.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/sunlightspear.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/teamcriticals.sp"
-			"Source"	"Path_SM/scripting/rtd/perks/timebomb.sp"
-
-			"Source"	"Path_SM/scripting/rtd/storage/cache.sp"
-			"Source"	"Path_SM/scripting/rtd/storage/precached.sp"
 		}
 
 		"Plugin"	"Path_SM/plugins/rtd.smx"

@@ -28,7 +28,7 @@
 #tryinclude <friendly>
 #tryinclude <friendlysimple>
 
-#define PLUGIN_VERSION	"2.5.0"
+#define PLUGIN_VERSION	"2.5.1"
 
 #define CHAT_PREFIX 	"\x07FFD700[RTD]\x01"
 #define CONS_PREFIX 	"[RTD]"
