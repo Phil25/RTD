@@ -1,6 +1,6 @@
 /**
 * Sickness perk.
-* Copyright (C) 2023 Filip Tomaszewski
+* Copyright (C) 2024 Filip Tomaszewski
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,11 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define SICKNESS_PARTICLE "spell_skeleton_goop_green"
-
 #define HealthyTicks Int[0]
-#define MinDamage Float[0]
-#define MaxDamage Float[1]
+#define Infect Int[1]
+#define InfectRangeSquared Float[0]
+#define MinDamage Float[1]
+#define MaxDamage Float[2]
 
 static char g_sSoundCough[][] = {
 	"ambient/voices/cough1.wav",
@@ -39,7 +39,11 @@ public void Sickness_Init(const Perk perk)
 
 void Sickness_ApplyPerk(const int client, const Perk perk)
 {
+	float fInfectRange = perk.GetPrefFloat("range", 100.0);
+
 	Cache[client].HealthyTicks = GetRandomInt(8, 16);
+	Cache[client].Infect = perk.GetPrefCell("infect", 1);
+	Cache[client].InfectRangeSquared = fInfectRange * fInfectRange;
 	Cache[client].MinDamage = perk.GetPrefFloat("mindamage", 5.0);
 	Cache[client].MaxDamage = perk.GetPrefFloat("maxdamage", 10.0);
 
@@ -53,12 +57,15 @@ public Action Sickness_Tick(const int client)
 		case 0:
 		{
 			EmitSoundToAll(g_sSoundCough[GetRandomInt(0, 3)], client);
-			Sickness_Cough(client);
+			Sickness_Cough(client, Cache[client].MinDamage, Cache[client].MaxDamage);
+
+			if (Cache[client].Infect)
+				Sickness_Spread(client);
 		}
 
 		case -1:
 		{
-			Sickness_Cough(client);
+			Sickness_Cough(client, Cache[client].MinDamage, Cache[client].MaxDamage);
 			Cache[client].HealthyTicks = GetRandomInt(8, 16);
 		}
 	}
@@ -66,21 +73,113 @@ public Action Sickness_Tick(const int client)
 	return Plugin_Continue;
 }
 
-void Sickness_Cough(const int client)
+void Sickness_Cough(const int client, const float fMinDamage, const float fMaxDamage, const int iAttacker=0)
 {
-	int iParticle = CreateParticle(client, SICKNESS_PARTICLE);
-	KILL_ENT_IN(iParticle,0.1);
+	SendTEParticleAttached(TEParticles.GreenGoop, client, .fOffset={0.0, 0.0, 36.0});
 
-	float fDamage = GetRandomFloat(Cache[client].MinDamage, Cache[client].MaxDamage);
-	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_PREVENT_PHYSICS_FORCE);
+	float fDamage = GetRandomFloat(fMinDamage, fMaxDamage);
+	SDKHooks_TakeDamage(client, iAttacker, iAttacker, fDamage, DMG_PREVENT_PHYSICS_FORCE);
 
 	float fShake[3];
 	fShake[0] = GetRandomFloat(10.0, 15.0);
 	SetEntPropVector(client, Prop_Send, "m_vecPunchAngle", fShake);
 }
 
-#undef SICKNESS_PARTICLE
+void Sickness_Spread(const int client)
+{
+	float fPos[3];
+	GetClientAbsOrigin(client, fPos);
+
+	TFTeam eTeam = TF2_GetClientTeam(client);
+	float fRangeSquared = Cache[client].InfectRangeSquared;
+	float fMinDamage = Cache[client].MinDamage * 0.8;
+	float fMaxDamage = Cache[client].MaxDamage * 0.8;
+	int iUserId = GetClientUserId(client);
+
+	for (int i = 1; i <= MaxClients; ++i)
+	{
+		if (!Sickness_IsValidTarget(i, eTeam, fPos, fRangeSquared))
+			continue;
+
+		DataPack hData = new DataPack();
+		hData.WriteCell(3);
+		hData.WriteCell(GetRandomInt(6, 10));
+		hData.WriteCell(GetClientUserId(i));
+		hData.WriteCell(iUserId);
+		hData.WriteFloat(fMinDamage);
+		hData.WriteFloat(fMaxDamage);
+
+		CreateTimer(0.2, Timer_Sickness_Infected, hData, TIMER_REPEAT | TIMER_HNDL_CLOSE);
+	}
+}
+
+bool Sickness_IsValidTarget(const int iTarget, const TFTeam eClientTeam, const float fClientPos[3], const float fRangeSquared)
+{
+	if (!IsClientInGame(iTarget) || !IsPlayerAlive(iTarget) || TF2_GetClientTeam(iTarget) == eClientTeam)
+		return false;
+
+	float fTargetPos[3];
+	GetClientAbsOrigin(iTarget, fTargetPos);
+
+	return GetVectorDistance(fClientPos, fTargetPos, true) <= fRangeSquared;
+}
+
+public Action Timer_Sickness_Infected(Handle hTimer, DataPack hData)
+{
+	hData.Reset();
+	int iTicks = hData.ReadCell();
+
+	if (iTicks <= 0)
+		return Plugin_Stop;
+
+	int iHealthyTicks = hData.ReadCell();
+
+	int client = GetClientOfUserId(hData.ReadCell());
+	if (!client || !IsPlayerAlive(client) || g_eInGodmode.Test(client))
+		return Plugin_Stop;
+
+	int iAttacker = GetClientOfUserId(hData.ReadCell());
+	if (!iAttacker)
+		return Plugin_Stop;
+
+	float fMinDamage = hData.ReadFloat();
+	float fMaxDamage = hData.ReadFloat();
+
+	switch (iHealthyTicks)
+	{
+		case 0:
+		{
+			EmitSoundToAll(g_sSoundCough[GetRandomInt(0, 3)], client);
+			Sickness_Cough(client, fMinDamage, fMaxDamage, iAttacker);
+			// fallthrough
+		}
+
+		case -1:
+		{
+			Sickness_Cough(client, fMinDamage, fMaxDamage, iAttacker);
+
+			hData.Reset();
+			hData.WriteCell(iTicks - 1);
+			hData.WriteCell(GetRandomInt(6, 10));
+
+			return Plugin_Continue;
+		}
+
+		default:
+		{
+			// fallthrough
+		}
+	}
+
+	hData.Reset();
+	hData.WriteCell(iTicks);
+	hData.WriteCell(iHealthyTicks - 1);
+
+	return Plugin_Continue;
+}
 
 #undef HealthyTicks
+#undef Infect
+#undef InfectRangeSquared
 #undef MinDamage
 #undef MaxDamage

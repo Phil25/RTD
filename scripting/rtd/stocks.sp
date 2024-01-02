@@ -1,6 +1,6 @@
 /**
 * Custom stocks used throughout RTD and its perks.
-* Copyright (C) 2023 Filip Tomaszewski
+* Copyright (C) 2024 Filip Tomaszewski
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -1175,12 +1175,12 @@ stock void SendTEParticleWithPriorityTo(const int client, const TEParticleId ePa
 	TE_SendToClient(client, -1.0);
 }
 
-void _SetupParticleAttached(const int iParticleId, const int iEnt, const int iAttachPoint, const bool bResetPrevious)
+void _SetupParticleAttached(const int iParticleId, const int iEnt, const int iAttachPoint, const bool bResetPrevious, const float fOffset[3]={0.0, 0.0, 0.0})
 {
 	TE_Start("TFParticleEffect");
-	TE_WriteFloat("m_vecStart[0]", 0.0);
-	TE_WriteFloat("m_vecStart[1]", 0.0);
-	TE_WriteFloat("m_vecStart[2]", 0.0);
+	TE_WriteFloat("m_vecStart[0]", fOffset[0]);
+	TE_WriteFloat("m_vecStart[1]", fOffset[1]);
+	TE_WriteFloat("m_vecStart[2]", fOffset[2]);
 	TE_WriteNum("m_iParticleSystemIndex", iParticleId);
 	TE_WriteNum("m_bResetParticles", view_as<int>(bResetPrevious));
 	TE_WriteNum("entindex", iEnt);
@@ -1190,9 +1190,9 @@ void _SetupParticleAttached(const int iParticleId, const int iEnt, const int iAt
 		TE_WriteNum("m_iAttachmentPointIndex", iAttachPoint);
 }
 
-stock void SendTEParticleAttached(const TEParticleId eParticleId, const int iEnt, const int iAttachPoint=0, const bool bResetPrevious=false)
+stock void SendTEParticleAttached(const TEParticleId eParticleId, const int iEnt, const int iAttachPoint=0, const bool bResetPrevious=false, const float fOffset[3]={0.0, 0.0, 0.0})
 {
-	_SetupParticleAttached(view_as<int>(eParticleId), iEnt, iAttachPoint, bResetPrevious);
+	_SetupParticleAttached(view_as<int>(eParticleId), iEnt, iAttachPoint, bResetPrevious, fOffset);
 	TE_SendToAll(-1.0);
 }
 
