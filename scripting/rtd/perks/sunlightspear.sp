@@ -1,6 +1,6 @@
 /**
 * Sunlight Spear perk.
-* Copyright (C) 2023 Filip Tomaszewski
+* Copyright (C) 2024 Filip Tomaszewski
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ void SunlightSpear_OnVoice(const int client)
 
 	SetEntPropEnt(iCarrier, Prop_Send, "m_hOwnerEntity", client);
 	DispatchKeyValue(iCarrier, "model", MODEL_PROJECTILE);
-	DispatchKeyValue(iCarrier, "modelscale", "0");
+	DispatchKeyValue(iCarrier, "modelscale", "0.1");
 
 	DispatchSpawn(iCarrier);
 	ActivateEntity(iCarrier);
