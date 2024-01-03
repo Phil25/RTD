@@ -189,7 +189,7 @@ public void OnConfigsExecuted()
 
 public void OnPluginEnd()
 {
-	ResetAllClients();
+	ResetAllClients(RTDRemove_PluginUnload);
 }
 
 void InitClientCache()
@@ -198,12 +198,21 @@ void InitClientCache()
 		Cache[i].Init(i);
 }
 
-void ResetAllClients(RTDRemoveReason reason=RTDRemove_PluginUnload)
+void ResetAllClients(RTDRemoveReason reason, const int iInitiator=0, const bool bForce=true)
 {
 	for (int i = 1; i <= MaxClients; ++i)
 	{
 		if (g_hRollers.GetInRoll(i))
-			ForceRemovePerk(i, reason);
+		{
+			if (bForce)
+			{
+				ForceRemovePerk(i, reason, .iInitiator=iInitiator);
+			}
+			else
+			{
+				RemovePerk(i, reason);
+			}
+		}
 
 		g_hRollers.Reset(i);
 	}
@@ -269,7 +278,7 @@ public void OnClientDisconnect(int client)
 	Events.PlayerDisconnected(client);
 
 	if (g_hRollers.GetInRoll(client))
-		ForceRemovePerk(client, RTDRemove_Disconnect, _, client);
+		RemovePerk(client, RTDRemove_Disconnect);
 
 	g_hRollers.Reset(client);
 	SDKUnhook(client, SDKHook_GetMaxHealth, OnGetMaxHealth);
@@ -576,7 +585,7 @@ public Action Command_Reload(int client, int args)
 	if (g_iCvarLogging & view_as<int>(LogFlag_Action))
 		LogAction(client, -1, "\"%L\" triggered configs and perks reload", client);
 
-	ResetAllClients();
+	ResetAllClients(RTDRemove_PluginUnload, client);
 
 	ParseEffects();
 	ParseCustomEffects();
@@ -669,7 +678,7 @@ public Action Event_PlayerDeath(Event hEvent, const char[] sEventName, bool dont
 	if (!g_hRollers.GetInRoll(client))
 		return Plugin_Continue;
 
-	ForceRemovePerk(client, RTDRemove_Death);
+	RemovePerk(client, RTDRemove_Death);
 	return Plugin_Continue;
 }
 
@@ -705,7 +714,7 @@ public Action Timer_ClassChangePost(Handle hTimer, DataPack hData)
 
 	int iDesiredClass = hData.ReadCell();
 	if (view_as<int>(TF2_GetPlayerClass(client)) == iDesiredClass)
-		ForceRemovePerk(client, RTDRemove_ClassChange, _, client);
+		RemovePerk(client, RTDRemove_ClassChange);
 
 	return Plugin_Stop;
 }
@@ -751,7 +760,7 @@ public Action Event_UberchargeDeployed(Handle hEvent, const char[] sEventName, b
 
 public Action Event_RoundStart(Handle hEvent, const char[] sEventName, bool dontBroadcast)
 {
-	ResetAllClients(RTDRemove_NoPrint);
+	ResetAllClients(RTDRemove_NoPrint, .bForce=false);
 	return Plugin_Continue;
 }
 

@@ -305,7 +305,17 @@ public int Native_Remove(Handle hPlugin, int iParams)
 	if (iReason == RTDRemove_Custom)
 		GetNativeString(3, sReason, sizeof(sReason));
 
-	Perk perk = ForceRemovePerk(client, iReason, sReason);
+	Perk perk = null;
+	if (GetNativeCell(4)) // bForce
+	{
+		int iInitiator = GetNativeCell(5);
+		perk = ForceRemovePerk(client, iReason, sReason, iInitiator);
+	}
+	else
+	{
+		perk = RemovePerk(client, iReason, sReason);
+	}
+
 	return perk ? perk.Id : -1;
 }
 

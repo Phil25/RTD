@@ -859,10 +859,12 @@ native RTDPerk RTD2_RemovePerk(int client, RTDRemoveReason reason=RTDRemove_Wear
  * @param client		Client Index.
  * @param reason		Reason enum.
  * @param sReason		Provide custom reason IF reason=RTDRemove_Custom.
+ * @param bForce		Forced removals are treated as loggable actions, whereas non-forced are "natural" reasons. No distinction other than what is logged.
+ * @param iInitiator	Client who initiated the removal. Used only when bForce=true.
  *
  * @return				RTDPerk object
  */
-native RTDPerk RTD2_Remove(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason="");
+native RTDPerk RTD2_Remove(int client, RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason="", bool bForce=false, int iInitiator=0);
 
 
 /**
