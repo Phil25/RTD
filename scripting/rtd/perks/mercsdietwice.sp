@@ -1,6 +1,6 @@
 /**
 * Mercs Die Twice perk.
-* Copyright (C) 2023 Filip Tomaszewski
+* Copyright (C) 2024 Filip Tomaszewski
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -182,7 +182,7 @@ void MercsDieTwice_SendDeathEvent(const int client, const int iAttacker, const i
 	hEvent.SetInt("attacker", iAttacker == 0 ? 0 : GetClientUserId(iAttacker));
 	hEvent.SetInt("weaponid", iWeapon);
 	hEvent.SetInt("weapon_def_index", iWeaponIndex);
-	hEvent.SetInt("death_flags", FLAG_FEIGNDEATH);
+	hEvent.SetInt("death_flags", TF_DEATHFLAG_DEADRINGER);
 
 	hEvent.Fire();
 }

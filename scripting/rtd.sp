@@ -1,6 +1,6 @@
 /**
 * Main RTD source file.
-* Copyright (C) 2023 Filip Tomaszewski
+* Copyright (C) 2024 Filip Tomaszewski
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -36,8 +36,10 @@
 #define PERK_COLOR_GOOD	"\x0732CD32"
 #define PERK_COLOR_BAD	"\x078650AC"
 
-#define FLAG_FEIGNDEATH	(1 << 5)
 #define FLAGS_CVARS		FCVAR_NOTIFY
+
+#define FREEZECAM_DELAY		2.0
+#define FREEZECAM_DURATION	5.0
 
 #if defined _updater_included
 #define UPDATE_URL		"https://phil25.github.io/RTD/update.txt"
@@ -648,16 +650,21 @@ public Action Listener_Sound(int clients[MAXPLAYERS], int& iLen, char sSample[PL
 	return (Stocks_Sound(iEnt, sSample) && Events.Sound(iEnt, sSample)) ? Plugin_Continue : Plugin_Stop;
 }
 
-public Action Event_PlayerDeath(Handle hEvent, const char[] sEventName, bool dontBroadcast)
+public Action Event_PlayerDeath(Event hEvent, const char[] sEventName, bool dontBroadcast)
 {
-	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+	int iUserId = hEvent.GetInt("userid");
+	int client = GetClientOfUserId(iUserId);
+
 	if (!client)
 		return Plugin_Continue;
 
-	if (GetEventInt(hEvent, "death_flags") & FLAG_FEIGNDEATH)
+	if (hEvent.GetInt("death_flags") & TF_DEATHFLAG_DEADRINGER)
 		return Plugin_Continue;
 
 	Events.PlayerDied(client);
+
+	if (g_hCvarDeathcamPerk.BoolValue)
+		ShowKillersPerk(iUserId, hEvent);
 
 	if (!g_hRollers.GetInRoll(client))
 		return Plugin_Continue;
@@ -1514,6 +1521,49 @@ void RemovedPerk(int client, RTDRemoveReason reason, const char[] sReason="")
 
 	if (reason != RTDRemove_NoPrint)
 		PrintPerkEndReason(client, reason, sReason);
+}
+
+void ShowKillersPerk(const int iUserId, const Event hEvent)
+{
+	int iAttackerUserId = hEvent.GetInt("attacker");
+	int iAttacker = GetClientOfUserId(iAttackerUserId);
+	if (!iAttacker)
+		return;
+
+	Perk perk = g_hRollers.GetPerk(iAttacker);
+	if (perk == null)
+		return;
+
+	char sAnnotation[RTD2_MAX_PERK_NAME_LENGTH + 16];
+	perk.Format(sAnnotation, sizeof(sAnnotation), CONS_PREFIX ... " $Name$");
+
+	DataPack hData = new DataPack();
+	hData.WriteCell(iUserId);
+	hData.WriteCell(iAttackerUserId);
+	hData.WriteCell(sizeof(sAnnotation));
+	hData.WriteString(sAnnotation);
+
+	CreateTimer(FREEZECAM_DELAY, Timer_ShowKillersPerk, hData, TIMER_DATA_HNDL_CLOSE);
+}
+
+public Action Timer_ShowKillersPerk(Handle hTimer, DataPack hData)
+{
+	hData.Reset();
+
+	int client = GetClientOfUserId(hData.ReadCell());
+	if (!client || IsPlayerAlive(client))
+		return Plugin_Stop;
+
+	int iAttacker = GetClientOfUserId(hData.ReadCell());
+	if (!iAttacker)
+		return Plugin_Stop;
+
+	int iAnnotationSize = hData.ReadCell();
+	char[] sAnnotation = new char[iAnnotationSize];
+	hData.ReadString(sAnnotation, iAnnotationSize);
+
+	ShowAnnotationFor(client, iAttacker, FREEZECAM_DURATION, sAnnotation);
+	return Plugin_Stop;
 }
 
 void PrintToRoller(int client, Perk perk, int iDuration)

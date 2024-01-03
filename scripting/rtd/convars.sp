@@ -126,8 +126,11 @@ float g_fCvarTimerPosX = -1.0;
 Handle g_hCvarTimerPosY;
 float g_fCvarTimerPosY = 0.55;
 
-#define DESC_SHOW_DESC "0.0-1.0 - Show perk description to roller after applying effect."
+#define DESC_SHOW_DESC "0/1 - Show perk description to roller after applying effect."
 ConVar g_hCvarShowDesc;
+
+#define DESC_DEATHCAM_PERK "0/1 - Show name of the killer's perk over their head during Deathcam."
+ConVar g_hCvarDeathcamPerk;
 
 void SetupConVars()
 {
@@ -168,6 +171,7 @@ void SetupConVars()
 	g_hCvarTimerPosY			= CreateConVar("sm_rtd2_timerpos_y",	"0.55",		DESC_TIMER_POS_Y,			FLAGS_CVARS);
 
 	g_hCvarShowDesc 			= CreateConVar("sm_rtd2_show_description", "0",		DESC_SHOW_DESC,				FLAGS_CVARS, true, 0.0, true, 1.0);
+	g_hCvarDeathcamPerk 		= CreateConVar("sm_rtd2_deathcam_perk",	"0",		DESC_DEATHCAM_PERK,			FLAGS_CVARS, true, 0.0, true, 1.0);
 
 
 		//-----[ ConVars Hooking & Setting ]-----//
