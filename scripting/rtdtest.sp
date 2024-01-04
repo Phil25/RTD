@@ -91,7 +91,7 @@ public Action Event_RoundStart(Handle hEvent, const char[] sEventName, bool dont
 void RemoveObjectives()
 {
 	char sMapName[32];
-	GetCurrentMap(sMapName, sizeof(sMapName))
+	GetCurrentMap(sMapName, sizeof(sMapName));
 	if (!StrEqual(sMapName, "ultiduo_grove_b4"))
 		return;
 

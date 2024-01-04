@@ -305,17 +305,28 @@ public int Native_Remove(Handle hPlugin, int iParams)
 	if (iReason == RTDRemove_Custom)
 		GetNativeString(3, sReason, sizeof(sReason));
 
-	Perk perk = null;
-	if (GetNativeCell(4)) // bForce
+	if (!GetNativeCell(4)) // not forced
 	{
-		int iInitiator = GetNativeCell(5);
-		perk = ForceRemovePerk(client, iReason, sReason, iInitiator);
-	}
-	else
-	{
-		perk = RemovePerk(client, iReason, sReason);
+		Perk perk = RemovePerk(client, iReason, sReason);
+		return perk ? perk.Id : -1;
 	}
 
+	int iInitiator = GetNativeCell(5);
+	if (IsValidClient(iInitiator) && g_hRollers.GetInRoll(client) && GetForwardFunctionCount(g_hFwdCanRemove) > 0)
+	{
+		Call_StartForward(g_hFwdCanRemove);
+		Call_PushCell(iInitiator);
+		Call_PushCell(client);
+		Call_PushCell(g_hRollers.GetPerk(client).Id);
+
+		Action result = Plugin_Continue;
+		Call_Finish(result);
+
+		if (result != Plugin_Continue)
+			return -1;
+	}
+
+	Perk perk = ForceRemovePerk(client, iReason, sReason, iInitiator);
 	return perk ? perk.Id : -1;
 }
 

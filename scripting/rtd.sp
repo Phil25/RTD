@@ -540,6 +540,7 @@ public Action Command_RemoveRTD(int client, int args)
 			Call_PushCell(client);
 			Call_PushCell(aTrgList[i]);
 			Call_PushCell(g_hRollers.GetPerk(aTrgList[i]).Id);
+
 			Action result = Plugin_Continue;
 			Call_Finish(result);
 
