@@ -207,7 +207,6 @@ enum struct AttributesCache
 	int NoFallDamage;
 	int ForceDamageTaken;
 	int OverhealBonus;
-	int NoHeadshotDeath;
 	int AirblastVulnerability;
 	int DeploySpeed;
 	int SilentRev;
@@ -226,7 +225,6 @@ enum struct AttributesCache
 		this.NoFallDamage = 275;
 		this.ForceDamageTaken = 535;
 		this.OverhealBonus = 11;
-		this.NoHeadshotDeath = 176;
 		this.AirblastVulnerability = 329;
 		this.DeploySpeed = 178;
 		this.SilentRev = 238;

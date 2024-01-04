@@ -1,6 +1,6 @@
 /**
 * Fire Timebomb perk.
-* Copyright (C) 2023 Filip Tomaszewski
+* Copyright (C) 2024 Filip Tomaszewski
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #define TICKS_SLOW 0.75
 #define TICKS_FAST 0.35
 
+#define Headshot Int[0]
 #define Resistance Float[0]
 #define RadiusSquared Float[1]
 #define PrimeThreshold Float[2]
@@ -58,13 +59,13 @@ void FireTimebomb_ApplyPerk(const int client, const Perk perk)
 	float fExplodeTime = GetEngineTime() + GetPerkTime(perk);
 	float fRadius = perk.GetPrefFloat("radius", 512.0);
 
+	Cache[client].Headshot = RoundFloat(perk.GetPrefFloat("headshot", 0.1) * 100);
 	Cache[client].Resistance = perk.GetPrefFloat("resistance", 0.75);
 	Cache[client].RadiusSquared = fRadius * fRadius;
 	Cache[client].PrimeThreshold = fExplodeTime - 3.0;
 	Cache[client].DetonateThreshold = fExplodeTime - 1.0;
 	Cache[client].SetEnt(Bomb, FireTimebomb_SpawnBombHead(client));
 
-	TF2Attrib_SetByDefIndex(client, Attribs.NoHeadshotDeath, 1.0);
 	SDKHook(client, SDKHook_OnTakeDamage, FireTimebomb_OnTakeDamage);
 
 	SetVariantInt(1);
@@ -78,7 +79,6 @@ void FireTimebomb_RemovePerk(const int client)
 	SetVariantInt(0);
 	AcceptEntityInput(client, "SetForcedTauntCam");
 
-	TF2Attrib_RemoveByDefIndex(client, Attribs.NoHeadshotDeath);
 	SDKUnhook(client, SDKHook_OnTakeDamage, FireTimebomb_OnTakeDamage);
 
 	if (GetEngineTime() < Cache[client].DetonateThreshold)
@@ -120,9 +120,9 @@ void FireTimebomb_RemovePerk(const int client)
 	TF2_IgnitePlayer(client, client);
 }
 
-public Action FireTimebomb_OnTakeDamage(int client, int& iAttacker, int& iInflictor, float& fDamage, int& iType)
+public Action FireTimebomb_OnTakeDamage(int client, int& iAttacker, int& iInflictor, float& fDamage, int& iType, int& iWeapon, float fForce[3], float fPos[3], int iCustomType)
 {
-	fDamage *= Cache[client].Resistance;
+	fDamage *= iCustomType == TF_CUSTOM_HEADSHOT ? float(Cache[client].Headshot) / 100.0 : Cache[client].Resistance;
 	EmitSoundToAll(g_sResistanceMedium[GetRandomInt(0, sizeof(g_sResistanceMedium) - 1)], client);
 
 	return Plugin_Changed;
@@ -206,6 +206,7 @@ int FireTimebomb_SpawnBombHead(const int client)
 #undef TICKS_SLOW
 #undef TICKS_FAST
 
+#undef Headshot
 #undef Resistance
 #undef RadiusSquared
 #undef PrimeThreshold
