@@ -1477,6 +1477,7 @@ void FormatRemoveReasonLog(char[] sBuffer, const int iBufferLen, const RTDRemove
 Perk RemovePerk(const int client, const RTDRemoveReason reason=RTDRemove_WearOff, const char[] sReason="")
 {
 	Perk perk = g_hRollers.GetPerk(client);
+
 	if (perk != null)
 		ManagePerk(client, perk, false, reason, sReason);
 
@@ -1490,7 +1491,7 @@ Perk ForceRemovePerk(const int client, const RTDRemoveReason reason=RTDRemove_We
 
 	Perk perk = RemovePerk(client, reason, sReason);
 
-	if (!(g_iCvarLogging & view_as<int>(LogFlag_Action)))
+	if (perk == null || !(g_iCvarLogging & view_as<int>(LogFlag_Action)))
 		return perk;
 
 	char sBuffer[64];
