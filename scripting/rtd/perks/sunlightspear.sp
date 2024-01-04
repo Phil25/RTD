@@ -117,7 +117,9 @@ void SunlightSpear_OnVoice(const int client)
 
 	SetEntPropEnt(iCarrier, Prop_Send, "m_hOwnerEntity", client);
 	DispatchKeyValue(iCarrier, "model", MODEL_PROJECTILE);
-	DispatchKeyValue(iCarrier, "modelscale", "0.1");
+
+	SetEntityRenderMode(iCarrier, RENDER_TRANSCOLOR);
+	SetEntityRenderColor(iCarrier, .a=0);
 
 	DispatchSpawn(iCarrier);
 	ActivateEntity(iCarrier);
