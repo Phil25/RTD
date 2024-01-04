@@ -4,8 +4,8 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.5.1"
-			"Previous"	"2.5.0"
+			"Latest"	"2.5.2"
+			"Previous"	"2.5.1"
 		}
 
 		"Notes"	"View changelog at https://github.com/Phil25/RTD/wiki/changelog"
@@ -18,7 +18,21 @@
 			"Plugin"	"Path_SM/plugins/rtd.smx"
 			"Plugin"	"Path_SM/configs/rtd2_perks.default.cfg"
 
+			"Source"	"Path_SM/scripting/include/rtd2.inc"
 			"Source"	"Path_SM/scripting/rtd.sp"
+			"Source"	"Path_SM/scripting/rtd/classes/perk.sp"
+			"Source"	"Path_SM/scripting/rtd/convars.sp"
+			"Source"	"Path_SM/scripting/rtd/natives.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/firetimebomb.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/frozen.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/mercsdietwice.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/sickness.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/sunlightspear.sp"
+			"Source"	"Path_SM/scripting/rtd/perks/timebomb.sp"
+			"Source"	"Path_SM/scripting/rtd/stocks.sp"
+			"Source"	"Path_SM/scripting/rtd/storage/cache.sp"
+			"Source"	"Path_SM/scripting/rtd/storage/precached.sp"
+			"Source"	"Path_SM/scripting/rtdtest.sp"
 		}
 
 		"Plugin"	"Path_SM/plugins/rtd.smx"
