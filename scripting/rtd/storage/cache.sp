@@ -14,6 +14,18 @@ enum struct ClientFlags
 		this.iVals[iOverflows] &= ~(1 << (iIndex - 32 * iOverflows));
 	}
 
+	void Bool(const int iIndex, const bool bSet)
+	{
+		if (bSet)
+		{
+			this.Set(iIndex);
+		}
+		else
+		{
+			this.Unset(iIndex);
+		}
+	}
+
 	bool Test(const int iIndex)
 	{
 		int iOverflows = iIndex / 32;

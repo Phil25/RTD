@@ -1,6 +1,6 @@
 /**
 * Frozen perk.
-* Copyright (C) 2023 Filip Tomaszewski
+* Copyright (C) 2024 Filip Tomaszewski
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,8 @@
 #define ICE_STATUE "models/props_moonbase/moon_cube_crystal07.mdl"
 
 #define OriginalAlpha Int[0]
-#define NeedsResupply Int[1]
-#define ResultingHealth Int[2]
-#define Legacy Int[3]
+#define ResultingHealth Int[1]
+#define Volume Int[2]
 
 #define LastFireTouch Float[0]
 #define LastDamageTaken Float[1]
@@ -36,9 +35,23 @@
 #define Ice EntSlot_2
 #define Ragdoll EntSlot_2
 
+#define State Flags
+#define IsResupplyNeeded Flags.Test(view_as<int>(Frozen_State_ResupplyNeeded))
+#define IsLegacy Flags.Test(view_as<int>(Frozen_State_Legacy))
+#define IsBreakable Flags.Test(view_as<int>(Frozen_State_Breakable))
+#define IsMuffled Flags.Test(view_as<int>(Frozen_State_Muffle))
+
 #define DETACH_GROUND_DISTANCE 5.0
 
-Perk g_ePerkFrozen = null;
+static Perk g_ePerkFrozen = null;
+
+enum Frozen_State
+{
+	Frozen_State_ResupplyNeeded = 1,
+	Frozen_State_Legacy,
+	Frozen_State_Breakable,
+	Frozen_State_Muffle,
+}
 
 DEFINE_CALL_APPLY_REMOVE(Frozen)
 
@@ -59,12 +72,16 @@ public void Frozen_Init(const Perk perk)
 void Frozen_ApplyPerk(const int client, const Perk perk)
 {
 	Cache[client].OriginalAlpha = Frozen_GetEntityAlpha(client);
-	Cache[client].NeedsResupply = false;
-	Cache[client].Legacy = perk.GetPrefCell("legacy", 0);
+	Cache[client].Volume = MinInt(perk.GetPrefCell("volume", 50), 100);
 	Cache[client].LastFireTouch = 0.0;
 	Cache[client].LastDamageTaken = 0.0;
 	Cache[client].Resistance = perk.GetPrefFloat("resistance", 0.1);
 	Cache[client].FlameBuff = perk.GetPrefFloat("flame_buff", 5.0);
+
+	Cache[client].State.Reset();
+	Cache[client].State.Bool(view_as<int>(Frozen_State_Legacy), perk.GetPrefBool("legacy", false));
+	Cache[client].State.Bool(view_as<int>(Frozen_State_Breakable), perk.GetPrefBool("breakable", true));
+	Cache[client].State.Bool(view_as<int>(Frozen_State_Muffle), perk.GetPrefBool("muffle", true));
 
 	DisarmWeapons(client, true);
 	ApplyPreventCapture(client);
@@ -74,7 +91,7 @@ void Frozen_ApplyPerk(const int client, const Perk perk)
 	SetVariantInt(1);
 	AcceptEntityInput(client, "SetForcedTauntCam");
 
-	if (Cache[client].Legacy)
+	if (Cache[client].IsLegacy)
 	{
 		Frozen_Set(client, 0);
 
@@ -156,8 +173,11 @@ void Frozen_ApplyPerk(const int client, const Perk perk)
 	SetEntProp(iIce, Prop_Data, "m_iHealth", perk.GetPrefCell("ice_health", 500));
 	SetEntProp(iIce, Prop_Data, "m_iMaxHealth", client); // m_iMaxHealth not used for anything
 
-	SDKHook(iIce, SDKHook_OnTakeDamage, Frozen_OnTakeDamageIce);
-	SDKHook(iIce, SDKHook_Touch, Frozen_OnTouchIce);
+	if (Cache[client].IsBreakable)
+	{
+		SDKHook(iIce, SDKHook_OnTakeDamage, Frozen_OnTakeDamageIce);
+		SDKHook(iIce, SDKHook_Touch, Frozen_OnTouchIce);
+	}
 }
 
 public void Frozen_ApplyPost(const int client)
@@ -176,7 +196,7 @@ public void Frozen_ApplyPost(const int client)
 		return;
 
 	Frozen_TransferWearables(client, iStatue);
-	Cache[client].NeedsResupply = true;
+	Cache[client].Flags.Set(view_as<int>(Frozen_State_ResupplyNeeded));
 
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);
@@ -214,7 +234,7 @@ void Frozen_RemovePerk(const int client)
 	SetVariantInt(0);
 	AcceptEntityInput(client, "SetForcedTauntCam");
 
-	if (Cache[client].Legacy)
+	if (Cache[client].IsLegacy)
 	{
 		SetClientViewEntity(client, client);
 		return;
@@ -229,7 +249,7 @@ void Frozen_RemovePerk(const int client)
 	TeleportEntity(client, fPos, NULL_VECTOR, NULL_VECTOR);
 
 	Cache[client].ResultingHealth = GetClientHealth(client);
-	if (Cache[client].NeedsResupply)
+	if (Cache[client].IsResupplyNeeded)
 		ForceResupplyCrude(client, fPos);
 }
 
@@ -240,10 +260,10 @@ public void Frozen_OnResupply_Any(const int client)
 	if (!Frozen_IsPostFrozen(client))
 		return;
 
-	if (!Cache[client].NeedsResupply)
+	if (!Cache[client].IsResupplyNeeded)
 		return;
 
-	Cache[client].NeedsResupply = false;
+	Cache[client].Flags.Unset(view_as<int>(Frozen_State_ResupplyNeeded));
 
 	// We need to await player health change and set it back to `iHealth`. However, I'm not sure
 	// if we could rely on it happening the next frame, so let's check up to 3 following frames.
@@ -295,15 +315,24 @@ bool Frozen_OnSound(const int client, const char[] sSound)
 	if (!IsVoicelineSound(sSound))
 		return true;
 
+	if (Cache[client].Volume <= 0)
+		return false;
+
 	// Voiceline is played on every hit also, let's make sure not to run this too frequently
 	float fTime = GetEngineTime();
 	if (fTime < Cache[client].LastDamageTaken + 1.0)
 		return false;
 
 	Cache[client].LastDamageTaken = fTime;
+	float fVolume = float(Cache[client].Volume) / 100.0;
+
+	if (!Cache[client].IsMuffled)
+	{
+		EmitSoundToAll(sSound, client, SNDCHAN_VOICE, _, _, fVolume);
+		return false;
+	}
 
 	int iContextStart = 0;
-	float fVolume = 0.5;
 	int iPitch = 100;
 
 	switch (Shared[client].ClassForPerk)
@@ -482,6 +511,9 @@ void Frozen_OnTakeDamage(int client, int iAttacker, int iInflictor, float fDamag
 {
 	if (!bFriendly)
 		SDKHooks_TakeDamage(client, iInflictor, iAttacker, fDamage * Cache[client].Resistance, iType);
+
+	if (!Cache[client].IsBreakable)
+		return;
 
 	if (iType & (DMG_BULLET | DMG_CLUB))
 	{
@@ -687,9 +719,8 @@ stock void Frozen_SetEntityAlpha(int iEntity, int iValue)
 #undef ICE_STATUE
 
 #undef OriginalAlpha
-#undef NeedsResupply
 #undef ResultingHealth
-#undef Legacy
+#undef Volume
 
 #undef LastFireTouch
 #undef LastDamageTaken
@@ -699,5 +730,11 @@ stock void Frozen_SetEntityAlpha(int iEntity, int iValue)
 #undef Statue
 #undef Ice
 #undef Ragdoll
+
+#undef State
+#undef IsResupplyNeeded
+#undef IsLegacy
+#undef IsBreakable
+#undef IsMuffled
 
 #undef DETACH_GROUND_DISTANCE

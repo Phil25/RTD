@@ -1,6 +1,6 @@
 /**
 * Perk class
-* Copyright (C) 2023 Filip Tomaszewski
+* Copyright (C) 2024 Filip Tomaszewski
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -145,6 +145,11 @@ methodmap Perk < StringMap
 	{
 		float fVal;
 		return this.GetValue(sKey, fVal) ? RoundFloat(fVal) : iDefault;
+	}
+
+	public bool GetPrefBool(const char[] sKey, bool bDefault=false)
+	{
+		return view_as<bool>(this.GetPrefCell(sKey, view_as<int>(bDefault)));
 	}
 
 	public float GetPrefFloat(char[] sKey, float fDefault=0.0)
