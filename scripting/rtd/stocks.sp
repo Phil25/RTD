@@ -1353,12 +1353,12 @@ stock void RotateClientSmooth(int client, float fAngle)
 
 stock bool IsFootstepSound(const char[] sSound)
 {
-	return !strncmp(sSound[7], "footstep", 8);
+	return strncmp(sSound, "player/footstep", 15) == 0;
 }
 
 stock bool IsVoicelineSound(const char[] sSound)
 {
-	return strncmp(sSound[0], "vo/", 3) == 0;
+	return strncmp(sSound, "vo/", 3) == 0;
 }
 
 
