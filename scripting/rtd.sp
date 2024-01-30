@@ -125,6 +125,11 @@ public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int iErr
 
 public void OnPluginStart()
 {
+#if defined DEBUG
+	PrintToChatAll(CHAT_PREFIX ... " Loaded %s@%s", PLUGIN_VERSION, __TIME__);
+	PrintToServer(CONS_PREFIX ... " Loaded %s@%s", PLUGIN_VERSION, __TIME__);
+#endif
+
 	LoadTranslations("rtd2.phrases.txt");
 	LoadTranslations("rtd2_perks.phrases.txt");
 	LoadTranslations("common.phrases.txt");
