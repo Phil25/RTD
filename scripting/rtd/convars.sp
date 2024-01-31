@@ -57,6 +57,9 @@ int g_iCvarRollInterval = 60;
 #define DESC_DISABLED_PERKS "Enter the effects you'd like to disable, separated by commas. You can use IDs, tokens or tags which occur in a single perk (ex. \"0, toxic, sandvich\" disables first 3)."
 Handle g_hCvarDisabledPerks;
 
+#define DESC_EMIT_SOUND "0/1 - Emit custom perk sound when it's applied."
+ConVar g_hCvarEmitSound;
+
 #define DESC_ALLOWED "Admin flags which are required to use RTD. If blank, all is assumed."
 Handle g_hCvarAllowed;
 int g_iCvarAllowed = 0;
@@ -147,6 +150,7 @@ void SetupConVars()
 	g_hCvarPerkDuration			= CreateConVar("sm_rtd2_duration",		"25",		DESC_PERK_DURATION,			FLAGS_CVARS);
 	g_hCvarRollInterval			= CreateConVar("sm_rtd2_interval",		"60",		DESC_ROLL_INTERVAL,			FLAGS_CVARS);
 	g_hCvarDisabledPerks		= CreateConVar("sm_rtd2_disabled",		"",			DESC_DISABLED_PERKS,		FLAGS_CVARS);
+	g_hCvarEmitSound			= CreateConVar("sm_rtd2_emit_sound",	"1",		DESC_EMIT_SOUND,			FLAGS_CVARS);
 
 	g_hCvarAllowed				= CreateConVar("sm_rtd2_accessflags",	"",			DESC_ALLOWED,				FLAGS_CVARS);
 	g_hCvarInSetup				= CreateConVar("sm_rtd2_insetup",		"0",		DESC_IN_SETUP,				FLAGS_CVARS, true, 0.0, true, 1.0);

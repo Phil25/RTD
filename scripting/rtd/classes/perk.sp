@@ -627,10 +627,10 @@ methodmap Perk < StringMap
 		return this.IsAptForSetupOf(client, iRollFlags);
 	}
 
-	public void EmitSound(int client)
+	public void EmitSound(const int client)
 	{
 		char sSound[64];
-		this.GetSound(sSound, 64);
+		this.GetSound(sSound, sizeof(sSound));
 		EmitSoundToAll(sSound, client);
 	}
 }

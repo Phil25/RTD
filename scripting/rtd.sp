@@ -1291,7 +1291,9 @@ void ApplyPerk(const int client, Perk perk, const int iPerkTime=-1)
 	// Save player class for the duration of the perk, specifically until the next one is applied
 	Shared[client].ClassForPerk = TF2_GetPlayerClass(client);
 
-	perk.EmitSound(client);
+	if (g_hCvarEmitSound.BoolValue)
+		perk.EmitSound(client);
+
 	ManagePerk(client, perk, true);
 
 	g_hPerkHistory.Push(perk.Id);
