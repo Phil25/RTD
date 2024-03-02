@@ -4,8 +4,8 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.5.3"
-			"Previous"	"2.5.2"
+			"Latest"	"2.5.4"
+			"Previous"	"2.5.3"
 		}
 
 		"Notes"	"View changelog at https://github.com/Phil25/RTD/wiki/changelog"
@@ -17,13 +17,8 @@
 		{
 			"Plugin"	"Path_SM/plugins/rtd.smx"
 
-			"Plugin"	"Path_SM/translations/rtd2.phrases.txt"
-			"Plugin"	"Path_SM/translations/rtd2_perks.phrases.txt"
-
 			"Source"	"Path_SM/scripting/rtd.sp"
-			"Source"	"Path_SM/scripting/rtd/classes/perk.sp"
-			"Source"	"Path_SM/scripting/rtd/convars.sp"
-			"Source"	"Path_SM/scripting/rtd/stocks.sp"
+			"Source"	"Path_SM/scripting/rtd/natives.sp"
 		}
 
 		"Plugin"	"Path_SM/plugins/rtd.smx"
