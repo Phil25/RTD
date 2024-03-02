@@ -305,13 +305,13 @@ public int Native_Remove(Handle hPlugin, int iParams)
 	if (iReason == RTDRemove_Custom)
 		GetNativeString(3, sReason, sizeof(sReason));
 
-	if (!GetNativeCell(4)) // not forced
+	if (iParams >= 4 && !GetNativeCell(4)) // not forced
 	{
 		Perk perk = RemovePerk(client, iReason, sReason);
 		return perk ? perk.Id : -1;
 	}
 
-	int iInitiator = GetNativeCell(5);
+	int iInitiator = iParams >= 5 ? GetNativeCell(5) : 0;
 	if (IsValidClient(iInitiator) && g_hRollers.GetInRoll(client) && GetForwardFunctionCount(g_hFwdCanRemove) > 0)
 	{
 		Call_StartForward(g_hFwdCanRemove);
