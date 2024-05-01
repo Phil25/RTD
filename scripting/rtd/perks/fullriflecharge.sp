@@ -23,7 +23,17 @@ public void FullRifleCharge_Init(const Perk perk)
 	Events.OnConditionAdded(perk, FullRifleCharge_OnConditionAdded);
 }
 
-void FullRifleCharge_OnConditionAdded(int client, TFCond condition){
+void FullRifleCharge_OnConditionAdded(int client, TFCond condition)
+{
+	// N.B.: Both Slowed and Zoomed are applied when scoping in. However, Slowed is a more generic
+	// condition for this case because:
+	// 1. bows do not zoom in, so we have to rely on Slowed only, and
+	// 2. The Classic zoomes in once, and it's not required to zoom out before shots.
+	//
+	// The Classic does apply Slowed as well once the shot is charged, possibly irrespective of the
+	// zoomed state. This might cause some confusion since the bar does not appear to be charged
+	// right after scoping in, but, rest assured, it will always be full before the shot is fired.
+
 	if (condition != TFCond_Slowed)
 		return;
 
@@ -34,11 +44,11 @@ void FullRifleCharge_OnConditionAdded(int client, TFCond condition){
 	char sClass[32];
 	GetEdictClassname(iWeapon, sClass, sizeof(sClass));
 
-	if (strcmp(sClass[10], "sniperrifle") == 0)
+	if (strncmp(sClass, "tf_weapon_sniperrifle", 21) == 0)
 	{
 		SetEntPropFloat(iWeapon, Prop_Send, "m_flChargedDamage", 150.0);
 	}
-	else if (strcmp(sClass[10], "compound_bow") == 0)
+	else if (StrEqual(sClass, "tf_weapon_compound_bow"))
 	{
 		SetEntPropFloat(iWeapon, Prop_Send, "m_flChargeBeginTime", GetGameTime() - 1.0);
 	}
