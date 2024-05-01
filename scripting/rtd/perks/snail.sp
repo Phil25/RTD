@@ -23,7 +23,7 @@ public void Snail_ApplyPerk(const int client, const Perk perk)
 	SetSpeedEx(client, perk.GetPrefFloat("multiplier", 0.4));
 }
 
-public void Snail_RemovePerk(const int client)
+public void Snail_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	SetSpeedEx(client);
 }

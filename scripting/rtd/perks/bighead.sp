@@ -34,7 +34,7 @@ public void BigHead_ApplyPerk(const int client, const Perk perk)
 	TF2Attrib_SetByDefIndex(client, Attribs.VoicePitch, 1.0 / Min(fScale, 3.0));
 }
 
-void BigHead_RemovePerk(const int client)
+public void BigHead_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	TF2Attrib_RemoveByDefIndex(client, Attribs.VoicePitch);
 }

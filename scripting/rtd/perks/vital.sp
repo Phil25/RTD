@@ -26,7 +26,7 @@ public void Vital_ApplyPerk(const int client, const Perk perk)
 	SetEntityHealth(client, GetClientHealth(client) + iAddedHealth);
 }
 
-public void Vital_RemovePerk(int client)
+public void Vital_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	TF2Attrib_RemoveByDefIndex(client, Attribs.MaxHealth);
 }

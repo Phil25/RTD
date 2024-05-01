@@ -35,7 +35,7 @@ public void FastHands_ApplyPerk(const int client, const Perk perk)
 	FastHands_Apply(client);
 }
 
-void FastHands_RemovePerk(const int client)
+public void FastHands_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	for (int i = 0; i < 3; ++i)
 	{

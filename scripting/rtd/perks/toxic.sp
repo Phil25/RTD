@@ -51,7 +51,7 @@ void Toxic_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(0.1, Toxic_SpawnParticles);
 }
 
-void Toxic_RemovePerk(const int client)
+public void Toxic_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	StopSound(client, SNDCHAN_AUTO, SOUND_TOXIC);
 }

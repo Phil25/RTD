@@ -68,7 +68,7 @@ void Invisibility_ApplyPerk(const int client, const Perk perk)
 		SDKHook(client, SDKHook_OnTakeDamagePost, Invisibility_OnTakeDamage);
 }
 
-void Invisibility_RemovePerk(const int client)
+public void Invisibility_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	SDKUnhook(client, SDKHook_StartTouchPost, Invisibility_OnStartTouchPlayerOnly);
 	SDKUnhook(client, SDKHook_StartTouchPost, Invisibility_OnStartTouchAny);

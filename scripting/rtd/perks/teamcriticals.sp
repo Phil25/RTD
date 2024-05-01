@@ -71,7 +71,7 @@ public void TeamCriticals_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(TICK_INTERVAL, TeamCriticals_SetTargets);
 }
 
-void TeamCriticals_RemovePerk(const int client)
+public void TeamCriticals_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	Shared[client].RemoveCritBoost(client, view_as<CritBoost>(Cache[client].Boost));
 

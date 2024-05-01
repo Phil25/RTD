@@ -224,8 +224,7 @@ public Action Timer_FrozenFreezeAnimation(Handle hTimer, const int iEntRef)
 	return Plugin_Stop;
 }
 
-// TODO: needs remove reason to check whether client died, resupply is not needed
-void Frozen_RemovePerk(const int client)
+public void Frozen_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	Frozen_Set(client, Cache[client].OriginalAlpha);
 	DisarmWeapons(client, false);
@@ -241,6 +240,12 @@ void Frozen_RemovePerk(const int client)
 	}
 
 	SDKUnhook(client, SDKHook_OnTakeDamage, Frozen_OnTakeDamageClient);
+
+	if (eRemoveReason == RTDRemove_Death || eRemoveReason == RTDRemove_ClassChange)
+	{
+		Cache[client].Flags.Unset(view_as<int>(Frozen_State_ResupplyNeeded));
+		return;
+	}
 
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);

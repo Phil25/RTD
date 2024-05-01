@@ -32,7 +32,7 @@ public void PowerfulHits_ApplyPerk(const int client, const Perk perk)
 	PowerfulHits_Apply(client);
 }
 
-void PowerfulHits_RemovePerk(const int client)
+public void PowerfulHits_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	for (int i = 0; i < 3; ++i)
 	{

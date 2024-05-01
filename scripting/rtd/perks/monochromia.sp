@@ -23,7 +23,7 @@ public void Monochromia_ApplyPerk(const int client, const Perk perk)
 	SetOverlay(client, ClientOverlay_Monochrome);
 }
 
-void Monochromia_RemovePerk(const int client)
+public void Monochromia_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	SetOverlay(client, ClientOverlay_None);
 }

@@ -46,7 +46,7 @@ void MercsDieTwice_ApplyPerk(const int client, const Perk perk)
 	SDKHook(client, SDKHook_OnTakeDamageAlive, MercsDieTwice_OnTakeDamage);
 }
 
-void MercsDieTwice_RemovePerk(const int client)
+public void MercsDieTwice_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	if (Cache[client].InFakeDeath)
 		MercsDieTwice_Resurrect(client);

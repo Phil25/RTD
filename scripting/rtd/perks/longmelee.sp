@@ -33,7 +33,7 @@ public void LongMelee_ApplyPerk(const int client, const Perk perk)
 	LongMelee_Apply(client);
 }
 
-public void LongMelee_RemovePerk(const int client)
+public void LongMelee_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	int iWeapon = GetPlayerWeaponSlot(client, 2);
 	if (iWeapon > MaxClients && IsValidEntity(iWeapon))

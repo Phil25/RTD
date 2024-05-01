@@ -28,7 +28,7 @@ public void Criticals_ApplyPerk(const int client, const Perk perk)
 	Shared[client].AddCritBoost(client, eCritBoost);
 }
 
-void Criticals_RemovePerk(int client)
+public void Criticals_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	Shared[client].RemoveCritBoost(client, view_as<CritBoost>(Cache[client].Boost));
 }

@@ -26,7 +26,7 @@ public void StrongGravity_ApplyPerk(const int client, const Perk perk)
 	SetEntityGravity(client, perk.GetPrefFloat("multiplier", 4.0));
 }
 
-void StrongGravity_RemovePerk(const int client)
+public void StrongGravity_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	SetEntityGravity(client, Cache[client].Base);
 }

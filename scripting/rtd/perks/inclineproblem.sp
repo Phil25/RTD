@@ -26,7 +26,7 @@ public void InclineProblem_ApplyPerk(const int client, const Perk perk)
 	SetEntPropFloat(client, Prop_Send, "m_flStepSize", 1.0);
 }
 
-public void InclineProblem_RemovePerk(const int client)
+public void InclineProblem_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	SetEntPropFloat(client, Prop_Send, "m_flStepSize", Cache[client].BaseStepSize);
 }

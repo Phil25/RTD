@@ -9,7 +9,7 @@
 	AcceptEntityInput(%1, "FireUser1") // no semicolor, require it's added on caller
 
 #define DEFINE_CALL_APPLY_REMOVE(%1) \
-public void %1_Call(const int client, const Perk perk, const bool apply) \
+public void %1_Call(const int client, const Perk perk, const bool apply, const RTDRemoveReason reason) \
 { \
 	if(apply) \
 	{ \
@@ -17,7 +17,7 @@ public void %1_Call(const int client, const Perk perk, const bool apply) \
 	} \
 	else \
 	{ \
-		%1_RemovePerk(client); \
+		%1_RemovePerk(client, reason); \
 	} \
 }
 

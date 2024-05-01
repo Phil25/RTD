@@ -1334,7 +1334,7 @@ void ManagePerk(const int client, const Perk perk, const bool bEnable, const RTD
 	}
 	else
 	{
-		perk.CallInternal(client, bEnable);
+		perk.CallInternal(client, bEnable, reason);
 	}
 
 	int iSubscribesToEntitySpawned = view_as<int>(Events.SubscribesToEntitySpawned(perk));

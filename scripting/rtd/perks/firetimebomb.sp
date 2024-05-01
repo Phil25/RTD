@@ -74,7 +74,7 @@ void FireTimebomb_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(TICKS_SLOW, FireTimebomb_TickSlow);
 }
 
-void FireTimebomb_RemovePerk(const int client)
+public void FireTimebomb_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	SetVariantInt(0);
 	AcceptEntityInput(client, "SetForcedTauntCam");

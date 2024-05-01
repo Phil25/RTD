@@ -54,7 +54,7 @@ void EldenStars_ApplyPerk(const int client, const Perk perk)
 	Notify.Attack(client);
 }
 
-void EldenStars_RemovePerk(const int client)
+public void EldenStars_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	int iLastOrb = EntRefToEntIndex(Cache[client].LastOrb);
 	if (iLastOrb > MaxClients)

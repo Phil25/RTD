@@ -115,7 +115,7 @@ void BatSwarm_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(perk.GetPrefFloat("rate", 0.35), BatSwarm_Tick);
 }
 
-void BatSwarm_RemovePerk(const int client)
+public void BatSwarm_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	if (Cache[client].Legacy)
 		return;

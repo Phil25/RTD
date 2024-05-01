@@ -97,7 +97,7 @@ void Explode_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(0.1, Explode_BindToBomb);
 }
 
-void Explode_RemovePerk(int client)
+public void Explode_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	StopSound(client, SNDCHAN_AUTO, BOMB_BEAM_DRAG);
 

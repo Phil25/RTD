@@ -36,7 +36,7 @@ public void WeaponMixup_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(0.5, WeaponMixup_SwitchTick);
 }
 
-public void WeaponMixup_RemovePerk(const int client)
+public void WeaponMixup_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	// If Heavy was revved up, this should fix it lingering
 	TF2_RemoveCondition(client, TFCond_Slowed);

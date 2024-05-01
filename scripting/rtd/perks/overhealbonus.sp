@@ -33,7 +33,7 @@ void OverhealBonus_ApplyPerk(const int client, const Perk perk)
 	OverhealBonus_Apply(client);
 }
 
-void OverhealBonus_RemovePerk(const int client)
+public void OverhealBonus_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	int iMediGun = GetPlayerWeaponSlot(client, 1);
 	if (iMediGun > MaxClients && IsValidEntity(iMediGun))

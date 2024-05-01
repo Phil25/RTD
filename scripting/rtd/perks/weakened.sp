@@ -27,7 +27,7 @@ public void Weakened_ApplyPerk(const int client, const Perk perk)
 	SDKHook(client, SDKHook_OnTakeDamage, Weakened_OnTakeDamage);
 }
 
-void Weakened_RemovePerk(const int client)
+public void Weakened_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	SDKUnhook(client, SDKHook_OnTakeDamage, Weakened_OnTakeDamage);
 }

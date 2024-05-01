@@ -34,7 +34,7 @@ void HomingProjectiles_ApplyPerk(const int client, const Perk perk)
 		TF2_AddCondition(client, iCrits < 2 ? TFCond_Buffed : TFCond_CritOnFirstBlood);
 }
 
-void HomingProjectiles_RemovePerk(const int client)
+public void HomingProjectiles_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	int iCrits = Cache[client].Crits;
 	if (iCrits > 0)

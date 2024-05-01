@@ -42,7 +42,7 @@ void Noclip_ApplyPerk(const int client, const Perk perk)
 	}
 }
 
-void Noclip_RemovePerk(const int client)
+public void Noclip_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	if (Cache[client].Mode)
 	{

@@ -26,7 +26,7 @@ public void Outline_ApplyPerk(const int client, const Perk perk)
 	SetEntProp(client, Prop_Send, "m_bGlowEnabled", 1);
 }
 
-void Outline_RemovePerk(const int client)
+public void Outline_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	SetEntProp(client, Prop_Send, "m_bGlowEnabled", Cache[client].InitialGlow);
 }

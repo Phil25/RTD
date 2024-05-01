@@ -51,7 +51,7 @@ public void LowGravity_ApplyPerk(int client, Perk perk)
 		TF2Attrib_SetByDefIndex(client, Attribs.NoFallDamage, 1.0);
 }
 
-public void LowGravity_RemovePerk(int client)
+public void LowGravity_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	if (Cache[client].JumpMode)
 	{

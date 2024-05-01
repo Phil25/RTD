@@ -256,7 +256,7 @@ methodmap Perk < StringMap
 		return this.ActiveCount.Get(view_as<int>(eTeam));
 	}
 
-	public void CallInternal(int client, bool bEnable)
+	public void CallInternal(const int client, const bool bEnable, const RTDRemoveReason eRemoveReason)
 	{
 		char sFuncName[64];
 		this.GetInternalCall(sFuncName, sizeof(sFuncName));
@@ -274,6 +274,7 @@ methodmap Perk < StringMap
 		Call_PushCell(client);
 		Call_PushCell(this);
 		Call_PushCell(bEnable);
+		Call_PushCell(eRemoveReason);
 		Call_Finish();
 	}
 

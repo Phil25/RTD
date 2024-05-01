@@ -31,7 +31,7 @@ public void Lag_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(0.1, Lag_SetPositionCheck);
 }
 
-public void Lag_RemovePerk(const int client)
+public void Lag_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	FixPotentialStuck(client);
 }

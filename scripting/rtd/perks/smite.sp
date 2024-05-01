@@ -136,7 +136,7 @@ void Smite_ApplyPerk(const int client, const Perk perk)
 	KILL_ENT_IN(iBeam,0.1);
 }
 
-void Smite_RemovePerk(const int client)
+public void Smite_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	SDKUnhook(client, SDKHook_OnTakeDamagePost, Smite_OnTakeDamage);
 

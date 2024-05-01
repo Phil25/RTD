@@ -35,7 +35,7 @@ public void TinyMann_ApplyPerk(const int client, const Perk perk)
 		TF2_AddCondition(client, TFCond_SpeedBuffAlly);
 }
 
-void TinyMann_RemovePerk(const int client)
+public void TinyMann_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	TF2Attrib_RemoveByDefIndex(client, Attribs.VoicePitch);
 	SetEntPropFloat(client, Prop_Send, "m_flModelScale", Cache[client].BaseScale);

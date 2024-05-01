@@ -75,7 +75,7 @@ public void TeamAutoheal_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(perk.GetPrefFloat("rate", 0.1), TeamAutoheal_TeamTick);
 }
 
-public void TeamAutoheal_RemovePerk(const int client)
+public void TeamAutoheal_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	for (int i = 1; i <= MaxClients; ++i)
 		if (IsClientInGame(i) && Cache[client].Healing.Test(i))

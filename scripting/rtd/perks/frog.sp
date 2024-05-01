@@ -55,7 +55,7 @@ public void Frog_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(0.1, Frog_JumpCheck);
 }
 
-public void Frog_RemovePerk(const int client)
+public void Frog_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	int iFlags = GetEntityFlags(client);
 	SetEntityFlags(client, iFlags & ~FL_ATCONTROLS);

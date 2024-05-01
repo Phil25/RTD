@@ -50,7 +50,7 @@ void HellsReach_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(1.0, HellsReach_Slowdown);
 }
 
-void HellsReach_RemovePerk(int client)
+public void HellsReach_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	ResetSpeed(client);
 }

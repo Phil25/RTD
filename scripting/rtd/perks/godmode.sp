@@ -188,7 +188,7 @@ void Godmode_ApplyPerk(const int client, const Perk perk)
 	g_eInGodmode.Set(client);
 }
 
-void Godmode_RemovePerk(const int client)
+public void Godmode_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	g_eInGodmode.Unset(client);
 

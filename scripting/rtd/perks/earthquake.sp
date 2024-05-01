@@ -35,7 +35,7 @@ public void Earthquake_ApplyPerk(const int client, const Perk perk)
 	UserMessages.Shake(client, Cache[client].Amplitude, Cache[client].Frequency, fPerkTime);
 }
 
-public void Earthquake_RemovePerk(const int client)
+public void Earthquake_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	float fRemainingTime = Cache[client].FinishTime - GetEngineTime();
 	float fPercentageLeft = fRemainingTime / Cache[client].PerkTime;

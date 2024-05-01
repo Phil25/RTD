@@ -182,7 +182,7 @@ void PowerPlay_Apply(const int client)
 	g_eInGodmode.Set(client);
 }
 
-void PowerPlay_RemovePerk(const int client)
+public void PowerPlay_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	if (Cache[client].IsLegacy)
 	{

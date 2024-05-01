@@ -48,7 +48,7 @@ public void Autoheal_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(perk.GetPrefFloat("rate", 0.1), Autoheal_Tick);
 }
 
-public void Autoheal_RemovePerk(const int client)
+public void Autoheal_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	StopSound(client, SNDCHAN_AUTO, SOUND_HEALING);
 }

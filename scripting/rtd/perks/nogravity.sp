@@ -26,7 +26,7 @@ public void NoGravity_ApplyPerk(const int client, const Perk perk)
 	SetEntityGravity(client, 0.0001);
 }
 
-public void NoGravity_RemovePerk(const int client)
+public void NoGravity_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	SetEntityGravity(client, Cache[client].Base);
 }

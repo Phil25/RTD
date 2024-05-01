@@ -41,7 +41,7 @@ public void DrunkWalk_ApplyPerk(const int client, const Perk perk)
 		Cache[client].Delay(3.5, DrunkWalk_DemomanDeny);
 }
 
-void DrunkWalk_RemovePerk(const int client)
+public void DrunkWalk_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	ResetSpeed(client);
 }

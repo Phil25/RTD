@@ -47,7 +47,7 @@ void Blind_ApplyPerk(const int client, const Perk perk)
 	}
 }
 
-void Blind_RemovePerk(const int client)
+public void Blind_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	Blind_SendFade(client, 0);
 	SetOverlay(client, ClientOverlay_None);

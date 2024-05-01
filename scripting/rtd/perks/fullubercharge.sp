@@ -67,7 +67,7 @@ public void FullUbercharge_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(0.1, FullUbercharge_RefillCharge);
 }
 
-public void FullUbercharge_RemovePerk(const int client)
+public void FullUbercharge_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	if (!Cache[client].UberchargeDeployed)
 		return;

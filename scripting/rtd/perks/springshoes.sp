@@ -32,7 +32,7 @@ public void SpringShoes_ApplyPerk(const int client, const Perk perk)
 	Cache[client].Repeat(0.25, SpringShoes_ForceJump);
 }
 
-void SpringShoes_RemovePerk(const int client)
+public void SpringShoes_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	TF2Attrib_RemoveByDefIndex(client, Attribs.PreventJump);
 }

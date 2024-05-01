@@ -34,7 +34,7 @@ public void FunnyFeeling_ApplyPerk(const int client, const Perk perk)
 	FunnyFeeling_SetFov(client, Cache[client].FunnyFov);
 }
 
-void FunnyFeeling_RemovePerk(const int client)
+public void FunnyFeeling_RemovePerk(const int client, const RTDRemoveReason eRemoveReason)
 {
 	FunnyFeeling_SetFov(client, Cache[client].BaseFov);
 }
