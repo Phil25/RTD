@@ -116,9 +116,8 @@ Action PowerPlay_ApplyCheck(const int client)
 
 void PowerPlay_Apply(const int client)
 {
-	SDKHook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
-
 	ForceSwitchSlot(client, 2);
+	SDKHook(client, SDKHook_WeaponCanSwitchTo, PowerPlay_BlockWeaponSwitch);
 
 	int iMelee = GetPlayerWeaponSlot(client, 2);
 	if (iMelee > MaxClients && IsValidEntity(iMelee))
@@ -292,7 +291,7 @@ public void PowerPlay_OnConditionAdded(const int client, const TFCond eCond)
 
 public Action PowerPlay_BlockWeaponSwitch(const int client, const int iWeapon)
 {
-	return Plugin_Handled;
+	return GetPlayerWeaponSlot(client, 2) == iWeapon ? Plugin_Continue : Plugin_Handled;
 }
 
 public Action PowerPlay_OnTakeDamage(int client, int& iAtk, int& iInflictor, float& fDamage, int& iType, int& iWeapon, float fForce[3], float fPos[3], int iCustomType)

@@ -770,12 +770,8 @@ stock void DisarmWeapons(int client, bool bDisarm)
 	}
 }
 
-stock bool SwitchSlot(const int client, const int iSlot)
+stock void SwitchSlotUnchecked(const int client, const int iSlot)
 {
-	int iLastWeapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
-	if (iLastWeapon == GetPlayerWeaponSlot(client, iSlot))
-		return true;
-
 	switch (iSlot)
 	{
 		case 0: ClientCommand(client, "slot1");
@@ -784,7 +780,15 @@ stock bool SwitchSlot(const int client, const int iSlot)
 		case 3: ClientCommand(client, "slot4");
 		case 4: ClientCommand(client, "slot5");
 	}
+}
 
+stock bool SwitchSlot(const int client, const int iSlot)
+{
+	int iLastWeapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+	if (iLastWeapon == GetPlayerWeaponSlot(client, iSlot))
+		return true;
+
+	SwitchSlotUnchecked(client, iSlot);
 	return GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") != iLastWeapon;
 }
 
@@ -793,6 +797,22 @@ stock bool ForceSwitchSlot(const int client, const int iSlot)
 	int iWeapon = GetPlayerWeaponSlot(client, iSlot);
 	if (iWeapon <= MaxClients || !IsValidEntity(iWeapon))
 		return false;
+
+	int iCurrentWeapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+	if (iCurrentWeapon == iWeapon)
+		return true;
+
+	if (iCurrentWeapon > MaxClients)
+	{
+		char sClassname[32];
+		GetEntityClassname(iCurrentWeapon, sClassname, sizeof(sClassname));
+		if (StrEqual(sClassname, "tf_weapon_medigun"))
+		{
+			// Switching away while healing retains the beam, fallback to a more "native" solution
+			SwitchSlotUnchecked(client, iSlot);
+			return true;
+		}
+	}
 
 	if (TF2_IsPlayerInCondition(client, TFCond_Zoomed))
 	{
