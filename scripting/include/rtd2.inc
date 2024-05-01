@@ -647,7 +647,7 @@ methodmap RTDPerkList < ArrayList{
 	//
 	// @return		RTDPerk object
 	public RTDPerk Get(int i){
-		return view_as<RTDPerk>(this.Get(i));
+		return view_as<RTDPerk>(view_as<ArrayList>(this).Get(i));
 	}
 
 	// Get random perk from the list.
