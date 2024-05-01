@@ -545,9 +545,9 @@ stock void DamageRadius(float fOrigin[3], int iInflictor=0, int iAttacker=0, flo
 	}
 }
 
-stock void TakeDamage(int client, int iInflictor, int iAttacker, float fDamage, int iFlags, Function call)
+stock void TakeDamage(int client, int iInflictor, int iAttacker, float fDamage, int iFlags=0, Function call=INVALID_FUNCTION)
 {
-	SDKHooks_TakeDamage(client, iInflictor, iAttacker, fDamage, iFlags);
+	SDKHooks_TakeDamage(client, iInflictor, iAttacker, fDamage, iFlags, .bypassHooks = false);
 
 	if (call == INVALID_FUNCTION)
 		return;

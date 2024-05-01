@@ -75,7 +75,7 @@ public Action Vampire_Tick_Followup(Handle hTimer, const int iUserId)
 void Vampire_Hurt(const int client)
 {
 	float fDamage = GetRandomFloat(Cache[client].MinDamage, Cache[client].MaxDamage);
-	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_PREVENT_PHYSICS_FORCE);
+	TakeDamage(client, client, client, fDamage, DMG_PREVENT_PHYSICS_FORCE);
 
 	ViewPunchRand(client, 5.0);
 }

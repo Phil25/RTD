@@ -31,13 +31,13 @@ public void Suffocation_ApplyPerk(const int client, const Perk perk)
 
 public void Suffocation_Begin(const int client)
 {
-	SDKHooks_TakeDamage(client, 0, 0, Cache[client].Damage, DMG_DROWN);
+	TakeDamage(client, 0, 0, Cache[client].Damage, DMG_DROWN);
 	Cache[client].Repeat(Cache[client].Rate, Suffocation_Tick);
 }
 
 public Action Suffocation_Tick(const int client)
 {
-	SDKHooks_TakeDamage(client, 0, 0, Cache[client].Damage, DMG_DROWN);
+	TakeDamage(client, 0, 0, Cache[client].Damage, DMG_DROWN);
 	return Plugin_Continue;
 }
 

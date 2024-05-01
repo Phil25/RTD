@@ -515,7 +515,7 @@ void Frozen_DuplicateAndAttachWearable(const int iOriginalWearable, const int iT
 void Frozen_OnTakeDamage(int client, int iAttacker, int iInflictor, float fDamage, int iType, float fPos[3], bool bFriendly)
 {
 	if (!bFriendly)
-		SDKHooks_TakeDamage(client, iInflictor, iAttacker, fDamage * Cache[client].Resistance, iType);
+		TakeDamage(client, iInflictor, iAttacker, fDamage * Cache[client].Resistance, iType);
 
 	if (!Cache[client].IsBreakable)
 		return;

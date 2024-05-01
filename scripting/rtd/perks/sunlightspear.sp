@@ -219,7 +219,7 @@ void SunlightSpear_DamageTick(const int iVictim, const int iAttacker, const bool
 	float fDamage = Cache[iAttacker].Damage;
 	fDamage += fDamage * view_as<int>(bInitial);
 
-	SDKHooks_TakeDamage(iVictim, iAttacker, iAttacker, fDamage, DMG_SHOCK);
+	TakeDamage(iVictim, iAttacker, iAttacker, fDamage, DMG_SHOCK);
 	EmitSoundToAll(g_sSoundZap[GetRandomInt(0, 2)], iVictim, _, _, _, _, GetRandomInt(90, 110));
 }
 

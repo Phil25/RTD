@@ -74,7 +74,7 @@ public Action Timer_Firework_Explode(Handle hTimer, DataPack hData)
 			if (hData.ReadCell())
 				TF2_IgnitePlayer(client, client);
 
-			SDKHooks_TakeDamage(client, 0, 0, float(iDamage), DMG_PREVENT_PHYSICS_FORCE | DMG_CRUSH | DMG_ALWAYSGIB | DMG_BLAST);
+			TakeDamage(client, 0, 0, float(iDamage), DMG_PREVENT_PHYSICS_FORCE | DMG_CRUSH | DMG_ALWAYSGIB | DMG_BLAST);
 		}
 	}
 

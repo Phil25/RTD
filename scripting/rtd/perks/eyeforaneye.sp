@@ -25,5 +25,5 @@ public void EyeForAnEye_Init(const Perk perk)
 
 public void EyeForAnEye_OnPlayerAttacked(const int client, const int iVictim, const int iDamage, const int iRemainingHealth)
 {
-	SDKHooks_TakeDamage(client, 0, 0, float(iDamage));
+	TakeDamage(client, 0, 0, float(iDamage));
 }

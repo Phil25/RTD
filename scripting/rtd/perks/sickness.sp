@@ -78,7 +78,7 @@ void Sickness_Cough(const int client, const float fMinDamage, const float fMaxDa
 	SendTEParticleAttached(TEParticles.GreenGoop, client, .fOffset={0.0, 0.0, 36.0});
 
 	float fDamage = GetRandomFloat(fMinDamage, fMaxDamage);
-	SDKHooks_TakeDamage(client, iAttacker, iAttacker, fDamage, DMG_PREVENT_PHYSICS_FORCE);
+	TakeDamage(client, iAttacker, iAttacker, fDamage, DMG_PREVENT_PHYSICS_FORCE);
 
 	float fShake[3];
 	fShake[0] = GetRandomFloat(10.0, 15.0);

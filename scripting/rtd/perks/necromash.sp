@@ -189,7 +189,7 @@ public Action Timer_NecroMash_Hit(Handle hTimer, any hPack)
 			}
 
 			if (GetVectorDistance(fPos, fPos2) <= 60.0)
-				SDKHooks_TakeDamage(i, i, i, 999999.0, DMG_CLUB | DMG_ALWAYSGIB | DMG_BLAST);
+				TakeDamage(i, i, i, 999999.0, DMG_CLUB | DMG_ALWAYSGIB | DMG_BLAST);
 		}
 	}
 

@@ -81,7 +81,7 @@ void HellsReach_Hurt(const int client)
 	KILL_ENT_IN(iEnt,1.0);
 
 	float fDamage = GetRandomFloat(Cache[client].MinDamage, Cache[client].MaxDamage);
-	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_PREVENT_PHYSICS_FORCE);
+	TakeDamage(client, client, client, fDamage, DMG_PREVENT_PHYSICS_FORCE);
 
 	ViewPunchRand(client, 70.0);
 	EmitSoundToAll(SOUND_HELL_DAMAGE, client);

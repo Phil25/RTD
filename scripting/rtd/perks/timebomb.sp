@@ -110,7 +110,7 @@ public void Timebomb_RemovePerk(const int client, const RTDRemoveReason eRemoveR
 		if (GetVectorDistance(fPos, fTargetPos, true) <= fRadiusSquared)
 		{
 			iPlayerDamage += RoundToFloor(fDamage);
-			SDKHooks_TakeDamage(i, 0, client, fDamage, DMG_PREVENT_PHYSICS_FORCE | DMG_CRUSH | DMG_ALWAYSGIB | DMG_BLAST);
+			TakeDamage(i, 0, client, fDamage, DMG_PREVENT_PHYSICS_FORCE | DMG_CRUSH | DMG_ALWAYSGIB | DMG_BLAST);
 		}
 	}
 

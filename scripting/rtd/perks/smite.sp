@@ -72,7 +72,7 @@ void Smite_ApplyPerk(const int client, const Perk perk)
 		SDKHook(client, SDKHook_OnTakeDamagePost, Smite_OnTakeDamage);
 	}
 
-	SDKHooks_TakeDamage(client, client, client, fDamage, DMG_SHOCK);
+	TakeDamage(client, client, client, fDamage, DMG_SHOCK);
 
 	int iStrike[2];
 	iStrike[0] = CreateEntityByName("info_target");
@@ -152,7 +152,7 @@ public Action Smite_Tick(const int client)
 		Cache[client].TicksLeft = iTicksLeft;
 
 		if (Cache[client].IsElectrocuted)
-			SDKHooks_TakeDamage(client, client, client, Cache[client].TickDamage, DMG_SHOCK);
+			TakeDamage(client, client, client, Cache[client].TickDamage, DMG_SHOCK);
 
 		return Plugin_Continue;
 	}

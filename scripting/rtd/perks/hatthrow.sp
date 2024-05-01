@@ -151,7 +151,7 @@ public Action Event_HatThrow_OnHatTouch(int iHat, int client)
 	{
 		int iAttacker = GetEntPropEnt(iHat, Prop_Send, "m_hOwnerEntity");
 		if (iAttacker && CanPlayerBeHurt(client, iAttacker))
-			SDKHooks_TakeDamage(client, iHat, iAttacker, Cache[iAttacker].Damage, DMG_CLUB);
+			TakeDamage(client, iHat, iAttacker, Cache[iAttacker].Damage, DMG_CLUB);
 
 		EmitSoundToAll(g_sSoundHatHit[GetRandomInt(0, 2)], iHat);
 	}
