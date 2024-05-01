@@ -116,7 +116,7 @@ void Frozen_ApplyPerk(const int client, const Perk perk)
 	// on a better frame. 0.2s from initialization seems like a good time.
 	Cache[client].Delay(0.2, Frozen_ApplyPost);
 
-	char sClientModel[64], sValueBuffer[8];
+	char sClientModel[PLATFORM_MAX_PATH], sValueBuffer[8];
 	float fPos[3], fAng[3];
 	GetClientAbsOrigin(client, fPos);
 	GetClientAbsAngles(client, fAng);
