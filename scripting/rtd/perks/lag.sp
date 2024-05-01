@@ -20,7 +20,7 @@
 #define TickSetPosition Int[1]
 #define Pos(%1) Float[%1]
 
-DEFINE_CALL_APPLY(Lag)
+DEFINE_CALL_APPLY_REMOVE(Lag)
 
 public void Lag_ApplyPerk(const int client, const Perk perk)
 {
@@ -29,6 +29,11 @@ public void Lag_ApplyPerk(const int client, const Perk perk)
 
 	Cache[client].Repeat(0.1, Lag_Teleport);
 	Cache[client].Repeat(0.1, Lag_SetPositionCheck);
+}
+
+public void Lag_RemovePerk(const int client)
+{
+	FixPotentialStuck(client);
 }
 
 public Action Lag_Teleport(const int client)
