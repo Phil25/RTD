@@ -24,13 +24,11 @@ DEFINE_CALL_APPLY(Lag)
 
 public void Lag_ApplyPerk(const int client, const Perk perk)
 {
-	Lag_SetPosition(client);
-
 	Cache[client].TickTeleport = GetRandomInt(6, 14);
-	Cache[client].TickSetPosition = GetRandomInt(3, 8);
+	Lag_SetPosition(client); // sets Pos and TickSetPosition
 
 	Cache[client].Repeat(0.1, Lag_Teleport);
-	Cache[client].Repeat(0.1, Lag_SetPosition);
+	Cache[client].Repeat(0.1, Lag_SetPositionCheck);
 }
 
 public Action Lag_Teleport(const int client)
@@ -49,11 +47,16 @@ public Action Lag_Teleport(const int client)
 	return Plugin_Continue;
 }
 
-public Action Lag_SetPosition(const int client)
+public Action Lag_SetPositionCheck(const int client)
 {
-	if (--Cache[client].TickSetPosition > 0)
-		return Plugin_Continue;
+	if (--Cache[client].TickSetPosition <= 0)
+		Lag_SetPosition(client)
 
+	return Plugin_Continue;
+}
+
+void Lag_SetPosition(const int client)
+{
 	float fPos[3];
 	GetClientAbsOrigin(client, fPos);
 
@@ -62,7 +65,6 @@ public Action Lag_SetPosition(const int client)
 	Cache[client].Pos(2) = fPos[2];
 
 	Cache[client].TickSetPosition = GetRandomInt(3, 8);
-	return Plugin_Continue;
 }
 
 #undef TickTeleport
