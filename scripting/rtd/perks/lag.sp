@@ -55,7 +55,7 @@ public Action Lag_Teleport(const int client)
 public Action Lag_SetPositionCheck(const int client)
 {
 	if (--Cache[client].TickSetPosition <= 0)
-		Lag_SetPosition(client)
+		Lag_SetPosition(client);
 
 	return Plugin_Continue;
 }
