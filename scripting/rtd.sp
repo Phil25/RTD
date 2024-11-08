@@ -76,6 +76,7 @@ bool g_bIsRegisteringOpen = false;
 ArrayList g_hPerkHistory = null;
 int g_iCorePerks = 0;
 
+bool g_bHasActivePerk[MAXPLAYERS + 1];
 bool g_bIsGameArena = false;
 bool g_bIsGameMedieval = false;
 int g_iLastPerkTime = -1;
@@ -228,6 +229,7 @@ public void OnMapStart()
 	HookEvent("player_death", Event_PlayerDeath);
 	HookEvent("player_changeclass", Event_ClassChange);
 	HookEvent("teamplay_round_active", Event_RoundActive);
+	HookEvent("teamplay_join_team", OnChangeClientTeam, EventHookMode_Pre);
 	HookEvent("post_inventory_application", Event_Resupply);
 	HookEvent("player_hurt", Event_PlayerHurt);
 	HookEvent("player_chargedeployed", Event_UberchargeDeployed);
@@ -386,10 +388,41 @@ public int Updater_OnPluginUpdated()
 
 public Action Command_RTD(const int client, const int args)
 {
+	 if (GetClientTeam(client) == 1) 
+    {
+        // Notifies the player they can't use the command while in spectator mode
+        PrintToChat(client, "[RTD] You cannot use RTD while in spectator mode!");
+        return Plugin_Handled;
+    }
+	
 	if (client != 0)
-		RollPerkForClient(client);
+    {
+        RollPerkForClient(client);
+        g_bHasActivePerk[client] = true;  // Perk gets marked as active...
+    }
 
-	return Plugin_Handled;
+	return Plugin_Continue;
+
+}
+
+public void ClearPerkForClient(int client)
+{
+    g_bHasActivePerk[client] = false;
+}
+
+public Action OnChangeClientTeam(Event event, const char[] name, bool dontBroadcast)
+{
+    int client = GetClientOfUserId(GetEventInt(event, "userid"));
+    int team = GetEventInt(event, "team");
+
+    // If the client has an active perk and tries to switch to spectator it will block
+    if (g_bHasActivePerk[client] && team == 1) 
+    {	//Notifies they can't switch to spectator while an RTD perk is active
+        PrintToChat(client, "[RTD] You cannot switch to spectator while an RTD perk is active!");
+        return Plugin_Handled;  
+    }
+
+    return Plugin_Continue;
 }
 
 public Action Command_DescMenu(const int client, const int args)
