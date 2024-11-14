@@ -121,6 +121,16 @@ void NecroMash_SmashClient(const int client)
 		WritePackFloat(pack2, flPpos[0]); // Position of effects
 		WritePackFloat(pack2, flPpos[1]); // Position of effects
 		WritePackFloat(pack2, flPpos[2]); // Position of effects
+		Handle pack3;
+		CreateDataTimer(0.5, Timer_NecroMash_Swing2, pack3);
+		WritePackFloat(pack3, flPpos[0]); // Position of effects
+		WritePackFloat(pack3, flPpos[1]); // Position of effects
+		WritePackFloat(pack3, flPpos[2]); // Position of effects
+		Handle pack4;
+		CreateDataTimer(3.4, Timer_NecroMash_Crank, pack4);
+		WritePackFloat(pack4, flPpos[0]); // Position of effects
+		WritePackFloat(pack4, flPpos[1]); // Position of effects
+		WritePackFloat(pack4, flPpos[2]); // Position of effects
 
 		EmitSoundToAll("misc/halloween/strongman_fast_swing_01.wav", _, _, _, _, _, _, _, flPpos);
 	}
@@ -210,6 +220,35 @@ public Action Timer_NecroMash_Whoosh(Handle hTimer, any hPack)
 	fPos[2] = ReadPackFloat(hPack);
 
 	EmitSoundToAll("misc/halloween/strongman_fast_whoosh_01.wav", _, _, _, _, _, _, _, fPos);
+
+	return Plugin_Stop;
+}
+
+
+public Action Timer_NecroMash_Swing2(Handle hTimer, any hPack)
+{
+	ResetPack(hPack);
+
+	float fPos[3];
+	fPos[0] = ReadPackFloat(hPack);
+	fPos[1] = ReadPackFloat(hPack);
+	fPos[2] = ReadPackFloat(hPack);
+
+	EmitSoundToAll("misc/halloween/strongman_fast_swing_01.wav", _, _, _, _, _, 70, _, fPos);
+
+	return Plugin_Stop;
+}
+
+public Action Timer_NecroMash_Crank(Handle hTimer, any hPack)
+{
+	ResetPack(hPack);
+
+	float fPos[3];
+	fPos[0] = ReadPackFloat(hPack);
+	fPos[1] = ReadPackFloat(hPack);
+	fPos[2] = ReadPackFloat(hPack);
+
+	EmitSoundToAll("doors/vent_open2.wav", _, _, _, _, _, 50, _, fPos);
 
 	return Plugin_Stop;
 }
