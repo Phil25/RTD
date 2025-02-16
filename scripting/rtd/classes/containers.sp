@@ -199,8 +199,12 @@ methodmap PerkContainer < StringMap
 		hKv.GetSectionName(sBuffer, 127);
 
 		Perk perk = this.Get(sBuffer);
+
 		if (perk == null)
+		{
+			LogError(CONS_PREFIX ... " Warning: Found unknown perk in rtd2_perks.custom.cfg - %s", sBuffer);
 			return false;
+		}
 
 		READ_IF_EXISTS_STRING("name",Name)
 		READ_IF_EXISTS_BOOL("good",Good)
