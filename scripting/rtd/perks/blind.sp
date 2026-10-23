@@ -21,7 +21,7 @@
 #define TriggerUnblind Int[2]
 #define AnnotationLifetime Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(Blind)
+public DEFINE_CALL_APPLY_REMOVE(Blind)
 
 public void Blind_Init(const Perk perk)
 {

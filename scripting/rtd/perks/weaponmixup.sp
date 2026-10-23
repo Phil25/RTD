@@ -18,7 +18,7 @@
 
 #define Ticks Int[0]
 
-DEFINE_CALL_APPLY_REMOVE(WeaponMixup)
+public DEFINE_CALL_APPLY_REMOVE(WeaponMixup)
 
 public void WeaponMixup_Init(const Perk perk)
 {

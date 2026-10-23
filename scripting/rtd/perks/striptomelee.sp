@@ -30,7 +30,7 @@
 #define FlingSpeed Float[1]
 #define BoxHealth Float[2]
 
-DEFINE_CALL_APPLY(StripToMelee)
+public DEFINE_CALL_APPLY(StripToMelee)
 
 public void StripToMelee_Init(const Perk perk)
 {

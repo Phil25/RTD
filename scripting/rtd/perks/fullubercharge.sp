@@ -24,7 +24,7 @@ ClientFlags g_eFullUberchargeExtendUbercharge;
 ClientFlags g_eFullUberchargeExtendKritzkrieg;
 ClientFlags g_eFullUberchargeExtendMegaHeal;
 
-DEFINE_CALL_APPLY_REMOVE(FullUbercharge)
+public DEFINE_CALL_APPLY_REMOVE(FullUbercharge)
 
 public void FullUbercharge_Init(const Perk perk)
 {

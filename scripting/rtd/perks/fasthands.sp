@@ -19,7 +19,7 @@
 #define Attack Float[0]
 #define Reload Float[1]
 
-DEFINE_CALL_APPLY_REMOVE(FastHands)
+public DEFINE_CALL_APPLY_REMOVE(FastHands)
 
 public void FastHands_Init(const Perk perk)
 {

@@ -27,7 +27,7 @@
 #define ProtectionTime Float[3]
 #define Ragdoll EntSlot_1
 
-DEFINE_CALL_APPLY_REMOVE(MercsDieTwice)
+public DEFINE_CALL_APPLY_REMOVE(MercsDieTwice)
 
 public void MercsDieTwice_Init(const Perk perk)
 {

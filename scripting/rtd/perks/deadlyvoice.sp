@@ -29,7 +29,7 @@ static char g_sDeadlyVoiceParticles[][] = {
 	"bombinomicon_burningdebris_halloween"
 };
 
-DEFINE_CALL_APPLY(DeadlyVoice)
+public DEFINE_CALL_APPLY(DeadlyVoice)
 
 public void DeadlyVoice_Init(const Perk perk)
 {

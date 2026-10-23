@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-DEFINE_CALL_EMPTY(HeavyRockets)
+public DEFINE_CALL_EMPTY(HeavyRockets)
 
 // Do not save in client cache -- it might be overridden by a different perk while rocket is alive.
 static int g_iHeavyRocketsSharpness = 8;

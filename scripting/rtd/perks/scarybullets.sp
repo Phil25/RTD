@@ -22,7 +22,7 @@
 #define Duration Float[0]
 #define Particle EntSlot_1
 
-DEFINE_CALL_APPLY(ScaryBullets)
+public DEFINE_CALL_APPLY(ScaryBullets)
 
 public void ScaryBullets_Init(const Perk perk)
 {

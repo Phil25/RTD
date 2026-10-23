@@ -18,7 +18,7 @@
 
 #define Multiplier Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(PowerfulHits)
+public DEFINE_CALL_APPLY_REMOVE(PowerfulHits)
 
 public void PowerfulHits_Init(const Perk perk)
 {

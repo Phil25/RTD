@@ -18,7 +18,7 @@
 
 #define Multiplier Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(Weakened)
+public DEFINE_CALL_APPLY_REMOVE(Weakened)
 
 public void Weakened_ApplyPerk(const int client, const Perk perk)
 {

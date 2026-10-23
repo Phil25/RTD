@@ -18,7 +18,7 @@
 
 #define Multiplier Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(LongMelee)
+public DEFINE_CALL_APPLY_REMOVE(LongMelee)
 
 public void LongMelee_Init(const Perk perk)
 {

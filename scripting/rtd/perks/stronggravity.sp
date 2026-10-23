@@ -18,7 +18,7 @@
 
 #define Base Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(StrongGravity)
+public DEFINE_CALL_APPLY_REMOVE(StrongGravity)
 
 public void StrongGravity_ApplyPerk(const int client, const Perk perk)
 {

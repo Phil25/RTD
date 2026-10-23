@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-DEFINE_CALL_APPLY_REMOVE(Vital)
+public DEFINE_CALL_APPLY_REMOVE(Vital)
 
 public void Vital_ApplyPerk(const int client, const Perk perk)
 {

@@ -18,7 +18,7 @@
 
 #define Crits Int[0]
 
-DEFINE_CALL_APPLY_REMOVE(HomingProjectiles)
+public DEFINE_CALL_APPLY_REMOVE(HomingProjectiles)
 
 public void HomingProjectiles_Init(const Perk perk)
 {

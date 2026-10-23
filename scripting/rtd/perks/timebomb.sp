@@ -40,7 +40,7 @@ static char g_sResistanceMedium[][] = {
 	"player/resistance_medium4.wav",
 };
 
-DEFINE_CALL_APPLY_REMOVE(Timebomb)
+public DEFINE_CALL_APPLY_REMOVE(Timebomb)
 
 public void Timebomb_Init(const Perk perk)
 {

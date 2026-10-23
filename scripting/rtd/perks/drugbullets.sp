@@ -19,7 +19,7 @@
 #define MinDamage Int[0]
 #define NextStun Float[0]
 
-DEFINE_CALL_APPLY(DrugBullets)
+public DEFINE_CALL_APPLY(DrugBullets)
 
 public void DrugBullets_Init(const Perk perk)
 {

@@ -18,7 +18,7 @@
 
 #define InitialGlow Int[0]
 
-DEFINE_CALL_APPLY_REMOVE(Outline)
+public DEFINE_CALL_APPLY_REMOVE(Outline)
 
 public void Outline_ApplyPerk(const int client, const Perk perk)
 {

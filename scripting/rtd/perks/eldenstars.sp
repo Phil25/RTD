@@ -29,7 +29,7 @@
 #define Lifetime Float[2]
 #define Damage Float[3]
 
-DEFINE_CALL_APPLY_REMOVE(EldenStars)
+public DEFINE_CALL_APPLY_REMOVE(EldenStars)
 
 public void EldenStars_Init(const Perk perk)
 {

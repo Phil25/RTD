@@ -154,7 +154,7 @@ public int Native_SetPerkString(Handle hPlugin, int iParams)
 public int Native_SetPerkCall(Handle hPlugin, int iParams)
 {
 	GET_PERK
-	perk.SetCall(GetNativeCell(2), hPlugin);
+	perk.SetCall(GetNativeFunction(2), hPlugin);
 	return iId;
 }
 
@@ -403,7 +403,7 @@ public int Native_RegisterPerk(Handle hPlugin, int iParams) // deprecated
 	GetNativeString(8, sBuffer, sizeof(sBuffer)); // tags
 	perk.SetTags(sBuffer);
 
-	perk.SetCall(GetNativeCell(9), hPlugin);
+	perk.SetCall(GetNativeFunction(9), hPlugin);
 
 	perk.External = true;
 

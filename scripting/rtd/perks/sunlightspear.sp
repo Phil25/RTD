@@ -35,7 +35,7 @@ static char g_sSoundZap[][] = {
 	"ambient/energy/zap3.wav",
 };
 
-DEFINE_CALL_APPLY(SunlightSpear)
+public DEFINE_CALL_APPLY(SunlightSpear)
 
 public void SunlightSpear_Init(const Perk perk)
 {

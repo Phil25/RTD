@@ -16,4 +16,4 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-DEFINE_CALL_EMPTY(WastedRoll)
+public DEFINE_CALL_EMPTY(WastedRoll)

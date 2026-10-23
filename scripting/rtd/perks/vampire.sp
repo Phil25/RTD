@@ -27,7 +27,7 @@
 #define Resistance Float[2]
 #define NextHurt Float[3]
 
-DEFINE_CALL_APPLY(Vampire)
+public DEFINE_CALL_APPLY(Vampire)
 
 public void Vampire_Init(const Perk perk)
 {

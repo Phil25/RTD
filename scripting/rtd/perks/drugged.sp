@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-DEFINE_CALL_APPLY(Drugged)
+public DEFINE_CALL_APPLY(Drugged)
 
 public void Drugged_ApplyPerk(const int client, const Perk perk)
 {

@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-DEFINE_CALL_EMPTY(InfiniteJump)
+public DEFINE_CALL_EMPTY(InfiniteJump)
 
 public void InfiniteJump_Init(const Perk perk)
 {

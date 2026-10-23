@@ -18,7 +18,7 @@
 
 #define Scale Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(OverhealBonus)
+public DEFINE_CALL_APPLY_REMOVE(OverhealBonus)
 
 public void OverhealBonus_Init(const Perk perk)
 {

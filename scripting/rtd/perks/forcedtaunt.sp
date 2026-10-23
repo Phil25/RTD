@@ -26,7 +26,7 @@ static char g_sSoundScoutBB[][] = {
 	"items/scout_boombox_05.wav"
 };
 
-DEFINE_CALL_APPLY(ForcedTaunt)
+public DEFINE_CALL_APPLY(ForcedTaunt)
 
 public void ForcedTaunt_Init(const Perk perk)
 {

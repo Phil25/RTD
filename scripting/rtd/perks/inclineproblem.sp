@@ -18,7 +18,7 @@
 
 #define BaseStepSize Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(InclineProblem)
+public DEFINE_CALL_APPLY_REMOVE(InclineProblem)
 
 public void InclineProblem_ApplyPerk(const int client, const Perk perk)
 {

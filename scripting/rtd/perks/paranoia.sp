@@ -84,7 +84,7 @@ static char g_sSpyAnimations[][] = {
 	"x_runSW_PDA",
 };
 
-DEFINE_CALL_APPLY(Paranoia)
+public DEFINE_CALL_APPLY(Paranoia)
 
 public void Paranoia_Init(const Perk perk)
 {

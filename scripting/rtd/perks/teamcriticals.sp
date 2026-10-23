@@ -27,7 +27,7 @@
 #define RingStart Float[1]
 #define RangeSquared Float[2]
 
-DEFINE_CALL_APPLY_REMOVE(TeamCriticals)
+public DEFINE_CALL_APPLY_REMOVE(TeamCriticals)
 
 public void TeamCriticals_Init(const Perk perk)
 {

@@ -85,7 +85,7 @@ methodmap BatSwarmFlags
 	}
 }
 
-DEFINE_CALL_APPLY_REMOVE(BatSwarm)
+public DEFINE_CALL_APPLY_REMOVE(BatSwarm)
 
 public void BatSwarm_Init(const Perk perk)
 {

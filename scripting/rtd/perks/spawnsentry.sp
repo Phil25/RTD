@@ -21,7 +21,7 @@
 #define Max Int[2]
 #define Spawned Int[3]
 
-DEFINE_CALL_APPLY(SpawnSentry)
+public DEFINE_CALL_APPLY(SpawnSentry)
 
 public void SpawnSentry_Init(const Perk perk)
 {

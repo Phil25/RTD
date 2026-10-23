@@ -23,7 +23,7 @@
 
 #define SOUND_TOXIC "player/general/flesh_burn.wav"
 
-DEFINE_CALL_APPLY_REMOVE(Toxic)
+public DEFINE_CALL_APPLY_REMOVE(Toxic)
 
 public void Toxic_Init()
 {

@@ -28,7 +28,7 @@
 #define LastBlink Float[0]
 #define BlinkRate Float[1]
 
-DEFINE_CALL_APPLY_REMOVE(Invisibility)
+public DEFINE_CALL_APPLY_REMOVE(Invisibility)
 
 public void Invisibility_Init(const Perk perk)
 {

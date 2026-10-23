@@ -21,7 +21,7 @@
 #define Clip Int[2]
 #define Ammo Int[3]
 
-DEFINE_CALL_APPLY(InfiniteAmmo)
+public DEFINE_CALL_APPLY(InfiniteAmmo)
 
 public void InfiniteAmmo_ApplyPerk(const int client, const Perk perk)
 {

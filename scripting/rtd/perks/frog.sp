@@ -29,7 +29,7 @@ static char g_sCritters[][] = {
 	"ambient/levels/canals/critter5.wav"
 };
 
-DEFINE_CALL_APPLY_REMOVE(Frog)
+public DEFINE_CALL_APPLY_REMOVE(Frog)
 
 public void Frog_Init(const Perk perk)
 {

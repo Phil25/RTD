@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-DEFINE_CALL_EMPTY(FullRifleCharge)
+public DEFINE_CALL_EMPTY(FullRifleCharge)
 
 public void FullRifleCharge_Init(const Perk perk)
 {

@@ -19,7 +19,7 @@
 #define SpeedBoost Int[0]
 #define BaseScale Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(TinyMann)
+public DEFINE_CALL_APPLY_REMOVE(TinyMann)
 
 public void TinyMann_ApplyPerk(const int client, const Perk perk)
 {

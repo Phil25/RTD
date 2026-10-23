@@ -19,7 +19,7 @@
 #define FIREWORK_EXPLOSION "weapons/flare_detonator_explode.wav"
 #define FIREWORK_PARTICLE "burningplayer_rainbow_flame"
 
-DEFINE_CALL_APPLY(Firework)
+public DEFINE_CALL_APPLY(Firework)
 
 public void Firework_Init(const Perk perk)
 {

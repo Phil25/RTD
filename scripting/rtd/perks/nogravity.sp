@@ -18,7 +18,7 @@
 
 #define Base Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(NoGravity)
+public DEFINE_CALL_APPLY_REMOVE(NoGravity)
 
 public void NoGravity_ApplyPerk(const int client, const Perk perk)
 {

@@ -21,7 +21,7 @@
 #define Max Int[2]
 #define Spawned Int[3]
 
-DEFINE_CALL_APPLY(SpawnDispenser)
+public DEFINE_CALL_APPLY(SpawnDispenser)
 
 public void SpawnDispenser_Init(const Perk perk)
 {

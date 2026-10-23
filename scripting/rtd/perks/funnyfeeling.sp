@@ -19,7 +19,7 @@
 #define FunnyFov Int[0]
 #define BaseFov Int[1]
 
-DEFINE_CALL_APPLY_REMOVE(FunnyFeeling)
+public DEFINE_CALL_APPLY_REMOVE(FunnyFeeling)
 
 public void FunnyFeeling_Init(const Perk perk)
 {

@@ -29,7 +29,7 @@ static char g_sSoundCough[][] = {
 	"ambient/voices/cough4.wav"
 };
 
-DEFINE_CALL_APPLY(Sickness)
+public DEFINE_CALL_APPLY(Sickness)
 
 public void Sickness_Init(const Perk perk)
 {

@@ -21,7 +21,7 @@
 #define PerkTime Float[2]
 #define FinishTime Float[3]
 
-DEFINE_CALL_APPLY_REMOVE(Earthquake)
+public DEFINE_CALL_APPLY_REMOVE(Earthquake)
 
 public void Earthquake_ApplyPerk(const int client, const Perk perk)
 {

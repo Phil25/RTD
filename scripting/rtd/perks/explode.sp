@@ -38,7 +38,7 @@
 #define BEAM_COLOR_INACTIVE "60 60 60"
 #define BEAM_COLOR_ACTIVE "255 255 255"
 
-DEFINE_CALL_APPLY_REMOVE(Explode)
+public DEFINE_CALL_APPLY_REMOVE(Explode)
 
 public void Explode_Init(const Perk perk)
 {

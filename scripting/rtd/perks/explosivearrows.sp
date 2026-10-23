@@ -20,7 +20,7 @@
 #define Force Float[1]
 #define Radius Float[2]
 
-DEFINE_CALL_APPLY(ExplosiveArrows)
+public DEFINE_CALL_APPLY(ExplosiveArrows)
 
 public void ExplosiveArrows_Init(const Perk perk)
 {

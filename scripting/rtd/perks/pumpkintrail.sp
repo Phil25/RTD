@@ -27,7 +27,7 @@
 #define Damage Float[2]
 #define LastAttack Float[3]
 
-DEFINE_CALL_APPLY(PumpkinTrail)
+public DEFINE_CALL_APPLY(PumpkinTrail)
 
 public void PumpkinTrail_Init(const Perk perk)
 {

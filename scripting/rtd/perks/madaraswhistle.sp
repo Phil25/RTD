@@ -35,7 +35,7 @@ static char g_sGatorRumble[][] = {
 	"ambient_mp3/lair/crocs_growl5.mp3",
 };
 
-DEFINE_CALL_APPLY(MadarasWhistle)
+public DEFINE_CALL_APPLY(MadarasWhistle)
 
 public void MadarasWhistle_Init(const Perk perk)
 {

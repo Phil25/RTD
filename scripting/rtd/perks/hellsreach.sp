@@ -28,7 +28,7 @@
 #define MaxDamage Float[3]
 #define Ghosts EntSlot_1
 
-DEFINE_CALL_APPLY_REMOVE(HellsReach)
+public DEFINE_CALL_APPLY_REMOVE(HellsReach)
 
 public void HellsReach_Init(const Perk perk)
 {

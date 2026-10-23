@@ -21,7 +21,7 @@
 #define Gravity Float[0]
 #define MaxBoostSquared Float[1]
 
-DEFINE_CALL_APPLY_REMOVE(LowGravity)
+public DEFINE_CALL_APPLY_REMOVE(LowGravity)
 
 public void LowGravity_Init(const Perk perk)
 {

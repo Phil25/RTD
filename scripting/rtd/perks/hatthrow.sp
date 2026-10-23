@@ -35,7 +35,7 @@ static char g_sSoundHatHit[][] = {
 	"weapons/demo_charge_hit_flesh3.wav"
 };
 
-DEFINE_CALL_APPLY(HatThrow)
+public DEFINE_CALL_APPLY(HatThrow)
 
 public void HatThrow_Init(const Perk perk)
 {

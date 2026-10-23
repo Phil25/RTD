@@ -22,7 +22,7 @@
 #define MaxSpeed Float[2]
 #define TurnAngle Float[3]
 
-DEFINE_CALL_APPLY_REMOVE(DrunkWalk)
+public DEFINE_CALL_APPLY_REMOVE(DrunkWalk)
 
 public void DrunkWalk_Init(const Perk perk)
 {

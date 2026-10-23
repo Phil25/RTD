@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-DEFINE_CALL_APPLY(BadSauce)
+public DEFINE_CALL_APPLY(BadSauce)
 
 public void BadSauce_Init(const Perk perk)
 {

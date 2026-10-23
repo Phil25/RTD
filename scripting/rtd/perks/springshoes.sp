@@ -18,7 +18,7 @@
 
 #define SPRING_JUMP "misc/halloween/duck_pickup_neg_01.wav"
 
-DEFINE_CALL_APPLY_REMOVE(SpringShoes)
+public DEFINE_CALL_APPLY_REMOVE(SpringShoes)
 
 public void SpringShoes_Init(const Perk perk)
 {

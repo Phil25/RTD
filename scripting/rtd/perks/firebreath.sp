@@ -22,7 +22,7 @@
 #define CritChance Float[1]
 #define LastAttack Float[2]
 
-DEFINE_CALL_APPLY(FireBreath)
+public DEFINE_CALL_APPLY(FireBreath)
 
 public void FireBreath_Init(const Perk perk)
 {

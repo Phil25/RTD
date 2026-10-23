@@ -20,7 +20,7 @@
 #define TickSetPosition Int[1]
 #define Pos(%1) Float[%1]
 
-DEFINE_CALL_APPLY_REMOVE(Lag)
+public DEFINE_CALL_APPLY_REMOVE(Lag)
 
 public void Lag_ApplyPerk(const int client, const Perk perk)
 {

@@ -18,7 +18,7 @@
 
 #define Boost Int[0]
 
-DEFINE_CALL_APPLY_REMOVE(Criticals)
+public DEFINE_CALL_APPLY_REMOVE(Criticals)
 
 public void Criticals_ApplyPerk(const int client, const Perk perk)
 {

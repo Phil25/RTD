@@ -23,7 +23,7 @@
 #define Healing Int[1]
 #define Particle Int[2]
 
-DEFINE_CALL_APPLY_REMOVE(Autoheal)
+public DEFINE_CALL_APPLY_REMOVE(Autoheal)
 
 public void Autoheal_Init(const Perk perk)
 {

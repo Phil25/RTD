@@ -57,7 +57,7 @@ enum PowerPlay_MeleeFlags
 	PowerPlay_MeleeFlags_SpyCicle = 1 << 1,
 }
 
-DEFINE_CALL_APPLY_REMOVE(PowerPlay)
+public DEFINE_CALL_APPLY_REMOVE(PowerPlay)
 
 public void PowerPlay_Init(const Perk perk)
 {

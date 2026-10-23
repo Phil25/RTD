@@ -18,7 +18,7 @@
 
 ClientFlags g_bLuckySandvichCrit;
 
-DEFINE_CALL_APPLY(LuckySandvich)
+public DEFINE_CALL_APPLY(LuckySandvich)
 
 public void LuckySandvich_Init(const Perk perk)
 {

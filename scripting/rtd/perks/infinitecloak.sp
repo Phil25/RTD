@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-DEFINE_CALL_APPLY(InfiniteCloak)
+public DEFINE_CALL_APPLY(InfiniteCloak)
 
 public void InfiniteCloak_ApplyPerk(const int client, const Perk perk)
 {

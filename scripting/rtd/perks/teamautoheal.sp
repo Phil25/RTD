@@ -28,7 +28,7 @@
 #define Healing Flags
 #define Effect EntSlot_1
 
-DEFINE_CALL_APPLY_REMOVE(TeamAutoheal)
+public DEFINE_CALL_APPLY_REMOVE(TeamAutoheal)
 
 public void TeamAutoheal_Init(const Perk perk)
 {

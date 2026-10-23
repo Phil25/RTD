@@ -30,7 +30,7 @@ static char g_sSoundAirStrikeFire[][] = {
 	"weapons/airstrike_fire_03.wav"
 };
 
-DEFINE_CALL_APPLY(ACallBeyond)
+public DEFINE_CALL_APPLY(ACallBeyond)
 
 public void ACallBeyond_Init(const Perk perk)
 {

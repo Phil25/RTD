@@ -19,7 +19,7 @@
 #define Mode Int[0]
 #define BaseGravity Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(Noclip)
+public DEFINE_CALL_APPLY_REMOVE(Noclip)
 
 public void Noclip_Init(const Perk perk)
 {

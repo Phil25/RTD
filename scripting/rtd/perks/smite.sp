@@ -37,7 +37,7 @@ static char g_sSoundZap[][] = {
 	"ambient/energy/zap3.wav",
 };
 
-DEFINE_CALL_APPLY_REMOVE(Smite)
+public DEFINE_CALL_APPLY_REMOVE(Smite)
 
 public void Smite_Init(const Perk perk)
 {

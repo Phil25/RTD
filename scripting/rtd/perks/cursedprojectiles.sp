@@ -21,7 +21,7 @@
 
 #define Delay Float[0]
 
-DEFINE_CALL_APPLY(CursedProjectiles)
+public DEFINE_CALL_APPLY(CursedProjectiles)
 
 public void CursedProjectiles_Init(const Perk perk)
 {

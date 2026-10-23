@@ -131,7 +131,7 @@ methodmap GodmodeFlags
 	}
 }
 
-DEFINE_CALL_APPLY_REMOVE(Godmode)
+public DEFINE_CALL_APPLY_REMOVE(Godmode)
 
 public void Godmode_Init(const Perk perk)
 {

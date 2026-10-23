@@ -16,7 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-DEFINE_CALL_APPLY(ExtraAmmo)
+public DEFINE_CALL_APPLY(ExtraAmmo)
 
 public void ExtraAmmo_ApplyPerk(const int client, const Perk perk)
 {

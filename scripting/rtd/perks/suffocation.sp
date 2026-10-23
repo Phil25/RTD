@@ -19,7 +19,7 @@
 #define Rate Float[0]
 #define Damage Float[1]
 
-DEFINE_CALL_APPLY(Suffocation)
+public DEFINE_CALL_APPLY(Suffocation)
 
 public void Suffocation_ApplyPerk(const int client, const Perk perk)
 {

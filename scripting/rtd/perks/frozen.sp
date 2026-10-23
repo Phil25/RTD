@@ -44,6 +44,7 @@
 #define DETACH_GROUND_DISTANCE 5.0
 
 static Perk g_ePerkFrozen = null;
+static bool g_bFrozenDealingDamage[MAXPLAYERS + 1];
 
 enum Frozen_State
 {
@@ -53,7 +54,7 @@ enum Frozen_State
 	Frozen_State_Muffle,
 }
 
-DEFINE_CALL_APPLY_REMOVE(Frozen)
+public DEFINE_CALL_APPLY_REMOVE(Frozen)
 
 public void Frozen_Init(const Perk perk)
 {
@@ -77,6 +78,7 @@ void Frozen_ApplyPerk(const int client, const Perk perk)
 	Cache[client].LastDamageTaken = 0.0;
 	Cache[client].Resistance = perk.GetPrefFloat("resistance", 0.1);
 	Cache[client].FlameBuff = perk.GetPrefFloat("flame_buff", 5.0);
+	g_bFrozenDealingDamage[client] = false;
 
 	Cache[client].State.Reset();
 	Cache[client].State.Bool(view_as<int>(Frozen_State_Legacy), perk.GetPrefBool("legacy", false));
@@ -515,7 +517,11 @@ void Frozen_DuplicateAndAttachWearable(const int iOriginalWearable, const int iT
 void Frozen_OnTakeDamage(int client, int iAttacker, int iInflictor, float fDamage, int iType, float fPos[3], bool bFriendly)
 {
 	if (!bFriendly)
+	{
+		g_bFrozenDealingDamage[client] = true;
 		TakeDamage(client, iInflictor, iAttacker, fDamage * Cache[client].Resistance, iType);
+		g_bFrozenDealingDamage[client] = false;
+	}
 
 	if (!Cache[client].IsBreakable)
 		return;
@@ -565,6 +571,9 @@ void Frozen_OnTakeDamage(int client, int iAttacker, int iInflictor, float fDamag
 
 public Action Frozen_OnTakeDamageClient(int client, int &iAttacker, int &iInflictor, float &fDamage, int &iType, int &iWeapon, float fForce[3], float fPos[3], int iCustom)
 {
+	if (g_bFrozenDealingDamage[client])
+		return Plugin_Continue;
+
 	if (!(1 <= iAttacker <= MaxClients))
 		return Plugin_Handled;
 

@@ -17,31 +17,31 @@
 */
 
 #define GET_PROP(%1,%2) \
-	public get(){ \
+	get(){ \
 		%1 i; \
 		this.GetValue("m_" ... #%2, i); \
 		return i;}
 
 #define SET_PROP(%1,%2) \
-	public set(%1 i){ \
+	set(%1 i){ \
 		this.SetValue("m_" ... #%2, i);}
 
 #define GET_VALUE(%1,%2) \
-	public %1 Get%2(){ \
+	%1 Get%2(){ \
 		%1 i; \
 		this.GetValue("m_" ... #%2, i); \
 		return i;}
 
 #define SET_VALUE(%1,%2) \
-	public void Set%2(%1 i){ \
+	void Set%2(%1 i){ \
 		this.SetValue("m_" ... #%2, i);}
 
 #define GET_STRING(%1) \
-	public void Get%1(char[] s, int i){ \
+	void Get%1(char[] s, int i){ \
 		this.GetString("m_" ... #%1, s, i);}
 
 #define SET_STRING(%1) \
-	public void Set%1(const char[] s){ \
+	void Set%1(const char[] s){ \
 		this.SetString("m_" ... #%1, s);}
 
 #define DISPOSE_MEMBER(%1) \
@@ -94,41 +94,41 @@ methodmap Perk < StringMap
 
 	property int Id
 	{
-		GET_PROP(int,Id)
-		SET_PROP(int,Id)
+		public GET_PROP(int,Id)
+		public SET_PROP(int,Id)
 	}
 
-	GET_STRING(Name)
-	SET_STRING(Name)
+	public GET_STRING(Name)
+	public SET_STRING(Name)
 
 	property bool Good
 	{
-		GET_PROP(bool,Good)
-		SET_PROP(bool,Good)
+		public GET_PROP(bool,Good)
+		public SET_PROP(bool,Good)
 	}
 
-	GET_STRING(Sound)
-	SET_STRING(Sound)
+	public GET_STRING(Sound)
+	public SET_STRING(Sound)
 
-	GET_STRING(Token)
-	SET_STRING(Token)
+	public GET_STRING(Token)
+	public SET_STRING(Token)
 
 	property int Time
 	{
-		GET_PROP(int,Time)
-		SET_PROP(int,Time)
+		public GET_PROP(int,Time)
+		public SET_PROP(int,Time)
 	}
 
 	property int Class
 	{
-		GET_PROP(int,Class)
+		public GET_PROP(int,Class)
 	}
 	public void SetClass(const char[] s){
 		int iClassFlags = StringToClass(s);
 		this.SetValue("m_Class", iClassFlags);
 	}
 
-	GET_VALUE(ArrayList,WeaponClass) // ArrayList storing strings of weapon classes
+	public GET_VALUE(ArrayList,WeaponClass) // ArrayList storing strings of weapon classes
 	public void SetWeaponClass(const char[] s)
 	{
 		delete this.GetWeaponClass();
@@ -176,7 +176,7 @@ methodmap Perk < StringMap
 		return true;
 	}
 
-	GET_VALUE(ArrayList,Tags) // ArrayList storing strings of perk tags
+	public GET_VALUE(ArrayList,Tags) // ArrayList storing strings of perk tags
 	public void SetTags(const char[] s)
 	{
 		delete this.GetTags();
@@ -186,49 +186,49 @@ methodmap Perk < StringMap
 
 	property bool Enabled
 	{
-		GET_PROP(bool,Enabled)
-		SET_PROP(bool,Enabled)
+		public GET_PROP(bool,Enabled)
+		public SET_PROP(bool,Enabled)
 	}
 
 	property bool External
 	{
-		GET_PROP(bool,External)
-		SET_PROP(bool,External)
+		public GET_PROP(bool,External)
+		public SET_PROP(bool,External)
 	}
 
 	property Handle Parent
 	{
-		GET_PROP(Handle,Parent)
-		SET_PROP(Handle,Parent)
+		public GET_PROP(Handle,Parent)
+		public SET_PROP(Handle,Parent)
 	}
 
-	GET_STRING(InternalCall)
-	SET_STRING(InternalCall)
+	public GET_STRING(InternalCall)
+	public SET_STRING(InternalCall)
 
-	GET_STRING(InternalInit)
-	SET_STRING(InternalInit)
+	public GET_STRING(InternalInit)
+	public SET_STRING(InternalInit)
 
 	property bool NoMedieval
 	{
-		GET_PROP(bool,NoMedieval)
-		SET_PROP(bool,NoMedieval)
+		public GET_PROP(bool,NoMedieval)
+		public SET_PROP(bool,NoMedieval)
 	}
 
 	property int LimitGlobal
 	{
-		GET_PROP(int,LimitGlobal)
-		SET_PROP(int,LimitGlobal)
+		public GET_PROP(int,LimitGlobal)
+		public SET_PROP(int,LimitGlobal)
 	}
 
 	property int LimitTeam
 	{
-		GET_PROP(int,LimitTeam)
-		SET_PROP(int,LimitTeam)
+		public GET_PROP(int,LimitTeam)
+		public SET_PROP(int,LimitTeam)
 	}
 
 	property ArrayList ActiveCount
 	{
-		GET_PROP(ArrayList,ActiveCount)
+		public GET_PROP(ArrayList,ActiveCount)
 	}
 
 	public void IncrementActiveCount(const int client)
@@ -307,7 +307,7 @@ methodmap Perk < StringMap
 		return hFwd;
 	}
 
-	public void SetCall(RTDCall func, Handle hPlugin)
+	public void SetCall(Function func, Handle hPlugin)
 	{
 		RemovePerkFromClients(this);
 		delete this.GetCall();

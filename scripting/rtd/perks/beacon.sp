@@ -20,7 +20,7 @@
 
 #define Radius Float[0]
 
-DEFINE_CALL_APPLY(Beacon)
+public DEFINE_CALL_APPLY(Beacon)
 
 public void Beacon_Init(const Perk perk)
 {

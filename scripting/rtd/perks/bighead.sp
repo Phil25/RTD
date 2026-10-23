@@ -18,7 +18,7 @@
 
 #define Scale Float[0]
 
-DEFINE_CALL_APPLY_REMOVE(BigHead)
+public DEFINE_CALL_APPLY_REMOVE(BigHead)
 
 public void BigHead_Init(const Perk perk)
 {

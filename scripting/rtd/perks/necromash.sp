@@ -22,7 +22,7 @@
 	All credits go to him!
 */
 
-DEFINE_CALL_APPLY(NecroMash)
+public DEFINE_CALL_APPLY(NecroMash)
 
 public void NecroMash_Init(const Perk perk)
 {
